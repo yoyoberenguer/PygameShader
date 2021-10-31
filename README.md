@@ -1,2 +1,3 @@
 # 2DVideoGame-SpecialEffects
-2D Game texture special effects
+## In progress will be updated soon
+## 2D Game texture special effects
