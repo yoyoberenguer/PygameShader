@@ -1,21 +1,21 @@
 # Pygame Shaders Library 
 
 
-Pygame shader project is a 2D game library written in Python and Cython that contains
-special effects for development of multimedia applications like video games, arcade game
-or for image processing 
+Pygame shader project is a `2D game library` written in Python and Cython that contains
+`special effects` for development of multimedia applications like video games, arcade game
+or for image processing.
 It contains shaders offering a large variety of tools or algorithms to modify your 
-game display and mechanics in real time @60 fps for games running display in medium 
-resolution such as 1024 x 768. 
+game display in real time @60 fps for games running display in medium resolution such 
+as 1024 x 768. 
 Some algorithms are more demanding than others in terms of processing power 
 (ex median filtering, predator vision, due to the fact that they are built with more
 than one shader to provide a composite effect).
 Consequently, not all shader will run at the same speed at medium resolutions, feel free
 to experiment with higher display resolution while the shader provides 60 fps or above.
 
-If you are using the shader library for sprites texturing and special effect 
-for your sprites, then the overall processing time will be extremely fast due to the
-code optimization with cython and the size of the textures.
+If you are using the shader library for sprites texturing / special effect 
+then the overall processing time will be extremely fast due to code optimization with
+cython and small size of the textures.
 
 The shaders effects can be sorted within 5 different categories
 * Color variation
