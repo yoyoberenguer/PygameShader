@@ -18,11 +18,11 @@ then the overall processing time will be extremely fast due to code optimization
 cython and small size of the textures.
 
 The shaders effects can be sorted within 5 different categories
-* Color variation
-* Filter
-* Transformation
-* Ambiance
-* Special effect
+* Color variations
+* Filters
+* Transformations
+* Ambiances
+* Special effects
  
 Some effects can be used for interaction with the player(s) (ex the player is being hit
 or is receiving damages, and the screen is turning red; check the blood effect).
