@@ -4,13 +4,22 @@
 Pygame shader project is a `2D game library` written in Python and Cython containing
 `special effects` for development of multimedia applications like video games, arcade game
 or to customize your textures.
+
+This library is compatible with BMP, GIF (non - animated), JPEG, PNG image format.
+```
+pygame may not always be built to support all image formats. At minimum it will support 
+uncompressed BMP. If pygame.image.get_extended() returns 'True', you should be able to
+load most images (including PNG, JPG and GIF).
+```
+ 
 The shaders can be apply to your game display in real time @60 fps for games running
 games in medium resolution such as 1024 x 768. 
 Some algorithms are more demanding than others in terms of processing power 
 (ex median filtering, predator vision, due to the fact that they are built with more
 than one shader to provide a composite effect).
+
 Consequently, not all shader will run at the same speed at medium resolutions, feel free
-to experiment with higher display resolution while the shader provides 60 fps or above.
+to experiment with higher display resolutions while the shader provides 60 fps or above.
 
 If you are using the shader library for sprites texturing / special effect 
 then the overall processing time will be extremely fast due to code optimization with
