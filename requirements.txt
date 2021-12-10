@@ -1,0 +1,5 @@
+numpy >= 1.18
+pygame >=2.0.0
+cython >=0.29.21
+setuptools~=54.1.1
+
