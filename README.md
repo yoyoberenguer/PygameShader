@@ -25,7 +25,7 @@ The shaders effects can be sorted within 5 different categories
 * Special effects
  
 Some effects can be used for interaction with the player(s) (ex the player is being hit
-or is receiving damages, and the screen is turning red; check the blood effect).
+and receive damages, and the screen is turning red; check the blood effect).
 
 Screen shacking after an explosion, check the dampening effect.
 
