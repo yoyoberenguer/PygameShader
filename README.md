@@ -1,5 +1,6 @@
 # Pygame Shaders Library 
 
+![alt text](PygameShader/Assets/FireEffect.gif)
 
 Pygame shader project is a `2D game library` written in Python and Cython containing
 `special effects` for development of multimedia applications like video games, arcade game
