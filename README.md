@@ -13,7 +13,7 @@ load most images (including PNG, JPG and GIF).
 ```
  
 The shaders can be apply to your game display in real time @60 fps for games running
-games in medium resolution such as 1024 x 768. 
+in medium resolution such as 1024 x 768. 
 Some algorithms are more demanding than others in terms of processing power 
 (ex median filtering, predator vision, due to the fact that they are built with more
 than one shader to provide a composite effect).
