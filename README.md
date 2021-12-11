@@ -102,6 +102,14 @@ This version contains the following shaders:
     water droplets on your game display, the droplets/bubbles will 
     reflect the game display in real time
     
+## Demo
+
+In the PygameShader root directory type 
+
+```commandline
+C:\>python demo.py
+```
+
 
 The project is under the `GNU GENERAL PUBLIC LICENSE Version 3`
 
