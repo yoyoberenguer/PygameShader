@@ -123,18 +123,18 @@ pip install PygameShader==1.0.2
 ## Building cython code
 
 #### When do you need to compile the cython code ? 
-```
+
 Each time you are modifying any of the following files 
 shader.pyx, shader.pxd, __init__.pxd or any external C code if applicable
 
 1) open a terminal window
 2) Go in the main project directory where (shader.pyx & 
    shader.pxd files are located)
-3) run : python setup_shader.py build_ext --inplace --force
+3) run : `C:\>python setup_shader.py build_ext --inplace --force`
 
 If you have to compile the code with a specific python 
 version, make sure to reference the right python version 
-in (python38 setup_shader.py build_ext --inplace)
+in (`python38 setup_shader.py build_ext --inplace`)
 
 If the compilation fail, refers to the requirement section and 
 make sure cython and a C-compiler are correctly install on your
@@ -147,7 +147,7 @@ make sure cython and a C-compiler are correctly install on your
   install on your system, refer to external documentation or 
   tutorial in order to setup this process.e.g https://devblogs.
   microsoft.com/python/unable-to-find-vcvarsall-bat/
-```
+
 ## OPENMP 
 In the main project directory, locate the file ```setup_shader.py```.
 The compilation flag /openmp is used by default.
