@@ -115,7 +115,7 @@ The project is under the `GNU GENERAL PUBLIC LICENSE Version 3`
 
 ## Installation 
 check the link for newest version https://pypi.org/project/PygameShader/
-Available python build 3.6, 3.7, 3.8, 3.9, 3.10 and source build
+* Available python build 3.6, 3.7, 3.8, 3.9, 3.10 and source build
 ```
 pip install PygameShader 
 # or version 1.0.2  
