@@ -3,7 +3,7 @@
 
 Pygame shader project is a `2D game library` written in Python and Cython containing
 `special effects` for development of multimedia applications like video games, arcade game
-or to customize your textures.
+or to customize your sprites textures or surfaces.
 
 This library is compatible with BMP, GIF (non - animated), JPEG, PNG image format.
 ```
@@ -11,21 +11,21 @@ pygame may not always be built to support all image formats. At minimum it will 
 uncompressed BMP. If pygame.image.get_extended() returns 'True', you should be able to
 load most images (including PNG, JPG and GIF).
 ```
- 
-The shaders can be apply to your game display in real time @60 fps for games running
-in medium resolution such as `1024 x 768`. 
+
+The shaders can be apply to the `entire game display` for a real time rendering @ 60 fps
+for games running in medium resolution such as `1024 x 768`. 
 Some algorithms are more demanding than others in terms of processing power 
-(ex median filtering, predator vision, due to the fact that they are built with more
-than one shader to provide a composite effect).
+ex : median filtering and predator vision (due to the fact that it is built with more
+than one shader to provide a composite effect). Consequently, not all shader will run at
+the same speed at medium resolutions. Feel free to experiment with higher display resolutions
+while the shader provides 60 fps or above.
 
-Consequently, not all shader will run at the same speed at medium resolutions, feel free
-to experiment with higher display resolutions while the shader provides 60 fps or above.
+If you are using the shader library for sprites texturing and special effects
+then the overall processing time should be extremely fast due to code optimization with
+cython. Nevertheless, to keep a good frame rate, it is advise to keep the sprites below
+the screen display resolution e,g 200x200 texture size.
 
-If you are using the shader library for sprites texturing / special effect 
-then the overall processing time will be extremely fast due to code optimization with
-cython and small size of the textures.
-
-The shaders effects can be sorted within 5 different categories
+The shaders effects can be placed into 5 different categories
 * Color variations
 * Filters
 * Transformations
@@ -33,16 +33,11 @@ The shaders effects can be sorted within 5 different categories
 * Special effects
  
 Some effects can be used for interaction with the player(s) (ex the player is being hit
-and receive damages, and the screen is turning red; check the blood effect).
-
-Screen shacking after an explosion, check the dampening effect.
-
-Game pausing, use the blur effect to blur the background image until you unpause the game
-
+and receive damages, use the shader blood effect to turn your screen red).
+Screen shacking after an explosion, check the shader dampening effect (horizontal or zoom in/out)
+Player is pausing the game, use the blur effect to blur the background image.
 You need to change the brightness of a scene uses the shader brightness.
-
 Sprite texture colors can be changed over time with the HSL algorithm.
-
 Your game needs to look a bit more retro, use the reduction shader to decrease the amount
 of colors in your texture or display
 etc
@@ -53,7 +48,7 @@ the entire screen.
 
 This version contains the following shaders:  
 
-* Color variations
+* `Color variations`
   
   - RGB to BGR (Change your game display from RGB to a BGR model) 
   - RGB to BRG (Change your game display from RGB to a BRG model) 
@@ -65,14 +60,14 @@ This version contains the following shaders:
   - plasma (Add a plasma effect to your display)
   - heatmap conversion
 
-* Filters
+* `Filters`
   - median* 
   - sobel effect (edge display)
   - gaussian blur 5x5 (add a blur effect to your game)
   - sharpen filter (increase the image sharpness)
   - bright pass filter (bpf) 
   
-* Transformations
+* `Transformations`
   - wave effect, create a wave effect to your game display
   - swirl, swirl the entire screen or texture 
   - horizontal glitch, create a glitch effect affecting 
@@ -84,12 +79,12 @@ This version contains the following shaders:
   - fisheye your game display is turned into a fisheye model
   - heatwave 
 
-* Ambiances 
+* `Ambiances`
   - brightness, increase / decrease the brightness of your
     texture or game display in real time
   - saturation, increase / decrease the level of saturation 
 
-* Special effects 
+* `Special effects` 
   - bloom effect, real time bloom effect for your display
   - water ripple effect, create water ripple effect in real 
     time on your game display 
