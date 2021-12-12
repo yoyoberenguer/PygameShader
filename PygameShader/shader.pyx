@@ -14,7 +14,17 @@ Copyright Yoann Berenguer
 """
 
 
-__VERSION__ = "1.0.0"
+"""
+Version 1.0.1 (yank)
++ new cartoon effect added to library for offline surface processing. This shader cannot  
+  be used in real time due to the amount of transformation. 
+
+Version 1.0.2 same than 1.0.1
++ new cartoon effect added to library for offline surface processing. This shader cannot  
+  be used in real time due to the amount of transformation. 
+"""
+
+__VERSION__ = "1.0.2"
 
 import warnings
 
@@ -22,10 +32,13 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=ImportWarning)
 
-
-import numpy
-from numpy import empty, uint8, int16, float32, asarray, linspace, \
-    ascontiguousarray, zeros, uint16, uint32, int32, int8
+try:
+    import numpy
+    from numpy import empty, uint8, int16, float32, asarray, linspace, \
+        ascontiguousarray, zeros, uint16, uint32, int32, int8
+except ImportError:
+    raise ImportError("\n<numpy> library is missing on your system."
+          "\nTry: \n   C:\\pip install numpy on a window command prompt.")
 
 try:
     cimport cython
@@ -39,7 +52,7 @@ except ImportError:
 try:
     import pygame
     from pygame import Color, Surface, SRCALPHA, RLEACCEL, BufferProxy, HWACCEL, HWSURFACE, \
-        QUIT, K_SPACE, BLEND_RGB_ADD, Rect
+    QUIT, K_SPACE, BLEND_RGB_ADD, Rect, BLEND_RGB_MAX, BLEND_RGB_MIN
     from pygame.surfarray import pixels3d, array_alpha, pixels_alpha, array3d, \
         make_surface, blit_array, pixels_red, \
     pixels_green, pixels_blue
@@ -51,8 +64,11 @@ try:
     from pygame.pixelcopy import array_to_surface
 
 except ImportError:
-    raise ValueError("\n<Pygame> library is missing on your system."
+    raise ImportError("\n<Pygame> library is missing on your system."
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
+
+
+from PygameShader.gaussianBlur5x5 import canny_blur5x5_surface24_c
 
 from libc.stdlib cimport rand, malloc
 from libc.math cimport sqrt, atan2, sin, cos, exp, round, pow, floor
@@ -1816,13 +1832,33 @@ cpdef transition(object surface_):
     raise NotImplementedError
 
 
-cpdef cartoon(object surface_):
+cpdef cartoon(
+        object surface_,
+        int sobel_threshold_ = 128,
+        int median_kernel_   = 2,
+        color_               = 8,
+        flag_                = BLEND_RGB_ADD
+):
+    """
+    CREATE A CARTOON EFFECT FROM A GIVEN SURFACE 
+    
+    * This shader cannot be use online or real time due to the amout of 
+      transformation. You can use this shader while editing your textures 
+      befre the main loop 
+    
+    * Compatible with 24 - 32 bit image 
+    
+    :param surface_: pygame.Surface compatible 24 - 32 bit 
+    :param sobel_threshold_: integer sobel threshold
+    :param median_kernel_  : integer median kernel  
+    :param color_          : integer; color reduction value (max color)
+    :param flag_           : integer; Blend flag e.g (BLEND_RGB_ADD, BLEND_RGB_SUB, 
+                             BLEND_RGB_MULT, BLEND_RGB_MAX, BLEND_RGB_MIN  
+    :return                : Return a pygame Surface with the cartoon effect 
     """
 
-    :param surface_: 
-    :return: 
-    """
-    raise NotImplementedError
+    return cartoon_effect(surface_, sobel_threshold_, median_kernel_, color_, flag_)
+
 
 
 cpdef explode(object surface_):
@@ -3064,13 +3100,13 @@ cdef inline void shader_blur5x5_array24_inplace_c(
                         if red + green + blue == 0:
                             continue
 
-
                     r = r + red * k[0]
                     g = g + green * k[0]
                     b = b + blue * k[0]
 
-                convolve[x, y, 0], convolve[x, y, 1], convolve[x, y, 2] = <unsigned char>r,\
-                    <unsigned char>g, <unsigned char>b
+                convolve[x, y, 0] = <unsigned char>r
+                convolve[x, y, 1] = <unsigned char>g
+                convolve[x, y, 2] = <unsigned char>b
 
         # Vertical convolution
         for x in prange(0,  w, schedule='static', num_threads=THREADS):
@@ -6884,5 +6920,53 @@ cdef inline void shader_sharpen_filter_inplace_c(unsigned char [:, :, :] rgb_arr
                     rgb_array_[x, y, 0] = rgb_array_1[x, y, 0]
                     rgb_array_[x, y, 1] = rgb_array_1[x, y, 1]
                     rgb_array_[x, y, 2] = rgb_array_1[x, y, 2]
+
+
+# Added to version 1.0.1
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cdef cartoon_effect(
+        object surface_,
+        int sobel_threshold_,
+        int median_kernel_,
+        int color_, int flag_):
+    """
+
+    :param surface_: pygame.Surface compatible 24 - 32 bit 
+    :param sobel_threshold_: integer sobel threshold
+    :param median_kernel_  : integer median kernel  
+    :param color_          : integer; color reduction value (max color)
+    :param flag_           : integer; Blend flag e.g (BLEND_RGB_ADD, BLEND_RGB_SUB, 
+                             BLEND_RGB_MULT, BLEND_RGB_MAX, BLEND_RGB_MIN  
+    :return               : Return a pygame Surface with the cartoon effect 
+    """
+
+    # First branch from the surface_
+    # surface_branch_1
+    surface_branch_1 = surface_.copy()
+    array_ = canny_blur5x5_surface24_c(surface_branch_1)
+    shader_greyscale_luminosity24_inplace_c(array_)
+    shader_sobel24_inplace_c(array_, sobel_threshold_)
+
+    # Second branch
+    arr = pixels3d(surface_)
+    shader_median_filter24_inplace_c(arr, median_kernel_)
+
+    # median_fast(
+    #     surface_,
+    #     kernel_size_=median_kernel_,
+    #     reduce_factor_=2)
+
+    # Color reduction
+    shader_color_reduction24_inplace_c(arr, color_)
+
+    del arr
+
+    # Blend both branch
+    surface_.blit(make_surface(array_), (0, 0), special_flags=flag_)
+
+    return surface_
 
 # ------------------------------------------------------------------------------------------------

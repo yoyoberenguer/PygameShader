@@ -1,6 +1,5 @@
 # Pygame Shaders Library 
 
-![alt text](PygameShader/Assets/FireEffect.gif)
 
 Pygame shader project is a `2D game library` written in Python and Cython containing
 `special effects` for development of multimedia applications like video games, arcade game
@@ -13,7 +12,7 @@ uncompressed BMP. If pygame.image.get_extended() returns 'True', you should be a
 load most images (including PNG, JPG and GIF).
 ```
 
-The shaders can be apply to the `entire game display` for a real time rendering @ 60 fps
+The shaders can be applied to the `entire game display` for a real time rendering @ 60 fps
 for games running in medium resolution such as `1024 x 768`. 
 Some algorithms are more demanding than others in terms of processing power 
 ex : median filtering and predator vision (due to the fact that it is built with more
@@ -23,10 +22,10 @@ while the shader provides 60 fps or above.
 
 If you are using the shader library for sprites texturing and special effects
 then the overall processing time should be extremely fast due to code optimization with
-cython. Nevertheless, to keep a good frame rate, it is advise to keep the sprites below
+cython. Nevertheless, to keep a good frame rate, it is advised to keep the sprites below
 the screen display resolution e,g 200x200 texture size.
 
-The shaders effects can be placed into 5 different categories
+The shaders effect can be placed into 5 different categories
 * Color variations
 * Filters
 * Transformations
@@ -105,10 +104,12 @@ This version contains the following shaders:
     
 ## Demo
 
-In the PygameShader root directory type 
+In the PygameShader `Demo` directory type (press ESC to quit)
 
 ```commandline
-C:\>python demo.py
+C:\>python demo_fire.py
+C:\>python demo_cartoon.py
+C:\>python demo_wave.py
 ```
 
 
@@ -116,6 +117,7 @@ The project is under the `GNU GENERAL PUBLIC LICENSE Version 3`
 
 ## Installation 
 check the link for newest version https://pypi.org/project/PygameShader/
+
 * Available python build 3.6, 3.7, 3.8, 3.9, 3.10 and source build
 ```
 pip install PygameShader 

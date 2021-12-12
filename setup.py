@@ -17,9 +17,11 @@ except ImportError:
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+# version 1.0.1 Yank, latest version 1.0.2
+# pypitest latest version 1.0.16
 setuptools.setup(
     name="PygameShader",
-    version="1.0.14",
+    version="1.0.2",
     author="Yoann Berenguer",
     author_email="yoyoberenguer@hotmail.com",
     description="Pygame shader effects for 2D video game and arcade game",
@@ -33,6 +35,9 @@ setuptools.setup(
                   extra_compile_args=["/openmp", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"],
                   language="c"),
         Extension("PygameShader.misc", ["PygameShader/misc.pyx"],
+                  extra_compile_args=["/openmp", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"],
+                  language="c"),
+        Extension("PygameShader.gaussianBlur5x5", ["PygameShader/gaussianBlur5x5.pyx"],
                   extra_compile_args=["/openmp", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"],
                   language="c")
     ]),
@@ -108,6 +113,13 @@ setuptools.setup(
              'PygameShader/Assets/Screendump3.png',
              'PygameShader/Assets/space1.jpg',
              'PygameShader/Assets/space2.jpg'
+         ]),
+        ('./lib/site-packages/PygameShader/Demo',
+         [
+             'PygameShader/Demo/demo_cartoon.py',
+             'PygameShader/Demo/demo_fire.py',
+             'PygameShader/Demo/demo_wave.py'
+
          ])
     ],
 

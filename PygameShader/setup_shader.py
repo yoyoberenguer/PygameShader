@@ -24,6 +24,9 @@ setup(
                   language="c"),
         Extension("misc", ["misc.pyx"],
                   extra_compile_args=["/openmp", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"],
+                  language="c"),
+        Extension("gaussianBlur5x5", ["gaussianBlur5x5.pyx"],
+                  extra_compile_args=["/openmp", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"],
                   language="c")
     ]),
 

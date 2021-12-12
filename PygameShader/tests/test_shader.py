@@ -1,6 +1,7 @@
 """"
 TEST LIBRARY shader
 """
+import ctypes
 import math
 import sys
 import unittest
@@ -8,6 +9,7 @@ import os
 import time
 from random import uniform, randint
 
+import cython
 import numpy
 from numpy import uint8, asarray
 from pygame.surfarray import make_surface
@@ -44,9 +46,138 @@ HEIGHT = 768
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=True)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
-BACKGROUND = pygame.image.load("../Assets/background.jpg").convert()
-BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
-BACKGROUND.convert(32, RLEACCEL)
+
+
+shader_list =\
+    {
+        "shader_rgb_to_bgr_inplace"                 : "RGB to BGR",
+        "shader_rgb_to_brg_inplace"                 : "RGB to BRG",
+        "shader_greyscale_luminosity24_inplace"     : "Luminosity",
+        "shader_sepia24_inplace"                    : "Sepia",
+        "shader_median_filter24_inplace"            : "Media",
+        "shader_median_grayscale_filter24_inplace"  : "Median grayscale",
+        "shader_median_filter24_avg_inplace"        : "Median avg",
+        "shader_color_reduction24_inplace"          : "Color reduction",
+        "shader_sobel24_inplace"                    : "Sobel",
+        "shader_sobel24_fast_inplace"               : "Sobel fast",
+        "shader_invert_surface_24bit_inplace"       : "Invert",
+        "shader_hsl_surface24bit_inplace"           : "HSL",
+        "shader_hsl_surface24bit_fast_inplace"      : "HSL fast",
+        "shader_blur5x5_array24_inplace"            : "Blur",
+        "shader_wave24bit_inplace"                  : "Wave",
+        "shader_swirl24bit_inplace"                 : "Swirl",
+        "shader_swirl24bit_inplace1"                : "Swirl1",
+        "shader_plasma24bit_inplace"                : "Plasma",
+        "shader_brightness24_inplace"               : "Brightness",
+        "shader_saturation_array24_inplace"         : "Saturation",
+        "shader_bpf24_inplace"                      : "Bright pass filter",
+        "shader_bloom_effect_array24"               : "Bloom",
+        "shader_fisheye24_inplace"                  : "Fisheye",
+        "shader_tv_scanline_inplace"                : "TV",
+        "heatmap_surface24_conv_inplace"            : "Heatmap",
+        "predator_vision_mode"                      : "Predator Vision",
+        "shader_blood_inplace"                      : "Blood",
+        "shader_sharpen_filter_inplace"             : "Sharpen",
+        "shader_fire_effect"                        : "Fire Effect 1",
+        "dampening_effect"                          : "Dampening",
+        "lateral_dampening_effect"                  : "Lateral dampening",
+        "mirroring_inplace"                         : "Mirror image",
+        "shader_cloud_effect"                       : "Shader cloud",
+        "tunnel_render32"                           : "Tunnel",
+        "shader_ripple"                             : "Water Ripple",
+        "shader_rgb_split_inplace"                  : "RGB split",
+        "shader_heatwave24_vertical_inplace"        : "Heatwave",
+        "shader_horizontal_glitch24_inplace"        : "Horizontal glitch",
+        "shader_plasma"                             : "Plasma 2"
+}
+
+
+def display_shader(shader_name: str, timer = 5, flag=0, *args, **kwargs):
+
+    background = pygame.image.load("../Assets/background.jpg").convert()
+    background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+    background.convert(32, RLEACCEL)
+    image = background.copy()
+
+    all_shaders = shader_list.keys()
+    if shader_name not in all_shaders:
+        raise ValueError("\nShader name is invalid got %s" % shader_name)
+
+    try:
+        pygame.display.set_caption("Testing %s" % shader_list[shader_name])
+
+    except IndexError:
+        raise IndexError('\nShader name is incorrect got %s' % shader_name)
+
+    shader_ = shader_list[shader_name]
+
+    frame = 0
+    clock = pygame.time.Clock()
+    game = True
+
+    t = time.time()
+
+    options = " "
+    for opt in args:
+        options += ", " + str(opt)
+
+    hsl_rotation = False
+
+    if shader_name in ("shader_hsl_surface24bit_inplace",
+                       "shader_hsl_surface24bit_fast_inplace"):
+        hsl_rotation = True
+        v = 0.001
+        hsl_value = 0.0
+
+    angle = 0
+
+    while game:
+
+        if hsl_rotation:
+            if args is None:
+                exec(str(shader_name) + "(image, hsl_value)")
+        else:
+            exec(str(shader_name)+"(image)"
+                 if kwargs is None else str(shader_name)+"(image" + options + ")")
+
+        pygame.event.pump()
+        for event in pygame.event.get():
+
+            keys = pygame.key.get_pressed()
+
+            if keys[pygame.K_ESCAPE]:
+                game = False
+
+        SCREEN.blit(image, (0, 0), special_flags=flag)
+        pygame.display.flip()
+        clock.tick()
+        frame += 1
+
+        pygame.display.set_caption(
+            "Testing %s @ %s fps (%sx%s) " %
+            (shader_, round(clock.get_fps(), 2), WIDTH, HEIGHT))
+        image = background.copy()
+
+        if hsl_rotation:
+
+            if hsl_value > 1.0:
+                v *= -1
+            elif hsl_value < -1.0:
+                v *= -1
+
+            hsl_value += v
+
+            if hsl_value > 1.0:
+                hsl_value = 1.0
+
+            elif hsl_value < -1.0:
+                hsl_value = -1.0
+
+        if time.time() - t > timer:
+            break
+
+        angle += 0.01
+        angle %= 1
 
 
 class ShaderRgbToBgrInplace(unittest.TestCase):
@@ -61,34 +192,8 @@ class ShaderRgbToBgrInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_rgb_to_bgr_inplace")
+        display_shader("shader_rgb_to_bgr_inplace", timer = 5, flag=0)
 
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_rgb_to_bgr_inplace(image)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_rgb_to_bgr_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
 
 class TestShaderRgbToBrgInplace(unittest.TestCase):
     """
@@ -102,34 +207,7 @@ class TestShaderRgbToBrgInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_rgb_to_brg_inplace")
-
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_rgb_to_brg_inplace(image)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_rgb_to_brg_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
+        display_shader("shader_rgb_to_brg_inplace", timer = 5, flag=0)
 
 
 class TestShaderGreyscaleLuminosity24Inplace(unittest.TestCase):
@@ -144,34 +222,7 @@ class TestShaderGreyscaleLuminosity24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_greyscale_luminosity24_inplace")
-
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_greyscale_luminosity24_inplace(image)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_greyscale_luminosity24_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
+        display_shader("shader_greyscale_luminosity24_inplace", timer = 5, flag=0)
 
 
 class TestShaderSepia24Inplace(unittest.TestCase):
@@ -186,34 +237,7 @@ class TestShaderSepia24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_sepia24_inplace")
-
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_sepia24_inplace(image)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_sepia24_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
+        display_shader("shader_sepia24_inplace", timer = 5, flag=0)
 
 
 class TestShaderMedianFilter24Inplace(unittest.TestCase):
@@ -228,34 +252,7 @@ class TestShaderMedianFilter24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_median_filter24_inplace")
-
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_median_filter24_inplace(image, kernel_size_=2, fast_=True)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_median_filter24_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
+        display_shader("shader_median_filter24_inplace", timer = 5, flag=0)
 
 
 class TestShaderMedianGrayscaleFilter24Inplace(unittest.TestCase):
@@ -270,34 +267,8 @@ class TestShaderMedianGrayscaleFilter24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_median_grayscale_filter24_inplace")
+        display_shader("shader_median_grayscale_filter24_inplace", timer = 5, flag=0)
 
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_median_grayscale_filter24_inplace(image, kernel_size_=2)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_median_grayscale_filter24_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
 
 class TestShaderMedianFilter24AvgInplace(unittest.TestCase):
     """
@@ -311,34 +282,8 @@ class TestShaderMedianFilter24AvgInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_median_filter24_avg_inplace")
+        display_shader("shader_median_filter24_avg_inplace", timer = 5, flag=0)
 
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_median_filter24_avg_inplace(image, kernel_size_=2)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_median_filter24_avg_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
 
 class TestShaderColorReduction24Inplace(unittest.TestCase):
     """
@@ -352,7 +297,11 @@ class TestShaderColorReduction24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
+
         pygame.display.set_caption("Test shader_color_reduction24_inplace")
 
         FRAME = 0
@@ -381,7 +330,7 @@ class TestShaderColorReduction24Inplace(unittest.TestCase):
                 "Test shader_color_reduction24_inplace %s fps "
                 "(%sx%s) %s colors" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT,
                                        COLORS[INDEX] ** 2 * 2))
-            image = BACKGROUND.copy()
+            image = background.copy()
             if FRAME % 1000 == 0:
                 INDEX += 1
                 if INDEX == len(COLORS):
@@ -402,34 +351,8 @@ class TestShaderSobel24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_sobel24_inplace")
+        display_shader("shader_sobel24_inplace")
 
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_sobel24_inplace(image, threshold_=64)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_sobel24_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
 
 class TestShaderSobel24FastInplace(unittest.TestCase):
     """
@@ -443,34 +366,8 @@ class TestShaderSobel24FastInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_sobel24_fast_inplace")
+        display_shader("shader_sobel24_fast_inplace", timer = 5, flag=0)
 
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_sobel24_fast_inplace(image, threshold_=64, factor_=1)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_sobel24_fast_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
 
 class TestShaderInvertSurface24bitInplace(unittest.TestCase):
     """
@@ -484,34 +381,8 @@ class TestShaderInvertSurface24bitInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_invert_surface_24bit_inplace")
+        display_shader("shader_invert_surface_24bit_inplace", timer = 5, flag=0)
 
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_invert_surface_24bit_inplace(image)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_invert_surface_24bit_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
 
 class TestShaderHslSurface24bitInplace(unittest.TestCase):
     """
@@ -525,41 +396,7 @@ class TestShaderHslSurface24bitInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_hsl_surface24bit_inplace")
-
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        V = 0.001
-        HSL_VALUE = 0.0
-        t = time.time()
-        while GAME:
-            shader_hsl_surface24bit_inplace(image, HSL_VALUE)
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_hsl_surface24bit_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if HSL_VALUE >= 1.0:
-                V *= -1
-            elif HSL_VALUE <= -1.0:
-                V *= -1
-            HSL_VALUE += V
-            if time.time() - t > 5:
-                break
+        display_shader("shader_hsl_surface24bit_inplace", timer = 5, flag=0)
 
 
 class TestShaderHslSurface24bitFastInplace(unittest.TestCase):
@@ -574,21 +411,28 @@ class TestShaderHslSurface24bitFastInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
+
         pygame.display.set_caption("Test shader_hsl_surface24bit_fast_inplace")
 
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        V = 0.001
-        HSL_VALUE = 0.0
+        frame = 0
+        clock = pygame.time.Clock()
+        game = True
+
+        v = 0.001
+        hsl_value = 0.0
+
         rgb2hsl_model = hsl_to_rgb_model()
         hsl2rgb_model = rgb_to_hsl_model()
+
         t = time.time()
-        while GAME:
+        while game:
             shader_hsl_surface24bit_fast_inplace(
                 image,
-                HSL_VALUE,
+                hsl_value,
                 hsl_model_=hsl2rgb_model,
                 rgb_model_=rgb2hsl_model)
 
@@ -598,22 +442,21 @@ class TestShaderHslSurface24bitFastInplace(unittest.TestCase):
                 keys = pygame.key.get_pressed()
 
                 if keys[pygame.K_ESCAPE]:
-                    GAME = False
+                    game = False
 
-            # SCREEN.fill((0, 0, 0))
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
+            clock.tick()
+            frame += 1
             pygame.display.set_caption(
                 "Test shader_hsl_surface24bit_fast_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            if HSL_VALUE >= 1.0:
-                V *= -1
-            elif HSL_VALUE <= -1.0:
-                V *= -1
-            HSL_VALUE += V
+                "(%sx%s)" % (round(clock.get_fps(), 2), WIDTH, HEIGHT))
+            image = background.copy()
+            if hsl_value >= 1.0:
+                v *= -1
+            elif hsl_value <= -1.0:
+                v *= -1
+            hsl_value += v
             if time.time() - t > 5:
                 break
 
@@ -630,36 +473,9 @@ class TestShaderBlur5x5Array24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_blur5x5_array24_inplace")
 
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        t = time.time()
-        while GAME:
-            shader_blur5x5_array24_inplace(image)
+        display_shader("shader_blur5x5_array24_inplace")
 
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-
-            # SCREEN.fill((0, 0, 0))
-            SCREEN.blit(image, (0, 0))
-            pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
-            pygame.display.set_caption(
-                "Test shader_blur5x5_array24_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            if FRAME % 200 == 0:
-                image = BACKGROUND.copy()
-            if time.time() - t > 5:
-                break
 
 class TestShaderWave24bitInplace(unittest.TestCase):
     """
@@ -673,16 +489,19 @@ class TestShaderWave24bitInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
         pygame.display.set_caption("Test shader_wave24bit_inplace")
 
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        ANGLE = 0
+        frame = 0
+        clock = pygame.time.Clock()
+        game = True
+        angle = 0
         t = time.time()
-        while GAME:
-            shader_wave24bit_inplace(image, ANGLE * math.pi / 180, 10)
+        while game:
+            shader_wave24bit_inplace(image, angle * math.pi / 180, 10)
 
             pygame.event.pump()
             for event in pygame.event.get():
@@ -690,21 +509,21 @@ class TestShaderWave24bitInplace(unittest.TestCase):
                 keys = pygame.key.get_pressed()
 
                 if keys[pygame.K_ESCAPE]:
-                    GAME = False
+                    game = False
 
-            # SCREEN.fill((0, 0, 0))
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
+            clock.tick()
+            frame += 1
             pygame.display.set_caption(
                 "Test shader_wave24bit_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            ANGLE += 5
-            ANGLE %= 360
+                "(%sx%s)" % (round(clock.get_fps(), 2), WIDTH, HEIGHT))
+            image = background.copy()
+            angle += 5
+            angle %= 360
             if time.time() - t > 5:
                 break
+
 
 class TestShaderSwirl24bitInplace(unittest.TestCase):
     """
@@ -718,16 +537,20 @@ class TestShaderSwirl24bitInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
+
         pygame.display.set_caption("Test shader_swirl24bit_inplace")
 
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-        ANGLE = 0
-        t=time.time()
-        while GAME:
-            shader_swirl24bit_inplace(image, ANGLE)
+        frame = 0
+        clock = pygame.time.Clock()
+        game = True
+        angle = 0
+        t = time.time()
+        while game:
+            shader_swirl24bit_inplace(image, angle)
 
             pygame.event.pump()
             for event in pygame.event.get():
@@ -735,21 +558,23 @@ class TestShaderSwirl24bitInplace(unittest.TestCase):
                 keys = pygame.key.get_pressed()
 
                 if keys[pygame.K_ESCAPE]:
-                    GAME = False
+                    game = False
 
             # SCREEN.fill((0, 0, 0))
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
-            CLOCK.tick()
-            FRAME += 1
+            clock.tick()
+            frame += 1
             pygame.display.set_caption(
                 "Test shader_swirl24bit_inplace %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
-            ANGLE += 0.01
-            ANGLE %= 1
+                "(%sx%s)" % (round(clock.get_fps(), 2), WIDTH, HEIGHT))
+            image = background.copy()
+            angle += 0.01
+            angle %= 1
             if time.time() - t > 5:
+
                 break
+
 
 class TestShaderSwirl24bitInplace1(unittest.TestCase):
     """
@@ -763,7 +588,10 @@ class TestShaderSwirl24bitInplace1(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
         pygame.display.set_caption("Test shader_swirl24bit_inplace1")
 
         FRAME = 0
@@ -790,7 +618,7 @@ class TestShaderSwirl24bitInplace1(unittest.TestCase):
             pygame.display.set_caption(
                 "Test shader_swirl24bit_inplace1 %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
             ANGLE += 0.01
             ANGLE %= 1
             if time.time() - t > 5:
@@ -809,7 +637,10 @@ class TestShaderPlasmaInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
         pygame.display.set_caption("Test shader_plasma")
 
         FRAME = 0.0
@@ -864,6 +695,7 @@ class TestShaderPlasmaInplace(unittest.TestCase):
             if time.time() - t > 5:
                 break
 
+
 class TestShaderPlasma24bitInplace(unittest.TestCase):
     """
     Test shader_plasma24bit_inplace
@@ -876,7 +708,10 @@ class TestShaderPlasma24bitInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
         pygame.display.set_caption("Test shader_plasma24bit_inplace")
 
         FRAME = 0.0
@@ -902,9 +737,10 @@ class TestShaderPlasma24bitInplace(unittest.TestCase):
             pygame.display.set_caption(
                 "Test shader_plasma24bit_inplace %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
             if time.time() - t > 5:
                 break
+
 
 class TestShaderBrightness24Inplace(unittest.TestCase):
     """
@@ -918,7 +754,10 @@ class TestShaderBrightness24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
         pygame.display.set_caption("Test shader_brightness24_inplace")
 
         FRAME = 0
@@ -947,7 +786,7 @@ class TestShaderBrightness24Inplace(unittest.TestCase):
             pygame.display.set_caption(
                 "Test shader_brightness24_inplace %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
             if BRIGHT >= 1.0:
                 V *= -1
                 BRIGHT = 1.0
@@ -971,7 +810,11 @@ class TestShaderSaturationArray24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
+
         pygame.display.set_caption("Test shader_saturation_array24_inplace")
 
         FRAME = 0
@@ -1000,7 +843,7 @@ class TestShaderSaturationArray24Inplace(unittest.TestCase):
             pygame.display.set_caption(
                 "Test shader_saturation_array24_inplace %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
             if SATURATION >= 1.0:
                 V *= -1
                 SATURATION = 1.0
@@ -1024,7 +867,11 @@ class TestShaderBpf24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
+
         pygame.display.set_caption("Test shader_bpf24_inplace")
 
         FRAME = 0
@@ -1053,7 +900,7 @@ class TestShaderBpf24Inplace(unittest.TestCase):
             pygame.display.set_caption(
                 "Test shader_bpf24_inplace %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
 
             if BPF >= 255.0:
                 V *= -1
@@ -1078,7 +925,10 @@ class TestShaderBloomEffectArray24(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
         pygame.display.set_caption("Test shader_bloom_effect_array24")
 
         FRAME = 0
@@ -1107,7 +957,7 @@ class TestShaderBloomEffectArray24(unittest.TestCase):
             pygame.display.set_caption(
                 "Test shader_bloom_effect_array24 %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
 
             if BPF >= 255.0:
                 V *= -1
@@ -1119,6 +969,7 @@ class TestShaderBloomEffectArray24(unittest.TestCase):
             BPF += V
             if time.time() - t > 5:
                 break
+
 
 class TestShaderFisheye24Inplace(unittest.TestCase):
     """
@@ -1132,7 +983,11 @@ class TestShaderFisheye24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
+
         pygame.display.set_caption("Test shader_fisheye24_inplace")
 
         FRAME = 0
@@ -1161,9 +1016,10 @@ class TestShaderFisheye24Inplace(unittest.TestCase):
             pygame.display.set_caption(
                 "Test shader_fisheye24_inplace %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
             if time.time() - t > 5:
                 break
+
 
 class TestShaderTvScanlineInplace(unittest.TestCase):
     """
@@ -1177,7 +1033,10 @@ class TestShaderTvScanlineInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
         pygame.display.set_caption("Test shader_tv_scanline_inplace")
 
         FRAME = 0
@@ -1196,7 +1055,7 @@ class TestShaderTvScanlineInplace(unittest.TestCase):
                     break
 
             shader_tv_scanline_inplace(image, FRAME + 1)
-            # SCREEN.fill((0, 0, 0))
+
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
@@ -1206,9 +1065,10 @@ class TestShaderTvScanlineInplace(unittest.TestCase):
             pygame.display.set_caption(
                 "Test shader_tv_scanline_inplace %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
             if time.time() - t > 5:
                 break
+
 
 class TESTHeatmapSurface24ConvInplace(unittest.TestCase):
     """
@@ -1222,7 +1082,10 @@ class TESTHeatmapSurface24ConvInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
         pygame.display.set_caption("Test heatmap_surface24_conv_inplace")
 
         FRAME = 0
@@ -1249,9 +1112,10 @@ class TESTHeatmapSurface24ConvInplace(unittest.TestCase):
             pygame.display.set_caption(
                 "Test heatmap_surface24_conv_inplace %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
             if time.time() - t > 5:
                 break
+
 
 class TestPredatorVisionMode(unittest.TestCase):
     """
@@ -1299,6 +1163,7 @@ class TestPredatorVisionMode(unittest.TestCase):
             if time.time() - t > 5:
                 break
 
+
 class TestShaderBloodInplace(unittest.TestCase):
     """
     Test shader_blood_inplace
@@ -1311,7 +1176,10 @@ class TestShaderBloodInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
         pygame.display.set_caption("Test shader_blood_inplace")
 
         FRAME = 0
@@ -1344,7 +1212,7 @@ class TestShaderBloodInplace(unittest.TestCase):
             pygame.display.set_caption(
                 "Test shader_blood_inplace %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
             PERCENTAGE += V
             if PERCENTAGE >= 1.0:
                 V *= -1
@@ -1367,7 +1235,10 @@ class TestShaderSharpenFilterInplace(unittest.TestCase):
 
         :return:  void
         """
-        image = BACKGROUND.copy()
+        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
         pygame.display.set_caption("Test shader_sharpen_filter_inplace")
 
         FRAME = 0
@@ -1393,9 +1264,10 @@ class TestShaderSharpenFilterInplace(unittest.TestCase):
             pygame.display.set_caption(
                 "Test shader_sharpen_filter_inplace %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+            image = background.copy()
             if time.time() - t > 5:
                 break
+
 
 class TestshaderFireEffect(unittest.TestCase):
     """
@@ -1476,6 +1348,7 @@ class TestshaderFireEffect(unittest.TestCase):
             image = BACKGROUND.copy()
             if time.time() - t > 5:
                 break
+
 
 class TestshaderFireEffect1(unittest.TestCase):
     """
@@ -1558,6 +1431,7 @@ class TestshaderFireEffect1(unittest.TestCase):
             if time.time() - t > 5:
                 break
 
+
 class TestLateralDampeningEffect(unittest.TestCase):
     """
     Test lateral_dampening_effect
@@ -1606,6 +1480,7 @@ class TestLateralDampeningEffect(unittest.TestCase):
             image = BACKGROUND.copy()
             if time.time() - t > 5:
                 break
+
 
 class TestDampeningEffect(unittest.TestCase):
     """
@@ -1659,6 +1534,7 @@ class TestDampeningEffect(unittest.TestCase):
             if time.time() - t > 5:
                 break
 
+
 class TestMirroringInplace(unittest.TestCase):
     """
     Test mirroring_inplace
@@ -1703,6 +1579,7 @@ class TestMirroringInplace(unittest.TestCase):
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             if time.time() - t > 5:
                 break
+
 
 class TestShaderCloudEffect(unittest.TestCase):
     """
@@ -1781,6 +1658,7 @@ class TestShaderCloudEffect(unittest.TestCase):
             if time.time() - t > 5:
                 break
 
+
 class TestTunnelRender32(unittest.TestCase):
     """
     Test tunnel_render32
@@ -1842,6 +1720,7 @@ class TestTunnelRender32(unittest.TestCase):
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             if time.time() - t > 5:
                 break
+
 
 class TestShaderRipple(unittest.TestCase):
     """
@@ -1910,6 +1789,7 @@ class TestShaderRipple(unittest.TestCase):
             if time.time() - t > 5:
                 break
 
+
 class TestRgbSplit(unittest.TestCase):
     """
     Test shader_rgb_split_inplace
@@ -1956,6 +1836,7 @@ class TestRgbSplit(unittest.TestCase):
             image = BACKGROUND.copy()
             if time.time() - t > 5:
                 break
+
 
 class TestShaderHorizontalGlitch24Inplace(unittest.TestCase):
     """
@@ -2005,6 +1886,7 @@ class TestShaderHorizontalGlitch24Inplace(unittest.TestCase):
             image = BACKGROUND.copy()
             if time.time() - t > 5:
                 break
+
 
 class TestShaderHeatwave24VerticalInplace(unittest.TestCase):
     """
@@ -2059,6 +1941,7 @@ class TestShaderHeatwave24VerticalInplace(unittest.TestCase):
             image = BACKGROUND.copy()
             if time.time() - t > 5:
                 break
+
 
 def run_testsuite():
     """
