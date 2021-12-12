@@ -2,8 +2,8 @@
 
 
 Pygame shader project is a `2D game library` written in Python and Cython containing
-`special effects` for development of multimedia applications like video games, arcade game
-or to customize your sprites textures or surfaces.
+`special effects` for development of multimedia applications like video games, arcade game, 
+video and camera image processing or to customize your sprites textures/surfaces.
 
 This library is compatible with BMP, GIF (non - animated), JPEG, PNG image format.
 ```
