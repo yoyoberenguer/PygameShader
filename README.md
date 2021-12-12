@@ -104,7 +104,7 @@ This version contains the following shaders:
     
 ## Demo
 
-In the PygameShader `Demo` directory type (press ESC to quit)
+In the PygameShader `Demo` directory (press ESC to quit the demo)
 
 ```commandline
 C:\>python demo_fire.py
