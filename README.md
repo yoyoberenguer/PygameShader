@@ -109,7 +109,7 @@ This version contains the following shaders:
  
 * New in version 1.0.3 
   - Added blending mode for `Predator mode`                  
-  - New algorithm `dirt_lens effect` bokeh effect
+  - New algorithm `dirt_lens effect` bokeh effect (texture available in Assets directory)
   - `Dithering` The classic dithering effect to create a retro image effect
   - `Color_palette` to convert image into Amstrad CPC 6128
      COMMODORE C64, ZX SPECTRUM etc 
