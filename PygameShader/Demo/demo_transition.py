@@ -1,9 +1,11 @@
 """
-PygameShader DEMO CARTOON EFFECT
+PygameShader TRANSITION DEMO
 """
 
+import sys
+
 try:
-    from PygameShader.shader import cartoon
+    from PygameShader.shader import blend
 except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
           "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
@@ -15,6 +17,8 @@ except ImportError:
     raise ImportError("\n<numpy> library is missing on your system."
           "\nTry: \n   C:\\pip install numpy on a window command prompt.")
 
+numpy.set_printoptions(threshold=sys.maxsize)
+
 # PYGAME IS REQUIRED
 try:
     import pygame
@@ -24,9 +28,9 @@ except ImportError:
     raise ImportError("\n<Pygame> library is missing on your system."
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
 
-# Set the display to 640 x 480
-WIDTH = 640
-HEIGHT = 480
+# Set the display to 1024 x 768
+WIDTH = 1024
+HEIGHT = 768
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=True)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
@@ -35,12 +39,18 @@ SCREEN.set_alpha(None)
 BACKGROUND = pygame.image.load("../Assets/Background.jpg").convert()
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
-image = BACKGROUND.copy()
-pygame.display.set_caption("demo cartoon effect")
+DESTINATION = pygame.image.load("../Assets/Aliens.jpg").convert()
+DESTINATION = pygame.transform.smoothscale(DESTINATION, (WIDTH, HEIGHT))
+
+assert BACKGROUND.get_size() == DESTINATION.get_size()
+
+pygame.display.set_caption("demo transition/blend effect")
 
 FRAME = 0
 CLOCK = pygame.time.Clock()
 GAME = True
+VALUE = 0
+V = +0.2
 
 while GAME:
 
@@ -53,17 +63,25 @@ while GAME:
             GAME = False
             break
 
-    surface_ = cartoon(image, sobel_threshold_ = 32, median_kernel_=2, color_=128,
-                       flag_=BLEND_RGB_ADD).convert()
+    transition = blend(
+        source_=BACKGROUND, destination_=DESTINATION, percentage_=VALUE)
 
-    SCREEN.blit(surface_, (0, 0), special_flags=0)
+    SCREEN.blit(transition, (0, 0))
 
     pygame.display.flip()
     CLOCK.tick()
     FRAME += 1
 
     pygame.display.set_caption(
-        "Test shader cartoon %s fps "
-        "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+        "Demo blend effect/transition %s percent; %s fps"
+        "(%sx%s)" % (round(VALUE, 2), round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+    VALUE += V
 
-    image = BACKGROUND.copy()
+    if VALUE >= 100:
+        VALUE = 100
+        V = -0.2
+    if VALUE <= 0:
+        VALUE = 0
+        V = 0.2
+
+

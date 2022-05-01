@@ -12,37 +12,42 @@ from random import uniform, randint
 import cython
 import numpy
 from numpy import uint8, asarray
+from pygame.freetype import STYLE_NORMAL
 from pygame.surfarray import make_surface
 from pygame.transform import scale, smoothscale
 
 from PygameShader.misc import create_horizontal_gradient_1d
 
 import pygame
-from pygame import BLEND_RGB_ADD, RLEACCEL
+from pygame import BLEND_RGB_ADD, RLEACCEL, BLEND_RGB_MAX, BLEND_RGB_MIN, BLEND_RGB_SUB, \
+    BLEND_RGB_MULT, freetype
 
-from PygameShader.shader import shader_rgb_to_bgr_inplace, shader_rgb_to_brg_inplace, \
-    shader_greyscale_luminosity24_inplace, shader_sepia24_inplace, \
-    shader_median_filter24_inplace, shader_median_grayscale_filter24_inplace, \
-    shader_median_filter24_avg_inplace, shader_color_reduction24_inplace, shader_sobel24_inplace, \
-    shader_sobel24_fast_inplace, shader_invert_surface_24bit_inplace, \
-    shader_hsl_surface24bit_inplace, shader_hsl_surface24bit_fast_inplace, rgb_to_hsl_model, \
-    hsl_to_rgb_model, shader_blur5x5_array24_inplace, shader_wave24bit_inplace, \
-    shader_swirl24bit_inplace, shader_swirl24bit_inplace1, shader_plasma24bit_inplace, \
-    shader_brightness24_inplace, shader_saturation_array24_inplace, shader_bpf24_inplace, \
-    shader_bloom_effect_array24, shader_fisheye24_inplace, shader_fisheye24_footprint_inplace, \
-    shader_tv_scanline_inplace, heatmap_surface24_conv_inplace, predator_vision_mode, \
-    shader_blood_inplace, shader_sharpen_filter_inplace, shader_fire_effect, custom_map, rgb_to_int, \
-    dampening_effect, lateral_dampening_effect, mirroring_inplace, shader_cloud_effect, \
-    tunnel_render32, tunnel_modeling32, shader_ripple, shader_rgb_split_inplace, \
-    shader_heatwave24_vertical_inplace, shader_horizontal_glitch24_inplace, shader_plasma
+from PygameShader.shader import rgb_to_bgr, rgb_to_brg, \
+    greyscale, sepia, \
+    median, median_grayscale, \
+    median_avg, color_reduction, sobel, \
+    sobel_fast, invert, \
+    hsl_effect, hsl_fast, rgb_to_hsl_model, \
+    hsl_to_rgb_model, blur, wave, \
+    swirl, swirl2, plasma_config, \
+    brightness, saturation, bpf, \
+    bloom, fisheye, fisheye_footprint, \
+    tv_scan, heatmap, predator_vision, \
+    blood, sharpen, fire_effect, custom_map, rgb_to_int, \
+    dampening, lateral_dampening, mirroring, cloud_effect, \
+    tunnel_render32, tunnel_modeling32, ripple, rgb_split, \
+    heatwave_vertical, horizontal_glitch, plasma, \
+    rain_fisheye, rain_footprint
 
 import PygameShader
+from PygameShader import cartoon, blend, dirt_lens, dirt_lens_blur
 
 PROJECT_PATH = list(PygameShader.__path__)
 os.chdir(PROJECT_PATH[0] + "\\tests")
 
 WIDTH = 1024
 HEIGHT = 768
+# SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, pygame.OPENGL, vsync=True)
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=True)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
@@ -50,45 +55,45 @@ SCREEN.set_alpha(None)
 
 shader_list =\
     {
-        "shader_rgb_to_bgr_inplace"                 : "RGB to BGR",
-        "shader_rgb_to_brg_inplace"                 : "RGB to BRG",
-        "shader_greyscale_luminosity24_inplace"     : "Luminosity",
-        "shader_sepia24_inplace"                    : "Sepia",
-        "shader_median_filter24_inplace"            : "Media",
-        "shader_median_grayscale_filter24_inplace"  : "Median grayscale",
-        "shader_median_filter24_avg_inplace"        : "Median avg",
-        "shader_color_reduction24_inplace"          : "Color reduction",
-        "shader_sobel24_inplace"                    : "Sobel",
-        "shader_sobel24_fast_inplace"               : "Sobel fast",
-        "shader_invert_surface_24bit_inplace"       : "Invert",
-        "shader_hsl_surface24bit_inplace"           : "HSL",
-        "shader_hsl_surface24bit_fast_inplace"      : "HSL fast",
-        "shader_blur5x5_array24_inplace"            : "Blur",
-        "shader_wave24bit_inplace"                  : "Wave",
-        "shader_swirl24bit_inplace"                 : "Swirl",
-        "shader_swirl24bit_inplace1"                : "Swirl1",
-        "shader_plasma24bit_inplace"                : "Plasma",
-        "shader_brightness24_inplace"               : "Brightness",
-        "shader_saturation_array24_inplace"         : "Saturation",
-        "shader_bpf24_inplace"                      : "Bright pass filter",
-        "shader_bloom_effect_array24"               : "Bloom",
-        "shader_fisheye24_inplace"                  : "Fisheye",
-        "shader_tv_scanline_inplace"                : "TV",
-        "heatmap_surface24_conv_inplace"            : "Heatmap",
-        "predator_vision_mode"                      : "Predator Vision",
-        "shader_blood_inplace"                      : "Blood",
-        "shader_sharpen_filter_inplace"             : "Sharpen",
-        "shader_fire_effect"                        : "Fire Effect 1",
-        "dampening_effect"                          : "Dampening",
-        "lateral_dampening_effect"                  : "Lateral dampening",
-        "mirroring_inplace"                         : "Mirror image",
-        "shader_cloud_effect"                       : "Shader cloud",
+        "rgb_to_bgr"                 : "RGB to BGR",
+        "rgb_to_brg"                 : "RGB to BRG",
+        "greyscale"     : "grayscale Luminosity",
+        "sepia"                    : "Sepia",
+        "median"            : "Median",
+        "median_grayscale"  : "Median grayscale",
+        "median_avg"        : "Median avg",
+        "color_reduction"          : "Color reduction",
+        "sobel"                    : "Sobel",
+        "sobel_fast"               : "Sobel fast",
+        "invert"       : "Invert",
+        "hsl"           : "HSL",
+        "hsl_fast"      : "HSL fast",
+        "blur"            : "Blur",
+        "wave"                  : "Wave",
+        "swirl"                 : "Swirl",
+        "swirl2"                : "Swirl1",
+        "plasma_config"                : "Plasma",
+        "brightness"               : "Brightness",
+        "saturation"         : "Saturation",
+        "bpf"                      : "Bright pass filter",
+        "bloom"               : "Bloom",
+        "fisheye"                  : "Fisheye",
+        "tv_scan"                : "TV",
+        "heatmap"            : "Heatmap",
+        "predator_vision"                      : "Predator Vision",
+        "blood"                      : "Blood",
+        "sharpen"             : "Sharpen",
+        "fire_effect"                        : "Fire Effect 1",
+        "dampening"                          : "Dampening",
+        "lateral_dampening"                  : "Lateral dampening",
+        "mirroring"                         : "Mirror image",
+        "cloud_effect"                       : "Shader cloud",
         "tunnel_render32"                           : "Tunnel",
-        "shader_ripple"                             : "Water Ripple",
-        "shader_rgb_split_inplace"                  : "RGB split",
-        "shader_heatwave24_vertical_inplace"        : "Heatwave",
-        "shader_horizontal_glitch24_inplace"        : "Horizontal glitch",
-        "shader_plasma"                             : "Plasma 2"
+        "ripple"                             : "Water Ripple",
+        "rgb_split"                  : "RGB split",
+        "heatwave_vertical"        : "Heatwave",
+        "horizontal_glitch"        : "Horizontal glitch",
+        "plasma"                             : "Plasma 2"
 }
 
 
@@ -123,8 +128,8 @@ def display_shader(shader_name: str, timer = 5, flag=0, *args, **kwargs):
 
     hsl_rotation = False
 
-    if shader_name in ("shader_hsl_surface24bit_inplace",
-                       "shader_hsl_surface24bit_fast_inplace"):
+    if shader_name in ("hsl",
+                       "hsl_fast"):
         hsl_rotation = True
         v = 0.001
         hsl_value = 0.0
@@ -182,7 +187,7 @@ def display_shader(shader_name: str, timer = 5, flag=0, *args, **kwargs):
 
 class ShaderRgbToBgrInplace(unittest.TestCase):
     """
-    Test shader_rgb_to_bgr_inplace
+    Test rgb_to_bgr
     """
 
     # pylint: disable=too-many-statements
@@ -192,12 +197,12 @@ class ShaderRgbToBgrInplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_rgb_to_bgr_inplace", timer = 5, flag=0)
+        display_shader("rgb_to_bgr", timer = 5, flag=0)
 
 
 class TestShaderRgbToBrgInplace(unittest.TestCase):
     """
-    Test shader_rgb_to_brg_inplace
+    Test rgb_to_brg
     """
 
     # pylint: disable=too-many-statements
@@ -207,12 +212,12 @@ class TestShaderRgbToBrgInplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_rgb_to_brg_inplace", timer = 5, flag=0)
+        display_shader("rgb_to_brg", timer = 5, flag=0)
 
 
 class TestShaderGreyscaleLuminosity24Inplace(unittest.TestCase):
     """
-    Test shader_greyscale_luminosity24_inplace
+    Test greyscale
     """
 
     # pylint: disable=too-many-statements
@@ -222,12 +227,12 @@ class TestShaderGreyscaleLuminosity24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_greyscale_luminosity24_inplace", timer = 5, flag=0)
+        display_shader("greyscale", timer = 5, flag=0)
 
 
 class TestShaderSepia24Inplace(unittest.TestCase):
     """
-    Test shader_sepia24_inplace
+    Test sepia
     """
 
     # pylint: disable=too-many-statements
@@ -237,12 +242,12 @@ class TestShaderSepia24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_sepia24_inplace", timer = 5, flag=0)
+        display_shader("sepia", timer = 5, flag=0)
 
 
 class TestShaderMedianFilter24Inplace(unittest.TestCase):
     """
-    Test shader_median_filter24_inplace
+    Test median
     """
 
     # pylint: disable=too-many-statements
@@ -252,12 +257,12 @@ class TestShaderMedianFilter24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_median_filter24_inplace", timer = 5, flag=0)
+        display_shader("median", timer = 5, flag=0)
 
 
 class TestShaderMedianGrayscaleFilter24Inplace(unittest.TestCase):
     """
-    Test shader_median_grayscale_filter24_inplace
+    Test median_grayscale
     """
 
     # pylint: disable=too-many-statements
@@ -267,12 +272,12 @@ class TestShaderMedianGrayscaleFilter24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_median_grayscale_filter24_inplace", timer = 5, flag=0)
+        display_shader("median_grayscale", timer = 5, flag=0)
 
 
 class TestShaderMedianFilter24AvgInplace(unittest.TestCase):
     """
-    Test shader_median_filter24_avg_inplace
+    Test median_avg
     """
 
     # pylint: disable=too-many-statements
@@ -282,12 +287,12 @@ class TestShaderMedianFilter24AvgInplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_median_filter24_avg_inplace", timer = 5, flag=0)
+        display_shader("median_avg", timer = 5, flag=0)
 
 
 class TestShaderColorReduction24Inplace(unittest.TestCase):
     """
-    Test shader_color_reduction24_inplace
+    Test color_reduction
     """
 
     # pylint: disable=too-many-statements
@@ -302,17 +307,17 @@ class TestShaderColorReduction24Inplace(unittest.TestCase):
         background.convert(32, RLEACCEL)
         image = background.copy()
 
-        pygame.display.set_caption("Test shader_color_reduction24_inplace")
+        pygame.display.set_caption("Test color_reduction")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
         GAME = True
 
-        COLORS = [64, 32, 24, 16, 8, 4, 2, 1]
+        COLORS = [64, 32, 24, 16, 8, 4, 2]
         INDEX = 0
         t = time.time()
         while GAME:
-            shader_color_reduction24_inplace(image, color_=COLORS[INDEX])
+            color_reduction(image, color_=COLORS[INDEX ])
             pygame.event.pump()
             for event in pygame.event.get():
 
@@ -327,21 +332,22 @@ class TestShaderColorReduction24Inplace(unittest.TestCase):
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_color_reduction24_inplace %s fps "
+                "Test color_reduction %s fps "
                 "(%sx%s) %s colors" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT,
                                        COLORS[INDEX] ** 2 * 2))
             image = background.copy()
-            if FRAME % 1000 == 0:
+            if FRAME % 250 == 0:
                 INDEX += 1
-                if INDEX == len(COLORS):
+                if INDEX >= len(COLORS):
                     INDEX = 0
-            if time.time() - t > 5:
+
+            if time.time() - t > 10:
                 break
 
 
 class TestShaderSobel24Inplace(unittest.TestCase):
     """
-    Test shader_sobel24_inplace
+    Test sobel
     """
 
     # pylint: disable=too-many-statements
@@ -351,12 +357,12 @@ class TestShaderSobel24Inplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_sobel24_inplace")
+        display_shader("sobel")
 
 
 class TestShaderSobel24FastInplace(unittest.TestCase):
     """
-    Test shader_sobel24_fast_inplace
+    Test sobel_fast
     """
 
     # pylint: disable=too-many-statements
@@ -366,12 +372,12 @@ class TestShaderSobel24FastInplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_sobel24_fast_inplace", timer = 5, flag=0)
+        display_shader("sobel_fast", timer = 5, flag=0)
 
 
 class TestShaderInvertSurface24bitInplace(unittest.TestCase):
     """
-    Test shader_invert_surface_24bit_inplace
+    Test invert
     """
 
     # pylint: disable=too-many-statements
@@ -381,12 +387,12 @@ class TestShaderInvertSurface24bitInplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_invert_surface_24bit_inplace", timer = 5, flag=0)
+        display_shader("invert", timer = 5, flag=0)
 
 
 class TestShaderHslSurface24bitInplace(unittest.TestCase):
     """
-    Test shader_hsl_surface24bit_inplace
+    Test hsl
     """
 
     # pylint: disable=too-many-statements
@@ -396,12 +402,12 @@ class TestShaderHslSurface24bitInplace(unittest.TestCase):
 
         :return:  void
         """
-        display_shader("shader_hsl_surface24bit_inplace", timer = 5, flag=0)
+        display_shader("hsl", timer = 5, flag=0, hsl_rotation=True)
 
 
 class TestShaderHslSurface24bitFastInplace(unittest.TestCase):
     """
-    Test shader_hsl_surface24bit_fast_inplace
+    Test hsl_fast
     """
 
     # pylint: disable=too-many-statements
@@ -416,7 +422,7 @@ class TestShaderHslSurface24bitFastInplace(unittest.TestCase):
         background.convert(32, RLEACCEL)
         image = background.copy()
 
-        pygame.display.set_caption("Test shader_hsl_surface24bit_fast_inplace")
+        pygame.display.set_caption("Test hsl_fast")
 
         frame = 0
         clock = pygame.time.Clock()
@@ -430,7 +436,7 @@ class TestShaderHslSurface24bitFastInplace(unittest.TestCase):
 
         t = time.time()
         while game:
-            shader_hsl_surface24bit_fast_inplace(
+            hsl_fast(
                 image,
                 hsl_value,
                 hsl_model_=hsl2rgb_model,
@@ -449,7 +455,7 @@ class TestShaderHslSurface24bitFastInplace(unittest.TestCase):
             clock.tick()
             frame += 1
             pygame.display.set_caption(
-                "Test shader_hsl_surface24bit_fast_inplace %s fps "
+                "Test hsl_fast %s fps "
                 "(%sx%s)" % (round(clock.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
             if hsl_value >= 1.0:
@@ -463,7 +469,7 @@ class TestShaderHslSurface24bitFastInplace(unittest.TestCase):
 
 class TestShaderBlur5x5Array24Inplace(unittest.TestCase):
     """
-    Test shader_blur5x5_array24_inplace
+    Test blur
     """
 
     # pylint: disable=too-many-statements
@@ -474,12 +480,12 @@ class TestShaderBlur5x5Array24Inplace(unittest.TestCase):
         :return:  void
         """
 
-        display_shader("shader_blur5x5_array24_inplace")
+        display_shader("blur")
 
 
 class TestShaderWave24bitInplace(unittest.TestCase):
     """
-    Test shader_wave24bit_inplace
+    Test wave
     """
 
     # pylint: disable=too-many-statements
@@ -493,7 +499,7 @@ class TestShaderWave24bitInplace(unittest.TestCase):
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
-        pygame.display.set_caption("Test shader_wave24bit_inplace")
+        pygame.display.set_caption("Test wave")
 
         frame = 0
         clock = pygame.time.Clock()
@@ -501,7 +507,7 @@ class TestShaderWave24bitInplace(unittest.TestCase):
         angle = 0
         t = time.time()
         while game:
-            shader_wave24bit_inplace(image, angle * math.pi / 180, 10)
+            wave(image, angle * math.pi / 180, 10)
 
             pygame.event.pump()
             for event in pygame.event.get():
@@ -516,7 +522,7 @@ class TestShaderWave24bitInplace(unittest.TestCase):
             clock.tick()
             frame += 1
             pygame.display.set_caption(
-                "Test shader_wave24bit_inplace %s fps "
+                "Test wave %s fps "
                 "(%sx%s)" % (round(clock.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
             angle += 5
@@ -527,7 +533,7 @@ class TestShaderWave24bitInplace(unittest.TestCase):
 
 class TestShaderSwirl24bitInplace(unittest.TestCase):
     """
-    Test shader_swirl24bit_inplace
+    Test swirl
     """
 
     # pylint: disable=too-many-statements
@@ -542,7 +548,7 @@ class TestShaderSwirl24bitInplace(unittest.TestCase):
         background.convert(32, RLEACCEL)
         image = background.copy()
 
-        pygame.display.set_caption("Test shader_swirl24bit_inplace")
+        pygame.display.set_caption("Test swirl")
 
         frame = 0
         clock = pygame.time.Clock()
@@ -550,7 +556,7 @@ class TestShaderSwirl24bitInplace(unittest.TestCase):
         angle = 0
         t = time.time()
         while game:
-            shader_swirl24bit_inplace(image, angle)
+            swirl(image, angle)
 
             pygame.event.pump()
             for event in pygame.event.get():
@@ -566,11 +572,11 @@ class TestShaderSwirl24bitInplace(unittest.TestCase):
             clock.tick()
             frame += 1
             pygame.display.set_caption(
-                "Test shader_swirl24bit_inplace %s fps "
+                "Test swirl %s fps "
                 "(%sx%s)" % (round(clock.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
-            angle += 0.01
-            angle %= 1
+            angle += 1
+            # angle %= 1
             if time.time() - t > 5:
 
                 break
@@ -578,7 +584,7 @@ class TestShaderSwirl24bitInplace(unittest.TestCase):
 
 class TestShaderSwirl24bitInplace1(unittest.TestCase):
     """
-    Test shader_swirl24bit_inplace1
+    Test swirl2
     """
 
     # pylint: disable=too-many-statements
@@ -592,7 +598,7 @@ class TestShaderSwirl24bitInplace1(unittest.TestCase):
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
-        pygame.display.set_caption("Test shader_swirl24bit_inplace1")
+        pygame.display.set_caption("Test swirl2")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -600,7 +606,7 @@ class TestShaderSwirl24bitInplace1(unittest.TestCase):
         ANGLE = 0
         t = time.time()
         while GAME:
-            shader_swirl24bit_inplace1(image, ANGLE)
+            swirl2(image, ANGLE)
 
             pygame.event.pump()
             for event in pygame.event.get():
@@ -616,18 +622,18 @@ class TestShaderSwirl24bitInplace1(unittest.TestCase):
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_swirl24bit_inplace1 %s fps "
+                "Test swirl2 %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
-            ANGLE += 0.01
-            ANGLE %= 1
+            ANGLE += 1
+
             if time.time() - t > 5:
                 break
 
 
 class TestShaderPlasmaInplace(unittest.TestCase):
     """
-    Test shader_plasma
+    Test plasma
     """
 
     # pylint: disable=too-many-statements
@@ -641,7 +647,7 @@ class TestShaderPlasmaInplace(unittest.TestCase):
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
-        pygame.display.set_caption("Test shader_plasma")
+        pygame.display.set_caption("Test plasma")
 
         FRAME = 0.0
         CLOCK = pygame.time.Clock()
@@ -683,14 +689,14 @@ class TestShaderPlasmaInplace(unittest.TestCase):
                     GAME = False
 
             im = image.copy()
-            shader_plasma(im, FRAME, heatmap_rescale)
+            plasma(im, FRAME, heatmap_rescale)
             im.blit(image, (0, 0), special_flags=BLEND_RGB_ADD)
             SCREEN.blit(im, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 0.2
             pygame.display.set_caption(
-                "Test shader_plasma %s fps "
+                "Test plasma %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             if time.time() - t > 5:
                 break
@@ -698,7 +704,7 @@ class TestShaderPlasmaInplace(unittest.TestCase):
 
 class TestShaderPlasma24bitInplace(unittest.TestCase):
     """
-    Test shader_plasma24bit_inplace
+    Test plasma_config
     """
 
     # pylint: disable=too-many-statements
@@ -712,14 +718,14 @@ class TestShaderPlasma24bitInplace(unittest.TestCase):
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
-        pygame.display.set_caption("Test shader_plasma24bit_inplace")
+        pygame.display.set_caption("Test plasma_config")
 
         FRAME = 0.0
         CLOCK = pygame.time.Clock()
         GAME = True
         t = time.time()
         while GAME:
-            shader_plasma24bit_inplace(image, FRAME)
+            plasma_config(image, FRAME, 0.5, 0.12, 0.38, 0.1)
 
             pygame.event.pump()
             for event in pygame.event.get():
@@ -735,7 +741,7 @@ class TestShaderPlasma24bitInplace(unittest.TestCase):
             CLOCK.tick()
             FRAME += 0.2
             pygame.display.set_caption(
-                "Test shader_plasma24bit_inplace %s fps "
+                "Test plasma_config %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
             if time.time() - t > 5:
@@ -744,7 +750,7 @@ class TestShaderPlasma24bitInplace(unittest.TestCase):
 
 class TestShaderBrightness24Inplace(unittest.TestCase):
     """
-    Test shader_brightness24_inplace
+    Test brightness
     """
 
     # pylint: disable=too-many-statements
@@ -758,7 +764,7 @@ class TestShaderBrightness24Inplace(unittest.TestCase):
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
-        pygame.display.set_caption("Test shader_brightness24_inplace")
+        pygame.display.set_caption("Test brightness")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -777,14 +783,14 @@ class TestShaderBrightness24Inplace(unittest.TestCase):
                     GAME = False
                     break
 
-            shader_brightness24_inplace(image, BRIGHT)
+            brightness(image, BRIGHT)
             # SCREEN.fill((0, 0, 0))
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_brightness24_inplace %s fps "
+                "Test brightness %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
             if BRIGHT >= 1.0:
@@ -800,7 +806,7 @@ class TestShaderBrightness24Inplace(unittest.TestCase):
 
 class TestShaderSaturationArray24Inplace(unittest.TestCase):
     """
-    Test shader_saturation_array24_inplace
+    Test saturation
     """
 
     # pylint: disable=too-many-statements
@@ -815,7 +821,7 @@ class TestShaderSaturationArray24Inplace(unittest.TestCase):
         background.convert(32, RLEACCEL)
         image = background.copy()
 
-        pygame.display.set_caption("Test shader_saturation_array24_inplace")
+        pygame.display.set_caption("Test saturation")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -834,14 +840,14 @@ class TestShaderSaturationArray24Inplace(unittest.TestCase):
                     GAME = False
                     break
 
-            shader_saturation_array24_inplace(image, SATURATION)
+            saturation(image, SATURATION)
             # SCREEN.fill((0, 0, 0))
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_saturation_array24_inplace %s fps "
+                "Test saturation %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
             if SATURATION >= 1.0:
@@ -857,7 +863,7 @@ class TestShaderSaturationArray24Inplace(unittest.TestCase):
 
 class TestShaderBpf24Inplace(unittest.TestCase):
     """
-    Test shader_bpf24_inplace
+    Test bpf
     """
 
     # pylint: disable=too-many-statements
@@ -872,7 +878,7 @@ class TestShaderBpf24Inplace(unittest.TestCase):
         background.convert(32, RLEACCEL)
         image = background.copy()
 
-        pygame.display.set_caption("Test shader_bpf24_inplace")
+        pygame.display.set_caption("Test bpf")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -891,14 +897,14 @@ class TestShaderBpf24Inplace(unittest.TestCase):
                     GAME = False
                     break
 
-            shader_bpf24_inplace(image, BPF)
+            bpf(image, BPF)
             # SCREEN.fill((0, 0, 0))
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_bpf24_inplace %s fps "
+                "Test bpf %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
 
@@ -915,7 +921,7 @@ class TestShaderBpf24Inplace(unittest.TestCase):
 
 class TestShaderBloomEffectArray24(unittest.TestCase):
     """
-    Test shader_bloom_effect_array24
+    Test bloom
     """
 
     # pylint: disable=too-many-statements
@@ -927,9 +933,9 @@ class TestShaderBloomEffectArray24(unittest.TestCase):
         """
         background = pygame.image.load("../Assets/background.jpg").convert()
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
-        background.convert(32, RLEACCEL)
+        # background.convert(32, RLEACCEL)
         image = background.copy()
-        pygame.display.set_caption("Test shader_bloom_effect_array24")
+        pygame.display.set_caption("Test bloom")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -948,14 +954,14 @@ class TestShaderBloomEffectArray24(unittest.TestCase):
                     GAME = False
                     break
 
-            shader_bloom_effect_array24(image, BPF, fast_=True)
+            bloom(image, BPF, fast_=True)
             # SCREEN.fill((0, 0, 0))
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_bloom_effect_array24 %s fps "
+                "Test bloom %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
 
@@ -973,7 +979,7 @@ class TestShaderBloomEffectArray24(unittest.TestCase):
 
 class TestShaderFisheye24Inplace(unittest.TestCase):
     """
-    Test shader_fisheye24_inplace
+    Test fisheye
     """
 
     # pylint: disable=too-many-statements
@@ -985,16 +991,16 @@ class TestShaderFisheye24Inplace(unittest.TestCase):
         """
         background = pygame.image.load("../Assets/background.jpg").convert()
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
-        background.convert(32, RLEACCEL)
+        background.convert()
         image = background.copy()
 
-        pygame.display.set_caption("Test shader_fisheye24_inplace")
+        pygame.display.set_caption("Test fisheye")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
         GAME = True
 
-        fisheye_model = shader_fisheye24_footprint_inplace(WIDTH + 1, HEIGHT + 1)
+        fisheye_model = fisheye_footprint(WIDTH + 1, HEIGHT + 1)
         t = time.time()
         while GAME:
 
@@ -1007,15 +1013,19 @@ class TestShaderFisheye24Inplace(unittest.TestCase):
                     GAME = False
                     break
 
-            shader_fisheye24_inplace(image, fisheye_model)
-            # SCREEN.fill((0, 0, 0))
+            fisheye(image, fisheye_model)
+
+            p = image.get_at((0, 0))
+            image.set_colorkey(p)
+
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_fisheye24_inplace %s fps "
+                "Test fisheye %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+
             image = background.copy()
             if time.time() - t > 5:
                 break
@@ -1023,7 +1033,7 @@ class TestShaderFisheye24Inplace(unittest.TestCase):
 
 class TestShaderTvScanlineInplace(unittest.TestCase):
     """
-    Test shader_tv_scanline_inplace
+    Test tv_scan
     """
 
     # pylint: disable=too-many-statements
@@ -1037,7 +1047,7 @@ class TestShaderTvScanlineInplace(unittest.TestCase):
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
-        pygame.display.set_caption("Test shader_tv_scanline_inplace")
+        pygame.display.set_caption("Test tv_scan")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -1054,7 +1064,7 @@ class TestShaderTvScanlineInplace(unittest.TestCase):
                     GAME = False
                     break
 
-            shader_tv_scanline_inplace(image, FRAME + 1)
+            tv_scan(image, FRAME + 1)
 
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
@@ -1063,7 +1073,7 @@ class TestShaderTvScanlineInplace(unittest.TestCase):
             FRAME %= 10
 
             pygame.display.set_caption(
-                "Test shader_tv_scanline_inplace %s fps "
+                "Test tv_scan %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
             if time.time() - t > 5:
@@ -1072,7 +1082,7 @@ class TestShaderTvScanlineInplace(unittest.TestCase):
 
 class TESTHeatmapSurface24ConvInplace(unittest.TestCase):
     """
-    Test heatmap_surface24_conv_inplace
+    Test heatmap
     """
 
     # pylint: disable=too-many-statements
@@ -1086,7 +1096,7 @@ class TESTHeatmapSurface24ConvInplace(unittest.TestCase):
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
-        pygame.display.set_caption("Test heatmap_surface24_conv_inplace")
+        pygame.display.set_caption("Test heatmap")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -1103,14 +1113,14 @@ class TESTHeatmapSurface24ConvInplace(unittest.TestCase):
                     GAME = False
                     break
 
-            heatmap_surface24_conv_inplace(image, True)
+            heatmap(image, True)
             # SCREEN.fill((0, 0, 0))
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test heatmap_surface24_conv_inplace %s fps "
+                "Test heatmap %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
             if time.time() - t > 5:
@@ -1119,7 +1129,7 @@ class TESTHeatmapSurface24ConvInplace(unittest.TestCase):
 
 class TestPredatorVisionMode(unittest.TestCase):
     """
-    Test predator_vision_mode
+    Test predator_vision
     """
 
     # pylint: disable=too-many-statements
@@ -1132,7 +1142,7 @@ class TestPredatorVisionMode(unittest.TestCase):
         BACKGROUND = pygame.image.load("../Assets/background.jpg").convert()
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
         image = BACKGROUND.copy()
-        pygame.display.set_caption("Test predator_vision_mode")
+        pygame.display.set_caption("Test predator_vision")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -1149,15 +1159,15 @@ class TestPredatorVisionMode(unittest.TestCase):
                     GAME = False
                     break
 
-            surface_ = predator_vision_mode(image, sobel_threshold=80, bpf_threshold=0,
-                                            bloom_threshold=0, inv_colormap=True, fast=False)
+            surface_ = predator_vision(image, sobel_threshold=80, bpf_threshold=0,
+                                       bloom_threshold=0, inv_colormap=True, fast=False)
             # SCREEN.fill((0, 0, 0))
             SCREEN.blit(surface_, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test predator_vision_mode %s fps "
+                "Test predator_vision %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = BACKGROUND.copy()
             if time.time() - t > 5:
@@ -1166,7 +1176,7 @@ class TestPredatorVisionMode(unittest.TestCase):
 
 class TestShaderBloodInplace(unittest.TestCase):
     """
-    Test shader_blood_inplace
+    Test blood
     """
 
     # pylint: disable=too-many-statements
@@ -1180,7 +1190,7 @@ class TestShaderBloodInplace(unittest.TestCase):
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
-        pygame.display.set_caption("Test shader_blood_inplace")
+        pygame.display.set_caption("Test blood")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -1203,14 +1213,14 @@ class TestShaderBloodInplace(unittest.TestCase):
                     GAME = False
                     break
 
-            shader_blood_inplace(image, BLOOD_MASK, PERCENTAGE)
+            blood(image, BLOOD_MASK, PERCENTAGE)
             # SCREEN.fill((0, 0, 0))
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_blood_inplace %s fps "
+                "Test blood %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
             PERCENTAGE += V
@@ -1225,7 +1235,7 @@ class TestShaderBloodInplace(unittest.TestCase):
 
 class TestShaderSharpenFilterInplace(unittest.TestCase):
     """
-    Test shader_sharpen_filter_inplace
+    Test sharpen
     """
 
     # pylint: disable=too-many-statements
@@ -1239,7 +1249,7 @@ class TestShaderSharpenFilterInplace(unittest.TestCase):
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
-        pygame.display.set_caption("Test shader_sharpen_filter_inplace")
+        pygame.display.set_caption("Test sharpen")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -1256,13 +1266,13 @@ class TestShaderSharpenFilterInplace(unittest.TestCase):
                     GAME = False
                     break
 
-            shader_sharpen_filter_inplace(image)
+            sharpen(image)
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_sharpen_filter_inplace %s fps "
+                "Test sharpen %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = background.copy()
             if time.time() - t > 5:
@@ -1271,7 +1281,7 @@ class TestShaderSharpenFilterInplace(unittest.TestCase):
 
 class TestshaderFireEffect(unittest.TestCase):
     """
-    Test shader_fire_effect with adjust_palette_=True
+    Test fire_effect with adjust_palette_=True
     """
 
     # pylint: disable=too-many-statements
@@ -1285,7 +1295,7 @@ class TestshaderFireEffect(unittest.TestCase):
         BACKGROUND = pygame.image.load("../Assets/background.jpg")
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
         image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_fire_effect")
+        pygame.display.set_caption("Test fire_effect")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -1329,7 +1339,7 @@ class TestshaderFireEffect(unittest.TestCase):
                     break
             SCREEN.blit(BACKGROUND, (0, 0))
 
-            surface_ = shader_fire_effect(
+            surface_ = fire_effect(
                 WIDTH, HEIGHT, 3.97 + uniform(0.002, 0.008),
                 heatmap_rescale,
                 FIRE_ARRAY, reduce_factor_=3, bloom_=True, fast_bloom_=False, bpf_threshold_=48,
@@ -1343,7 +1353,7 @@ class TestshaderFireEffect(unittest.TestCase):
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_fire_effect %s fps "
+                "Test fire_effect %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = BACKGROUND.copy()
             if time.time() - t > 5:
@@ -1352,7 +1362,7 @@ class TestshaderFireEffect(unittest.TestCase):
 
 class TestshaderFireEffect1(unittest.TestCase):
     """
-    Test shader_fire_effect
+    Test fire_effect
     """
 
     # pylint: disable=too-many-statements
@@ -1365,7 +1375,7 @@ class TestshaderFireEffect1(unittest.TestCase):
         BACKGROUND = pygame.image.load("../Assets/background.jpg")
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
         image = BACKGROUND.copy()
-        pygame.display.set_caption("Test shader_fire_effect")
+        pygame.display.set_caption("Test fire_effect")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -1408,7 +1418,7 @@ class TestshaderFireEffect1(unittest.TestCase):
                     GAME = False
                     break
             SCREEN.blit(BACKGROUND, (0, 0))
-            surface_ = shader_fire_effect(
+            surface_ = fire_effect(
                 WIDTH, HEIGHT, 3.97 + uniform(0.002, 0.008),
                 heatmap_rescale,
                 FIRE_ARRAY,
@@ -1425,7 +1435,7 @@ class TestshaderFireEffect1(unittest.TestCase):
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_fire_effect %s fps "
+                "Test fire_effect %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = BACKGROUND.copy()
             if time.time() - t > 5:
@@ -1434,7 +1444,7 @@ class TestshaderFireEffect1(unittest.TestCase):
 
 class TestLateralDampeningEffect(unittest.TestCase):
     """
-    Test lateral_dampening_effect
+    Test lateral_dampening
     """
 
     # pylint: disable=too-many-statements
@@ -1447,7 +1457,7 @@ class TestLateralDampeningEffect(unittest.TestCase):
         BACKGROUND = pygame.image.load("../Assets/background.jpg")
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
         image = BACKGROUND.copy()
-        pygame.display.set_caption("Test lateral_dampening_effect")
+        pygame.display.set_caption("Test lateral_dampening")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -1464,18 +1474,18 @@ class TestLateralDampeningEffect(unittest.TestCase):
                     GAME = False
                     break
             # ZOOM IN
-            # surf, xx, yy = dampening_effect(BACKGROUND, FRAME, WIDTH, HEIGHT, amplitude_=60,
+            # surf, xx, yy = dampening(BACKGROUND, FRAME, WIDTH, HEIGHT, amplitude_=60,
             #                                 duration_=100, freq_=0.8)
             # SCREEN.blit(surf, (xx, yy))
 
-            tm = lateral_dampening_effect(FRAME, amplitude_=10.0, duration_=10, freq_=50.0)
+            tm = lateral_dampening(FRAME, amplitude_=10.0, duration_=10, freq_=50.0)
             SCREEN.blit(BACKGROUND, (tm, 0), special_flags=0)
 
             pygame.display.flip()
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test lateral_dampening_effect %s fps "
+                "Test lateral_dampening %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = BACKGROUND.copy()
             if time.time() - t > 5:
@@ -1484,7 +1494,7 @@ class TestLateralDampeningEffect(unittest.TestCase):
 
 class TestDampeningEffect(unittest.TestCase):
     """
-    Test dampening_effect
+    Test dampening
     """
 
     # pylint: disable=too-many-statements
@@ -1497,7 +1507,7 @@ class TestDampeningEffect(unittest.TestCase):
         BACKGROUND = pygame.image.load("../Assets/background.jpg")
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
         image = BACKGROUND.copy()
-        pygame.display.set_caption("Test dampening_effect")
+        pygame.display.set_caption("Test dampening")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -1513,7 +1523,7 @@ class TestDampeningEffect(unittest.TestCase):
                 if keys[pygame.K_ESCAPE]:
                     GAME = False
                     break
-            surf, xx, yy = dampening_effect(
+            surf, xx, yy = dampening(
                 BACKGROUND,
                 FRAME,
                 WIDTH,
@@ -1528,7 +1538,7 @@ class TestDampeningEffect(unittest.TestCase):
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test dampening_effect %s fps "
+                "Test dampening %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = BACKGROUND.copy()
             if time.time() - t > 5:
@@ -1537,7 +1547,7 @@ class TestDampeningEffect(unittest.TestCase):
 
 class TestMirroringInplace(unittest.TestCase):
     """
-    Test mirroring_inplace
+    Test mirroring
     """
 
     # pylint: disable=too-many-statements
@@ -1550,7 +1560,7 @@ class TestMirroringInplace(unittest.TestCase):
         BACKGROUND = pygame.image.load("../Assets/background.jpg")
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
         image = BACKGROUND.copy()
-        pygame.display.set_caption("Test mirroring_inplace")
+        pygame.display.set_caption("Test mirroring")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -1567,7 +1577,7 @@ class TestMirroringInplace(unittest.TestCase):
                     GAME = False
                     break
 
-            mirroring_inplace(image)
+            mirroring(image)
 
             SCREEN.blit(image, (0, 0))
             image = BACKGROUND.copy()
@@ -1575,7 +1585,7 @@ class TestMirroringInplace(unittest.TestCase):
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test mirroring_inplace %s fps "
+                "Test mirroring %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             if time.time() - t > 5:
                 break
@@ -1583,7 +1593,7 @@ class TestMirroringInplace(unittest.TestCase):
 
 class TestShaderCloudEffect(unittest.TestCase):
     """
-    Test shader_cloud_effect
+    Test cloud_effect
     """
 
     # pylint: disable=too-many-statements
@@ -1636,7 +1646,7 @@ class TestShaderCloudEffect(unittest.TestCase):
                     break
             SCREEN.blit(BACKGROUND, (0, 0))
 
-            surface_ = shader_cloud_effect(
+            surface_ = cloud_effect(
                 WIDTH, HEIGHT, 3.970 + uniform(0.002, 0.008),
                 heatmap_rescale,
                 CLOUD_ARRAY,
@@ -1652,7 +1662,7 @@ class TestShaderCloudEffect(unittest.TestCase):
             CLOCK.tick()
             FRAME += 1
             pygame.display.set_caption(
-                "Test shader_cloud_effect %s fps "
+                "Test cloud_effect %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
             image = BACKGROUND.copy()
             if time.time() - t > 5:
@@ -1724,7 +1734,7 @@ class TestTunnelRender32(unittest.TestCase):
 
 class TestShaderRipple(unittest.TestCase):
     """
-    Test shader_ripple
+    Test ripple
     """
 
     # pylint: disable=too-many-statements
@@ -1771,7 +1781,7 @@ class TestShaderRipple(unittest.TestCase):
                 m = randint(1000, 10000)
                 previous[randint(0, W2 - 1), randint(0, H2 - 1)] = m
 
-            previous, current, array_ = shader_ripple(W2, H2, previous, current, array_)
+            previous, current, array_ = ripple(W2, H2, previous, current, array_)
 
             surf = make_surface(asarray(array_, dtype=uint8))
             surf = smoothscale(surf, (WIDTH, HEIGHT))
@@ -1792,7 +1802,7 @@ class TestShaderRipple(unittest.TestCase):
 
 class TestRgbSplit(unittest.TestCase):
     """
-    Test shader_rgb_split_inplace
+    Test rgb_split
     """
 
     # pylint: disable=too-many-statements
@@ -1823,7 +1833,7 @@ class TestRgbSplit(unittest.TestCase):
                     GAME = False
                     break
 
-            shader_rgb_split_inplace(image, 15)
+            rgb_split(image, 15)
 
             SCREEN.blit(image, (0, 0))
 
@@ -1840,7 +1850,7 @@ class TestRgbSplit(unittest.TestCase):
 
 class TestShaderHorizontalGlitch24Inplace(unittest.TestCase):
     """
-    Test shader_horizontal_glitch24_inplace
+    Test horizontal_glitch
     """
 
     # pylint: disable=too-many-statements
@@ -1873,7 +1883,7 @@ class TestShaderHorizontalGlitch24Inplace(unittest.TestCase):
                     GAME = False
                     break
 
-            shader_horizontal_glitch24_inplace(image, 0.5, 0.08, FRAME % 20)
+            horizontal_glitch(image, 0.5, 0.08, FRAME % 20)
 
             SCREEN.blit(image, (0, 0))
 
@@ -1890,7 +1900,7 @@ class TestShaderHorizontalGlitch24Inplace(unittest.TestCase):
 
 class TestShaderHeatwave24VerticalInplace(unittest.TestCase):
     """
-    Test shader_heatwave24_vertical_inplace
+    Test heatwave_vertical
     """
 
     # pylint: disable=too-many-statements
@@ -1924,7 +1934,7 @@ class TestShaderHeatwave24VerticalInplace(unittest.TestCase):
                     break
 
             b = 0.1
-            shader_heatwave24_vertical_inplace(
+            heatwave_vertical(
                 image, numpy.full((WIDTH, HEIGHT), 255, dtype=numpy.uint8),
                 b * uniform(150, 800), 0,
                 sigma_=uniform(2, 4), mu_=b * 2
@@ -1941,6 +1951,423 @@ class TestShaderHeatwave24VerticalInplace(unittest.TestCase):
             image = BACKGROUND.copy()
             if time.time() - t > 5:
                 break
+
+
+class TestShaderCartoon(unittest.TestCase):
+    """
+    Test cartoon
+    """
+
+    # pylint: disable=too-many-statements
+    @staticmethod
+    def runTest() -> None:
+        """
+
+        :return:  void
+        """
+
+        # Load the background image
+        BACKGROUND = pygame.image.load("../Assets/Background.jpg").convert()
+        BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
+
+        image = BACKGROUND.copy()
+        pygame.display.set_caption("demo cartoon effect")
+
+        FRAME = 0
+        CLOCK = pygame.time.Clock()
+        GAME = True
+        t = time.time()
+        while GAME:
+
+            pygame.event.pump()
+            for event in pygame.event.get():
+
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_ESCAPE]:
+                    GAME = False
+                    break
+
+            surface_ = cartoon(image, sobel_threshold_=32, median_kernel_=2, color_=128,
+                               flag_=BLEND_RGB_ADD).convert()
+
+            SCREEN.blit(surface_, (0, 0), special_flags=0)
+
+            pygame.display.flip()
+            CLOCK.tick()
+            FRAME += 1
+
+            pygame.display.set_caption(
+                "Test shader cartoon %s fps "
+                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+
+            image = BACKGROUND.copy()
+            if time.time() - t > 5:
+                break
+
+
+class TestShaderBlend24(unittest.TestCase):
+    """
+    Test blend
+    """
+
+    # pylint: disable=too-many-statements
+    @staticmethod
+    def runTest() -> None:
+        """
+
+        :return:  void
+        """
+
+        # Load the background image
+        BACKGROUND = pygame.image.load("../Assets/Background.jpg").convert()
+        BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
+
+        DESTINATION = pygame.image.load("../Assets/Aliens.jpg").convert()
+        DESTINATION = pygame.transform.smoothscale(DESTINATION, (WIDTH, HEIGHT))
+
+        assert BACKGROUND.get_size() == DESTINATION.get_size()
+
+        pygame.display.set_caption("demo wave effect")
+
+        FRAME = 0
+        CLOCK = pygame.time.Clock()
+        GAME = True
+        VALUE = 0
+        V = +0.2
+
+        while GAME:
+
+            pygame.event.pump()
+            for event in pygame.event.get():
+
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_ESCAPE]:
+                    GAME = False
+                    break
+
+            transition = blend(
+                source_=BACKGROUND, destination_=DESTINATION, percentage_=VALUE)
+
+            SCREEN.blit(transition, (0, 0))
+
+            pygame.display.flip()
+            CLOCK.tick()
+            FRAME += 1
+
+            pygame.display.set_caption(
+                "Demo blend effect/transition %s percent; %s fps"
+                "(%sx%s)" % (round(VALUE, 2), round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+            VALUE += V
+
+            if VALUE >= 100:
+                VALUE = 100
+                V = -0.2
+            if VALUE <= 0:
+                VALUE = 0
+                V = 0.2
+
+
+class TestDirtLens(unittest.TestCase):
+    """
+    Test Dirt Lens
+    """
+
+    # pylint: disable=too-many-statements
+    @staticmethod
+    def runTest() -> None:
+        """
+
+        :return:  void
+        """
+        IMAGE = pygame.image.load("../Assets/Aliens.jpg").convert()
+        IMAGE = pygame.transform.smoothscale(IMAGE, (WIDTH, HEIGHT))
+        IMAGE_COPY = IMAGE.copy()
+
+        dirt_lens_image = [
+            pygame.image.load("../Assets/Bokeh__Lens_Dirt_9.jpg").convert(),
+            pygame.image.load("../Assets/Bokeh__Lens_Dirt_38.jpg").convert(),
+            pygame.image.load("../Assets/Bokeh__Lens_Dirt_46.jpg").convert(),
+            pygame.image.load("../Assets/Bokeh__Lens_Dirt_50.jpg").convert(),
+            pygame.image.load("../Assets/Bokeh__Lens_Dirt_54.jpg").convert(),
+            pygame.image.load("../Assets/Bokeh__Lens_Dirt_67.jpg").convert()
+        ]
+
+        lens = dirt_lens_image[0]
+        lens = pygame.transform.scale(lens, (WIDTH, HEIGHT)).convert()
+        lens_copy = lens.copy()
+
+        pygame.display.set_caption("demo Dirt Lens effect")
+
+        FRAME = 0
+        CLOCK = pygame.time.Clock()
+        GAME = True
+        VALUE = 0.2
+        V = -0.005
+        freetype.init(cache_size=64, resolution=72)
+        FONT = freetype.SysFont('ARIALBLACK', size=18)
+        while GAME:
+
+            pygame.event.pump()
+            for event in pygame.event.get():
+
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_ESCAPE]:
+                    GAME = False
+                    break
+
+            dirt_lens_blur(IMAGE, flag_=BLEND_RGB_ADD, lens_model_=lens, light_=VALUE)
+
+            SCREEN.blit(IMAGE, (0, 0))
+            image, rect = FONT.render(
+                "FPS %s" % round(CLOCK.get_fps(), 2),
+                fgcolor=(255, 255, 255, 255),
+                style=STYLE_NORMAL,
+                size=15)
+            SCREEN.blit(image, (100, 100))
+            pygame.display.flip()
+            CLOCK.tick()
+            FRAME += 1
+
+            pygame.display.set_caption(
+                "Demo Dirt Lens effect %s percent; %s fps"
+                "(%sx%s)" % (round(VALUE, 2), round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+            VALUE += V
+
+            if VALUE >= 0.2:
+                VALUE = 0.2
+                V = -0.005
+            if VALUE <= -1.0:
+                VALUE = -1.0
+                V = 0.005
+
+            IMAGE = IMAGE_COPY.copy()
+            lens = lens_copy.copy()
+
+import pyglet
+from os import path
+FULL_VIDEO = []
+PATH_TEXTURE = '../Assets/'
+VIDEO_FLAGS  = pygame.HWSURFACE | pygame.RLEACCEL
+SCREEN_BIT_DEPTH = 32
+
+
+def play_intro():
+
+    path_join = path.join
+    media_player = pyglet.media.Player()
+
+    ffmpeg = pyglet.media.have_ffmpeg()
+    if not ffmpeg:
+        print('\nFFmpeg library is missing on your system.')
+        print('Video intro is skipped.')
+        return
+    try:
+
+        video_name = "demo.avi"
+        source = pyglet.media.load(path_join(PATH_TEXTURE, video_name))
+        video_format = source.video_format
+        source_info = source.info
+        duration = source.duration
+        width = video_format.width
+        height = video_format.height
+        sample_aspect = video_format.sample_aspect
+        frame_rate = int(video_format.frame_rate)
+        print("Length            : %ss " % round(duration, 2))
+        print("Resolution        : %sx%s " % (width, height))
+        print("Aspect resolution : %s " % sample_aspect)
+        print("Frame rate        : %s fps" % frame_rate)
+    except FileNotFoundError:
+        print('\nVideo %s not found in %s ' % (video_name, PATH_TEXTURE))
+        # IGNORE THE ERROR
+        return
+
+    pygame.init()
+    vformat = source.video_format
+    media_player.queue(source)
+    media_player.play()
+    screen = pygame.display.set_mode(
+        (vformat.width, vformat.height), VIDEO_FLAGS, SCREEN_BIT_DEPTH)
+
+    frame = 0
+    running = True
+
+    display_flip = pygame.display.flip
+    media_get_texture = media_player.get_texture
+    event_pump = pygame.event.pump
+
+    screen.fill((0, 0, 0, 255))
+
+    print('\nBuffering video \nPlease wait...(ESC to abort)')
+    while running:
+
+        event_pump()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            running = False
+            pygame.event.clear()
+            break
+        media_player.play()
+
+        texture = media_get_texture()
+
+        if texture is not None:
+
+            raw = texture.get_image_data().get_data('RGBA', texture.width << 2)
+            buff = numpy.frombuffer(raw, dtype=uint8).reshape(texture.height, texture.width, 4)
+            # buff[:, :, :3] keep RGB no alpha channel
+            # After removing the alpha channel (loosing alpha channel information).
+            # The final result is a 24 bit pygame Surface.
+            # Applying convert_alpha() will have no effect has the alpha channel has been removed
+            # (the image will be converted to a 32 bit format with a layer set at
+            # maximum opacity, 255 values).
+            # If you wish to apply transparency to the surface use the method
+            # set_colorkey to apply transparency
+            # based on color key.
+            arr = buff[:, :, :3].transpose(1, 0, 2)
+            # blit_array(screen, arr)
+
+            surf = pygame.surfarray.make_surface(arr).convert()
+            # surf.set_colorkey((0, 0, 0), RLEACCEL)
+            # surf = pygame.transform.scale(surf, (GL.SCREENRECT_W, GL.SCREENRECT_H))
+            FULL_VIDEO.append(surf)
+
+            pyglet.clock.tick(frame_rate)
+
+            frame += 1
+            if frame >= 200:
+                running = False
+        else:
+            running = False
+        try:
+            media_player.seek_next_frame()
+        except:
+            pass
+
+    print('[Done]')
+
+    # ----- RESIZE VIDEO HERE ---------
+    new_size = (1024, 768)
+    i = 0
+    for frame in FULL_VIDEO:
+        FULL_VIDEO[i] = pygame.transform.smoothscale(frame, new_size)
+        i += 1
+
+    # ------ RESET THE DISPLAY WITH THE NEW SIZE
+    screen = pygame.display.set_mode(
+        new_size, VIDEO_FLAGS, SCREEN_BIT_DEPTH)
+
+
+    frame = 0
+
+    clock = pygame.time.Clock()
+    running = True
+
+    if running:
+        # SOUND EFFECT
+        # PLAY HERE
+
+        # time per frame (T period)
+        timing = duration / len(FULL_VIDEO)
+        fps = 1.0 / timing
+
+    # PLAY THE VIDEO FROM THE BUFFER
+    while running:
+        try:
+            event_pump()
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_ESCAPE]:
+                running = False
+                pygame.event.clear()
+                # CONTROL SOUND HERE
+                # HERE
+                break
+            surface = FULL_VIDEO[frame]
+            screen.blit(surface, (0, 0))
+
+            display_flip()
+            clock.tick(60)
+
+            frame += 1
+
+        except IndexError as e:
+            running = False
+
+
+
+class TestShaderMultiFisheyes(unittest.TestCase):
+    """
+        Test RainDrops
+        """
+
+    # pylint: disable=too-many-statements
+    @staticmethod
+    def runTest() -> None:
+        """
+
+        :return:  void
+        """
+
+        play_intro()
+
+        pygame.display.set_caption("Test RainDrops")
+
+        FRAME = 0
+        CLOCK = pygame.time.Clock()
+        GAME = True
+
+        TEXTURE_SIZE = 512
+        s, arr = rain_footprint(TEXTURE_SIZE, TEXTURE_SIZE)
+
+        RAIN_LIST = []
+
+        for i in range(2):
+            RAIN_LIST.append((randint(0, 1024), randint(0, 200)))
+
+
+        t = time.time()
+
+        while GAME:
+
+            pygame.event.pump()
+            for event in pygame.event.get():
+
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_ESCAPE]:
+                    GAME = False
+                    break
+
+            surface = FULL_VIDEO[FRAME % len(FULL_VIDEO)]
+            SCREEN.blit(surface, (0, 0))
+
+            ss = pygame.transform.scale(
+                SCREEN, (TEXTURE_SIZE, TEXTURE_SIZE))
+            rain_fisheye(ss, arr)
+            p = ss.get_at((0, 0))
+            ss.set_colorkey(p)
+
+            surf = pygame.Surface((TEXTURE_SIZE, TEXTURE_SIZE)).convert()
+            surf.fill((0, 0, 0))
+            surf.blit(ss, (0, 0))
+
+            for i in range(2):
+                SCREEN.blit(surf,
+                            (RAIN_LIST[i][0], RAIN_LIST[i][1]), special_flags=pygame.BLEND_RGB_MAX)
+
+
+            pygame.display.flip()
+            CLOCK.tick(60)
+            FRAME += 1
+
+            pygame.display.set_caption(
+                "Test fisheye %s fps "
+                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+
+            # if time.time() - t > 200:
+            #     break
 
 
 def run_testsuite():
@@ -1992,7 +2419,10 @@ def run_testsuite():
         TestShaderRipple(),
         TestRgbSplit(),
         TestShaderHorizontalGlitch24Inplace(),
-        TestShaderHeatwave24VerticalInplace()
+        TestShaderHeatwave24VerticalInplace(),
+        TestShaderCartoon(),
+        TestShaderBlend24(),
+        # TestShaderMultiFisheyes()
     ])
 
     unittest.TextTestRunner().run(suite)
@@ -2000,5 +2430,7 @@ def run_testsuite():
 
 
 if __name__ == '__main__':
+    # play_intro()
     run_testsuite()
     sys.exit(0)
+

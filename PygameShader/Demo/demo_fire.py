@@ -5,7 +5,7 @@ PygameShader FIRE DEMO
 from random import uniform
 
 try:
-    from PygameShader.shader import custom_map, rgb_to_int, shader_fire_effect
+    from PygameShader.shader import custom_map, rgb_to_int, fire_effect
 except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
           "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
@@ -100,7 +100,7 @@ while GAME:
     SCREEN.blit(BACKGROUND, (0, 0))
 
     # Execute the shader fire effect
-    surface_ = shader_fire_effect(
+    surface_ = fire_effect(
         WIDTH,
         HEIGHT,
         3.97 + uniform(0.002, 0.008),
@@ -125,7 +125,7 @@ while GAME:
     FRAME += 1
 
     pygame.display.set_caption(
-        "Test shader_fire_effect %s fps "
+        "Test fire_effect %s fps "
         "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
 
     image = BACKGROUND.copy()

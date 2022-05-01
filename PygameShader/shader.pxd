@@ -40,6 +40,11 @@ warnings.filterwarnings("ignore", category=ImportWarning)
 
 cdef extern from 'Include/Shaderlib.c':
 
+    struct hsv:
+        float h;
+        float s;
+        float v;
+
     struct hsl:
         float h
         float s
@@ -61,6 +66,10 @@ cdef extern from 'Include/Shaderlib.c':
 
     hsl struct_rgb_to_hsl(float r, float g, float b)nogil;
     rgb struct_hsl_to_rgb(float h, float s, float l)nogil;
+
+    rgb struct_hsv_to_rgb(float h, float s, float v)nogil;
+    hsv struct_rgb_to_hsv(float r, float g, float b)nogil;
+
     int *quickSort(int arr[], int low, int high)nogil;
     float Q_inv_sqrt(float number)nogil;
     rgb_color_int wavelength_to_rgb(int wavelength, float gamma)nogil;
@@ -69,7 +78,8 @@ cdef extern from 'Include/Shaderlib.c':
     float randRangeFloat(float lower, float upper)nogil;
     int randRange(int lower, int upper)nogil;
     int get_largest(int arr[], int n)nogil;
-    int get_lowest(int arr[], int n)nogil;
+    int min_c(int arr[], int n)nogil;
+    float minf(float arr[ ], int n)nogil;
     int get_max_and_min(int arr[], int n)nogil;
 
 
@@ -82,71 +92,78 @@ cdef float DEG_TO_RAD=M_PI/180.0
 
 cdef int THREADS = 6
 
-cpdef void shader_rgb_to_bgr_inplace(object surface_)
-cpdef void shader_rgb_to_brg_inplace(object surface_)
-cpdef void shader_greyscale_luminosity24_inplace(object surface_)
-cpdef void shader_sepia24_inplace(object surface_)
+cpdef void rgb_to_bgr(object surface_)
+cpdef void rgb_to_brg(object surface_)
+cpdef void greyscale(object surface_)
+cpdef void sepia(object surface_)
 
 cdef void median_fast(object surface_, unsigned short int kernel_size_=*,
                       unsigned short int reduce_factor_=*)
-cpdef void shader_median_filter24_inplace(
+cpdef void median(
         object surface_,
         unsigned short int kernel_size_=*,
         bint fast_=*,
         unsigned short int reduce_factor_=*)except *
-cpdef void shader_median_grayscale_filter24_inplace(object surface_, int kernel_size_=*)
-cpdef void shader_median_filter24_avg_inplace(object surface_, int kernel_size_=*)
+cpdef void median_grayscale(object surface_, int kernel_size_=*)
+cpdef void median_avg(object surface_, int kernel_size_=*)
 
-cpdef void shader_color_reduction24_inplace(object surface_, int color_=*)
+cpdef void color_reduction(object surface_, int color_=*)
 
-cpdef void shader_sobel24_inplace(object surface_, int threshold_=*)
-cpdef void shader_sobel24_fast_inplace(object surface_, int threshold_=*,
+cpdef void sobel(object surface_, int threshold_=*)
+cpdef void sobel_fast(object surface_, int threshold_=*,
                                        unsigned short factor_=*)
 
-cpdef void shader_invert_surface_24bit_inplace(object surface_)
+cpdef void invert(object surface_)
 
-cpdef void shader_hsl_surface24bit_inplace(object surface_, float shift_)
-cpdef void shader_hsl_surface24bit_fast_inplace(
+cpdef void hsl_effect(object surface_, float shift_)
+cpdef void hsl_fast(
         object surface_, float shift_, float [:, :, :, ::1] hsl_model_,
         unsigned char [:, :, :, ::1] rgb_model_)
 
-cpdef void shader_blur5x5_array24_inplace(object surface_)
-cpdef void shader_wave24bit_inplace(object surface_, float rad, int size)
+cpdef void blur(object surface_, t_=*)
+cpdef void wave(object surface_, float rad, int size)
 
-cpdef void shader_swirl24bit_inplace(object surface_, float degrees)
-cpdef void shader_swirl24bit_inplace1(object surface_, float degrees)
+cpdef void swirl(object surface_, float degrees)
+cpdef void swirl2(object surface_, float degrees)
 
-cpdef void shader_plasma24bit_inplace(object surface_, int frame,
+cpdef void plasma_config(object surface_, int frame,
                                       float hue_=*, float sat_=*, float value_=*,
                                       float a_=*, float b_=*, float c_=*)
-cpdef void shader_plasma(surface_, float frame, unsigned int [::1] palette_)
+cpdef void plasma(surface_, float frame, unsigned int [::1] palette_)
 cpdef float [:, :, :, ::1] rgb_to_hsl_model()
 cpdef unsigned char [:, :, :, ::1] hsl_to_rgb_model()
 
-cpdef void shader_brightness24_inplace(object surface_, float shift_)
-cpdef void shader_brightness24_exclude_inplace(object surface_, float shift_, color_=*)
-cpdef void shader_brightness_24_inplace1(object surface_, float shift_,
+cpdef void brightness(object surface_, float shift_)
+cpdef void brightness_exclude(object surface_, float shift_, color_=*)
+cpdef void brightness_bpf(
+        object surface_,
+        float shift_,
+        unsigned char bpf_threshold = *)
+cpdef void brightness_model(object surface_, float shift_,
                                          float [:, :, :, :] rgb_to_hsl_model)
 
-cpdef void shader_saturation_array24_inplace(object surface_, float shift_)
-cpdef void shader_heatwave24_vertical_inplace(
+cpdef void saturation(object surface_, float shift_)
+cpdef void heatwave_vertical(
         object surface_, unsigned char [:, :] mask, float factor_, float center_,
         float sigma_, float mu_)
-cpdef void shader_horizontal_glitch24_inplace(object surface_, float rad1_, float frequency_,
+cpdef void horizontal_glitch(object surface_, float rad1_, float frequency_,
                                               float amplitude_)
-cpdef void shader_bpf24_inplace(object surface_, int threshold = *)
-cpdef void shader_bloom_effect_array24(object surface_, int threshold_, bint fast_=*)
+cpdef void bpf(object surface_, int threshold = *)
+cpdef void bloom(object surface_, int threshold_, bint fast_=*)
 
-cpdef shader_fisheye24_footprint_inplace(int w, int h)
-cpdef void shader_fisheye24_inplace(object surface_, unsigned int [:, :, :] fisheye_model)
+cpdef fisheye_footprint(int w, int h)
+cpdef void fisheye(object surface_, unsigned int [:, :, :] fisheye_model)
 
-cpdef tuple shader_rain_footprint_inplace(int w, int h)
-cpdef void shader_rain_fisheye24_inplace(object surface_,
+cpdef tuple rain_footprint(int w, int h)
+cpdef void rain_fisheye(object surface_,
                                          unsigned int [:, :, ::1] rain_fisheye_model)
 
-cpdef void shader_tv_scanline_inplace(object surface_, int space=*)
-cpdef void shader_rgb_split_inplace(object surface_, int offset_=*)
-cpdef tuple shader_ripple(int rows_, int cols_, float [:, ::1] previous_, float [:, ::1] current_,
+cpdef void tv_scan(object surface_, int space=*)
+
+cpdef void rgb_split(object surface_, int offset_=*)
+cpdef object rgb_split_clean(object surface_, int offset_=*)
+
+cpdef tuple ripple(int rows_, int cols_, float [:, ::1] previous_, float [:, ::1] current_,
            unsigned char [:, :, ::1] array_)
 
 cpdef tunnel_modeling32(Py_ssize_t screen_width, Py_ssize_t screen_height)
@@ -161,21 +178,23 @@ cpdef tunnel_render32(int t,
                     unsigned char [::1] scr_data,
                     unsigned char [::1] dest_array)
 
-cpdef void heatmap_surface24_conv_inplace(object surface_, bint rgb_=*)
+cpdef void heatmap(object surface_, bint rgb_=*)
 
-cpdef predator_vision_mode(object surface_, unsigned int sobel_threshold=*,
+cpdef predator_vision(object surface_, unsigned int sobel_threshold=*,
                            unsigned int bpf_threshold=*, unsigned int bloom_threshold=*,
-                           inv_colormap=*, fast=*)
-cpdef shader_blood_inplace(object surface_, float [:, :] mask_, float perc_)
+                           bint inv_colormap=*, bint fast=*, int blend=*)
+
+
+cpdef blood(object surface_, float [:, :] mask_, float perc_)
 cpdef object make_palette(int width, float fh, float fs, float fl)
 
-cpdef void bluemap_surface24_inplace_c(object surface_)
-cpdef void redmap_surface24_inplace_c(object surface_)
+cpdef void bluescale(object surface_)
+cpdef void redscale(object surface_)
 
-cpdef shader_fire_surface24(
+cpdef fire_sub(
         int width, int height, float factor, unsigned int [::1] palette, float [:, ::1] fire)
 
-cpdef shader_fire_effect(
+cpdef fire_effect(
         int width_,
         int height_,
         float factor_,
@@ -199,7 +218,7 @@ cpdef shader_fire_effect(
         bint blur_                        = *
         )
 
-cpdef shader_cloud_effect(
+cpdef cloud_effect(
         int width_,
         int height_,
         float factor_,
@@ -220,16 +239,19 @@ cpdef shader_cloud_effect(
         bint blur_                        = *
         )
 
-cpdef mirroring(object surface_)
-cpdef void mirroring_inplace(object surface_)
+cpdef mirroring_array(object surface_)
+cpdef void mirroring(object surface_)
 
-cpdef float lateral_dampening_effect(int frame_, float amplitude_=*, int duration_=*,
+cpdef float lateral_dampening(int frame_, float amplitude_=*, int duration_=*,
                                      float freq_=*)
-cpdef tuple dampening_effect(
+cpdef tuple dampening(
         object surface_, int frame_, int display_width, int display_height_,
         float amplitude_=*, int duration_=*, float freq_=*)
 
-# Added version 1.0.1
+# Added version 1.0.2
+cpdef object blend(object source_, object destination_, float percentage_)
+
+# Added version 1.0.2
 cpdef cartoon(
         object surface_,
         int sobel_threshold_ = *,
@@ -237,3 +259,27 @@ cpdef cartoon(
         color_               = *,
         flag_                = *
 )
+
+cpdef void dirt_lens(
+        object surface_,
+        object lens_model_,
+        int flag_=*,
+        float light_ = *
+)
+
+cpdef object dithering(object surface_, int factor_=*)
+cpdef void dithering_int(object surface_, int factor_=*)
+
+cpdef object spectrum(int width, int height, float gamma=*)
+
+cpdef void convert_27colors(object surface_)
+
+cpdef void palette_change(
+        object surface_,
+        object palette_)
+
+cpdef object bilateral(object image, float sigma_s, float sigma_i)
+
+cpdef object emboss(object surface_, unsigned int flag=*)
+
+cpdef object pixelation(object surface_)

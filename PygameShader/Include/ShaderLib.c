@@ -21,7 +21,6 @@ gcc -ffast-math -O3 -fopenmp -o ShaderLib ShaderLib.c
 This will generate an object file (.o), now you take it and create the .so file:
 
 gcc hello.o -shared -o libhello.so
-EDIT: Suggestions from the comments:
 
 gcc -shared -o libhello.so -fPIC hello.c
 
@@ -61,6 +60,7 @@ inline float randRangeFloat(float lower, float upper);
 inline int randRange(int lower, int upper);
 inline int get_largest(int arr[], int n);
 inline int get_lowest(int arr[], int n);
+inline float minf(float arr[], int n);
 
 #define ONE_SIX 1.0/6.0
 #define ONE_THIRD 1.0 / 3.0
@@ -739,7 +739,7 @@ inline int get_largest(int arr[], int n)
 
 
 // C function to find minimum in arr[] of size n
-inline int get_lowest(int arr[], int n)
+inline int min_c(int arr[], int n)
 {
     int i;
 
@@ -755,6 +755,23 @@ inline int get_lowest(int arr[], int n)
     return min;
 }
 
+
+// C function to find minimum in arr[] of size n
+inline float minf(float arr[], int n)
+{
+    int i;
+
+    // Initialize minimum element
+    float min = arr[0];
+
+    // Traverse array elements from second and
+    // compare every element with current min
+    for (i = 1; i < n; i++)
+        if (arr[i] < min)
+            min = arr[i];
+
+    return min;
+}
 
 
 

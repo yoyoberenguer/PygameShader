@@ -4,7 +4,7 @@ PygameShader WAVE DEMO
 import math
 
 try:
-    from PygameShader.shader import shader_wave24bit_inplace
+    from PygameShader.shader import wave
 except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
           "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
@@ -56,7 +56,7 @@ while GAME:
             GAME = False
             break
 
-    shader_wave24bit_inplace(image, ANGLE * math.pi / 180.0, 10)
+    wave(image, ANGLE * math.pi / 180.0, 10)
     SCREEN.blit(image, (0, 0))
 
     pygame.display.flip()
