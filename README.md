@@ -1,5 +1,10 @@
 # Pygame Shaders Library 
 
+*New version 1.0.3* and WIKI available here https://github.com/yoyoberenguer/PygameShader/wiki
+```
+pip install PygameShader==1.0.3
+```
+
 
 Pygame shader project is a `2D game library` written in Python and Cython containing
 `special effects` for development of multimedia applications like video games, arcade game, 
@@ -101,7 +106,21 @@ This version contains the following shaders:
   - rain (bubble effect), You can generate a hundred bubbles or 
     water droplets on your game display, the droplets/bubbles will 
     reflect the game display in real time
-    
+ 
+* New in version 1.0.3 
+  - Added blending mode for `Predator mode`                  
+  - New algorithm `dirt_lens effect` bokeh effect
+  - `Dithering` The classic dithering effect to create a retro image effect
+  - `Color_palette` to convert image into Amstrad CPC 6128
+     COMMODORE C64, ZX SPECTRUM etc 
+  - `Bilateral filter`Blur effect that conserve the edge of an image 
+  - `Emboss filter` Emboss an image or create relief 
+  - `Pixelation` Pixelate an image
+  - `Convert to 27 colors` Similar to color_reduction effect but cap the reduction to 27 colors
+  - `Spectrum surface` Create a pygame surface that contains the light spectrum (colors)
+  - `Horizontal gradient (unit misc.pyx)` New algorithms to create custom 2D - 3D gradient colors surface
+  - `New transition effect (blend effect)` Transistion between two images
+
 ## Demo
 
 Youtube : https://youtu.be/XgLF2BWP0Rs
