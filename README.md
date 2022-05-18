@@ -1,8 +1,8 @@
 # Pygame Shaders Library 
 
-*New version 1.0.3* and WIKI available here https://github.com/yoyoberenguer/PygameShader/wiki
+*New version 1.0.4* and WIKI available here https://github.com/yoyoberenguer/PygameShader/wiki
 ```
-pip install PygameShader==1.0.3
+pip install PygameShader==1.0.4
 ```
 
 
