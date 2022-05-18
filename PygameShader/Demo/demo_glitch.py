@@ -1,7 +1,7 @@
 import pygame
 from pygame import RLEACCEL
 import PygameShader
-from PygameShader import shader_horizontal_glitch24_inplace
+from PygameShader import horizontal_glitch
 
 WIDTH = 1024
 HEIGHT = 768
@@ -29,7 +29,7 @@ while GAME:
             GAME = False
             break
 
-    shader_horizontal_glitch24_inplace(image, 0.5, 0.08, FRAME % 20)
+    horizontal_glitch(image, 0.5, 0.08, FRAME % 20)
 
     SCREEN.blit(image, (0, 0))
 
