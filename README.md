@@ -1,6 +1,6 @@
 # Pygame Shaders Library 
 
-*Future version 1.0.5 will contains GPU accelartation for some of the methods*
+*Future version 1.0.5 will contains GPU acceleration for some of the methods*
 
 *New version 1.0.4* and WIKI available here https://github.com/yoyoberenguer/PygameShader/wiki
 ```
