@@ -6374,7 +6374,7 @@ cpdef inline unsigned int rgb_to_int(int red, int green, int blue)nogil:
     :param blue  : Blue color, must be in range [0.255]
     :return      : returns a positive python integer representing the RGB values(int32)
     """
-    return 65536 * red + 65536*10 + 256 * green + 256 + blue + 1
+    return 65536 * red + 256 * green + 256 + blue
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
