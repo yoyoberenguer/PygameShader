@@ -1,7 +1,7 @@
 import pygame
 from pygame import RLEACCEL
 import PygameShader
-from PygameShader import shader_bloom_effect_array24
+from PygameShader import bloom
 
 WIDTH = 1024
 HEIGHT = 768
@@ -10,10 +10,12 @@ SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 
 background = pygame.image.load("../Assets/Background.jpg").convert()
-background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))    
+background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+    
 image = background.copy()
  
-FRAME = 0
+
+FRAME = 0
 CLOCK = pygame.time.Clock()
 GAME = True
 V = 0.5
@@ -30,7 +32,7 @@ while GAME:
                     GAME = False
                     break
 
-            shader_bloom_effect_array24(image, BPF, fast_=True)
+            bloom(image, BPF, fast_=True)
            
             SCREEN.blit(image, (0, 0))
             pygame.display.flip()
