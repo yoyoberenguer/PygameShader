@@ -160,7 +160,6 @@ except ImportError:
 from PygameShader.gaussianBlur5x5 import canny_blur5x5_surface24_c
 from PygameShader.misc cimport color_diff_hsv, color_diff_hsl, close_color
 
-import cupy as cp
 cimport numpy as np
 
 from libc.stdlib cimport rand, malloc
