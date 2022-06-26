@@ -37,6 +37,9 @@ to have an overview of CUPY and CUDA
 
 `A wiki page will be soon available for the GPU shaders`
 
+```
+pip install PygameShader==1.0.5
+```
 
 ---
 
