@@ -1,7 +1,13 @@
 # Pygame Shaders Library 
 
 
-*New Version 1.0.5*
+
+*New Version 1.0.6*
+
+
+```
+pip install PygameShader==1.0.6
+```
 
 Some scripts have been ported to GPU using CUPY and CUDA raw Kernels for running 
 on NVIDIA graphics cards (NVIDIA CUDA GPU with the compute Capability 3.0 or larger.). 
@@ -35,11 +41,13 @@ For the curious, please check this excellent post
 https://carpentries-incubator.github.io/lesson-gpu-programming/aio/index.html
 to have an overview of CUPY and CUDA 
 
+*In python*
+```
+from PygameShader.shader_gpu import *
+```
+
 `A wiki page will be soon available for the GPU shaders`
 
-```
-pip install PygameShader==1.0.5
-```
 
 ---
 
