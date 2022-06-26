@@ -36,6 +36,7 @@ gcc -shared -o libhello.so -fPIC hello.c
 #include <time.h>
 #include <omp.h>
 
+inline double * my_sort(double buffer[], int filter_size);
 inline void swap(int* a, int* b);
 inline int partition (int arr[], int low, int high);
 inline int * quickSort(int arr[], int low, int high);
@@ -150,6 +151,26 @@ inline float fmin_rgb_value(float red, float green, float blue)
 	    return blue;
 	}
 }
+
+
+inline double * my_sort(double buffer[], int filter_size){
+double temp=0;
+int i, j;
+for (i = 0; i < (filter_size - 1); ++i)
+    {
+        for (j = 0; j < filter_size - 1 - i; ++j )
+        {
+            if (buffer[j] > buffer[j+1])
+            {
+                temp = buffer[j+1];
+                buffer[j+1] = buffer[j];
+                buffer[j] = temp;
+            }
+        }
+    }
+return buffer;
+}
+
 
 
 

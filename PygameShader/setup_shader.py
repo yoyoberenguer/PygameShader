@@ -30,7 +30,11 @@ setup(
                   language="c"),
         Extension("Palette", ["Palette.pyx"],
                   extra_compile_args=["/openmp", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"],
-                  language="c")
+                  language="c"),
+        Extension("shader_gpu", ["shader_gpu.pyx"],
+                  extra_compile_args=["/openmp", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"],
+                  language="c"),
+
     ]),
 
 

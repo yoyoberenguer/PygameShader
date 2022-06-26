@@ -2,7 +2,17 @@
 Setup.py file
 
 Configure the project, build the package and upload the package to PYPI
+
+
+python_version setup.py sdist bdist_wheel (to include the source)
+
+[TEST PYPI]
+repository = https://test.pypi.org/
+
+[PRODUCTION]
+repository = https://upload.pypi.org/legacy/
 """
+
 import setuptools
 from Cython.Build import cythonize
 from setuptools import Extension
@@ -18,10 +28,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 # version 1.0.1 Yank, latest version 1.0.2
-# pypitest latest version 1.0.16
+# pypitest latest version 1.0.17
+
 setuptools.setup(
     name="PygameShader",
-    version="1.0.2",
+    version= "1.0.5",       # testing version "1.0.23",
     author="Yoann Berenguer",
     author_email="yoyoberenguer@hotmail.com",
     description="Pygame shader effects for 2D video game and arcade game",
@@ -39,7 +50,13 @@ setuptools.setup(
                   language="c"),
         Extension("PygameShader.gaussianBlur5x5", ["PygameShader/gaussianBlur5x5.pyx"],
                   extra_compile_args=["/openmp", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"],
-                  language="c")
+                  language="c"),
+        Extension("PygameShader.Palette", ["PygameShader/Palette.pyx"],
+                  extra_compile_args=["/openmp", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"],
+                  language="c"),
+        Extension("PygameShader.shader_gpu", ["PygameShader/shader_gpu.pyx"],
+                  extra_compile_args=["/openmp", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"],
+                  language="c"),
     ]),
 
     include_dirs=[numpy.get_include()],
@@ -79,7 +96,8 @@ setuptools.setup(
         'setuptools>=49.2.1',
         'Cython>=0.28',
         'numpy>=1.18',
-        'pygame>=2.0'
+        'pygame>=2.0',
+        'cupy >=9.6.0'
     ],
     python_requires='>=3.6',
     platforms=['Windows'],
@@ -96,7 +114,12 @@ setuptools.setup(
           'PygameShader/setup_shader.py',
           'PygameShader/shader.pyx',
           'PygameShader/shader.pxd',
-          'PygameShader/misc.pyx'
+          'PygameShader/misc.pyx',
+          'PygameShader/misc.pxd',
+          'PygameShader/gaussianBlur5x5.pyx',
+          'PygameShader/Palette.pyx',
+          'PygameShader/shader_gpu.pyx',
+          'PygameShader/shader_gpu.pxd'
           ]),
         ('./lib/site-packages/PygameShader/Include',
          ['PygameShader/Include/ShaderLib.c'
@@ -108,18 +131,40 @@ setuptools.setup(
           ]),
         ('./lib/site-packages/PygameShader/Assets',
          [
+             'PygameShader/Assets/Aliens.jpg',
              'PygameShader/Assets/background.jpg',
+             'PygameShader/Assets/background2.jpg',
+             'PygameShader/Assets/city.jpg',
+             'PygameShader/Assets/ES_WaterDrip1.wav',
+             'PygameShader/Assets/ES_WaterDrip2.wav',
+             'PygameShader/Assets/ES_WaterDrip3.wav',
+             'PygameShader/Assets/img.png',
+             'PygameShader/Assets/Radial4.png',
+             'PygameShader/Assets/Radial8.png',
              'PygameShader/Assets/redvignette.png',
-             'PygameShader/Assets/Screendump3.png',
              'PygameShader/Assets/space1.jpg',
-             'PygameShader/Assets/space2.jpg'
+             'PygameShader/Assets/space2.jpg',
+             'PygameShader/Assets/Bokeh__Lens_Dirt_9.jpg',
+             'PygameShader/Assets/Bokeh__Lens_Dirt_38.jpg',
+             'PygameShader/Assets/Bokeh__Lens_Dirt_46.jpg',
+             'PygameShader/Assets/Bokeh__Lens_Dirt_50.jpg',
+             'PygameShader/Assets/Bokeh__Lens_Dirt_54.jpg',
+             'PygameShader/Assets/Bokeh__Lens_Dirt_67.jpg'
+
          ]),
         ('./lib/site-packages/PygameShader/Demo',
          [
-             'PygameShader/Demo/demo_cartoon.py',
+             'PygameShader/Demo/cloud_smoke_effect.py',
+             'PygameShader/Demo/demo_bloom.py',
              'PygameShader/Demo/demo_fire.py',
-             'PygameShader/Demo/demo_wave.py'
-
+             'PygameShader/Demo/demo_transition.py',
+             'PygameShader/Demo/demo_wave.py',
+             'PygameShader/Demo/GPU_cartoon.py',
+             'PygameShader/Demo/GPU_demo_ripple.py',
+             'PygameShader/Demo/GPU_fisheye.py',
+             'PygameShader/Demo/GPU_hsl.py',
+             'PygameShader/Demo/GPU_light.py',
+             'PygameShader/Demo/GPU_wave.py'
          ])
     ],
 
