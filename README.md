@@ -1,6 +1,44 @@
 # Pygame Shaders Library 
 
-*Future version 1.0.5 will contains GPU acceleration for some of the methods*
+
+*New Version 1.0.5*
+
+Some scripts have been ported to GPU using CUPY and CUDA raw Kernels for running 
+on NVIDIA graphics cards (NVIDIA CUDA GPU with the compute Capability 3.0 or larger.). 
+These shaders are only compatible with NVIDIA chipset.
+
+In order to use the GPU shaders the library `CUPY` has to be 
+installed on your system in addition to CUDA Toolkit: 
+v10.2 / v11.0 / v11.1 / v11.2 / v11.3 / v11.4 / v11.5 / v11.6. 
+Please refer to the below link for the full installation 
+https://docs.cupy.dev/en/stable/install.html
+
+The GPU shaders are still experimental, and the performances are restricted
+by the pci-express bandwidth due to the amount of data sent from the CPU to 
+the GPU, especially when the shaders are use for real time rendering.
+
+Check the Shader GPU_demo_ripple.py in the `Demo folder` for an example of real time 
+rendering of a pygame.Surface.
+
+How this shaders compare to GLSL (GL shading language): 
+You may ask yourself how fast these shaders perform against the shading language GLSL,
+well without any doubt GLSL outperform CUPY & CUDA for graphics performance. 
+However, CUDA is taking advantage of its highly parallelized architecture and will improve 
+the speed of pygame, python & cython algorithms designed for CPU architecture only.
+
+Difference between shading language and CUDA:
+CUDA is essentially just a way to run compute shaders without the graphics API and
+without requiring a particular language. CUDA programs are compiled into PTX (NVIDIA's
+analoque to x86 assembly for the GPU.
+
+For the curious, please check this excellent post 
+https://carpentries-incubator.github.io/lesson-gpu-programming/aio/index.html
+to have an overview of CUPY and CUDA 
+
+`A wiki page will be soon available for the GPU shaders`
+
+
+---
 
 *New version 1.0.4* and WIKI available here https://github.com/yoyoberenguer/PygameShader/wiki
 ```

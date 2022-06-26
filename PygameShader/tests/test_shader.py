@@ -7,7 +7,8 @@ import sys
 import unittest
 import os
 import time
-from random import uniform, randint
+from random import uniform, randint, random
+import cupy
 
 import cython
 import numpy
@@ -37,16 +38,17 @@ from PygameShader.shader import rgb_to_bgr, rgb_to_brg, \
     dampening, lateral_dampening, mirroring, cloud_effect, \
     tunnel_render32, tunnel_modeling32, ripple, rgb_split, \
     heatwave_vertical, horizontal_glitch, plasma, \
-    rain_fisheye, rain_footprint
+    rain_fisheye, rain_footprint, area24_c, stack_buffer_c
 
 import PygameShader
-from PygameShader import cartoon, blend, dirt_lens, dirt_lens_blur
+from PygameShader import cartoon, blend, dirt_lens
+from PygameShader.shader_gpu import ripple_effect_gpu, block_grid, area24_gpu
 
 PROJECT_PATH = list(PygameShader.__path__)
 os.chdir(PROJECT_PATH[0] + "\\tests")
 
-WIDTH = 1024
-HEIGHT = 768
+WIDTH = 800
+HEIGHT = 600
 # SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, pygame.OPENGL, vsync=True)
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=True)
 SCREEN.convert(32, RLEACCEL)
@@ -931,7 +933,7 @@ class TestShaderBloomEffectArray24(unittest.TestCase):
 
         :return:  void
         """
-        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.image.load("../Assets/city.jpg").convert()
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         # background.convert(32, RLEACCEL)
         image = background.copy()
@@ -1142,6 +1144,11 @@ class TestPredatorVisionMode(unittest.TestCase):
         BACKGROUND = pygame.image.load("../Assets/background.jpg").convert()
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
         image = BACKGROUND.copy()
+
+        BACKGROUND1 = pygame.image.load("../Assets/city.jpg").convert()
+        BACKGROUND1 = pygame.transform.smoothscale(BACKGROUND1, (WIDTH, HEIGHT))
+        image1 = BACKGROUND1.copy()
+
         pygame.display.set_caption("Test predator_vision")
 
         FRAME = 0
@@ -1159,8 +1166,15 @@ class TestPredatorVisionMode(unittest.TestCase):
                     GAME = False
                     break
 
-            surface_ = predator_vision(image, sobel_threshold=80, bpf_threshold=0,
-                                       bloom_threshold=0, inv_colormap=True, fast=False)
+            if FRAME < 30:
+                surface_ = predator_vision(
+                    image.copy(), sobel_threshold=80, bpf_threshold=0,
+                    bloom_threshold=0, inv_colormap=True, fast=True)
+            else:
+                surface_ = predator_vision(
+                    image1.copy(), sobel_threshold=10, bpf_threshold=0,
+                    bloom_threshold=50, inv_colormap=True, fast=True)
+
             # SCREEN.fill((0, 0, 0))
             SCREEN.blit(surface_, (0, 0))
             pygame.display.flip()
@@ -1169,7 +1183,7 @@ class TestPredatorVisionMode(unittest.TestCase):
             pygame.display.set_caption(
                 "Test predator_vision %s fps "
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-            image = BACKGROUND.copy()
+
             if time.time() - t > 5:
                 break
 
@@ -1186,7 +1200,7 @@ class TestShaderBloodInplace(unittest.TestCase):
 
         :return:  void
         """
-        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.image.load("../Assets/aliens.jpg").convert()
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
@@ -1245,7 +1259,7 @@ class TestShaderSharpenFilterInplace(unittest.TestCase):
 
         :return:  void
         """
-        background = pygame.image.load("../Assets/background.jpg").convert()
+        background = pygame.image.load("../Assets/city.jpg").convert()
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
@@ -1304,10 +1318,10 @@ class TestshaderFireEffect(unittest.TestCase):
         arr = numpy.array([0, 1,  # violet
                            0, 1,  # blue
                            0, 1,  # green
-                           2, 619,  # yellow
+                           0, 619,  # yellow
                            620, 650,  # orange
-                           651, 660],  # red
-                          numpy.int)
+                           651, 680],  # red
+                          numpy.int32)
 
         HEATMAP = [custom_map(i - 20, arr, 1.0) for i in range(380, 800)]
         heatmap_array = numpy.zeros((800 - 380, 3), uint8)
@@ -1342,12 +1356,15 @@ class TestshaderFireEffect(unittest.TestCase):
             surface_ = fire_effect(
                 WIDTH, HEIGHT, 3.97 + uniform(0.002, 0.008),
                 heatmap_rescale,
-                FIRE_ARRAY, reduce_factor_=3, bloom_=True, fast_bloom_=False, bpf_threshold_=48,
-                brightness_=True, brightness_intensity_=0.095, transpose_=False, border_=False,
-                low_=0, high_=WIDTH, blur_=True).convert(
-                32, RLEACCEL)
+                FIRE_ARRAY,
+                reduce_factor_=3, fire_intensity_=32,
+                smooth_=True, bloom_=True, fast_bloom_=False,
+                bpf_threshold_=128, low_=1, high_=WIDTH, brightness_=True,
+                brightness_intensity_=0.1, adjust_palette_=True,
+                hsl_=(10, 80, 1.8), transpose_=False, border_=False,
+                surface_=None).convert()
 
-            SCREEN.blit(surface_, (0, 0), special_flags=BLEND_RGB_ADD)
+            SCREEN.blit(surface_, (0, 0), special_flags=pygame.BLEND_RGBA_MAX)
 
             pygame.display.flip()
             CLOCK.tick()
@@ -1424,8 +1441,8 @@ class TestshaderFireEffect1(unittest.TestCase):
                 FIRE_ARRAY,
                 reduce_factor_=3, fire_intensity_=16,
                 smooth_=True, bloom_=True, fast_bloom_=False,
-                bpf_threshold_=128, low_=1, high_=WIDTH, brightness_=True,
-                brightness_intensity_=0.1, adjust_palette_=True,
+                bpf_threshold_=1, low_=1, high_=WIDTH, brightness_=True,
+                brightness_intensity_=0.15, adjust_palette_=False,
                 hsl_=(10, 80, 1.8), transpose_=False, border_=False,
                 surface_=None).convert(32, RLEACCEL)
 
@@ -1557,7 +1574,7 @@ class TestMirroringInplace(unittest.TestCase):
 
         :return:  void
         """
-        BACKGROUND = pygame.image.load("../Assets/background.jpg")
+        BACKGROUND = pygame.image.load("../Assets/city.jpg")
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
         image = BACKGROUND.copy()
         pygame.display.set_caption("Test mirroring")
@@ -1800,6 +1817,143 @@ class TestShaderRipple(unittest.TestCase):
                 break
 
 
+
+
+def ripple_2(previous, current):
+
+    val = (cupy.roll(previous, 1, axis=0).astype(dtype=cupy.float32) +
+           cupy.roll(previous, -1, axis=0).astype(dtype=cupy.float32) +
+           cupy.roll(previous, 1, axis=1).astype(dtype=cupy.float32) +
+           cupy.roll(previous, -1, axis=1).astype(dtype=cupy.float32)) / float(2.0) - current.astype(dtype=cupy.float32)
+
+    current = (val * 0.98).astype(dtype=cupy.float32)
+
+    return previous, current
+
+
+def show_fps(screen_, fps_, avg_) -> None:
+    """ Show framerate in upper left corner """
+    font = pygame.font.SysFont("Arial", 15)
+    fps = str(f"fps:{fps_:.3f}")
+    av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
+
+    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    screen_.blit(fps_text, (10, 0))
+    if av != 0:
+        av = str(f"avg:{av:.3f}")
+        avg_text = font.render(av, 1, pygame.Color("coral"))
+        screen_.blit(avg_text, (80, 0))
+    if len(avg_) > 200:
+        avg_ = avg_[200:]
+
+
+class TestShaderRippleGpu(unittest.TestCase):
+    """
+    Test ripple
+    """
+
+    # pylint: disable=too-many-statements
+    @staticmethod
+    def runTest() -> None:
+        """
+
+        :return:  void
+        """
+        width = 900
+        height = 600
+
+        texture = pygame.image.load('../Assets/background2.jpg').convert()
+        texture = pygame.transform.smoothscale(texture, (width, height))
+        texture.set_colorkey((0, 0, 0, 0), pygame.RLEACCEL)
+        texture.set_alpha(None)
+
+        BACKGROUND = pygame.image.load("../Assets/background2.jpg").convert()
+        BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (width, height))
+        BACKGROUND.set_colorkey((0, 0, 0, 0), pygame.RLEACCEL)
+        BACKGROUND_COPY = BACKGROUND.copy()
+
+        SCREENRECT = pygame.Rect(0, 0, width, height)
+        pygame.display.init()
+        # SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.DOUBLEBUF, 32)
+
+
+        pygame.init()
+
+        clock = pygame.time.Clock()
+        FRAME = 0
+        STOP_GAME = False
+
+        current = cupy.empty((width, height), dtype=cupy.float32)
+        previous = cupy.empty((width, height), dtype=cupy.float32)
+        texture_array = cupy.asarray(pygame.surfarray.array3d(texture), dtype=cupy.uint8)
+        back_array = cupy.asarray(pygame.surfarray.pixels3d(BACKGROUND), dtype=cupy.uint8)
+
+        # TWEAKS
+        cget_fps = clock.get_fps
+        event_pump = pygame.event.pump
+        event_get = pygame.event.get
+        get_key = pygame.key.get_pressed
+        get_pos = pygame.mouse.get_pos
+        flip = pygame.display.flip
+
+        array = cupy.full((width, height, 3), 0, dtype=cupy.uint8)
+        grid, block = block_grid(width, height)
+        avg = []
+        while not STOP_GAME:
+
+            pygame.display.set_caption("DEMO ripple effect GPU : FPS %s " % round(cget_fps(), 2))
+
+            event_pump()
+
+            keys = get_key()
+            # SCREEN.fill((0, 0, 0, 0))
+            for event in event_get():
+
+                if keys[pygame.K_ESCAPE]:
+                    STOP_GAME = True
+                    break
+
+                if event.type == pygame.MOUSEMOTION:
+                    mouse_pos = pygame.math.Vector2(get_pos())
+
+                    previous[int(mouse_pos.x % width), int(mouse_pos.y % height)] = 2 ** 12
+
+            rnd = randint(0, 1000)
+
+            if rnd > 820:
+
+                previous[randint(0, width - 2), randint(0, height - 2)] = 2 ** 10
+
+            # METHOD 1
+            # previous, current = ripple_2(current, previous)
+            # array[:, :, 0:3] = current.reshape((width, height, 1))
+            #
+            # surf = pygame.image.frombuffer(array.transpose(1, 0, 2).tobytes(), (width, height), "RGB")
+            # BACKGROUND.blit(surf, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
+            # SCREEN.blit(BACKGROUND, (0, 0))
+            # BACKGROUND = BACKGROUND_COPY.copy()
+
+            SCREEN.fill((0, 0, 0))
+
+
+            # METHOD 2
+            previous, current = ripple_effect_gpu(
+                grid, block, width, height,
+                current, previous, texture_array, back_array)
+            surf = pygame.image.frombuffer(back_array.transpose(1, 0, 2).tobytes(), (width, height), "RGB")
+            SCREEN.blit(surf, (0, 0))
+
+            clock.tick(8000)
+            t = clock.get_fps()
+            avg.append(t)
+            show_fps(SCREEN, t, avg)
+            FRAME += 1
+            flip()
+        pygame.mixer.stop()
+
+
+
+
 class TestRgbSplit(unittest.TestCase):
     """
     Test rgb_split
@@ -1979,6 +2133,7 @@ class TestShaderCartoon(unittest.TestCase):
         t = time.time()
         while GAME:
 
+            SCREEN.fill((0, 0, 0))
             pygame.event.pump()
             for event in pygame.event.get():
 
@@ -1988,8 +2143,8 @@ class TestShaderCartoon(unittest.TestCase):
                     GAME = False
                     break
 
-            surface_ = cartoon(image, sobel_threshold_=32, median_kernel_=2, color_=128,
-                               flag_=BLEND_RGB_ADD).convert()
+            surface_ = cartoon(image, sobel_threshold_=128, median_kernel_=3, color_=4,
+                               flag_=BLEND_RGB_ADD)
 
             SCREEN.blit(surface_, (0, 0), special_flags=0)
 
@@ -2118,7 +2273,7 @@ class TestDirtLens(unittest.TestCase):
                     GAME = False
                     break
 
-            dirt_lens_blur(IMAGE, flag_=BLEND_RGB_ADD, lens_model_=lens, light_=VALUE)
+            dirt_lens(IMAGE, flag_=BLEND_RGB_ADD, lens_model_=lens, light_=VALUE)
 
             SCREEN.blit(IMAGE, (0, 0))
             image, rect = FONT.render(
@@ -2145,6 +2300,174 @@ class TestDirtLens(unittest.TestCase):
 
             IMAGE = IMAGE_COPY.copy()
             lens = lens_copy.copy()
+
+
+
+class TestLight_CPU(unittest.TestCase):
+    """
+    Test Light
+    """
+
+    # pylint: disable=too-many-statements
+    @staticmethod
+    def runTest() -> None:
+        """
+
+        :return:  void
+        """
+        SCREENRECT = pygame.Rect(0, 0, 800, 600)
+        pygame.display.init()
+        SCREEN = pygame.display.set_mode(SCREENRECT.size,  pygame.DOUBLEBUF, 32)
+        pygame.init()
+        background = pygame.image.load('..//Assets//Aliens.jpg').convert()
+        background.set_alpha(None)
+
+        background = pygame.transform.smoothscale(background, (800, 800))
+        background_rgb = pygame.surfarray.pixels3d(background)
+        w, h = background.get_size()
+
+        back = background.copy()
+        back.set_alpha(255)
+
+        pygame.display.set_caption("demo light effect")
+
+        light = pygame.image.load('..//Assets//Radial8.png').convert_alpha()
+        light = pygame.transform.smoothscale(light, (600, 600))
+        lw, lh = light.get_size()
+        lw2, lh2 = lw >> 1, lh >> 1
+
+        lalpha = pygame.surfarray.pixels_alpha(light)
+
+        c = numpy.array([128.0 / 255.0, 128.0 / 255.0, 200.0 / 255.0], numpy.float32, copy=False)
+        MOUSE_POS = [0, 0]
+        FRAME = 0
+        CLOCK = pygame.time.Clock()
+        GAME = True
+        avg = []
+        while GAME:
+
+            pygame.event.pump()
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEMOTION:
+                    MOUSE_POS = event.pos
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_ESCAPE]:
+                    GAME = False
+                    break
+
+            lit_surface, sw, sh = area24_c(
+                MOUSE_POS[0], MOUSE_POS[1], background_rgb, lalpha, intensity=8.0, color=c,
+                smooth=False, saturation=False, sat_value=0.4, bloom=False, heat=False, frequency=1000)
+
+
+            if sw < lw and MOUSE_POS[0] <= lw - lw2:
+                xx = 0
+            else:
+                xx = MOUSE_POS[0] - lw2
+
+            if sh < lh and MOUSE_POS[1] <= lh - lh2:
+                yy = 0
+            else:
+                yy = MOUSE_POS[1] - lh2
+
+            SCREEN.fill((0, 0, 0))
+            SCREEN.blit(lit_surface, (xx, yy), special_flags=pygame.BLEND_RGBA_ADD)
+            CLOCK.tick(8000)
+            t = CLOCK.get_fps()
+            avg.append(t)
+            show_fps(SCREEN, t, avg)
+            pygame.display.flip()
+
+            FRAME += 1
+
+            pygame.display.set_caption(
+                "Test light CPU %s fps"
+                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+
+
+
+class TestLight_GPU(unittest.TestCase):
+    """
+    Test Light
+    """
+
+    # pylint: disable=too-many-statements
+    @staticmethod
+    def runTest() -> None:
+        """
+
+        :return:  void
+        """
+        SCREENRECT = pygame.Rect(0, 0, 800, 600)
+        pygame.display.init()
+        SCREEN = pygame.display.set_mode(SCREENRECT.size,  pygame.DOUBLEBUF, 32)
+        pygame.init()
+
+        background = pygame.image.load('..//Assets//Aliens.jpg').convert()
+        background.set_alpha(None)
+
+        background = pygame.transform.smoothscale(background, (800, 800))
+        background_rgb = cupy.asarray(pygame.surfarray.pixels3d(background), dtype=cupy.uint8)
+        background_rgb = background_rgb.transpose(1, 0, 2)
+        w, h = background.get_size()
+
+        back = background.copy()
+        back.set_alpha(255)
+
+        pygame.display.set_caption("demo light effect")
+
+        light = pygame.image.load('..//Assets//Radial8.png').convert_alpha()
+        light = pygame.transform.smoothscale(light, (600, 600))
+        lalpha = cupy.asarray(pygame.surfarray.pixels_alpha(light), dtype=cupy.uint8)
+
+        lw, lh = light.get_size()
+        lw2, lh2 = lw >> 1, lh >> 1
+
+        c = cupy.array([128.0 / 255.0, 128.0 / 255.0, 200.0 / 255.0], numpy.float32, copy=False)
+        MOUSE_POS = [0, 0]
+        FRAME = 0
+        CLOCK = pygame.time.Clock()
+        GAME = True
+        avg = []
+        while GAME:
+
+            pygame.event.pump()
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEMOTION:
+                    MOUSE_POS = event.pos
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_ESCAPE]:
+                    GAME = False
+                    break
+
+            lit_surface, sw, sh = area24_gpu(
+                MOUSE_POS[0], MOUSE_POS[1], background_rgb, lalpha, intensity=8.0, color=c)
+
+
+            if sw < lw and MOUSE_POS[0] <= lw - lw2:
+                xx = 0
+            else:
+                xx = MOUSE_POS[0] - lw2
+
+            if sh < lh and MOUSE_POS[1] <= lh - lh2:
+                yy = 0
+            else:
+                yy = MOUSE_POS[1] - lh2
+
+            SCREEN.fill((0, 0, 0))
+            SCREEN.blit(lit_surface, (xx, yy), special_flags=pygame.BLEND_RGBA_ADD)
+            t = CLOCK.get_fps()
+            avg.append(t)
+            show_fps(SCREEN, t, avg)
+            pygame.display.flip()
+            CLOCK.tick()
+            FRAME += 1
+
+            pygame.display.set_caption(
+                "Demo light GPU %s fps"
+                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
 
 import pyglet
 from os import path
@@ -2296,78 +2619,77 @@ def play_intro():
             running = False
 
 
-
-class TestShaderMultiFisheyes(unittest.TestCase):
-    """
-        Test RainDrops
-        """
-
-    # pylint: disable=too-many-statements
-    @staticmethod
-    def runTest() -> None:
-        """
-
-        :return:  void
-        """
-
-        play_intro()
-
-        pygame.display.set_caption("Test RainDrops")
-
-        FRAME = 0
-        CLOCK = pygame.time.Clock()
-        GAME = True
-
-        TEXTURE_SIZE = 512
-        s, arr = rain_footprint(TEXTURE_SIZE, TEXTURE_SIZE)
-
-        RAIN_LIST = []
-
-        for i in range(2):
-            RAIN_LIST.append((randint(0, 1024), randint(0, 200)))
-
-
-        t = time.time()
-
-        while GAME:
-
-            pygame.event.pump()
-            for event in pygame.event.get():
-
-                keys = pygame.key.get_pressed()
-
-                if keys[pygame.K_ESCAPE]:
-                    GAME = False
-                    break
-
-            surface = FULL_VIDEO[FRAME % len(FULL_VIDEO)]
-            SCREEN.blit(surface, (0, 0))
-
-            ss = pygame.transform.scale(
-                SCREEN, (TEXTURE_SIZE, TEXTURE_SIZE))
-            rain_fisheye(ss, arr)
-            p = ss.get_at((0, 0))
-            ss.set_colorkey(p)
-
-            surf = pygame.Surface((TEXTURE_SIZE, TEXTURE_SIZE)).convert()
-            surf.fill((0, 0, 0))
-            surf.blit(ss, (0, 0))
-
-            for i in range(2):
-                SCREEN.blit(surf,
-                            (RAIN_LIST[i][0], RAIN_LIST[i][1]), special_flags=pygame.BLEND_RGB_MAX)
-
-
-            pygame.display.flip()
-            CLOCK.tick(60)
-            FRAME += 1
-
-            pygame.display.set_caption(
-                "Test fisheye %s fps "
-                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-
-            # if time.time() - t > 200:
-            #     break
+# class TestShaderMultiFisheyes(unittest.TestCase):
+#     """
+#         Test RainDrops
+#         """
+#
+#     # pylint: disable=too-many-statements
+#     @staticmethod
+#     def runTest() -> None:
+#         """
+#
+#         :return:  void
+#         """
+#
+#         play_intro()
+#
+#         pygame.display.set_caption("Test RainDrops")
+#
+#         FRAME = 0
+#         CLOCK = pygame.time.Clock()
+#         GAME = True
+#
+#         TEXTURE_SIZE = 512
+#         s, arr = rain_footprint(TEXTURE_SIZE, TEXTURE_SIZE)
+#
+#         RAIN_LIST = []
+#
+#         for i in range(2):
+#             RAIN_LIST.append((randint(0, 1024), randint(0, 200)))
+#
+#
+#         t = time.time()
+#
+#         while GAME:
+#
+#             pygame.event.pump()
+#             for event in pygame.event.get():
+#
+#                 keys = pygame.key.get_pressed()
+#
+#                 if keys[pygame.K_ESCAPE]:
+#                     GAME = False
+#                     break
+#
+#             surface = FULL_VIDEO[FRAME % len(FULL_VIDEO)]
+#             SCREEN.blit(surface, (0, 0))
+#
+#             ss = pygame.transform.scale(
+#                 SCREEN, (TEXTURE_SIZE, TEXTURE_SIZE))
+#             rain_fisheye(ss, arr)
+#             p = ss.get_at((0, 0))
+#             ss.set_colorkey(p)
+#
+#             surf = pygame.Surface((TEXTURE_SIZE, TEXTURE_SIZE)).convert()
+#             surf.fill((0, 0, 0))
+#             surf.blit(ss, (0, 0))
+#
+#             for i in range(2):
+#                 SCREEN.blit(surf,
+#                             (RAIN_LIST[i][0], RAIN_LIST[i][1]), special_flags=pygame.BLEND_RGB_MAX)
+#
+#
+#             pygame.display.flip()
+#             CLOCK.tick(60)
+#             FRAME += 1
+#
+#             pygame.display.set_caption(
+#                 "Test fisheye %s fps "
+#                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+#
+#             # if time.time() - t > 200:
+#             #     break
 
 
 def run_testsuite():
@@ -2417,12 +2739,15 @@ def run_testsuite():
         TestShaderCloudEffect(),
         TestTunnelRender32(),
         TestShaderRipple(),
+        TestShaderRippleGpu(),
         TestRgbSplit(),
         TestShaderHorizontalGlitch24Inplace(),
         TestShaderHeatwave24VerticalInplace(),
         TestShaderCartoon(),
         TestShaderBlend24(),
-        # TestShaderMultiFisheyes()
+        TestDirtLens(),
+        TestLight_CPU(),
+        TestLight_GPU()
     ])
 
     unittest.TextTestRunner().run(suite)

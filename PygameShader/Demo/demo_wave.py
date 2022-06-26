@@ -20,17 +20,36 @@ except ImportError:
 try:
     import pygame
     from pygame import Surface, RLEACCEL, QUIT, K_SPACE, BLEND_RGB_ADD
+    from pygame.transform import scale
 
 except ImportError:
     raise ImportError("\n<Pygame> library is missing on your system."
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
 
+
+def show_fps(screen_, fps_, avg_) -> None:
+    """ Show framerate in upper left corner """
+    font = pygame.font.SysFont("Arial", 15)
+    fps = str(f"CPU fps:{fps_:.3f}")
+    av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
+
+    fps_text = font.render(fps, 1, pygame.Color("green"))
+    screen_.blit(fps_text, (10, 0))
+    if av != 0:
+        av = str(f"avg:{av:.3f}")
+        avg_text = font.render(av, 1, pygame.Color("green"))
+        screen_.blit(avg_text, (120, 0))
+    if len(avg_) > 200:
+        avg_ = avg_[200:]
+
+
 # Set the display to 1024 x 768
-WIDTH = 1024
-HEIGHT = 768
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=True)
+WIDTH = 800
+HEIGHT = 600
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, vsync=True)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
+pygame.init()
 
 # Load the background image
 BACKGROUND = pygame.image.load("../Assets/Background.jpg").convert()
@@ -44,6 +63,8 @@ CLOCK = pygame.time.Clock()
 GAME = True
 
 ANGLE = 0
+avg = []
+
 
 while GAME:
 
@@ -57,7 +78,12 @@ while GAME:
             break
 
     wave(image, ANGLE * math.pi / 180.0, 10)
-    SCREEN.blit(image, (0, 0))
+    image = scale(image, (WIDTH + 90, HEIGHT + 90))
+    SCREEN.blit(image, (-50, -50))
+
+    t = CLOCK.get_fps()
+    avg.append(t)
+    show_fps(SCREEN, t, avg)
 
     pygame.display.flip()
     CLOCK.tick()
@@ -70,3 +96,5 @@ while GAME:
         "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
 
     image = BACKGROUND.copy()
+
+pygame.quit()

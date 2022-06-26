@@ -149,7 +149,8 @@ cpdef void heatwave_vertical(
 cpdef void horizontal_glitch(object surface_, float rad1_, float frequency_,
                                               float amplitude_)
 cpdef void bpf(object surface_, int threshold = *)
-cpdef void bloom(object surface_, int threshold_, bint fast_=*)
+cpdef void bloom(object surface_, int threshold_, bint fast_=*, object mask_=*)
+cpdef object shader_bloom_fast(surface_, int threshold_, bint fast_ = *, unsigned short int factor_ = *)
 
 cpdef fisheye_footprint(int w, int h)
 cpdef void fisheye(object surface_, unsigned int [:, :, :] fisheye_model)
@@ -283,3 +284,12 @@ cpdef object bilateral(object image, float sigma_s, float sigma_i)
 cpdef object emboss(object surface_, unsigned int flag=*)
 
 cpdef object pixelation(object surface_)
+
+cpdef object bilinear(object surface_, int new_width, int new_height, fx=*, fy=*)
+
+cpdef object alpha_blending(object source_, object destination_)
+cpdef void alpha_blending_inplace(object source_, object destination_)
+
+cpdef float [:, :] array2d_normalized_c(unsigned char [:, :] array)
+cpdef filtering24_c(object surface_, mask_)
+cpdef void heatmap_convert(object surface_, bint rgb_=*)

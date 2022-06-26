@@ -85,3 +85,4 @@ while GAME:
         V = 0.2
 
 
+pygame.quit()

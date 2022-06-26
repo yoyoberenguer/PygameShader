@@ -100,6 +100,7 @@ cpdef swap_channels24_c(surface_, model):
     to null the entire channel. e.g : 'R0B' -> no green channel
 
     """
+
     assert PyObject_IsInstance(surface_, Surface), \
            'Expecting Surface for argument surface_ got %s ' % type(surface_)
 

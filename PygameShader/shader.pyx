@@ -67,9 +67,37 @@ cpdef predator_vision(object surface_, unsigned int sobel_threshold=*,
 """
 
 
+"""
+VERSION 1.0.5
+Bug correction in shader_median_filter24_inplace_c 
+The value returned previously was a minimal value and not the median value
+rgb_array_[i, j, 0] = tmpr[(index -1) >> 1]
+rgb_array_[i, j, 1] = tmpg[(index -1) >> 1]
+rgb_array_[i, j, 2] = tmpb[(index -1) >> 1]
+
+Bug correction in shader_plasma24bit_inplace_c  (replace t by t_)
+if i == 0:
+    r, g, b =  v, t_, p
+if i == 1:
+     r, g, b = q, v, p
+if i == 2:
+     r, g, b = p, v, t_
+if i == 3:
+     r, g, b = p, q, v
+if i == 4:
+     r, g, b = t_, p, v
+if i == 5:
+     r, g, b = v, p, q
+
+++ Added bilinear filter 
+++ Added alpha_blending
+++ Light effect 24 bit
+++ added shader_bloom_fast (much faster)
+++ bug corrected in fisheye lens (different width and height would have cause an exception)
+"""
 
 
-__VERSION__ = "1.0.3"
+__VERSION__ = "1.0.5"
 
 import warnings
 
@@ -132,10 +160,13 @@ except ImportError:
 from PygameShader.gaussianBlur5x5 import canny_blur5x5_surface24_c
 from PygameShader.misc cimport color_diff_hsv, color_diff_hsl, close_color
 
+import cupy as cp
+cimport numpy as np
+
 from libc.stdlib cimport rand, malloc
 from libc.math cimport sqrt, atan2, sin, cos, nearbyint, exp, pow, floor
 from libc.stdlib cimport malloc, free
-from libc.math cimport round as round_c
+from libc.math cimport round as round_c, fmin, fmax
 
 from libc.stdio cimport printf
 
@@ -151,7 +182,7 @@ cdef float C2 = <float>3.0/<float>16.0
 cdef float C3 = <float>5.0/<float>16.0
 cdef float C4 = <float>1.0/<float>16.0
 
-cdef int THREADS = 4
+cdef int THREADS = 8
 
 DEF HALF         = 1.0/2.0
 DEF ONE_THIRD    = 1.0/3.0
@@ -212,13 +243,6 @@ cdef:
 
 
 
-# todo  BILATERAL FILTER (CHECK project spritesheetstudio tools) + PIXELATE and PIXEL
-#  BLOCKS
-# TODO FUNCTION TESTING IMAGE
-# TODO ADD HSV
-
-
-
 cpdef inline void rgb_to_bgr(object surface_):
     """  
     SHADER RGB to BGR
@@ -239,7 +263,14 @@ cpdef inline void rgb_to_bgr(object surface_):
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    shader_rgb_to_bgr_inplace_c(pixels3d(surface_))
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+
+    shader_rgb_to_bgr_inplace_c(rgb_array)
 
 
 cpdef inline void rgb_to_brg(object surface_):
@@ -261,8 +292,13 @@ cpdef inline void rgb_to_brg(object surface_):
     """
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+    try:
+        rgb_array = pixels3d(surface_)
 
-    shader_rgb_to_brg_inplace_c(pixels3d(surface_))
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_rgb_to_brg_inplace_c(rgb_array)
 
 cpdef inline void greyscale(object surface_):
     """
@@ -286,7 +322,13 @@ cpdef inline void greyscale(object surface_):
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    shader_greyscale_luminosity24_inplace_c(pixels3d(surface_))
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_greyscale_luminosity24_inplace_c(rgb_array)
 
 
 cpdef inline void sepia(object surface_):
@@ -309,7 +351,13 @@ cpdef inline void sepia(object surface_):
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    shader_sepia24_inplace_c(pixels3d(surface_))
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_sepia24_inplace_c(rgb_array)
 
 
 @cython.boundscheck(False)
@@ -329,6 +377,12 @@ cdef inline void median_fast(
     :param reduce_factor_: integer; value of 1 divide the image by 2, value of 2 div the image by 4
     :return: void
     """
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
 
     surface_cp = surface_.copy()
     cdef:
@@ -337,10 +391,16 @@ cdef inline void median_fast(
 
     surface_cp = smoothscale(surface_cp, (w >> reduce_factor_, h >> reduce_factor_))
 
+    try:
+        cp_array = pixels3d(surface_cp)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
     cdef:
-        unsigned char [:, :, :] surface_cp_arr = pixels3d(surface_cp)
         int i, j
-        unsigned char[:, :, :] org_surface = pixels3d(surface_)
+        unsigned char[:, :, :] org_surface = rgb_array
+        unsigned char[:, :, :] surface_cp_arr = cp_array
 
     shader_median_filter24_inplace_c(surface_cp_arr, kernel_size_)
     surface_cp_arr = scale_array24_c(surface_cp_arr, w, h)
@@ -397,7 +457,13 @@ cpdef inline void median(
     if fast_:
         median_fast(surface_, kernel_size_, reduce_factor_)
     else:
-        shader_median_filter24_inplace_c(pixels3d(surface_), kernel_size_)
+        try:
+            rgb_array = pixels3d(surface_)
+
+        except Exception as e:
+            raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+        shader_median_filter24_inplace_c(rgb_array, kernel_size_)
 
 
 cpdef inline void median_grayscale(
@@ -426,8 +492,13 @@ cpdef inline void median_grayscale(
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
     assert kernel_size_ > 0, "\nArgument kernel_size_ cannot be <= 0"
+    try:
+        rgb_array = pixels3d(surface_)
 
-    shader_median_grayscale_filter24_inplace_c(pixels3d(surface_), kernel_size_)
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_median_grayscale_filter24_inplace_c(rgb_array, kernel_size_)
 
 
 cpdef inline void median_avg(
@@ -458,7 +529,13 @@ cpdef inline void median_avg(
 
     assert kernel_size_ > 0, "\nArgument kernel_size_ cannot be <= 0"
 
-    shader_median_filter24_avg_inplace_c(pixels3d(surface_), kernel_size_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_median_filter24_avg_inplace_c(rgb_array, kernel_size_)
 
 
 
@@ -490,7 +567,13 @@ cpdef inline void color_reduction(
 
     assert color_ > 0, "Argument color_number must be > 0"
 
-    shader_color_reduction24_inplace_c(pixels3d(surface_), color_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_color_reduction24_inplace_c(rgb_array, color_)
 
 
 cpdef inline void sobel(
@@ -520,7 +603,13 @@ cpdef inline void sobel(
 
     assert -1 < threshold_ < 256, "\nArgument threshold must be an integer in range [0 ... 255]"
 
-    shader_sobel24_inplace_c(pixels3d(surface_), threshold_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_sobel24_inplace_c(rgb_array, threshold_)
 
 
 cpdef inline void sobel_fast(
@@ -583,7 +672,13 @@ cpdef inline void invert(object surface_):
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    shader_invert_surface_24bit_inplace_c(pixels3d(surface_))
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_invert_surface_24bit_inplace_c(rgb_array)
 
 
 
@@ -609,10 +704,15 @@ cpdef inline void hsl_effect(object surface_, float shift_):
     assert -1.0 <= shift_ <= 1.0, \
         "Argument shift must be in range[-1.0 ... 1.0]"
 
-    shader_hsl_surface24bit_inplace_c(pixels3d(surface_), shift_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_hsl_surface24bit_inplace_c(rgb_array, shift_)
 
 
-# todo wiki
 cpdef inline void hsl_fast(
         object surface_,
         float shift_,
@@ -653,7 +753,13 @@ cpdef inline void hsl_fast(
         "\nArgument rgb_model_ must be a numpy.ndarray or memoryview type, got %s " % type(
             rgb_model_)
 
-    shader_hsl_surface24bit_fast_inplace_c(pixels3d(surface_), shift_, hsl_model_, rgb_model_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_hsl_surface24bit_fast_inplace_c(rgb_array, shift_, hsl_model_, rgb_model_)
 
 
 cpdef inline void blur(object surface_, t_=1):
@@ -676,7 +782,7 @@ cpdef inline void blur(object surface_, t_=1):
       new surface.  
 
     :param surface_: pygame.Surface; compatible 24 - 32 bit surfaces
-    :param t_      : integer; number if times must be >0
+    :param t_      : integer; must be >0
     :return: void 
     """
     assert PyObject_IsInstance(surface_, pygame.Surface), \
@@ -684,7 +790,13 @@ cpdef inline void blur(object surface_, t_=1):
     assert t_ > 0, \
         "\nArgument t_ must be > 0, got %s " % t_
 
-    shader_blur5x5_array24_inplace_c(pixels3d(surface_), None, t_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_blur5x5_array24_inplace_c(rgb_array, None, t_)
 
 
 cpdef inline void wave(object surface_, float rad, int size):
@@ -708,7 +820,13 @@ cpdef inline void wave(object surface_, float rad, int size):
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
     assert size > 0, "Argument size must be > 0"
 
-    shader_wave24bit_inplace_c(pixels3d(surface_), rad, size)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_wave24bit_inplace_c(rgb_array, rad, size)
 
 
 cpdef inline void swirl(object surface_, float degrees):
@@ -732,7 +850,13 @@ cpdef inline void swirl(object surface_, float degrees):
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    shader_swirl24bit_inplace_c(pixels3d(surface_), degrees)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_swirl24bit_inplace_c(rgb_array, degrees)
 
 
 
@@ -755,7 +879,13 @@ cpdef inline void swirl2(object surface_, float degrees):
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    shader_swirl24bit_inplace_c1(pixels3d(surface_), degrees)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_swirl24bit_inplace_c1(rgb_array, degrees)
 
 
 
@@ -794,7 +924,13 @@ cpdef inline void plasma_config(
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    shader_plasma24bit_inplace_c(pixels3d(surface_), frame, hue_, sat_, value_, a_, b_, c_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_plasma24bit_inplace_c(rgb_array, frame, hue_, sat_, value_, a_, b_, c_)
 
 
 cpdef inline void plasma(surface_, float frame, unsigned int [::1] palette_):
@@ -814,7 +950,7 @@ cpdef inline void plasma(surface_, float frame, unsigned int [::1] palette_):
     shader_plasma_c(surface_, frame, palette_)
 
 
-# todo wiki
+
 cpdef inline float [:, :, :, ::1] rgb_to_hsl_model():
     """
     Create an HSL model containing all the values
@@ -823,7 +959,6 @@ cpdef inline float [:, :, :, ::1] rgb_to_hsl_model():
     return rgb_to_hsl_model_c()
 
 
-# todo wiki
 cpdef inline unsigned char [:, :, :, ::1] hsl_to_rgb_model():
     """
     Create an RGB model containing all the values
@@ -864,7 +999,13 @@ cpdef inline void brightness(object surface_, float shift_):
 
     assert -1.0 <= shift_ <= 1.0, "\nArgument shift_ must be in range [-1.0 ... 1.0]"
 
-    shader_brightness24_inplace_c(pixels3d(surface_), shift_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_brightness24_inplace_c(rgb_array, shift_)
 
 
 cpdef inline void brightness_exclude(
@@ -900,7 +1041,13 @@ cpdef inline void brightness_exclude(
     assert -1.0 <= shift_ <= 1.0, \
         "Argument shift_ must be in range[-1.0 ... 1.0]"
 
-    shader_brightness24_exclude_inplace_c(pixels3d(surface_), shift_, color_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_brightness24_exclude_inplace_c(rgb_array, shift_, color_)
 
 
 
@@ -933,7 +1080,13 @@ cpdef inline void brightness_bpf(
     assert -1.0 <= shift_ <= 1.0, \
         "Argument shift must be in range[-1.0 ... 1.0]"
 
-    shader_brightness24_bpf_c(pixels3d(surface_), shift_, bpf_threshold)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_brightness24_bpf_c(rgb_array, shift_, bpf_threshold)
 
 
 cpdef inline void brightness_model(
@@ -963,7 +1116,13 @@ cpdef inline void brightness_model(
                   DeprecationWarning)
     assert -1.0 <= shift_ <= 1.0, "\nArgument shift_ must be in range [-1.0 ... 1.0]"
 
-    shader_brightness_24_inplace1_c(pixels3d(surface_), shift_, rgb_to_hsl_model)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_brightness_24_inplace1_c(rgb_array, shift_, rgb_to_hsl_model)
 
 
 
@@ -987,7 +1146,13 @@ cpdef inline void saturation(object surface_, float shift_):
 
     assert -1.0 <= shift_ <= 1.0, "\nArgument shift_ must be in range [-1.0 ... 1.0]"
 
-    shader_saturation_array24_inplace_c(pixels3d(surface_), shift_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_saturation_array24_inplace_c(rgb_array, shift_)
 
 
 
@@ -1022,7 +1187,13 @@ cpdef inline void heatwave_vertical(
     assert PyObject_IsInstance(mask, (numpy.ndarray, cython.view.memoryview)), \
         "\nArgument mask must be a numpy.array or memoryview type, got %s " % type(mask)
 
-    shader_heatwave24_vertical_inplace_c(pixels3d(surface_), mask, factor_, center_, sigma_, mu_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_heatwave24_vertical_inplace_c(rgb_array, mask, factor_, center_, sigma_, mu_)
 
 
 
@@ -1046,7 +1217,13 @@ cpdef inline void horizontal_glitch(
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    shader_horizontal_glitch24_inplace_c(pixels3d(surface_), rad1_, frequency_, amplitude_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_horizontal_glitch24_inplace_c(rgb_array, rad1_, frequency_, amplitude_)
 
 
 
@@ -1063,12 +1240,17 @@ cpdef inline void bpf(object surface_, int threshold = 128):
     """
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+    try:
+        rgb_array = pixels3d(surface_)
 
-    shader_bpf24_inplace_c(pixels3d(surface_), threshold)
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_bpf24_inplace_c(rgb_array, threshold)
 
 
 
-cpdef inline void bloom(object surface_, int threshold_, bint fast_=False):
+cpdef inline void bloom(object surface_, int threshold_, bint fast_=False, object mask_=None):
     """
     
     CREATE A BLOOM EFFECT
@@ -1085,13 +1267,14 @@ cpdef inline void bloom(object surface_, int threshold_, bint fast_=False):
                           and only the x16 subsurface
                           will be processed to maximize the overall processing time, 
                           default is False).
+    :param mask_        : 
     :return             : void
     
     """
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    shader_bloom_effect_array24_c(surface_, threshold_, fast_)
+    shader_bloom_effect_array24_c(surface_, threshold_, fast_, mask_)
 
 
 
@@ -1142,7 +1325,13 @@ cpdef inline void fisheye(
         "\nArgument fisheye_model must be a numpy.ndarray or a cython.view.memoryview  type, " \
         "got %s " % type(fisheye_model)
 
-    shader_fisheye24_inplace_c(pixels3d(surface_), fisheye_model)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_fisheye24_inplace_c(rgb_array, fisheye_model)
 
 
 
@@ -1212,7 +1401,13 @@ cpdef inline void rain_fisheye(
         "\nArgument rain_fisheye_model must be a " \
         "numpy.ndarray or a cython memoryview type, got %s " % type(rain_fisheye_model)
 
-    shader_rain_fisheye24_inplace_c(pixels3d(surface_), rain_fisheye_model)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_rain_fisheye24_inplace_c(rgb_array, rain_fisheye_model)
 
 
 
@@ -1237,7 +1432,13 @@ cpdef inline void tv_scan(surface_, int space=5):
 
     assert space > 0, "Argument space cannot be <=0"
 
-    shader_tv_scanline_inplace_c(pixels3d(surface_), space)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_tv_scanline_inplace_c(rgb_array, space)
 
 
 
@@ -1397,7 +1598,7 @@ cpdef inline predator_vision(
         sobel(surface_copy, sobel_threshold)
 
     bpf(surface_, bpf_threshold)
-    shader_bloom_effect_array24_c(surface_, bloom_threshold, fast_=True)
+    surface_ = shader_bloom_fast(surface_, bloom_threshold, fast_=fast)
     heatmap_convert(surface_, inv_colormap)
     surface_.blit(surface_copy, (0, 0), special_flags=blend)
 
@@ -1433,7 +1634,13 @@ cpdef inline blood(object surface_, float [:, :] mask_, float perc_):
 
     assert w == mask_w and h == mask_h, "\nSurface size and mask size mismatch"
 
-    shader_blood_inplace_c(pixels3d(surface_), mask_, perc_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_blood_inplace_c(rgb_array, mask_, perc_)
 
 
 # TODO DOC
@@ -1459,7 +1666,7 @@ cpdef inline object make_palette(int width, float fh, float fs, float fl):
     return make_palette_c(width, fh, fs, fl)
 
 
-# todo develop DOC
+
 cpdef inline fire_sub(
         int width,
         int height,
@@ -1959,7 +2166,13 @@ cpdef inline mirroring_array(object surface_):
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    return mirroring_c(pixels3d(surface_))
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    return mirroring_c(rgb_array)
 
 
 
@@ -1976,7 +2189,13 @@ cpdef inline void mirroring(object surface_):
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    mirroring_inplace_c(pixels3d(surface_))
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    mirroring_inplace_c(rgb_array)
 
 # cpdef inline transpose_inplace(object surface_):
 #     return tranpose_c(pixels3d(surface_))
@@ -1995,7 +2214,13 @@ cpdef inline void sharpen(object surface_):
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    shader_sharpen_filter_inplace_c(pixels3d(surface_))
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    shader_sharpen_filter_inplace_c(rgb_array)
 
 
 cpdef inline void dirt_lens(
@@ -2141,7 +2366,13 @@ cpdef object dithering(object surface_, int factor_=2):
     assert factor_ > 1, \
         "Argument factor_ must be > 1"
 
-    return dithering_c(numpy.divide(pixels3d(surface_), 255.0).astype(float32), factor_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    return dithering_c(numpy.divide(rgb_array, 255.0).astype(float32), factor_)
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -2177,7 +2408,13 @@ cpdef inline void dithering_int(object surface_, int factor_=2):
     assert factor_ > 1, \
         "Argument factor_ must be > 1"
 
-    dithering_int_c(pixels3d(surface_), factor_)
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    dithering_int_c(rgb_array, factor_)
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -2447,7 +2684,7 @@ cpdef inline void convert_27colors(object surface_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-cpdef object bilateral(object image, float sigma_s, float sigma_i):
+cpdef object bilateral(object image, float sigma_s, float sigma_i, unsigned int kernel_size = 3):
     """
     A bilateral filter is a non-linear, edge-preserving, and noise-reducing
     smoothing filter for images. It replaces the intensity of each pixel with a
@@ -2466,6 +2703,7 @@ cpdef object bilateral(object image, float sigma_s, float sigma_i):
     
     bilateral(surface, sigma_s = 16, sigma_i = 18)
     
+    :param kernel_size  : integer; kernel size, default is 3
     :param image: Surface, Pygame Surface format 24-32 bit format (alpha channel will be ignored)
     
     :param sigma_s: float sigma_s : Spatial extent of the kernel, size of the 
@@ -2492,7 +2730,7 @@ cpdef object bilateral(object image, float sigma_s, float sigma_i):
         raise ValueError('\nTexture/image is not compatible.')
 
 
-    return bilateral_filter24_c(array_, sigma_s, sigma_i)
+    return bilateral_filter24_c(array_, sigma_s, sigma_i, kernel_size)
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -2563,6 +2801,25 @@ cpdef void palette_change(
         raise ValueError('\nTexture/image is not compatible.')
 
     palette_change_c(array_, palette_)
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef object bilinear(object surface_, int new_width, int new_height, fx=None, fy=None):
+
+
+    assert isinstance(surface_, Surface), \
+        'Argument surface_ must be a valid Surface, got %s ' % type(surface_)
+
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except (pygame.error, ValueError):
+        raise ValueError('\nTexture/image is not compatible.')
+
+
+    return bilinear_c(rgb_array, new_width, new_height)
 
 # ******************************************************************
 
@@ -3121,9 +3378,9 @@ cdef inline void shader_median_filter24_inplace_c(
                 tmpg = quickSort(&tmp_green[0], 0, k_size)
                 tmpb = quickSort(&tmp_blue[0], 0, k_size)
 
-                rgb_array_[i, j, 0] = tmpr[k + 1]
-                rgb_array_[i, j, 1] = tmpg[k + 1]
-                rgb_array_[i, j, 2] = tmpb[k + 1]
+                rgb_array_[i, j, 0] = tmpr[(index -1) >> 1]
+                rgb_array_[i, j, 1] = tmpg[(index -1) >> 1]
+                rgb_array_[i, j, 2] = tmpb[(index -1) >> 1]
 
 
 
@@ -3336,7 +3593,6 @@ cdef inline void shader_color_reduction24_inplace_c(
     cdef Py_ssize_t w, h
     w, h = rgb_array.shape[:2]
 
-    # cdef float color_number = <float>pow(2, factor)
 
     cdef:
         int x=0, y=0
@@ -3440,17 +3696,17 @@ cdef inline void shader_sobel24_inplace_c(unsigned char [:, :, :] rgb_array, flo
                         # grayscale image red = green = blue
                         gray = &source_array[xx, yy, 0]
 
-                        if kernel_offset_x != 0:
+                        # if kernel_offset_x != 0:
 
-                            r_gx = r_gx + <float> gray[0] * \
-                                   <float> GX[kernel_offset_x + KERNEL_HALF,
-                                              kernel_offset_y + KERNEL_HALF]
+                        r_gx = r_gx + <float> gray[0] * \
+                               <float> GX[kernel_offset_x + KERNEL_HALF,
+                                          kernel_offset_y + KERNEL_HALF]
 
-                        if kernel_offset_y != 0:
+                        # if kernel_offset_y != 0:
 
-                            r_gy = r_gy + <float> gray[0] * \
-                                   <float> GY[kernel_offset_x + KERNEL_HALF,
-                                              kernel_offset_y + KERNEL_HALF]
+                        r_gy = r_gy + <float> gray[0] * \
+                               <float> GY[kernel_offset_x + KERNEL_HALF,
+                                          kernel_offset_y + KERNEL_HALF]
 
                 magnitude = min(<float> sqrt(r_gx * r_gx + r_gy * r_gy), <float>255.0)
 
@@ -3507,7 +3763,7 @@ cdef unsigned char [:, :, ::1] scale_array24_c(
         raise ValueError('\nArray shape not understood.')
 
     cdef:
-        unsigned char [:, :, ::1] new_array = numpy.zeros((w2, h2, 3), numpy.uint8)
+        unsigned char [:, :, ::1] new_array = numpy.empty((w2, h2, 3), numpy.uint8)
         float fx = <float>w1 / <float>w2
         float fy = <float>h1 / <float>h2
         int x, y
@@ -3683,7 +3939,9 @@ cdef inline void shader_invert_surface_24bit_inplace_c(
                 b[0] = 255 - b[0]
 
 
-cdef float[5] GAUSS_KERNEL = [1.0/16.0, 4.0/16.0, 6.0/16.0, 4.0/16.0, 1.0/16.0]
+cdef float[5] GAUSS_KERNEL = \
+    [<float>(1.0/16.0), <float>(4.0/16.0),
+     <float>(6.0/16.0), <float>(4.0/16.0), <float>(1.0/16.0)]
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -3721,9 +3979,7 @@ cdef inline void shader_blur5x5_array24_inplace_c(
     cdef:
 
         short int kernel_half = 2
-        unsigned char [:, :, ::1] convolve = numpy.empty((w, h, 3), dtype=uint8)
-        unsigned char [:, :, ::1] convolved = numpy.empty((w, h, 3), dtype=uint8)
-        Py_ssize_t kernel_length = len(GAUSS_KERNEL)
+        unsigned char [:, :, :] convolve = numpy.empty((w, h, 3), dtype=uint8)
         int x, y, xx, yy
         float r, g, b, s
         char kernel_offset
@@ -3845,7 +4101,7 @@ cdef inline void shader_wave24bit_inplace_c(
     w, h = rgb_array_.shape[:2]
 
     cdef:
-        unsigned char [:, :, :] rgb = numpy.array(rgb_array_, copy=True)
+        unsigned char [:, :, ::1] rgb = numpy.array(rgb_array_, copy=True, order='C')
         int x, y, x_pos, y_pos, xx, yy
         int i=0, j=0
         float c1 = <float>1.0 / <float>(size * size)
@@ -3980,6 +4236,7 @@ cdef inline void shader_swirl24bit_inplace_c1(unsigned char [:, :, :] rgb_array_
     columns = <float>0.5 * (w - <float>1.0)
     rows    = <float>0.5 * (h - <float>1.0)
     r_max   = <float>sqrt(columns * columns + rows * rows)
+
     with nogil:
         for i in prange(w, schedule='static', num_threads=THREADS):
             for j in range(h):
@@ -4073,11 +4330,11 @@ cdef inline void shader_plasma24bit_inplace_c(
                 i = i % 6
 
                 if i == 0:
-                    r, g, b =  v, t, p
+                    r, g, b =  v, t_, p
                 if i == 1:
                      r, g, b = q, v, p
                 if i == 2:
-                     r, g, b = p, v, t
+                     r, g, b = p, v, t_
                 if i == 3:
                      r, g, b = p, q, v
                 if i == 4:
@@ -4122,10 +4379,16 @@ cdef inline void shader_plasma_c(surface_, float frame, unsigned int [::1] palet
     cdef Py_ssize_t width, height
     width, height = surface_.get_size()
 
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
     cdef:
         int x, y, ii,c
 
-        unsigned char [:, :, :] rgb_array_ = pixels3d(surface_)
+        unsigned char [:, :, :] rgb_array_ = rgb_array
 
         unsigned char *rr
         unsigned char *gg
@@ -4333,8 +4596,7 @@ cdef inline void shader_hsl_surface24bit_fast_inplace_c(
 
                 h_ = hsl_model_[r[0], g[0], b[0], 0]
 
-                h__ = <unsigned char> (<float>min((h_ * ONE_255 + shift_), <float>1.0) * \
-                    <float>255.0)
+                h__ = <unsigned char> (<float>min((h_ * ONE_255 + shift_), <float>1.0) * <float>255.0)
 
                 s__ = <unsigned char> hsl_model_[r[0], g[0], b[0], 1]
                 l__ = <unsigned char> hsl_model_[r[0], g[0], b[0], 2]
@@ -4405,7 +4667,7 @@ cdef inline void shader_brightness24_inplace_c(
                 b[0] = <unsigned char> (rgb_.b * 255.0)
 
 
-
+# TODO CHECK WHY NOT PRANGE
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
@@ -4887,6 +5149,59 @@ cdef inline bpf24_c(
 
 
 
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef inline filtering24_c(object surface_, mask_):
+    """
+    MULTIPLY MASK VALUES WITH AN ARRAY REPRESENTING THE SURFACE PIXELS (COMPATIBLE 24 BIT ONLY).
+    Mask values are floats in range (0 ... 1.0)
+
+    :param surface_: pygame.Surface compatible 24-bit
+    :param mask_: 2d array (MemoryViewSlice) containing alpha values (float).
+    The mask_ output image is monochromatic (values range [0 ... 1.0] and R=B=G.
+    :return: Return a pygame.Surface 24 bit
+    """
+    cdef int w, h, w_, h_
+    w, h = surface_.get_size()
+    try:
+        w_, h_ = mask_.shape[:2]
+    except (ValueError, pygame.error):
+       raise ValueError(
+           '\nArgument mask_ type not understood, '
+           'expecting numpy.ndarray type (w, h) got %s ' % type(mask_))
+
+
+    assert w == w_ and h == h_, \
+        '\nSurface and mask size does not match (w:%s, h:%s), ' \
+        '(w:%s, h:%s) ' % (w, h, w_, h_)
+
+    try:
+        rgb_ = pixels3d(surface_)
+    except (ValueError, pygame.error):
+        try:
+            rgb_ = array3d(surface_)
+        except (ValueError, pygame.error):
+            raise ValueError('Incompatible surface.')
+
+    cdef:
+        unsigned char [:, :, :] rgb = rgb_.transpose(1, 0, 2)
+        unsigned char [:, :, ::1] rgb1 = numpy.empty((h, w, 3), numpy.uint8)
+        float [:, :] mask = numpy.asarray(mask_, numpy.float32)
+        int i, j
+    with nogil:
+        for i in prange(0, w, schedule='static', num_threads=THREADS):
+            for j in range(h):
+                rgb1[j, i, 0] = <unsigned char>(rgb[j, i, 0] * mask[i, j])
+                rgb1[j, i, 1] = <unsigned char>(rgb[j, i, 1] * mask[i, j])
+                rgb1[j, i, 2] = <unsigned char>(rgb[j, i, 2] * mask[i, j])
+
+    return frombuffer(rgb1, (w, h), 'RGB')
+
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
@@ -4894,7 +5209,9 @@ cdef inline bpf24_c(
 cdef inline void shader_bloom_effect_array24_c(
         surface_,
         int threshold_,
-        bint fast_ = False):
+        bint fast_ = False,
+        object mask_ = None
+):
     """
     CREATE A BLOOM EFFECT
 
@@ -4909,6 +5226,7 @@ cdef inline void shader_bloom_effect_array24_c(
     :param fast_        : bool; True | False; If True the bloom effect will be approximated
     and only the x16 subsurface
     will be processed to maximize the overall processing time, default is False).
+    :param mask_        : 
     :return             : void
     """
 
@@ -4929,7 +5247,11 @@ cdef inline void shader_bloom_effect_array24_c(
         w8, h8   = w4 >> 1, h4 >> 1
         w16, h16 = w8 >> 1, h8 >> 1
 
-    with nogil:
+        if w16 == 0 or h16 == 0:
+            raise ValueError(
+                "\nImage too small and cannot be processed.\n"
+                "Try to increase the size of the image")
+
         if w2 > 0 and h2 > 0:
             x2 = True
         else:
@@ -4950,6 +5272,8 @@ cdef inline void shader_bloom_effect_array24_c(
         else:
             x16 = False
 
+    s2, s4, s8, s16 = None, None, None, None
+
     # SUBSURFACE DOWNSCALE CANNOT
     # BE PERFORMED AND WILL RAISE AN EXCEPTION
     if not x2:
@@ -4958,13 +5282,12 @@ cdef inline void shader_bloom_effect_array24_c(
     if fast_:
         x2, x4, x8 = False, False, False
 
-    surface_cp = bpf24_c(pixels3d(surface_), threshold=threshold_)
-
 
     # FIRST SUBSURFACE DOWNSCALE x2
     # THIS IS THE MOST EXPENSIVE IN TERM OF PROCESSING TIME
     if x2:
-        s2 = scale(surface_cp, (w2, h2))
+        s2 = scale(surface_, (w2, h2))
+        s2 = bpf24_c(pixels3d(s2), threshold=threshold_)
         s2_array = numpy.array(s2.get_view('3'), dtype=numpy.uint8)
         shader_blur5x5_array24_inplace_c(s2_array)
         # b2_blurred = frombuffer(numpy.array(s2_array.transpose(1, 0, 2),
@@ -4976,7 +5299,8 @@ cdef inline void shader_bloom_effect_array24_c(
     # SECOND SUBSURFACE DOWNSCALE x4
     # THIS IS THE SECOND MOST EXPENSIVE IN TERM OF PROCESSING TIME
     if x4:
-        s4 = scale(surface_cp, (w4, h4))
+        s4 = scale(surface_, (w4, h4))
+        s4 = bpf24_c(pixels3d(s4), threshold=threshold_)
         s4_array = numpy.array(s4.get_view('3'), dtype=numpy.uint8)
         shader_blur5x5_array24_inplace_c(s4_array)
         # b4_blurred = frombuffer(numpy.array(s4_array.transpose(1, 0, 2),
@@ -4987,7 +5311,8 @@ cdef inline void shader_bloom_effect_array24_c(
 
     # THIRD SUBSURFACE DOWNSCALE x8
     if x8:
-        s8 = scale(surface_cp, (w8, h8))
+        s8 = scale(surface_, (w8, h8))
+        s8 = bpf24_c(pixels3d(s8), threshold=threshold_)
         s8_array = numpy.array(s8.get_view('3'), dtype=numpy.uint8)
         shader_blur5x5_array24_inplace_c(s8_array)
         # b8_blurred = frombuffer(numpy.array(s8_array.transpose(1, 0, 2),
@@ -4999,8 +5324,10 @@ cdef inline void shader_bloom_effect_array24_c(
     # FOURTH SUBSURFACE DOWNSCALE x16
     # LESS SIGNIFICANT IN TERMS OF RENDERING AND PROCESSING TIME
     if x16:
-        s16 = scale(surface_cp, (w16, h16))
+        s16 = scale(surface_, (w16, h16))
+        s16 = bpf24_c(pixels3d(s16), threshold=threshold_)
         s16_array = numpy.array(s16.get_view('3'), dtype=numpy.uint8)
+        shader_blur5x5_array24_inplace_c(s16_array)
         shader_blur5x5_array24_inplace_c(s16_array)
         # b16_blurred = frombuffer(numpy.array(s16_array.transpose(1, 0, 2),
         # order='C', copy=False), (w16, h16), 'RGB')
@@ -5008,15 +5335,158 @@ cdef inline void shader_bloom_effect_array24_c(
         s16 = smoothscale(b16_blurred, (w, h))
         surface_.blit(s16, (0, 0), special_flags=BLEND_RGB_ADD)
 
+    # todo filtering is not an inplace function and will returned a surface
+    # todo Bloom is an inplace method an cannot return a surface, so filtering here
+    # todo is not working ?
+    if mask_ is not None:
+        surface_ = filtering24_c(surface_, mask_)
 
-    # if mask_ is not None:
-    #     # Multiply mask surface pixels with mask values.
-    #     # RGB pixels = 0 when mask value = 0.0, otherwise
-    #     # modify RGB amplitude
-    #     surface_cp = filtering24_c(surface_cp, mask_)
 
 
-cdef unsigned int [:, :, ::1] IMAGE_FISHEYE_MODEL = numpy.zeros((800, 1024, 2), uint32)
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef inline object shader_bloom_fast(
+        surface_,
+        int threshold_,
+        bint fast_ = False,
+        unsigned short int factor_ = 2
+):
+    """
+    
+    :param surface_  : pygame.Surface; compatible 32-24 bit containing RGB pixel values 
+    :param threshold_: integer; Bloom threshold value, small value cause greater bloon effect 
+    :param fast_     : boolean; True will increase the speed of the algorithm since only the S16 surface is blit
+    :param factor_   : integer; Texture reduction value, must be in range [0, 4] and correspond to the dividing texture
+        factor (div 1, div 2, div 4, div 8)
+    :return          : Return a pygame Surface with the bloom effect (24 bit format)
+    """
+
+    assert isinstance(surface_, pygame.Surface), "Argument surface_ must be a pygame.Surface got %s " % type(surface_)
+    assert 0 <= threshold_ <= 255, "Argument threshold must be in range [0 ... 255] got %s " % threshold_
+    assert 0 <= factor_ <= 4, "Argument factor_ must be in range [0 ... 4] got %s " % factor_
+    assert isinstance(fast_, bool), "Argument fast_ must be boolean True | False got %s " % type(fast_)
+
+    cdef:
+        Py_ssize_t  w, h
+        int bit_size
+        int w2, h2, w4, h4, w8, h8, w16, h16
+        bint x2, x4, x8, x16 = False
+
+    surface_copy = surface_.copy()
+    surface_ = smoothscale(surface_,
+                           (surface_.get_width() >> factor_, surface_.get_height() >> factor_))
+
+    w, h = surface_.get_size()
+    bit_size = surface_.get_bitsize()
+
+    with nogil:
+
+        w2, h2   = <int>w >> 1, <int>h >> 1
+        w4, h4   = w2 >> 1, h2 >> 1
+        w8, h8   = w4 >> 1, h4 >> 1
+        w16, h16 = w8 >> 1, h8 >> 1
+
+        if w16 == 0 or h16 == 0:
+            raise ValueError(
+                "\nImage too small and cannot be processed.\n"
+                "Try to increase the size of the image or decrease the factor_ value (default 2)")
+
+        if w2 > 0 and h2 > 0:
+            x2 = True
+        else:
+            x2 = False
+
+        if w4 > 0 and h4 > 0:
+            x4 = True
+        else:
+            x4 = False
+
+        if w8 > 0 and h8 > 0:
+            x8 = True
+        else:
+            x8 = False
+
+        if w16 > 0 and h16 > 0:
+            x16 = True
+        else:
+            x16 = False
+
+    s2, s4, s8, s16 = None, None, None, None
+
+    # SUBSURFACE DOWNSCALE CANNOT
+    # BE PERFORMED AND WILL RAISE AN EXCEPTION
+    if not x2:
+        return
+
+    if fast_:
+        x2, x4, x8 = False, False, False
+
+
+    # FIRST SUBSURFACE DOWNSCALE x2
+    # THIS IS THE MOST EXPENSIVE IN TERM OF PROCESSING TIME
+    if x2:
+        s2 = scale(surface_, (w2, h2))
+        s2 = bpf24_c(pixels3d(s2), threshold=threshold_)
+        s2_array = numpy.array(s2.get_view('3'), dtype=numpy.uint8)
+        shader_blur5x5_array24_inplace_c(s2_array)
+        b2_blurred = make_surface(s2_array)
+        s2 = smoothscale(b2_blurred, (w, h))
+
+
+    # SECOND SUBSURFACE DOWNSCALE x4
+    # THIS IS THE SECOND MOST EXPENSIVE IN TERM OF PROCESSING TIME
+    if x4:
+        s4 = scale(surface_, (w4, h4))
+        s4 = bpf24_c(pixels3d(s4), threshold=threshold_)
+        s4_array = numpy.array(s4.get_view('3'), dtype=numpy.uint8)
+        shader_blur5x5_array24_inplace_c(s4_array)
+        b4_blurred = make_surface(s4_array)
+        s4 = smoothscale(b4_blurred, (w, h))
+
+
+    # THIRD SUBSURFACE DOWNSCALE x8
+    if x8:
+        s8 = scale(surface_, (w8, h8))
+        s8 = bpf24_c(pixels3d(s8), threshold=threshold_)
+        s8_array = numpy.array(s8.get_view('3'), dtype=numpy.uint8)
+        shader_blur5x5_array24_inplace_c(s8_array)
+        # order='C', copy=False), (w8, h8), 'RGB')
+        b8_blurred = make_surface(s8_array)
+        s8 = smoothscale(b8_blurred, (w, h))
+
+
+    # FOURTH SUBSURFACE DOWNSCALE x16
+    # LESS SIGNIFICANT IN TERMS OF RENDERING AND PROCESSING TIME
+    if x16:
+        s16 = scale(surface_, (w16, h16))
+        s16 = bpf24_c(pixels3d(s16), threshold=threshold_)
+        s16_array = numpy.array(s16.get_view('3'), dtype=numpy.uint8)
+        shader_blur5x5_array24_inplace_c(s16_array)
+        shader_blur5x5_array24_inplace_c(s16_array)
+        b16_blurred = make_surface(s16_array)
+        s16 = smoothscale(b16_blurred, (w, h))
+
+    if fast_:
+        s16 = smoothscale(s16, (w << factor_, h << factor_))
+        surface_copy.blit(s16, (0, 0), special_flags=BLEND_RGB_ADD)
+    else:
+        s2.blit(s4, (0, 0), special_flags=BLEND_RGB_ADD)
+        s2.blit(s8, (0, 0), special_flags=BLEND_RGB_ADD)
+        s2.blit(s16, (0, 0), special_flags=BLEND_RGB_ADD)
+        s2 = smoothscale(s2, (w << factor_, h << factor_))
+        surface_copy.blit(s2, (0, 0), special_flags=BLEND_RGB_ADD)
+
+    return surface_copy
+
+
+
+
+
+# cdef unsigned int [:, :, ::1] IMAGE_FISHEYE_MODEL = numpy.zeros((800, 1024, 2), uint32)
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -5046,7 +5516,7 @@ cdef inline shader_fisheye24_footprint_c(Py_ssize_t w, Py_ssize_t h):
     assert h > 0, "Argument h must be > 0"
 
     cdef:
-        unsigned int [:, :, :] image_fisheye_model = numpy.zeros((w, h, 2), numpy.uint)
+        unsigned int [:, :, :] image_fisheye_model = numpy.zeros((w, h, 3), numpy.uint32)
         int y=0, x=0, v
         float ny, ny2, nx, nx2, r, theta, nxn, nyn, nr
         int x2, y2
@@ -5075,8 +5545,13 @@ cdef inline shader_fisheye24_footprint_c(Py_ssize_t w, Py_ssize_t h):
                         v = <int>(y2 * w + x2)
                         image_fisheye_model[x, y, 0] = x2
                         image_fisheye_model[x, y, 1] = y2
+                        image_fisheye_model[x, y, 2] = 0
+                else:
+                    image_fisheye_model[x, y, 0] = 0
+                    image_fisheye_model[x, y, 1] = 0
+                    image_fisheye_model[x, y, 2] = 0
 
-    return asarray(ascontiguousarray(image_fisheye_model))
+    return asarray(image_fisheye_model)
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -5120,12 +5595,16 @@ cdef inline void shader_fisheye24_inplace_c(
     with nogil:
         for x in prange(w, schedule='static', num_threads=THREADS):
             for y in range(h):
+
                 x2 = &fisheye_model[x, y, 0]
                 y2 = &fisheye_model[x, y, 1]
 
-                rgb_array_[x, y, 0] = rgb_array_copy[x2[0], y2[0], 0]
-                rgb_array_[x, y, 1] = rgb_array_copy[x2[0], y2[0], 1]
-                rgb_array_[x, y, 2] = rgb_array_copy[x2[0], y2[0], 2]
+                if x2[0]!=0 and y2[0]!=0:
+
+                    rgb_array_[x, y, 0] = rgb_array_copy[x2[0] % w, y2[0] % h, 0]
+                    rgb_array_[x, y, 1] = rgb_array_copy[x2[0] % w, y2[0] % h, 1]
+                    rgb_array_[x, y, 2] = rgb_array_copy[x2[0] % w, y2[0] % h, 2]
+
 
 
 
@@ -6374,7 +6853,7 @@ cpdef inline unsigned int rgb_to_int(int red, int green, int blue)nogil:
     :param blue  : Blue color, must be in range [0.255]
     :return      : returns a positive python integer representing the RGB values(int32)
     """
-    return 65536 * red + 256 * green + 256 + blue
+    return 65536 * red + 256 * green + blue
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -6680,7 +7159,7 @@ cdef inline shader_fire_effect_c(
         unsigned short int fire_intensity_= 32,
         bint smooth_                      = True,
         bint bloom_                       = True,
-        bint fast_bloom_                  = True,
+        bint fast_bloom_                  = False,
         unsigned char bpf_threshold_      = 0,
         unsigned int low_                 = 0,
         unsigned int high_                = 600,
@@ -6967,7 +7446,15 @@ cdef inline shader_fire_effect_c(
     if bloom_:
         assert 0 <= bpf_threshold_ < 256, \
             "Argument bpf_threshold_ must be in range [0 ... 256] got %s " % bpf_threshold_
-        shader_bloom_effect_array24_c(fire_surface_smallest, bpf_threshold_, fast_=fast_bloom_)
+        # shader_bloom_effect_array24_c(fire_surface_smallest, bpf_threshold_, fast_=fast_bloom_)
+        try:
+            fire_surface_smallest = shader_bloom_fast(
+                fire_surface_smallest, bpf_threshold_, fast_=fast_bloom_, factor_=1)
+        except ValueError:
+            raise ValueError(
+                "The surface is too small and cannot be bloomed with shader_bloom_fast.\n"
+                "Increase the size of the image or change the "
+                "shader_bloom_fast factor_ value (default is 2).")
 
     # RESCALE THE SURFACE TO THE FULL SIZE
     if smooth_:
@@ -7732,28 +8219,37 @@ cdef cartoon_effect(
     # First branch from the surface_
     # surface_branch_1
     surface_branch_1 = surface_.copy()
-    array_ = canny_blur5x5_surface24_c(surface_branch_1)
-    shader_greyscale_luminosity24_inplace_c(array_)
+    #array_ = canny_blur5x5_surface24_c(surface_branch_1)
+    #shader_greyscale_luminosity24_inplace_c(array_)
+
+    try:
+        array_ = pixels3d(surface_branch_1)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
     shader_sobel24_inplace_c(array_, sobel_threshold_)
 
     # Second branch
-    arr = pixels3d(surface_)
+    try:
+        arr = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+
+
     shader_median_filter24_inplace_c(arr, median_kernel_)
+    #
+    # # Color reduction
+    # shader_color_reduction24_inplace_c(arr, color_)
+    #
 
-    # median_fast(
-    #     surface_,
-    #     kernel_size_=median_kernel_,
-    #     reduce_factor_=2)
-
-    # Color reduction
-    shader_color_reduction24_inplace_c(arr, color_)
-
-    del arr
-
+    #
     # Blend both branch
+    del arr
     surface_.blit(make_surface(array_), (0, 0), special_flags=flag_)
-
     return surface_
+
 
 
 
@@ -7835,6 +8331,181 @@ cdef object blending(object source_, object destination_, float percentage_):
     return pygame.image.frombuffer(final_array, (w, h), 'RGB').convert()
 
 
+# new version 1.0.5
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef object alpha_blending(object source_, object destination_):
+    """
+    ALPHA BLENDING 
+
+    * Video system must be initialised 
+    * source_ & destination_ Textures must be same sizes
+    * Compatible with 32 bit surfaces only
+    * Output create a new surface
+    * Image returned is converted for fast blit (convert())
+
+    :param source_     : pygame.Surface (Source) 32-bit with alpha channel
+    :param destination_: pygame.Surface (Destination) 32-bit with alpha channel
+    :return: return    : Return a 24 bit pygame.Surface with alpha blending
+    """
+
+    cdef:
+            float [:] source_array
+            float [:] destination_array
+            int w, h
+
+    w, h = source_.get_size()
+
+    # source & destination array are normalized
+    try:
+        source_array      = (numpy.frombuffer(source_.get_view('0').raw,
+                                              dtype=numpy.uint8) / <float>255.0).astype(dtype=numpy.float32)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    try:
+        destination_array = (numpy.frombuffer(destination_.get_view('0').raw,
+                                              dtype=numpy.uint8) / <float>255.0).astype(dtype=numpy.float32)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference destination pixels into a 3d array.\n %s " % e)
+
+    cdef:
+
+        float rr, gg, bb, alpha, tmp
+        int i=0
+        int l = w * h * 4
+        unsigned char[:] final_array = empty(l, dtype=uint8)
+
+
+        float *r
+        float *g
+        float *b
+        float *a
+
+    with nogil:
+        # noinspection SpellCheckingInspection
+        for i in prange(0, l, 4, schedule='static', num_threads=THREADS):
+
+                r = &source_array[i+2]
+                g = &source_array[i+1]
+                b = &source_array[i]
+                a = &source_array[i+3]
+
+                # premult with alpha
+                r[0] = r[0] * a[0]
+                g[0] = g[0] * a[0]
+                b[0] = b[0] * a[0]
+
+                tmp = (<float>1.0 - a[0]) * destination_array[i+3]
+                alpha = a[0] + tmp
+
+                # premult with alpha
+                rr = r[0] + destination_array[i+2] *  tmp
+                gg = g[0] + destination_array[i+1] *  tmp
+                bb = b[0] + destination_array[i  ] *  tmp
+
+                # back to [0 ... 255]
+                final_array[i]   = <unsigned char>min(rr * <float>255.0, 255)
+                final_array[i+1] = <unsigned char>min(gg * <float>255.0, 255)
+                final_array[i+2] = <unsigned char>min(bb * <float>255.0, 255)
+                final_array[i+3] = <unsigned char>min(alpha * <float>255.0, 255)
+
+    return pygame.image.frombuffer(numpy.asarray(
+        final_array).reshape(w, h, 4), (w, h), 'RGBA').convert()
+
+# new version 1.0.5
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef void alpha_blending_inplace(object source_, object destination_):
+    """
+    ALPHA BLENDING INPLACE
+
+    * Video system must be initialised 
+    * source_ & destination_ Textures must be same sizes
+    * Compatible with 32 bit surfaces only
+    * Output create a new surface
+    * Image returned is converted for fast blit (convert())
+
+    :param source_     : pygame.Surface (Source) 32-bit with alpha channel
+    :param destination_: pygame.Surface (Destination) 32-bit with alpha channel
+    :return: return    : Return a 24 bit pygame.Surface with alpha blending
+    """
+
+    cdef:
+            float [:, :, :] source_array
+            float [:, :, :] destination_array
+            unsigned char [:, :, :] dest_rgb
+            unsigned char [:, :] dest_alpha
+            int w, h
+
+    w, h = source_.get_size()
+
+    # source & destination array are normalized
+    try:
+        source_rgb = (pixels3d(source_)/<float>255.0)
+        source_alpha = (pixels_alpha(source_)/<float>255.0)
+        source_array = numpy.dstack((source_rgb, source_alpha)).astype(dtype=numpy.float32)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    try:
+        dest_rgb = pixels3d(destination_)
+        dest_alpha = pixels_alpha(destination_)
+        destination_array = (numpy.dstack(
+            (numpy.asarray(dest_rgb), numpy.asarray(dest_alpha)))/255.0).astype(dtype=numpy.float32)
+
+
+    except Exception as e:
+        raise ValueError("\nCannot reference destination pixels into a 3d array.\n %s " % e)
+
+    cdef:
+
+        float rr, gg, bb, alpha, tmp
+        int i=0, j=0
+
+        float *r
+        float *g
+        float *b
+        float *a
+
+    with nogil:
+        # noinspection SpellCheckingInspection
+        for j in prange(h, schedule='static', num_threads=THREADS):
+            for i in range(w):
+                r = &source_array[i, j, 0]
+                g = &source_array[i, j, 1]
+                b = &source_array[i, j, 2]
+                a = &source_array[i, j, 3]
+
+                # premult with alpha
+                r[0] = r[0] * a[0]
+                g[0] = g[0] * a[0]
+                b[0] = b[0] * a[0]
+
+                tmp = (<float>1.0 - a[0]) * destination_array[i, j, 3]
+                alpha = a[0] + tmp
+
+                # premult with alpha
+                rr = r[0] + destination_array[i, j, 0] *  tmp
+                gg = g[0] + destination_array[i, j, 1] *  tmp
+                bb = b[0] + destination_array[i, j, 2] *  tmp
+
+                # back to [0 ... 255]
+                dest_rgb[i, j, 0] = <unsigned char>min(rr * <float>255.0, 255)
+                dest_rgb[i, j, 1] = <unsigned char>min(gg * <float>255.0, 255)
+                dest_rgb[i, j, 2] = <unsigned char>min(bb * <float>255.0, 255)
+                dest_alpha[i, j] = <unsigned char>min(alpha * <float>255.0, 255)
+
+
+
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
@@ -7885,6 +8556,7 @@ cdef object dithering_c(float [:, :, :] rgb_array_, int factor_):
         float quantization_error_red, quantization_error_green, quantization_error_blue
         float oldr, oldg, oldb
 
+    rgb_array_ = rgb_array_.astype(dtype=numpy.float32)
     with nogil:
 
         for y in prange(1, h, schedule='static', num_threads=THREADS, chunksize=2**8):
@@ -7895,9 +8567,9 @@ cdef object dithering_c(float [:, :, :] rgb_array_, int factor_):
                 oldg = rgb_array_[x, y, 1]
                 oldb = rgb_array_[x, y, 2]
 
-                new_red   = <float>round_c(oldr * (factor_ - 1)) / (factor_ - 1)
-                new_green = <float>round_c(oldg * (factor_ - 1)) / (factor_ - 1)
-                new_blue  = <float>round_c(oldb * (factor_ - 1)) / (factor_ - 1)
+                new_red   = <float>round_c(oldr * (factor_ - 1.0)/255.0) / ((factor_ - 1)/255.0)
+                new_green = <float>round_c(oldg * (factor_ - 1.0)/255.0) / ((factor_ - 1)/255.0)
+                new_blue  = <float>round_c(oldb * (factor_ - 1.0)/255.0) / ((factor_ - 1)/255.0)
 
                 rgb_array_[x, y, 0] = new_red
                 rgb_array_[x, y, 1] = new_green
@@ -8152,8 +8824,8 @@ cdef inline void palette_change_c(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-cdef float distance_ (float x1, float y1, float x2, float y2)nogil:
-  return <float>sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+cdef float distance_ (float x, float y)nogil:
+  return <float>sqrt(x*x + y*y)
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -8169,7 +8841,8 @@ cdef float gaussian_ (float v, float sigma2)nogil:
 cdef bilateral_filter24_c(
         unsigned char [:, :, :] rgb_array_,
         float sigma_s_,
-        float sigma_i_
+        float sigma_i_,
+        unsigned int kernel_size = 3
 ):
     """
     A bilateral filter is a non-linear, edge-preserving, and noise-reducing
@@ -8185,6 +8858,7 @@ cdef bilateral_filter24_c(
     The smaller the value of sigma_r  , the sharper the edge. As sigma_r  tends to infinity,  
     the equation tends to a Gaussian blur.
     
+    :param kernel_size: integer; kernel size; default is 3 
     :param rgb_array_: Surface, 24-32 bit format (alpha channel will be ignored)
     
     :param sigma_s_: float sigma_s : Spatial extent of the kernel, size of the 
@@ -8202,7 +8876,7 @@ cdef bilateral_filter24_c(
     cdef:
         unsigned char [:, :, :] bilateral = empty((h, w, 3), dtype=uint8)
         int x, y, xx, yy
-        int k = 3
+        int k = kernel_size
         int kx, ky
         float gs, wr, wg, wb, ir, ig, ib , wpr, wpg, wpb
         unsigned char *r
@@ -8220,6 +8894,7 @@ cdef bilateral_filter24_c(
                 wpr, wpg, wpb = 0, 0, 0
 
                 for ky in range(-k, k + 1):
+
                     for kx in range(-k, k + 1):
 
                         xx = x + kx
@@ -8235,7 +8910,7 @@ cdef bilateral_filter24_c(
                         elif yy > h:
                             yy = h
 
-                        gs = gaussian_(distance_(xx, yy, x, y), sigma_s2)
+                        gs = gaussian_(distance_(kx, ky), sigma_s2)
 
                         r = &rgb_array_[xx, yy, 0]
                         g = &rgb_array_[xx, yy, 1]
@@ -8357,4 +9032,368 @@ cdef object emboss5x5_c(unsigned char [:, :, :] rgb_array_):
 
 
 
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cdef object bilinear_c(
+        unsigned char [:, :, :] rgb_array_,
+        int new_width, int new_height,
+        fx=None, fy=None):
+
+    cdef Py_ssize_t w, h
+    w, h = rgb_array_.shape[:2]
+
+    cdef:
+        float rowScale, colScale
+        float original_x, original_y
+        unsigned int bl, br, tl, tr,\
+            modXiPlusOneLim, modYiPlusOneLim
+        int modXi, modYi, x, y, chan
+        float modXf, modYf, b, t, xf
+
+    rowScale = <float>w / <float>new_width
+    colScale = <float>h / <float>new_height
+
+    if fx is not None:
+        new_width = <int> (w * fx)
+    if fy is not None:
+       new_height = <int>(h * fy)
+
+    cdef unsigned char [: , :, :] new_rgb = \
+        numpy.empty((new_width, new_height, 3), dtype=numpy.uint8)
+
+    with nogil:
+        for x in prange(0, new_width, schedule='static', num_threads=THREADS):
+            for y in prange(new_height):
+                original_x = <float>x * rowScale
+                original_y = <float>y * colScale
+
+                modXi = <int>original_x
+                modYi = <int>original_y
+                modXf = original_x - modXi
+                modYf = original_y - modYi
+                modXiPlusOneLim = min(modXi + 1, h - 1)
+                modYiPlusOneLim = min(modYi + 1, w - 1)
+                xf = <float>1.0 - modXf
+
+                # for chan in range(3):
+                #     bl = rgb_array_[modYi, modXi, chan]
+                #     br = rgb_array_[modYi, modXiPlusOneLim, chan]
+                #     tl = rgb_array_[modYiPlusOneLim, modXi, chan]
+                #     tr = rgb_array_[modYiPlusOneLim, modXiPlusOneLim, chan]
+                #
+                #     # Calculate interpolation
+                #     b = modXf * br + xf * bl
+                #     t = modXf * tr + xf * tl
+                #     # pixel_value = modYf * t + (<float>1.0 - modYf) * b
+                #     new_rgb[x, y, chan] = <int>(modYf * t + (<float>1.0 - modYf) * b + <float>0.5)
+
+                bl = rgb_array_[modYi, modXi, 0]
+                br = rgb_array_[modYi, modXiPlusOneLim, 0]
+                tl = rgb_array_[modYiPlusOneLim, modXi, 0]
+                tr = rgb_array_[modYiPlusOneLim, modXiPlusOneLim, 0]
+
+                # Calculate interpolation
+                b = modXf * br + xf * bl
+                t = modXf * tr + xf * tl
+
+                new_rgb[x, y, 0] = <int> (modYf * t + (<float> 1.0 - modYf) * b + <float> 0.5)
+
+                bl = rgb_array_[modYi, modXi, 1]
+                br = rgb_array_[modYi, modXiPlusOneLim, 1]
+                tl = rgb_array_[modYiPlusOneLim, modXi, 1]
+                tr = rgb_array_[modYiPlusOneLim, modXiPlusOneLim, 1]
+
+                # Calculate interpolation
+                b = modXf * br + xf * bl
+                t = modXf * tr + xf * tl
+
+                new_rgb[x, y, 1] = <int> (modYf * t + (<float> 1.0 - modYf) * b + <float> 0.5)
+
+                bl = rgb_array_[modYi, modXi, 2]
+                br = rgb_array_[modYi, modXiPlusOneLim, 2]
+                tl = rgb_array_[modYiPlusOneLim, modXi, 2]
+                tr = rgb_array_[modYiPlusOneLim, modXiPlusOneLim, 2]
+
+                # Calculate interpolation
+                b = modXf * br + xf * bl
+                t = modXf * tr + xf * tl
+
+                new_rgb[x, y, 2] = <int> (modYf * t + (<float> 1.0 - modYf) * b + <float> 0.5)
+
+
+
+    return frombuffer(new_rgb, (new_height, new_width), 'RGB')
+
+
+# -------------------------------------------------------------------------------------------------------------------
+
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cdef heatwave_array24_horiz_c(unsigned char [:, :, :] rgb_array,
+                            unsigned char [:, :] mask_array,
+                            float frequency, float amplitude, float attenuation=0.10,
+                            unsigned char threshold=64):
+    """
+    HORIZONTAL HEATWAVE 
+
+    DISTORTION EQUATION: 
+    distortion = sin(x * attenuation + frequency) * amplitude * mask_array[x, y]
+    Amplitude is equivalent to ((frequency % 2) / 1000.0) and will define the maximum pixel displacement.
+    The highest the frequency the lowest the heat wave  
+
+
+    :param rgb_array: numpy.ndarray or MemoryViewSlice, array shape (w, h, 3) containing RGB values
+    :param mask_array: numpy.ndarray or  MemoryViewSlice shape (w, h) containing alpha values
+    :param frequency: float; increment value. The highest the frequency the lowest the heat wave  
+    :param amplitude: float; variable amplitude. Max amplitude is 10e-3 * 255 = 2.55 
+    when alpha is 255 otherwise 10e-3 * alpha.
+    :param attenuation: float; default 0.10
+    :param threshold: unsigned char; Compare the alpha value with the threshold.
+     if alpha value > threshold, apply the displacement to the texture otherwise no change
+    :return: Return a pygame.Surface 24 bit format 
+    """
+
+
+    cdef int w, h
+    w, h = (<object>rgb_array).shape[:2]
+
+    cdef:
+        unsigned char [:, :, ::1] new_array = empty((h, w, 3), dtype=numpy.uint8)
+        int x = 0, y = 0, xx, yy
+        float distortion
+
+
+    with nogil:
+        for x in prange(0, w, schedule='static', num_threads=THREADS):
+            for y in range(h):
+                distortion = sin(x * attenuation + frequency) * amplitude * mask_array[x, y]
+
+                xx = <int>(x  + distortion + rand() * 0.0002)
+                if xx > w - 1:
+                    xx = w - 1
+                if xx < 0:
+                    xx = 0
+
+                if mask_array[x, y] > threshold:
+                    new_array[y, x, 0] = rgb_array[xx, y, 0]
+                    new_array[y, x, 1] = rgb_array[xx, y, 1]
+                    new_array[y, x, 2] = rgb_array[xx, y, 2]
+                else:
+                    new_array[y, x, 0] = rgb_array[x, y, 0]
+                    new_array[y, x, 1] = rgb_array[x, y, 1]
+                    new_array[y, x, 2] = rgb_array[x, y, 2]
+
+    return numpy.asarray(new_array)
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+
+cpdef unsigned char[::1] stack_buffer_c(rgb_array_, alpha_, int w, int h, bint transpose=False):
+    """
+    Stack RGB & ALPHA MemoryViewSlice C-buffers structures together.
+    If transpose is True, the output MemoryViewSlice is flipped.
+
+    :param h: integer; Texture height
+    :param w: integer; Texture width
+    :param transpose: boolean; Transpose rows and columns (default False)
+    :param rgb_array_: MemoryViewSlice or pygame.BufferProxy (C-buffer type) representing the texture
+    RGB values filled with uint8
+    :param alpha_:  MemoryViewSlice or pygame.BufferProxy (C-buffer type) representing the texture
+    alpha values filled with uint8 
+    :return: Return a contiguous MemoryViewSlice representing RGBA pixel values
+    """
+
+    cdef:
+        int b_length = w * h * 3
+        int new_length = w * h * 4
+        unsigned char [:] rgb_array = rgb_array_
+        unsigned char [:] alpha = alpha_
+        unsigned char [::1] new_buffer =  numpy.empty(new_length, dtype=numpy.uint8)
+        unsigned char [::1] flipped_array = numpy.empty(new_length, dtype=numpy.uint8)
+        int i=0, j=0, ii, jj, index, k
+        int w4 = w * 4
+
+    with nogil:
+
+        for i in prange(0, b_length, 3, schedule='static', num_threads=THREADS):
+                ii = i // 3
+                jj = ii * 4
+                new_buffer[jj]   = rgb_array[i]
+                new_buffer[jj+1] = rgb_array[i+1]
+                new_buffer[jj+2] = rgb_array[i+2]
+                new_buffer[jj+3] = alpha[ii]
+
+        if transpose:
+            for i in prange(0, w4, 4, schedule='static', num_threads=THREADS):
+                for j in range(0, h):
+                    index = i + (w4 * j)
+                    k = (j * 4) + (i * h)
+                    flipped_array[k    ] = new_buffer[index    ]
+                    flipped_array[k + 1] = new_buffer[index + 1]
+                    flipped_array[k + 2] = new_buffer[index + 2]
+                    flipped_array[k + 3] = new_buffer[index + 3]
+            return flipped_array
+
+    return new_buffer
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef inline float [:, :] array2d_normalized_c(unsigned char [:, :] array):
+
+    """
+    NORMALIZED AN ARRAY
+
+    Transform/convert an array shapes (w, h) containing unsigned char values
+    into a MemoryViewSlice (2d array) with float values rescale in range [0 ... 1.0]
+
+    :param array: numpy.array shape (w, h) containing unsigned int values (uint8)
+    :return     : a MemoryViewSlice 2d array shape (w, h) with float values in range [0 ... 1.0]
+
+    """
+    cdef:
+        int w, h
+    try:
+        w, h = array.shape[:2]
+    except (ValueError, pygame.error) as e:
+        raise ValueError('\nArray shape not understood. Only 2d array shape (w, h) are compatible.')
+
+    cdef:
+        int i = 0, j = 0
+        float [:, :] array_f = numpy.empty((w, h), numpy.float32)
+
+    with nogil:
+        for i in prange(w, schedule='static', num_threads=THREADS):
+            for j in range(h):
+                array_f[i, j] = <float>(array[i, j] * ONE_255)
+    return array_f
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef area24_c(int x, int y, np.ndarray[np.uint8_t, ndim=3] background_rgb,
+              np.ndarray[np.uint8_t, ndim=2] mask_alpha, float intensity=1.0,
+              float [:] color=numpy.array([128.0, 128.0, 128.0], dtype=numpy.float32, copy=False),
+              bint smooth=False, bint saturation=False, float sat_value=0.2, bint bloom=False,
+              bint heat=False, float frequency=1):
+    """
+    Create a realistic light effect on a pygame.Surface or texture.
+
+    You can blit the output surface with additive mode using pygame flag BLEND_RGBA_ADD.
+
+
+    :param x: integer, light x coordinates (must be in range [0..max screen.size x]
+    :param y: integer, light y coordinates (must be in range [0..max screen size y]
+    :param background_rgb: numpy.ndarray (w, h, 3) uint8. 3d array shape containing all RGB values
+    of the background surface (display background).
+    :param mask_alpha: numpy.ndarray (w, h) uint8, 2d array with light texture alpha values.
+    For better appearances, choose a texture with a radial mask shape (maximum light intensity in the center)
+    :param color: numpy.array; Light color (RGB float), default
+    array([128.0 / 255.0, 128.0 / 255.0, 128.0 / 255.0], float32, copy=False)
+    :param intensity: float; Light intensity range [0.0 ... 20.0]
+    :param bloom: boolean; Bloom effect, default False
+    :param sat_value: float; Set the saturation value
+    :param saturation: boolean; Saturation effect
+    :param smooth: boolean; Blur effect
+    :param frequency: float; frequency must be incremental
+    :param heat: boolean; Allow heat wave effect
+    :return: Return a pygame surface 24 bit without per-pixel information,
+    surface with same size as the light texture. Represent the lit surface.
+    """
+
+    assert intensity >= 0.0, '\nIntensity value cannot be > 0.0'
+
+
+    cdef int w, h, lx, ly, ax, ay
+    try:
+        w, h = background_rgb.shape[:2]
+    except (ValueError, pygame.error) as e:
+        raise ValueError('\nArray shape not understood.')
+
+    try:
+        ax, ay = (<object>mask_alpha).shape[:2]
+    except (ValueError, pygame.error) as e:
+        raise ValueError('\nArray shape not understood.')
+
+    # Return an empty surface if the x or y are not within the normal range.
+    if (x < 0) or (x > w - 1) or (y < 0) or (y > h - 1):
+        return Surface((ax, ay), SRCALPHA), ax, ay
+
+    # return an empty Surface when intensity = 0.0
+    if intensity == 0.0:
+        return Surface((ax, ay), SRCALPHA), ax, ay
+
+    lx = ax >> 1
+    ly = ay >> 1
+
+    cdef:
+        np.ndarray[np.uint8_t, ndim=3] rgb = empty((ax, ay, 3), uint8, order='C')
+        np.ndarray[np.uint8_t, ndim=2] alpha = empty((ax, ay), uint8, order='C')
+        int i=0, j=0
+        float f
+        int w_low = lx
+        int w_high = lx
+        int h_low = ly
+        int h_high = ly
+
+    if x < lx:
+        w_low = x
+    elif x > w - lx:
+        w_high = w - x
+
+    if y < ly:
+        h_low = y
+    elif y >  h - ly:
+        h_high = h - y
+
+    rgb = background_rgb[x - w_low:x + w_high, y - h_low:y + h_high, :]
+    alpha = mask_alpha[lx - w_low:lx + w_high, ly - h_low:ly + h_high]
+
+    ax, ay = rgb.shape[:2]
+    cdef:
+        unsigned char [:, :, ::1] new_array = empty((ay, ax, 3), numpy.uint8)
+
+    # NOTE the array is transpose
+    with nogil:
+        for i in prange(ax, schedule='static', num_threads=THREADS):
+            for j in range(ay):
+                f = alpha[i, j] * ONE_255 * intensity
+                new_array[j, i, 0] = <unsigned char>fmin(rgb[i, j, 0] * f * color[0], 255.0)
+                new_array[j, i, 1] = <unsigned char>fmin(rgb[i, j, 1] * f * color[1], 255.0)
+                new_array[j, i, 2] = <unsigned char>fmin(rgb[i, j, 2] * f * color[2], 255.0)
+
+    ay, ax = new_array.shape[:2]
+
+    if smooth:
+        shader_blur5x5_array24_inplace_c(new_array, mask=None, t=1)
+
+    if saturation:
+        shader_saturation_array24_inplace_c(new_array, sat_value)
+
+    if heat:
+        new_array = heatwave_array24_horiz_c(numpy.asarray(new_array).transpose(1, 0, 2),
+            alpha, frequency, (frequency % 8) / 1000.0, attenuation=100, threshold=10)
+
+    surface = pygame.image.frombuffer(new_array, (ax, ay), "RGB")
+
+    if bloom:
+        mask = array2d_normalized_c(alpha)
+        shader_bloom_effect_array24_c(surface, threshold_=190, fast_=True, mask_=mask)
+
+    return surface, ax, ay
 

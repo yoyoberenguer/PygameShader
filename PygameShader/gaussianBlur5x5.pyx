@@ -51,6 +51,10 @@ if OPENMP is True:
     DEF THREAD_NUMBER = 8
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
 cpdef blur5x5_array24_inplace_c(unsigned char [:, :, :] rgb_array_):
     """
     # Gaussian kernel 5x5
@@ -76,11 +80,10 @@ cpdef blur5x5_array24_inplace_c(unsigned char [:, :, :] rgb_array_):
 
     # kernel 5x5 separable
     cdef:
-        float[5] kernel = [1.0/16.0, 4.0/16.0, 6.0/16.0, 4.0/16.0, 1.0/16.0]
+        float[5] kernel = [<float>(1.0/16.0), <float>(4.0/16.0),
+                           <float>(6.0/16.0), <float>(4.0/16.0), <float>(1.0/16.0)]
         short int kernel_half = <short int>2
         unsigned char [:, :, ::1] convolve = numpy.empty((w, h, 3), dtype=uint8)
-        unsigned char [:, :, ::1] convolved = numpy.empty((w, h, 3), dtype=uint8)
-        short int kernel_length = <short int>len(kernel)
         int x, y, xx, yy
         float k, r, g, b, s
         char kernel_offset
@@ -149,7 +152,7 @@ cpdef blur5x5_array24_inplace_c(unsigned char [:, :, :] rgb_array_):
 
 
 
-cpdef blur5x5_surface24_inplace_c(surface_):
+cdef blur5x5_surface24_inplace_c(surface_):
     """
     # Gaussian kernel 5x5
         # |1   4   6   4  1|
@@ -333,6 +336,9 @@ cpdef canny_blur5x5_surface24_c(surface_):
                         g += green * k
                         b += blue * k
 
+                r = r / 25
+                g = g / 25
+                b = b / 25
                 if r > 255.0:
                     r = 255.0
                 if g > 255.0:
