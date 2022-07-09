@@ -2,11 +2,11 @@
 
 
 
-*New Version 1.0.6*
+*New Version 1.0.7 - 1.0.6*
 
 
 ```
-pip install PygameShader==1.0.6
+pip install PygameShader==1.0.7
 ```
 
 Some scripts have been ported to GPU using CUPY and CUDA raw Kernels for running 
