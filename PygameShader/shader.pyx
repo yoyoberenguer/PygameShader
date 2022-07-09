@@ -97,7 +97,32 @@ if i == 5:
 """
 
 
-__VERSION__ = "1.0.5"
+""" 
+VERSION 1.0.6 
+same than 1.0.6 
++ removed the cupy import from the __init__.py file to avoid user not being able to 
+use CPU shader without installing CUPY and CUDA
+
+"""
+
+"""
+`Version 1.0.7`
+
+new GPU rgb_split_gpu
+new GPU chromatic 
+new GPU zoom 
+
+improved bloom effect for moving objects and particles, 
+this version is also faster (less sub-surface used to generate the bloom)
+new CPU shader_bloom_fast1  (works for moving objects) 
+new CPU chromatic 
+new CPU zoom
+
+Removed CPU median_avg 
+"""
+
+
+__VERSION__ = "1.0.7"
 
 import warnings
 
@@ -500,42 +525,6 @@ cpdef inline void median_grayscale(
     shader_median_grayscale_filter24_inplace_c(rgb_array, kernel_size_)
 
 
-cpdef inline void median_avg(
-        object surface_,
-        int kernel_size_=2
-):
-    """
-    SHADER MEDIAN FILTER (AVERAGE)
-    
-    This shader cannot be used for real time rendering as the performance of the algorithm are not
-    satisfactory. The code would have to be changed and improved with C or assembler in order to
-    be adapted for a real time application. 
-
-    In the state, this shader can be used for texture/surface transformation offline
-
-    The surface is compatible 24 - 32 bit with or without alpha layer
-    
-    * The changes are automatically applied inplace to the surface you do not need to create a 
-      new surface.  
-
-    :param surface_: pygame.Surface; compatible 24 - 32 bit with or without alpha layer
-    :param kernel_size_: integer; Kernel size (must be > 0), default value = 2
-    :return: void 
-    """
-
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-
-    assert kernel_size_ > 0, "\nArgument kernel_size_ cannot be <= 0"
-
-    try:
-        rgb_array = pixels3d(surface_)
-
-    except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
-
-    shader_median_filter24_avg_inplace_c(rgb_array, kernel_size_)
-
 
 
 cpdef inline void color_reduction(
@@ -765,12 +754,6 @@ cpdef inline void blur(object surface_, t_=1):
     """
     APPLY A GAUSSIAN BLUR EFFECT TO THE GAME DISPLAY OR TO A GIVEN TEXTURE (KERNEL 5x5)
 
-    # Gaussian kernel 5x5
-        # |1   4   6   4  1|
-        # |4  16  24  16  4|
-        # |6  24  36  24  6|  x 1/256
-        # |4  16  24  16  4|
-        # |1  4    6   4  1|
     This method is using convolution property and process the image in two passes,
     first the horizontal convolution and last the vertical convolution
     pixels convoluted outside image edges will be set to adjacent edge value
@@ -781,7 +764,7 @@ cpdef inline void blur(object surface_, t_=1):
       new surface.  
 
     :param surface_: pygame.Surface; compatible 24 - 32 bit surfaces
-    :param t_      : integer; must be >0
+    :param t_      : integer; must be >0; number of passes (default 1)
     :return: void 
     """
     assert PyObject_IsInstance(surface_, pygame.Surface), \
@@ -1277,7 +1260,7 @@ cpdef inline void bloom(object surface_, int threshold_, bint fast_=False, objec
 
 
 
-cpdef inline fisheye_footprint(int w, int h):
+cpdef inline fisheye_footprint(int w, int h, unsigned int centre_x, unsigned int centre_y):
     """
 
     :param w: integer; width of the fisheye model
@@ -1285,7 +1268,7 @@ cpdef inline fisheye_footprint(int w, int h):
     :return: Return a numpy.ndarray type (w, h, 2) representing the fisheye model (coordinates
     of all surface pixels passing through the fisheye lens model)
     """
-    return shader_fisheye24_footprint_c(w, h)
+    return shader_fisheye24_footprint_c(w, h, centre_x, centre_y)
 
 
 
@@ -1597,7 +1580,7 @@ cpdef inline predator_vision(
         sobel(surface_copy, sobel_threshold)
 
     bpf(surface_, bpf_threshold)
-    surface_ = shader_bloom_fast(surface_, bloom_threshold, fast_=fast)
+    shader_bloom_fast1(surface_, bloom_threshold)
     heatmap_convert(surface_, inv_colormap)
     surface_.blit(surface_copy, (0, 0), special_flags=blend)
 
@@ -3380,103 +3363,6 @@ cdef inline void shader_median_filter24_inplace_c(
                 rgb_array_[i, j, 0] = tmpr[(index -1) >> 1]
                 rgb_array_[i, j, 1] = tmpg[(index -1) >> 1]
                 rgb_array_[i, j, 2] = tmpb[(index -1) >> 1]
-
-
-
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-cdef inline void shader_median_filter24_avg_inplace_c(
-        unsigned char [:, :, :] rgb_array_, int kernel_size_=2):
-
-    """
-    SHADER MEDIAN FILTER
-
-    This shader cannot be used for real time rendering as the performance of the algorithm are not
-    satisfactory. The code would have to be changed and improved with C or assembler in order to
-    be adapted for a real time application. Another version can also be written with a surface
-    downscale prior processing /rescale method that would boost the fps performance.
-
-    In the state, this shader can be used for texture/surface transformation offline
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a
-    3d array (library surfarray)
-
-    :param rgb_array_   : numpy.ndarray shape(w, h, 3) uint8 (unsigned char 0...255) containing the
-    pygame display pixels format RGB
-    :param kernel_size_ : integer; size of the kernel
-    :return             : void
-    """
-
-    cdef Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
-
-    cdef:
-        unsigned char [:, :, ::1] rgb_array_copy = \
-            ascontiguousarray(numpy.array(rgb_array_, copy=True))
-
-        int i=0, j=0
-        int ky, kx
-        Py_ssize_t ii=0, jj=0
-        int k = kernel_size_ >> 1
-        int k_size = kernel_size_ * kernel_size_
-
-        Py_ssize_t w_1 = w - 1, h_1 = h - 1
-        int red, green, blue
-        unsigned char max_r, min_r, max_g, min_g, max_b, min_b
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
-
-    with nogil:
-        for i in prange(w, schedule='static', num_threads=THREADS, chunksize=2048):
-            for j in range(h):
-
-                max_r = 0
-                min_r = 0
-                max_g = 0
-                min_g = 0
-                max_b = 0
-                min_b = 0
-
-                for kx in range(-k, k):
-                    for ky in range(-k, k):
-                        ii = (i + kx)
-                        jj = (j + ky)
-
-                        if ii < 0:
-                            ii = 0
-                        elif ii > w_1:
-                            ii = w_1
-
-                        if jj < 0:
-                            jj = 0
-                        elif jj > h_1:
-                            jj = h_1
-
-                        r = &rgb_array_[ii, jj, 0]
-                        g = &rgb_array_[ii, jj, 1]
-                        b = &rgb_array_[ii, jj, 2]
-
-                        if r[0] > max_r:
-                            max_r = r[0]
-                        if g[0] > max_g:
-                            max_g = g[0]
-                        if b[0] > max_b:
-                            max_b = b[0]
-
-                        if r[0] < min_r:
-                            min_r = r[0]
-                        if g[0] < min_g:
-                            min_g = g[0]
-                        if b[0] < min_b:
-                            min_b = b[0]
-
-                rgb_array_[i, j, 0] = <unsigned char>((max_r - min_r) *0.5)
-                rgb_array_[i, j, 1] = <unsigned char>((max_g - min_g) *0.5)
-                rgb_array_[i, j, 2] = <unsigned char>((max_b - min_b) *0.5)
 
 
 
@@ -5355,9 +5241,9 @@ cpdef inline object shader_bloom_fast(
         unsigned short int factor_ = 2
 ):
     """
-    
-    :param surface_  : pygame.Surface; compatible 32-24 bit containing RGB pixel values 
-    :param threshold_: integer; Bloom threshold value, small value cause greater bloon effect 
+
+    :param surface_  : pygame.Surface; compatible 32-24 bit containing RGB pixel values
+    :param threshold_: integer; Bloom threshold value, small value cause greater bloon effect
     :param fast_     : boolean; True will increase the speed of the algorithm since only the S16 surface is blit
     :param factor_   : integer; Texture reduction value, must be in range [0, 4] and correspond to the dividing texture
         factor (div 1, div 2, div 4, div 8)
@@ -5483,6 +5369,61 @@ cpdef inline object shader_bloom_fast(
 
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef inline object shader_bloom_fast1(
+        surface_,
+        unsigned short int smooth_ = 3,
+        unsigned int threshold_ = 20,
+        unsigned short int flag_ = BLEND_RGB_ADD,
+        bint saturation_ = False
+):
+    """
+
+    :param surface_    : pygame.Surface; compatible 32-24 bit containing RGB pixel values 
+    :param smooth_     : integer; Smooth the hallow default 3 (gaussian kernel)
+    :param threshold_  : integer; BPF threshold default 20
+    :param flag_       : integer; pygame flag to use (default is BLEND_RGB_ADD)
+    :param saturation_ : bool; True | False include saturation effect to the halo  
+    :return            : Return a pygame Surface with the bloom effect (24 bit format)
+    """
+
+    cdef:
+        Py_ssize_t  w, h
+        int bit_size
+        int  w16, h16
+
+    w, h = surface_.get_size()
+    bit_size = surface_.get_bitsize()
+
+    with nogil:
+
+        w16, h16 = w >> 4, h >> 4
+
+        if w16 == 0 or h16 == 0:
+            raise ValueError(
+                "\nImage too small and cannot be processed.\n"
+                "Try to increase the size of the image or decrease the factor_ value (default 2)")
+
+    s2 = smoothscale(surface_, (w16, h16))
+    s2.blit(s2, (0, 0), special_flags=BLEND_RGB_ADD)
+
+    s2 = bpf24_c(pixels3d(s2), threshold=threshold_)    # --> return a surface (better to be inplace)
+    s2_array = numpy.array(s2.get_view('3'), dtype=numpy.uint8)
+
+    for r in range(smooth_):
+        shader_blur5x5_array24_inplace_c(s2_array)
+        if saturation_ : shader_saturation_array24_inplace_c(s2_array, 0.3)
+
+    b2_blurred = make_surface(s2_array)
+    s2 = smoothscale(b2_blurred, (w, h))
+
+    if flag_ is not None:
+        surface_.blit(s2, (0, 0), special_flags=flag_)
+    else:
+        surface_.glit(s2, (0, 0))
 
 
 # cdef unsigned int [:, :, ::1] IMAGE_FISHEYE_MODEL = numpy.zeros((800, 1024, 2), uint32)
@@ -5491,7 +5432,12 @@ cpdef inline object shader_bloom_fast(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-cdef inline shader_fisheye24_footprint_c(Py_ssize_t w, Py_ssize_t h):
+cdef inline shader_fisheye24_footprint_c(
+        Py_ssize_t w,
+        Py_ssize_t h,
+        unsigned int centre_x,
+        unsigned int centre_y
+):
 
     """
     CREATE A FISHEYE MODEL TO HOLD THE PIXEL COORDINATES OF A SURFACE/ GAME DISPLAY
@@ -5522,8 +5468,8 @@ cdef inline shader_fisheye24_footprint_c(Py_ssize_t w, Py_ssize_t h):
         float s = <float>w * <float>h
         float c1 = <float>2.0 / <float>h
         float c2 = <float>2.0 / <float>w
-        float w2 = <float>w * <float>0.5
-        float h2 = <float>h * <float>0.5
+        float w2 = <float>w * <float>centre_x/<float>w
+        float h2 = <float>h * <float>centre_y/<float>h
 
     with nogil:
         for x in prange(w, schedule='static', num_threads=THREADS):
@@ -7447,13 +7393,13 @@ cdef inline shader_fire_effect_c(
             "Argument bpf_threshold_ must be in range [0 ... 256] got %s " % bpf_threshold_
         # shader_bloom_effect_array24_c(fire_surface_smallest, bpf_threshold_, fast_=fast_bloom_)
         try:
-            fire_surface_smallest = shader_bloom_fast(
-                fire_surface_smallest, bpf_threshold_, fast_=fast_bloom_, factor_=1)
+            # fire_surface_smallest = shader_bloom_fast(
+            #     fire_surface_smallest, bpf_threshold_, fast_=fast_bloom_, factor_=1)
+            shader_bloom_fast1(fire_surface_smallest, threshold_=bpf_threshold_, smooth_=0, saturation_=True)
         except ValueError:
             raise ValueError(
-                "The surface is too small and cannot be bloomed with shader_bloom_fast.\n"
-                "Increase the size of the image or change the "
-                "shader_bloom_fast factor_ value (default is 2).")
+                "The surface is too small and cannot be bloomed with shader_bloom_fast1.\n"
+                "Increase the size of the image")
 
     # RESCALE THE SURFACE TO THE FULL SIZE
     if smooth_:
@@ -8566,9 +8512,12 @@ cdef object dithering_c(float [:, :, :] rgb_array_, int factor_):
                 oldg = rgb_array_[x, y, 1]
                 oldb = rgb_array_[x, y, 2]
 
-                new_red   = <float>round_c(oldr * (factor_ - 1.0)/255.0) / ((factor_ - 1)/255.0)
-                new_green = <float>round_c(oldg * (factor_ - 1.0)/255.0) / ((factor_ - 1)/255.0)
-                new_blue  = <float>round_c(oldb * (factor_ - 1.0)/255.0) / ((factor_ - 1)/255.0)
+                new_red   = <float>round_c(oldr *
+                                           (factor_ - <float>1.0)/<float>255.0) / ((factor_ - <float>1.0)/<float>255.0)
+                new_green = <float>round_c(oldg *
+                                           (factor_ - <float>1.0)/<float>255.0) / ((factor_ - <float>1.0)/<float>255.0)
+                new_blue  = <float>round_c(oldb *
+                                           (factor_ - <float>1.0)/<float>255.0) / ((factor_ - <float>1.0)/<float>255.0)
 
                 rgb_array_[x, y, 0] = new_red
                 rgb_array_[x, y, 1] = new_green
@@ -9396,3 +9345,180 @@ cpdef area24_c(int x, int y, np.ndarray[np.uint8_t, ndim=3] background_rgb,
 
     return surface, ax, ay
 
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef object chromatic(
+        surface_,
+        unsigned int delta_x,
+        unsigned int delta_y,
+        float zoom=0.9999,
+        float fx=0.02
+):
+    """
+    CHROMATIC ABERRATION 
+    
+    Create a chromatic aberration with an amplitude proportional to the 
+    distance from the centre of the effect
+    
+    :param surface_ : pygame.Surface
+    :param delta_x  : int; chromatic centre effect coordinate X, must be in range [0 ... w]
+    :param delta_y  : int; chromatic centre effect coordinate Y, must be in range [0 ... h]
+    :param zoom     : float; zoom factor 0.9999 (no zoom, full image), < 1.0 zoom-in. Must 
+        be in range [0.0 ... 0.9999] 
+    :param fx       : channel rgb layer offset default 0.02. Must be in range [0.0 ... 0.2]
+    :return         : a chromatic aberration effect
+    """
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    cdef Py_ssize_t w, h
+    w, h = surface_.get_size()
+
+    if w == 0 or h == 0:
+        raise ValueError("Surface width or height cannot be null!")
+
+    if delta_x < 0 or delta_y < 0:
+        raise ValueError("Arguments delta_x and delta_y must be > 0")
+
+    delta_x %= w
+    delta_y %= h
+
+    if zoom < 0 or <float>floor(zoom) > <float>0.99999999:
+        raise ValueError("Argument zoom must be in range [0.0 ... 0.999]")
+
+    if 0 > <float>floor(fx) > 0.2:
+        raise ValueError("Argument fx must be in range [0.0 ... 0.2]")
+
+    cdef unsigned char [:, :, :] rgb_array
+
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    cdef:
+        unsigned char [:, :, ::1] new_array = empty((h, w, 3), dtype=numpy.uint8)
+        int i = 0, j = 0
+        float dw = <float>delta_y / <float>w
+        float dh = <float>delta_x / <float>h
+        float nx, ny, theta_rad, nx2, ny2, dist, new_dist, new_ii, new_jj
+        int new_j, new_i
+
+    with nogil:
+        for j in prange(0, h, schedule='static', num_threads=THREADS):
+            for i in range(w):
+                nx = <float>(<float>i / <float>h) - dh
+                ny = <float>(<float>j / <float>w) - dw
+                theta_rad = <float>atan2 (ny,nx)
+                nx2 = nx * nx
+                ny2 = ny * ny
+                dist = <float>sqrt(nx2 + ny2)
+                new_dist = dist * (zoom - fx)
+                new_ii = <float>cos(<float>theta_rad) * new_dist
+                new_jj = <float>sin(<float>theta_rad) * new_dist
+                new_j = <int>((new_jj + dw) * <float>w)
+                new_i = <int>((new_ii + dh) * <float>h)
+                new_array[j, i, 0] = rgb_array[new_i, new_j, 0]
+
+                new_dist = dist * (zoom  - fx * <float>2.0)
+
+                new_j = <int>((<float>sin(<float>theta_rad) * new_dist + dw) * <float>w)
+                new_i = <int>((<float>cos(<float>theta_rad) * new_dist + dh) * <float>h)
+                new_array[j, i, 1] = rgb_array[new_i, new_j, 1]
+
+                new_dist = dist * (zoom  - fx * <float>3.0)
+
+                new_ii = <float>cos(<float>theta_rad) * new_dist
+                new_jj = <float>sin(<float>theta_rad) * new_dist
+
+                new_j = <int>((new_jj + dw) * <float>w)
+                new_i = <int>((new_ii + dh) * <float>h)
+
+                new_array[j, i, 2] = rgb_array[new_i, new_j, 2]
+
+    return frombuffer(new_array, (w, h), 'RGB').convert()
+
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef object zoom(surface_, unsigned int delta_x, unsigned int delta_y, float zx=0.9999):
+    """
+    ZOOM WITHIN AN IMAGE
+    
+    Zoom-in or zoom-out (factor zx) toward a given centre point (delta_x, delta_y) 
+    
+    :param surface_ : pygame.Surface
+    :param delta_x  : int; Zoom centre x coordinate must be in range [0 ... w] 
+    :param delta_y  : int; Zoom centre y coordinate must be in range [0 ... h]
+    :param zx       : float; Zoom factor (0.9999 no zoom) must be in range [0.0 ... 0.9999]
+    :return         : Returns an image with a zoom effect
+    """
+
+    cdef int w, h
+    w, h = surface_.get_size()
+
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    if w == 0 or h == 0:
+        raise ValueError("Surface width or height cannot be null!")
+
+    if delta_x < 0 or delta_y < 0:
+        raise ValueError("Arguments delta_x and delta_y must be > 0")
+
+    delta_x %= w
+    delta_y %= h
+
+    if zx < 0 or <float>floor(zx) > <float>0.99999999:
+        raise ValueError("Argument zx must be in range [0.0 ... 0.999]")
+
+
+    cdef unsigned char [:, :, :] rgb_array
+
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    cdef:
+        unsigned char [:, :, ::1] new_array = empty((h, w, 3), dtype=numpy.uint8)
+        int i = 0, j = 0
+        float dw = delta_y / <float>w
+        float dh = delta_x / <float>h
+        float nx, ny, theta, nx2, ny2, dist, new_dist
+        int new_j, new_i, r, g, b
+
+    with nogil:
+        for j in prange(0, h, schedule='static', num_threads=THREADS):
+            for i in range(w):
+                nx = <float>(<float>i / <float>h) - dh
+                ny = <float>(<float>j / <float>w) - dw
+
+                theta = <float>atan2 (ny,nx)
+
+                nx2 = nx * nx
+                ny2 = ny * ny
+
+                dist = <float>sqrt(nx2 + ny2)
+                new_dist = dist * zx
+
+                new_j = <int>((<float>sin(<float>theta) * new_dist + dw) * <float>w)
+                new_i = <int>((<float>cos(<float>theta) * new_dist + dh) * <float>h)
+
+                new_array[j, i, 0] = rgb_array[new_i, new_j, 0]
+                new_array[j, i, 1] = rgb_array[new_i, new_j, 1]
+                new_array[j, i, 2] = rgb_array[new_i, new_j, 2]
+
+
+    return frombuffer(new_array, (w, h), 'RGB').convert()

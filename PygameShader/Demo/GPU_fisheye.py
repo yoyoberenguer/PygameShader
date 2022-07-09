@@ -3,7 +3,7 @@ PygameShader FISHEYE DEMO
 """
 from random import randint, uniform, randrange
 
-from PygameShader import blend
+
 
 try:
     import numpy
@@ -31,6 +31,7 @@ try:
     import PygameShader
     from PygameShader.shader_gpu import block_grid, ripple_effect_gpu, \
         get_gpu_info, block_and_grid_info, area24_gpu, fisheye_gpu, wave_gpu
+    from PygameShader.shader import blend
 except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
                       "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
@@ -104,10 +105,10 @@ while STOP_GAME:
         if event.type == pygame.MOUSEMOTION:
             MOUSE_POS = event.pos
 
-    transition = blend(
-        source_=background, destination_=city, percentage_=VALUE)
+    # transition = blend(
+    #     source_=background, destination_=city, percentage_=VALUE)
 
-    image = fisheye_gpu(transition, grid, block)
+    image = IMAGE = fisheye_gpu(background, VALUE/49.0, 0.35, grid, block)
     SCREEN.blit(image, (0, 0))
 
     t = clock.get_fps()

@@ -44,51 +44,53 @@ cpdef unsigned int get_max_grid_per_block()
 cdef get_divisors(int n)
 cpdef block_grid(int w, int h)
 
-cpdef object invert_gpu(gpu_array_)
-cdef object invert_cupy(gpu_array_)
+cpdef object invert_gpu(surface_)
 cpdef void invert_inplace_cupy(cpu_array_)
 
-cpdef object sepia_gpu(object cpu_array_)
+cpdef object sepia_gpu(object surface_)
 cdef object sepia_cupy(gpu_array_)
 cpdef void sepia_inplace_cupy(cpu_array_)
 
 
-cpdef object bpf_gpu(object gpu_array_, unsigned int threshold_ = *)
+cpdef object bpf_gpu(object surface_, unsigned int threshold_ = *)
 cdef object bpf_cupy(gpu_array_, unsigned int threshold_)
-cpdef object bpf1_gpu(object gpu_array_, grid_, block_, unsigned int threshold_ = *)
+cpdef object bpf1_gpu(object surface_, grid_, block_, unsigned int threshold_ = *)
 cdef object bpf1_cupy(object gpu_array_, unsigned int threshold_, object grid_, object block_)
 
 
-cpdef object grayscale_gpu(object gpu_array_)
+cpdef object grayscale_gpu(object surface_)
 cdef object grayscale_cupy(gpu_array_)
-cpdef object grayscale_lum_gpu(object gpu_array_)
+
+cpdef object grayscale_lum_gpu(object surface_)
 cdef object grayscale__lum_cupy(gpu_array_)
 
-cpdef object median_gpu(object gpu_array_, unsigned int size_ = *)
+cpdef object median_gpu(object surface_, unsigned int size_ = *)
 cdef object median_cupy(gpu_array_, unsigned int size_ = *)
-cpdef object median1_gpu(object gpu_array_, unsigned int size_ = *)
+
+cpdef object median1_gpu(object surface_, unsigned int size_ = *)
 cdef object median1_cupy(gpu_array_, unsigned int size_ = *)
 
-cpdef object gaussian_5x5_gpu(object gpu_array_)
+cpdef object gaussian_5x5_gpu(object surface_)
 cdef object gaussian_5x5_cupy(gpu_array_)
-cpdef object gaussian_3x3_gpu(object gpu_array_)
+
+cpdef object gaussian_3x3_gpu(object surface_)
 cdef object gaussian_3x3_cupy(gpu_array_)
 
 
-cpdef object sobel_gpu(object gpu_array_)
+cpdef object sobel_gpu(object surface_)
 cdef object sobel_cupy(gpu_array_)
 
-cpdef object prewitt_gpu(object gpu_array_)
+cpdef object prewitt_gpu(object surface_)
 cdef object prewitt_cupy(gpu_array_)
 
-cpdef object canny_gpu(object gpu_array_)
+cpdef object canny_gpu(object surface_)
 cdef object canny_cupy(gpu_array_)
 
-cpdef object color_reduction_gpu(object gpu_array_, int color_number = *)
+cpdef object color_reduction_gpu(object surface_, int color_number = *)
 cdef object color_reduction_cupy(object gpu_array_, int color_number)
 
 
-cpdef object hsv_gpu(object gpu_array_, float val_, object grid_ = *, object block_ = *)
+cpdef object hsv_gpu(object surface_, float val_, object grid_ = *, object block_ = *)
 cdef object hsv_cupy(object cupy_array, object grid_, object block_, float val_, w, h)
 
 cpdef object mult_downscale_gpu(object gpu_array)
@@ -144,8 +146,8 @@ cdef object cartoon_cupy(
 
 cpdef object blending_gpu(object source_, object destination_, float percentage_)
 
-cpdef object sharpen_gpu(gpu_array_)
-cpdef object sharpen1_gpu(gpu_array_, grid_, block_)
+cpdef object sharpen_gpu(object surface_)
+cpdef object sharpen1_gpu(object surfaace_, grid_, block_)
 
 
 cpdef ripple_effect_gpu(
@@ -159,21 +161,21 @@ cpdef ripple_effect_gpu(
        )
 
 cpdef object mirroring_gpu(
-        object gpu_array_,
+        object surface_,
         object grid_,
         object block_,
         bint format_ = *
 )
-cpdef inline mirroring_cupy(object gpu_array_, object grid_, object block_, bint format_=*)
+cdef mirroring_cupy(object gpu_array_, object grid_, object block_, bint format_=*)
 
 
 cpdef object saturation_gpu(
-        object gpu_array_,
+        object surface_,
         object grid_,
         object block_,
         float val_ = *
 )
-cpdef object saturation_cupy(
+cdef object saturation_cupy(
         object cupy_array,
         object grid_,
         object block_,
@@ -181,12 +183,13 @@ cpdef object saturation_cupy(
 )
 
 
-cpdef object bilateral_gpu(gpu_array_, unsigned int kernel_size_)
+cpdef object bilateral_gpu(surface_, unsigned int kernel_size_)
 cdef bilateral_cupy(gpu_array_, unsigned int kernel_size_)
-cpdef object bilateral_fast_gpu(gpu_array_, unsigned int kernel_size_)
+
+cpdef object bilateral_fast_gpu(surface_, unsigned int kernel_size_)
 cdef bilateral_fast_cupy(gpu_array_, unsigned int kernel_size_)
 
-cpdef object emboss5x5_gpu(gpu_array_)
+cpdef object emboss5x5_gpu(surface_)
 cdef object emboss5x5_cupy(gpu_array_)
 
 cpdef area24_gpu(int x, int y,
@@ -196,21 +199,56 @@ cpdef area24_gpu(int x, int y,
                  color=*)
 
 cpdef object brightness_gpu(
-        object gpu_array_,
+        object surface_,
         float val_,
         object grid_  = *,
         object block_ = *
 )
 
 cpdef object hsl_gpu(
-        object gpu_array_,
+        object surface_,
         float val_,
         object grid_  = *,
         object block_ = *
 )
 
-cpdef inline object fisheye_gpu(object surface_, grid_, block_)
+cpdef object fisheye_gpu(object surface_, float focal, float focal_texture, object grid_, object block_)
 
-cpdef inline object swirl_gpu(object surface_, float rad, object grid_, object block_)
+cpdef object swirl_gpu(
+        object surface_,
+        float rad,
+        object grid_,
+        object block_,
+        unsigned int centre_x,
+        unsigned int centre_y
+)
 
-cpdef inline object wave_gpu(object surface_, rad_, size_, object grid_, object block_)
+cpdef object wave_gpu(object surface_, float rad_, int size_, object grid_, object block_)
+
+cpdef object chromatic_gpu(
+        object surface_,
+        unsigned int delta_x,
+        unsigned int delta_y,
+        object grid_,
+        object block_,
+        float zoom = *,
+        float fx = *
+)
+
+
+cpdef object rgb_split_gpu(
+        object surface_,
+        unsigned int delta_x,
+        unsigned int delta_y,
+        object grid_,
+        object block_
+)
+
+cpdef object zoom_gpu(
+        object surface_,
+        unsigned int delta_x,
+        unsigned int delta_y,
+        object grid_,
+        object block_,
+        float zoom = *
+)

@@ -4,10 +4,9 @@ PygameShader SMOKE DEMO
 
 from random import uniform, randint
 
-from PygameShader import create_horizontal_gradient_1d
-
 try:
     from PygameShader.shader import custom_map, rgb_to_int, cloud_effect
+    from PygameShader.misc import create_horizontal_gradient_1d
 except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
           "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
@@ -22,7 +21,8 @@ except ImportError:
 # PYGAME IS REQUIRED
 try:
     import pygame
-    from pygame import Surface, RLEACCEL, QUIT, K_SPACE, BLEND_RGB_ADD, BLEND_RGB_SUB, BLEND_RGB_MULT, BLEND_RGB_MAX
+    from pygame import Surface, RLEACCEL, QUIT, K_SPACE, BLEND_RGB_ADD, \
+        BLEND_RGB_SUB, BLEND_RGB_MULT, BLEND_RGB_MAX
 
 except ImportError:
     raise ImportError("\n<Pygame> library is missing on your system."
@@ -43,7 +43,6 @@ def show_fps(screen_, fps_, avg_) -> None:
         screen_.blit(avg_text, (120, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
-
 
 
 # Set the display to 1024 x 768
