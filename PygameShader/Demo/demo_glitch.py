@@ -1,7 +1,7 @@
 import pygame
 from pygame import RLEACCEL
 import PygameShader
-from PygameShader import horizontal_glitch
+from PygameShader.shader import horizontal_glitch
 
 WIDTH = 1024
 HEIGHT = 768
@@ -36,6 +36,7 @@ while GAME:
     pygame.display.flip()
     CLOCK.tick()
     FRAME += 1
-    
+
     image = BACKGROUND.copy()
-   
+
+pygame.quit()

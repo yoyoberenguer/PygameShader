@@ -105,7 +105,6 @@ cpdef void median(
         bint fast_=*,
         unsigned short int reduce_factor_=*)except *
 cpdef void median_grayscale(object surface_, int kernel_size_=*)
-cpdef void median_avg(object surface_, int kernel_size_=*)
 
 cpdef void color_reduction(object surface_, int color_=*)
 
@@ -148,11 +147,20 @@ cpdef void heatwave_vertical(
         float sigma_, float mu_)
 cpdef void horizontal_glitch(object surface_, float rad1_, float frequency_,
                                               float amplitude_)
+
 cpdef void bpf(object surface_, int threshold = *)
+
 cpdef void bloom(object surface_, int threshold_, bint fast_=*, object mask_=*)
 cpdef object shader_bloom_fast(surface_, int threshold_, bint fast_ = *, unsigned short int factor_ = *)
+cpdef object shader_bloom_fast1(
+        surface_,
+        unsigned short int smooth_= *,
+        unsigned int threshold_   = *,
+        unsigned short int flag_  = *,
+        bint saturation_          = *
+)
 
-cpdef fisheye_footprint(int w, int h)
+cpdef fisheye_footprint(int w, int h, unsigned int centre_x, unsigned int centre_y)
 cpdef void fisheye(object surface_, unsigned int [:, :, :] fisheye_model)
 
 cpdef tuple rain_footprint(int w, int h)
@@ -293,3 +301,20 @@ cpdef void alpha_blending_inplace(object source_, object destination_)
 cpdef float [:, :] array2d_normalized_c(unsigned char [:, :] array)
 cpdef filtering24_c(object surface_, mask_)
 cpdef void heatmap_convert(object surface_, bint rgb_=*)
+
+
+cpdef object chromatic(
+        surface_,
+        unsigned int delta_x,
+        unsigned int delta_y,
+        float zoom=*,
+        float fx=*
+)
+
+cpdef object zoom(
+        surface_,
+        unsigned int delta_x,
+        unsigned int delta_y,
+        float zx=*
+)
+

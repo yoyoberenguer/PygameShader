@@ -1,6 +1,6 @@
 import pygame
 from pygame import RLEACCEL
-from PygameShader import shader_bloom_fast
+from PygameShader import shader_bloom_fast, shader_bloom_fast1
 
 
 def show_fps(screen_, fps_, avg_) -> None:
@@ -51,7 +51,8 @@ while GAME:
             GAME = False
             break
 
-    image = shader_bloom_fast(image, BPF, fast_=False, factor_=3)
+    # image = shader_bloom_fast(image, BPF, fast_=False, factor_=3)
+    shader_bloom_fast1(image, threshold_=BPF, smooth_=0)
 
     SCREEN.blit(image, (0, 0))
     t = CLOCK.get_fps()

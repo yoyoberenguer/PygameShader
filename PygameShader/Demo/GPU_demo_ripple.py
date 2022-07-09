@@ -3,6 +3,8 @@ PygameShader RIPPLE DEMO
 """
 from random import randint, uniform, randrange
 
+from PygameShader import shader_bloom_fast1
+
 try:
     import numpy
     from numpy import uint8
@@ -136,6 +138,7 @@ while STOP_GAME:
     surf = pygame.image.frombuffer(back_array.transpose(1, 0, 2).tobytes(), (width, height), "RGB")
 
     SCREEN.blit(surf, (0, 0), special_flags=0)
+
 
     clock.tick(120)
     t = clock.get_fps()

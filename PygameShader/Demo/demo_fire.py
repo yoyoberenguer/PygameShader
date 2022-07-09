@@ -4,7 +4,7 @@ PygameShader FIRE DEMO
 
 from random import uniform, randint
 
-# from PygameShader import block_grid, block_and_grid_info, wave_gpu
+# from PygameShader.shader_gpu import block_grid, block_and_grid_info, wave_gpu
 
 try:
     from PygameShader.shader import custom_map, rgb_to_int, fire_effect, wave
@@ -127,6 +127,7 @@ while GAME:
 
     # image = wave_gpu(BACKGROUND, 8 * 3.14 / 180.0 + FRAME / 10, 8, grid, block)
     # image = scale(image, (WIDTH + 16, HEIGHT + 16))  # Hide the left and bottom borders
+    # SCREEN.blit(image, (0, 0))
 
     SCREEN.blit(BACKGROUND, (0, 0))
 
@@ -143,7 +144,7 @@ while GAME:
         fast_bloom_             =False,
         bpf_threshold_          = bpf,
         brightness_             =True,
-        brightness_intensity_   = 0.045 + uniform(0.055, 0.09),
+        brightness_intensity_   = 0.095 + uniform(0.055, 0.09),
         transpose_              =False,
         border_                 =False,
         low_                    =30,

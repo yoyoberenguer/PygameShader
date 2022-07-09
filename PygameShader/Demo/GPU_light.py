@@ -2,7 +2,6 @@
 PygameShader GPU LIGHT DEMO
 """
 
-
 try:
     import numpy
     from numpy import uint8
@@ -127,6 +126,7 @@ while STOP_GAME:
     SCREEN.blit(background, (0, 0))
 
     SCREEN.blit(lit_surface, (xx, yy), special_flags=pygame.BLEND_RGBA_ADD)
+
     t = clock.get_fps()
     avg.append(t)
     show_fps(SCREEN, t, avg)
