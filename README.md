@@ -55,7 +55,9 @@ WIKI available here https://github.com/yoyoberenguer/PygameShader/wiki
 
 Pygame shader project is a `2D game library` written in Python and Cython containing
 `special effects` for development of multimedia applications like video games, arcade game, 
-video and camera image processing or to customize your sprites textures/surfaces.
+video and camera image processing or to customize your sprites textures/surfaces. The library 
+contains special that use multiprocessing (OPENMP) to transform Pygame surfaces 
+
 
 This library is compatible with BMP, GIF (non - animated), JPEG, PNG image format.
 ```
@@ -70,103 +72,14 @@ Some algorithms are more demanding than others in terms of processing power
 ex : median filtering and predator vision (due to the fact that it is built with more
 than one shader to provide a composite effect). Consequently, not all shader will run at
 the same speed at medium resolutions. Feel free to experiment with higher display resolutions
-while the shader provides 60 fps or above.
+while the shader provides 60 fps or above. If the CPU shaders are unfortunately not fast enough, 
+consider using the GPU shader instead.
 
 If you are using the shader library for sprites texturing and special effects
 then the overall processing time should be extremely fast due to code optimization with
 cython. Nevertheless, to keep a good frame rate, it is advised to keep the sprites below
 the screen display resolution e,g 200x200 texture size.
 
-The shaders effect can be placed into 5 different categories
-* Color variations
-* Filters
-* Transformations
-* Ambiances
-* Special effects
- 
-Some effects can be used for interaction with the player(s) (ex the player is being hit
-and receive damages, use the shader blood effect to turn your screen red).
-Screen shacking after an explosion, check the shader dampening effect (horizontal or zoom in/out)
-Player is pausing the game, use the blur effect to blur the background image.
-You need to change the brightness of a scene uses the shader brightness.
-Sprite texture colors can be changed over time with the HSL algorithm.
-Your game needs to look a bit more retro, use the reduction shader to decrease the amount
-of colors in your texture or display
-etc
-
-PygameShader provide tools to improve your overall game appearance by changing 
-Sprites texture/surface and or by using great special effects that will affect 
-the entire screen. 
-
-This version contains the following shaders:  
-
-* `Color variations`
-  
-  - RGB to BGR (Change your game display from RGB to a BGR model) 
-  - RGB to BRG (Change your game display from RGB to a BRG model) 
-  - grayscale mode
-  - sepia; Sepia mode  
-  - color reduction, decrease the amount of color 
-  - hsl Rotate the colors
-  - invert (Invert the game display negative color)
-  - plasma (Add a plasma effect to your display)
-  - heatmap conversion
-
-* `Filters`
-  - median* 
-  - sobel effect (edge display)
-  - gaussian blur 5x5 (add a blur effect to your game)
-  - sharpen filter (increase the image sharpness)
-  - bright pass filter (bpf) 
-  
-* `Transformations`
-  - wave effect, create a wave effect to your game display
-  - swirl, swirl the entire screen or texture 
-  - horizontal glitch, create a glitch effect affecting 
-    your display
-  - mirroring 
-  - lateral dampening (lateral dampening effect that can 
-    be used  for explosions)
-  - dampening effect (zoom in and out dampening effect)
-  - fisheye your game display is turned into a fisheye model
-  - heatwave 
-
-* `Ambiances`
-  - brightness, increase / decrease the brightness of your
-    texture or game display in real time
-  - saturation, increase / decrease the level of saturation 
-
-* `Special effects` 
-  - bloom effect, real time bloom effect for your display
-  - water ripple effect, create water ripple effect in real 
-    time on your game display 
-  - tunnel effect, show a tunnel effect 
-  - tv scanline, TV scanline effect
-  - blood effect, use a red vignette to color your screen 
-    each time your player is taking damage 
-  - predator vision, create a predator vision mode
-  - fire effect, Display an amazing fire effect onto your 
-    game display or texture in real time
-  - smoke/cloud effect, create a smoke effect or moving cloud 
-  - RGB split, split all the RGB channels separately and display 
-    the R, G and B channel with an offset
-  - rain (bubble effect), You can generate a hundred bubbles or 
-    water droplets on your game display, the droplets/bubbles will 
-    reflect the game display in real time
- 
-* New in version 1.0.3 
-  - Added blending mode for `Predator mode`                  
-  - New algorithm `dirt_lens effect` bokeh effect (texture available in Assets directory)
-  - `Dithering` The classic dithering effect to create a retro image effect
-  - `Color_palette` to convert image into Amstrad CPC 6128
-     COMMODORE C64, ZX SPECTRUM etc 
-  - `Bilateral filter`Blur effect that conserve the edge of an image 
-  - `Emboss filter` Emboss an image or create relief 
-  - `Pixelation` Pixelate an image
-  - `Convert to 27 colors` Similar to color_reduction effect but cap the reduction to 27 colors
-  - `Spectrum surface` Create a pygame surface that contains the light spectrum (colors)
-  - `Horizontal gradient (unit misc.pyx)` New algorithms to create custom 2D - 3D gradient colors surface
-  - `New transition effect (blend effect)` Transistion between two images
 
 ## Demo
 
