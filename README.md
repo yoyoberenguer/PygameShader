@@ -1,8 +1,7 @@
 # Pygame Shaders Library 
 
 
-
-*New Version 1.0.6 - 1.0.7
+*New Version 1.0.6 - 1.0.7 with GPU acceleration
 
 
 ```
@@ -50,12 +49,9 @@ from PygameShader.shader_gpu import *
 
 
 ---
+## What is PygameShader?
 
-*New version 1.0.4* and WIKI available here https://github.com/yoyoberenguer/PygameShader/wiki
-```
-pip install PygameShader==1.0.4
-```
-
+WIKI available here https://github.com/yoyoberenguer/PygameShader/wiki
 
 Pygame shader project is a `2D game library` written in Python and Cython containing
 `special effects` for development of multimedia applications like video games, arcade game, 
