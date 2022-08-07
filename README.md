@@ -55,8 +55,10 @@ WIKI available here https://github.com/yoyoberenguer/PygameShader/wiki
 
 Pygame shader project is a `2D game library` written in Python and Cython containing
 `special effects` for development of multimedia applications like video games, arcade game, 
-video and camera image processing or to customize your sprites textures/surfaces. The library 
-contains special that use multiprocessing (OPENMP) to transform Pygame surfaces 
+video and camera image processing or to customize your sprites textures/surfaces. 
+
+The CPU shader library is using multiprocessing (OPENMP) to transform Pygame surfaces 
+and the GPU shader library is using `cupy` and CUDA.
 
 
 This library is compatible with BMP, GIF (non - animated), JPEG, PNG image format.
