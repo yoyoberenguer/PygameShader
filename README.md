@@ -2,7 +2,7 @@
 
 
 
-*New Version 1.0.7 - 1.0.6*
+*New Version 1.0.6 - 1.0.7
 
 
 ```
@@ -174,11 +174,9 @@ This version contains the following shaders:
 
 ## Demo
 
-Youtube : https://youtu.be/XgLF2BWP0Rs
-
 In the PygameShader `Demo` directory 
 
-(press ESC to quit the demo)
+(press key ESC to quit the demo)
 
 ```commandline
 C:\>python demo_fire.py
@@ -189,14 +187,18 @@ C:\>python demo_wave.py
 
 The project is under the `GNU GENERAL PUBLIC LICENSE Version 3`
 
-## Installation 
+---
+
+# Installation 
 check the link for newest version https://pypi.org/project/PygameShader/
 
-* Available python build 3.6, 3.7, 3.8, 3.9, 3.10 and source build
+## Windows (PIP)
+* Available python build `3.6`, `3.7`, `3.8`, `3.9`, `3.10` and source build for 
+amd64 (64-bit)
 ```
 pip install PygameShader 
-# or version 1.0.2  
-pip install PygameShader==1.0.2
+# or version 1.0.5
+pip install PygameShader==1.0.5
 ```
 
 * version installed 
@@ -205,13 +207,39 @@ pip install PygameShader==1.0.2
 >>>from PygameShader.shader import __VERSION__
 >>>__VERSION__
 ```
+## Linux (PIP)
+* Available build `3.6`, `3.7`, `3.8`, `3.9`, `3.10` and source build for 
+i686 and x86_64 platforms build with docker
+
+```shell session
+pip install PygameShader
+```
+
+## Build from source
+
+Copy or download the source code 
+`PygameShader-1.0.xx.tar.gz` 
+
+Under linux 
+```bash
+tar -xvf PygameShader-1.0.xx.tar.gz
+cd PygameShader-1.0.xx
+python setup.py build
+python setup.py install 
+
+```
+
+
+----
+
 
 ## Building cython code
 
 #### When do you need to compile the cython code ? 
 
 Each time you are modifying any of the following files 
-shader.pyx, shader.pxd, __init__.pxd or any external C code if applicable
+shader.pyx, shader.pxd, shader_gpu.pyx, shader_gpu.pxd or any other 
+pyx files or external C code
 
 1) open a terminal window
 2) Go in the main project directory where (shader.pyx & 
@@ -233,14 +261,16 @@ make sure cython and a C-compiler are correctly install on your
   install on your system, refer to external documentation or 
   tutorial in order to setup this process.e.g https://devblogs.
   microsoft.com/python/unable-to-find-vcvarsall-bat/
+---
 
 ## OPENMP 
 In the main project directory, locate the file ```setup_shader.py```.
-The compilation flag /openmp is used by default.
+The compilation flag /openmp (for `windows`) and "-fopenmp" (for `linux`) is used by default.
 To override the OPENMP feature and disable the multi-processing remove the flag ```/openmp```
 
 ####
-```setup_shader.py```
+```setup_shader.py``` and ```setup.py```
+
 ```python
 
 ext_modules=cythonize(Extension(
@@ -264,8 +294,12 @@ running in a different thread.
 - cython >=0.29.21 (C extension for python) 
 - A C compiler for windows (Visual Studio, MinGW etc)
 
+---
+
 ## Credit
 Yoann Berenguer 
+
+---
 
 ## Dependencies :
 ```
@@ -273,6 +307,8 @@ numpy >= 1.18
 pygame >=2.0.0
 cython >=0.29.21
 ```
+
+---
 
 ## License :
 
@@ -284,6 +320,7 @@ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
 Everyone is permitted to copy and distribute verbatim copies
 of this license document, but changing it is not allowed.
 
+---
 
 ## Testing: 
 ```python
