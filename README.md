@@ -103,7 +103,7 @@ The project is under the `GNU GENERAL PUBLIC LICENSE Version 3`
 # Installation 
 check the link for newest version https://pypi.org/project/PygameShader/
 
-## Windows (PIP)
+## Windows (PIP in construction)
 * Available python build `3.6`, `3.7`, `3.8`, `3.9`, `3.10` and source build for 
 amd64 (64-bit)
 ```
