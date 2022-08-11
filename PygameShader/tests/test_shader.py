@@ -25,8 +25,7 @@ from pygame import BLEND_RGB_ADD, RLEACCEL, BLEND_RGB_MAX, BLEND_RGB_MIN, BLEND_
 
 from PygameShader.shader import rgb_to_bgr, rgb_to_brg, \
     greyscale, sepia, \
-    median, median_grayscale, \
-    median_avg, color_reduction, sobel, \
+    color_reduction, sobel, \
     sobel_fast, invert, \
     hsl_effect, hsl_fast, rgb_to_hsl_model, \
     hsl_to_rgb_model, blur, wave, \
@@ -61,9 +60,8 @@ shader_list =\
         "rgb_to_brg"                 : "RGB to BRG",
         "greyscale"     : "grayscale Luminosity",
         "sepia"                    : "Sepia",
-        "median"            : "Median",
-        "median_grayscale"  : "Median grayscale",
-        "median_avg"        : "Median avg",
+        # "median"            : "Median",
+        # "median_grayscale"  : "Median grayscale",
         "color_reduction"          : "Color reduction",
         "sobel"                    : "Sobel",
         "sobel_fast"               : "Sobel fast",
@@ -246,50 +244,50 @@ class TestShaderSepia24Inplace(unittest.TestCase):
         """
         display_shader("sepia", timer = 5, flag=0)
 
+#
+# class TestShaderMedianFilter24Inplace(unittest.TestCase):
+#     """
+#     Test median
+#     """
+#
+#     # pylint: disable=too-many-statements
+#     @staticmethod
+#     def runTest() -> None:
+#         """
+#
+#         :return:  void
+#         """
+#         display_shader("median", timer = 5, flag=0)
 
-class TestShaderMedianFilter24Inplace(unittest.TestCase):
-    """
-    Test median
-    """
+#
+# class TestShaderMedianGrayscaleFilter24Inplace(unittest.TestCase):
+#     """
+#     Test median_grayscale
+#     """
+#
+#     # pylint: disable=too-many-statements
+#     @staticmethod
+#     def runTest() -> None:
+#         """
+#
+#         :return:  void
+#         """
+#         display_shader("median_grayscale", timer = 5, flag=0)
 
-    # pylint: disable=too-many-statements
-    @staticmethod
-    def runTest() -> None:
-        """
-
-        :return:  void
-        """
-        display_shader("median", timer = 5, flag=0)
-
-
-class TestShaderMedianGrayscaleFilter24Inplace(unittest.TestCase):
-    """
-    Test median_grayscale
-    """
-
-    # pylint: disable=too-many-statements
-    @staticmethod
-    def runTest() -> None:
-        """
-
-        :return:  void
-        """
-        display_shader("median_grayscale", timer = 5, flag=0)
-
-
-class TestShaderMedianFilter24AvgInplace(unittest.TestCase):
-    """
-    Test median_avg
-    """
-
-    # pylint: disable=too-many-statements
-    @staticmethod
-    def runTest() -> None:
-        """
-
-        :return:  void
-        """
-        display_shader("median_avg", timer = 5, flag=0)
+#
+# class TestShaderMedianFilter24AvgInplace(unittest.TestCase):
+#     """
+#     Test median_avg
+#     """
+#
+#     # pylint: disable=too-many-statements
+#     @staticmethod
+#     def runTest() -> None:
+#         """
+#
+#         :return:  void
+#         """
+#         display_shader("median_avg", timer = 5, flag=0)
 
 
 class TestShaderColorReduction24Inplace(unittest.TestCase):
@@ -1002,7 +1000,7 @@ class TestShaderFisheye24Inplace(unittest.TestCase):
         CLOCK = pygame.time.Clock()
         GAME = True
 
-        fisheye_model = fisheye_footprint(WIDTH + 1, HEIGHT + 1)
+        fisheye_model = fisheye_footprint(WIDTH + 1, HEIGHT + 1, WIDTH >> 1, HEIGHT >> 1)
         t = time.time()
         while GAME:
 
@@ -2698,6 +2696,9 @@ def run_testsuite():
 
     :return: void
     """
+    # TestShaderMedianFilter24Inplace(),
+    # TestShaderMedianGrayscaleFilter24Inplace(),
+    # TestShaderMedianFilter24AvgInplace(),
 
     suite = unittest.TestSuite()
 
@@ -2706,9 +2707,7 @@ def run_testsuite():
         TestShaderRgbToBrgInplace(),
         TestShaderGreyscaleLuminosity24Inplace(),
         TestShaderSepia24Inplace(),
-        TestShaderMedianFilter24Inplace(),
-        TestShaderMedianGrayscaleFilter24Inplace(),
-        TestShaderMedianFilter24AvgInplace(),
+
         TestShaderColorReduction24Inplace(),
         TestShaderSobel24Inplace(),
         TestShaderSobel24FastInplace(),

@@ -94,8 +94,9 @@ cpdef object hsv_gpu(object surface_, float val_, object grid_ = *, object block
 cdef object hsv_cupy(object cupy_array, object grid_, object block_, float val_, w, h)
 
 cpdef object mult_downscale_gpu(object gpu_array)
-cpdef object downscale_gpu(object gpu_array_, int w, int h)
-cpdef object upscale_gpu(object gpu_array_, int w, int h)
+
+# cpdef object zoom_in_gpu(object surface, int w, int h)
+# cpdef object upscale_gpu(object gpu_array_, int w, int h)
 
 # ------------------ BLOOM ------------------
 cdef void bpf_c(object gpu_array_, int w, int h, unsigned int threshold_=*)
@@ -186,8 +187,6 @@ cdef object saturation_cupy(
 cpdef object bilateral_gpu(surface_, unsigned int kernel_size_)
 cdef bilateral_cupy(gpu_array_, unsigned int kernel_size_)
 
-cpdef object bilateral_fast_gpu(surface_, unsigned int kernel_size_)
-cdef bilateral_fast_cupy(gpu_array_, unsigned int kernel_size_)
 
 cpdef object emboss5x5_gpu(surface_)
 cdef object emboss5x5_cupy(gpu_array_)
@@ -225,6 +224,15 @@ cpdef object swirl_gpu(
 
 cpdef object wave_gpu(object surface_, float rad_, int size_, object grid_, object block_)
 
+
+cpdef object rgb_split_gpu(
+        object surface_,
+        float delta_x,
+        float delta_y,
+        object grid_,
+        object block_
+)
+
 cpdef object chromatic_gpu(
         object surface_,
         unsigned int delta_x,
@@ -236,14 +244,6 @@ cpdef object chromatic_gpu(
 )
 
 
-cpdef object rgb_split_gpu(
-        object surface_,
-        unsigned int delta_x,
-        unsigned int delta_y,
-        object grid_,
-        object block_
-)
-
 cpdef object zoom_gpu(
         object surface_,
         unsigned int delta_x,
@@ -251,4 +251,17 @@ cpdef object zoom_gpu(
         object grid_,
         object block_,
         float zoom = *
+)
+
+cpdef object wavelength_map_gpu(
+        object surface_,
+        object grid_,
+        object block_,
+        unsigned short int layer_=*
+)
+cpdef object heatmap_gpu(
+        object surface_,
+        object grid_,
+        object block_,
+        bint invert_ = *
 )

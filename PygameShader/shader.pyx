@@ -122,7 +122,31 @@ Removed CPU median_avg
 """
 
 
-__VERSION__ = "1.0.7"
+"""
+`Version 1.0.8`
+New GPU wavelength_map_gpu
+New GPU heatmap_gpu
+new CPU shader_rgb_to_yiq_inplace
+new CPU shader_rgb_to_yiq_i_comp_inplace
+new CPU shader_rgb_to_yiq_q_comp_inplace
+
+ADDED CPU METHOD FOR 
+create_horizontal_gradient_1d
+create_horizontal_gradient_1d_alpha
+object horizontal_grad3d
+object horizontal_grad3d_alpha
+create_radial_gradient
+create_radial_gradient_alpha
+create_quarter_radial_gradient
+create_quarter_radial_gradient_alpha
+
+Removed fast cpdef object bilateral_fast_gpu(surface_, unsigned int kernel_size_)
+Removed cdef bilateral_fast_cupy(gpu_array_, unsigned int kernel_size_)
+
+"""
+
+
+__VERSION__ = "1.0.8"
 
 import warnings
 
@@ -265,6 +289,39 @@ COLORS_CPC64 = numpy.array(
 cdef:
     float [:, :] COLORS_CPC64_C = numpy.divide(COLORS_CPC64, 255.0).astype(dtype=float32)
 
+
+
+cpdef tuple rgb_2_yiq(unsigned char r, unsigned char g, unsigned char b):
+    """
+    CONVERT RGB VALUES INTO YIQ COLOR MODEL 
+    
+    * formulas NTSC 1953 
+    
+    :param r: integer; (unsigned char) red value in range [0.255]
+    :param g: integer; (unsigned char) green value in range [0.255]
+    :param b: integer; (unsigned char) blue value in range [0.255]
+    :return: tuple representing the color in YIQ color model
+    """
+    cdef yiq yiq_
+    yiq_ = rgb_to_yiq(r/<float>255.0, g/<float>255.0, b/<float>255.0)
+    return yiq_.y, yiq_.i, yiq_.q
+
+cpdef tuple yiq_2_rgb(float y, float i, float q):
+    """
+    CONVERT YIQ COLOR MODEL INTO EQUIVALENT RGB VALUES
+    * NTSC 1953
+    
+    :param y: float; LUMA
+    :param i: float; I stands for in-phase
+    :param q: float; Q stands for quadrature, 
+    :return: tuple representing the RGB values [0...255] unsigned char values
+    """
+    cdef rgb rgb_
+
+    rgb_ = yiq_to_rgb(y, i, q)
+    return <unsigned char>(rgb_.r * <float>255.0), \
+           <unsigned char>(rgb_.g * <float>255.0), \
+           <unsigned char>(rgb_.b * <float>255.0)
 
 
 cpdef inline void rgb_to_bgr(object surface_):
@@ -3083,7 +3140,7 @@ cdef inline void insertion_sort(unsigned char [::1] nums, int size)nogil:
 @cython.cdivision(True)
 # There are different ways to do a Quick Sort partition, this implements the
 # Hoare partition scheme. Tony Hoare also created the Quick Sort algorithm.
-cdef inline int partition(unsigned char [::1] nums, int low, int high)nogil:
+cdef inline int partition_cython(unsigned char [::1] nums, int low, int high)nogil:
     """
     
     :param nums: 
@@ -3126,7 +3183,7 @@ cdef inline void _quick_sort(unsigned char [::1] items, int low, int high)nogil:
     """
     cdef int split_index
     if low < high:
-        split_index = partition(items, low, high)
+        split_index = partition_cython(items, low, high)
         _quick_sort(items, low, split_index)
         _quick_sort(items, split_index + 1, high)
 
@@ -3171,6 +3228,7 @@ cdef inline void heap_sort(unsigned char [::1] nums, int n)nogil:
     :param n: 
     :return: 
     """
+    cdef int i
 
     for i in range(n, -1, -1):
         heapify(nums, n, i)
@@ -3189,7 +3247,8 @@ cdef inline void heap_sort(unsigned char [::1] nums, int n)nogil:
 @cython.nonecheck(False)
 @cython.cdivision(True)
 cdef inline void shader_median_filter24_inplace_heapsort_c(
-        unsigned char [:, :, :] rgb_array_, int kernel_size_=2):
+        unsigned char [:, :, :] rgb_array_, 
+        int kernel_size_ =2):
 
     """
     SHADER MEDIAN FILTER
@@ -3274,7 +3333,9 @@ cdef inline void shader_median_filter24_inplace_heapsort_c(
 @cython.nonecheck(False)
 @cython.cdivision(True)
 cdef inline void shader_median_filter24_inplace_c(
-        unsigned char [:, :, :] rgb_array_, int kernel_size_=2):
+        unsigned char [:, :, :] rgb_array_, 
+        int kernel_size_=2
+        ):
 
     """
     SHADER MEDIAN FILTER
@@ -3371,7 +3432,9 @@ cdef inline void shader_median_filter24_inplace_c(
 @cython.nonecheck(False)
 @cython.cdivision(True)
 cdef inline void shader_median_grayscale_filter24_inplace_c(
-        unsigned char [:, :, :] rgb_array_, int kernel_size_=2):
+        unsigned char [:, :, :] rgb_array_, 
+        int kernel_size_=2
+        ):
 
     """
     SHADER MEDIAN FILTER
@@ -3407,9 +3470,7 @@ cdef inline void shader_median_grayscale_filter24_inplace_c(
         int k_size = kernel_size_ * kernel_size_
         # int [64] tmp_  = empty(64, numpy.int16, order='C')
         int *tmp_   = <int *> malloc(k_size * sizeof(int))
-        int *tmp
         int index = 0
-        unsigned char *v
 
 
     with nogil:
@@ -5126,36 +5187,36 @@ cdef inline void shader_bloom_effect_array24_c(
     w, h = surface_.get_size()
     bit_size = surface_.get_bitsize()
 
-    with nogil:
-        w2, h2   = <int>w >> 1, <int>h >> 1
-        w4, h4   = w2 >> 1, h2 >> 1
-        w8, h8   = w4 >> 1, h4 >> 1
-        w16, h16 = w8 >> 1, h8 >> 1
 
-        if w16 == 0 or h16 == 0:
-            raise ValueError(
-                "\nImage too small and cannot be processed.\n"
-                "Try to increase the size of the image")
+    w2, h2   = <int>w >> 1, <int>h >> 1
+    w4, h4   = w2 >> 1, h2 >> 1
+    w8, h8   = w4 >> 1, h4 >> 1
+    w16, h16 = w8 >> 1, h8 >> 1
 
-        if w2 > 0 and h2 > 0:
-            x2 = True
-        else:
-            x2 = False
+    if w16 == 0 or h16 == 0:
+        raise ValueError(
+            "\nImage too small and cannot be processed.\n"
+            "Try to increase the size of the image")
 
-        if w4 > 0 and h4 > 0:
-            x4 = True
-        else:
-            x4 = False
+    if w2 > 0 and h2 > 0:
+        x2 = True
+    else:
+        x2 = False
 
-        if w8 > 0 and h8 > 0:
-            x8 = True
-        else:
-            x8 = False
+    if w4 > 0 and h4 > 0:
+        x4 = True
+    else:
+        x4 = False
 
-        if w16 > 0 and h16 > 0:
-            x16 = True
-        else:
-            x16 = False
+    if w8 > 0 and h8 > 0:
+        x8 = True
+    else:
+        x8 = False
+
+    if w16 > 0 and h16 > 0:
+        x16 = True
+    else:
+        x16 = False
 
     s2, s4, s8, s16 = None, None, None, None
 
@@ -5241,6 +5302,7 @@ cpdef inline object shader_bloom_fast(
         unsigned short int factor_ = 2
 ):
     """
+    BLOOM EFFECT
 
     :param surface_  : pygame.Surface; compatible 32-24 bit containing RGB pixel values
     :param threshold_: integer; Bloom threshold value, small value cause greater bloon effect
@@ -5268,37 +5330,37 @@ cpdef inline object shader_bloom_fast(
     w, h = surface_.get_size()
     bit_size = surface_.get_bitsize()
 
-    with nogil:
 
-        w2, h2   = <int>w >> 1, <int>h >> 1
-        w4, h4   = w2 >> 1, h2 >> 1
-        w8, h8   = w4 >> 1, h4 >> 1
-        w16, h16 = w8 >> 1, h8 >> 1
 
-        if w16 == 0 or h16 == 0:
-            raise ValueError(
-                "\nImage too small and cannot be processed.\n"
-                "Try to increase the size of the image or decrease the factor_ value (default 2)")
+    w2, h2   = <int>w >> 1, <int>h >> 1
+    w4, h4   = w2 >> 1, h2 >> 1
+    w8, h8   = w4 >> 1, h4 >> 1
+    w16, h16 = w8 >> 1, h8 >> 1
 
-        if w2 > 0 and h2 > 0:
-            x2 = True
-        else:
-            x2 = False
+    if w16 == 0 or h16 == 0:
+        raise ValueError(
+            "\nImage too small and cannot be processed.\n"
+            "Try to increase the size of the image or decrease the factor_ value (default 2)")
 
-        if w4 > 0 and h4 > 0:
-            x4 = True
-        else:
-            x4 = False
+    if w2 > 0 and h2 > 0:
+        x2 = True
+    else:
+        x2 = False
 
-        if w8 > 0 and h8 > 0:
-            x8 = True
-        else:
-            x8 = False
+    if w4 > 0 and h4 > 0:
+        x4 = True
+    else:
+        x4 = False
 
-        if w16 > 0 and h16 > 0:
-            x16 = True
-        else:
-            x16 = False
+    if w8 > 0 and h8 > 0:
+        x8 = True
+    else:
+        x8 = False
+
+    if w16 > 0 and h16 > 0:
+        x16 = True
+    else:
+        x16 = False
 
     s2, s4, s8, s16 = None, None, None, None
 
@@ -5373,57 +5435,92 @@ cpdef inline object shader_bloom_fast(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-cpdef inline object shader_bloom_fast1(
-        surface_,
+cpdef void shader_bloom_fast1(
+        object surface_,
         unsigned short int smooth_ = 3,
-        unsigned int threshold_ = 20,
+        unsigned int threshold_ = 0,
         unsigned short int flag_ = BLEND_RGB_ADD,
         bint saturation_ = False
 ):
     """
-
+    BLOOM EFFECT (SIMPLIFY VERSION) 
+    
+    This version is compatible with moving object in the display.
+    
+    The other bloom versions cause the halo of light to be offset from moving 
+    objects due to the re-scaling (down sampling) of the sub-surfaces and the loss 
+    of accuracy.
+    
+    The quantity of bloom can be adjust with the bright pass filter threshold
+     (variable threshold_). The variable can help you to choose what level of 
+     light can trigger a bloom effect. 
+    The lowest the value the brightest the effect. 
+    
+    The smooth factor will help to spread the light homogeneously around the objects. 
+    A large number of smooth will cast the bloom over the entire scene and diminished 
+    the overall bloom effect, while a small value will pixelate the hallo around objects 
+    but will generate the brightest effect on objects. 
+    When smooth is below 3, the halo appear to be slightly pixelated. 
+    
+    You can use the saturation to generate saturated colors within the light 
+    effect.
+    The flag can be used to create different special effect with the light within the 
+    pygame display. The default value is pygame.BLEND_RGB_ADD and allow to blend 
+    the bloom to the display. 
+    Nevertheless you cann also use any of the other flags such as BLEND_RGB_MAX, BLEND_RGB_SUB etc 
+    
+    This effect is applied inplace
+    
     :param surface_    : pygame.Surface; compatible 32-24 bit containing RGB pixel values 
     :param smooth_     : integer; Smooth the hallow default 3 (gaussian kernel)
     :param threshold_  : integer; BPF threshold default 20
     :param flag_       : integer; pygame flag to use (default is BLEND_RGB_ADD)
     :param saturation_ : bool; True | False include saturation effect to the halo  
-    :return            : Return a pygame Surface with the bloom effect (24 bit format)
+    :return            : void 
     """
 
     cdef:
         Py_ssize_t  w, h
-        int bit_size
-        int  w16, h16
+        unsigned int bit_size
+        unsigned int  w16, h16
+        int r
+
+    assert isinstance(surface_, pygame.Surface), \
+        "Argument surface_ must be a pygame.Surface got %s " % type(surface_)
+    if flag_ < 0:
+        raise ValueError("Argument flag_ cannot be < 0")
+    if smooth_ < 0:
+        raise ValueError("Argument smooth_ cannot be < 0")
+
+    threshold_ %= 255
 
     w, h = surface_.get_size()
     bit_size = surface_.get_bitsize()
 
-    with nogil:
+    w16, h16 = w >> 4, h >> 4
 
-        w16, h16 = w >> 4, h >> 4
-
-        if w16 == 0 or h16 == 0:
-            raise ValueError(
-                "\nImage too small and cannot be processed.\n"
-                "Try to increase the size of the image or decrease the factor_ value (default 2)")
+    if w16 == 0 or h16 == 0:
+        raise ValueError(
+            "\nImage too small and cannot be processed.\n"
+                "Try to increase the size of the image")
 
     s2 = smoothscale(surface_, (w16, h16))
     s2.blit(s2, (0, 0), special_flags=BLEND_RGB_ADD)
 
-    s2 = bpf24_c(pixels3d(s2), threshold=threshold_)    # --> return a surface (better to be inplace)
-    s2_array = numpy.array(s2.get_view('3'), dtype=numpy.uint8)
+    cdef unsigned char [ :, :, : ] s2_array = pixels3d(s2)
+    shader_bpf24_inplace_c(s2_array, threshold=threshold_)
 
     for r in range(smooth_):
         shader_blur5x5_array24_inplace_c(s2_array)
-        if saturation_ : shader_saturation_array24_inplace_c(s2_array, 0.3)
+        if saturation_ : shader_saturation_array24_inplace_c(s2_array, <float>0.3)
 
-    b2_blurred = make_surface(s2_array)
+    b2_blurred = make_surface(numpy.asarray(s2_array))
     s2 = smoothscale(b2_blurred, (w, h))
 
-    if flag_ is not None:
+    if flag_ is not None and flag_!=0:
         surface_.blit(s2, (0, 0), special_flags=flag_)
     else:
-        surface_.glit(s2, (0, 0))
+        surface_.blit(s2, (0, 0))
 
 
 # cdef unsigned int [:, :, ::1] IMAGE_FISHEYE_MODEL = numpy.zeros((800, 1024, 2), uint32)
@@ -5451,10 +5548,12 @@ cdef inline shader_fisheye24_footprint_c(
     This method has to be call once before the main loop in order to calculate
     the projected position for each pixels.
 
-    :param w    : integer; width of the model
-    :param h    : integer; height of the model
-    :return     : Return a numpy.ndarray type (w, h, 2) representing the fisheye model (coordinates
-    of all surface pixels passing through the fisheye lens model)
+    :param centre_y: integer; centre y of the effect   
+    :param centre_x: integer; centre x of the effect 
+    :param w       : integer; width of the model
+    :param h       : integer; height of the model
+    :return        : Return a numpy.ndarray type (w, h, 2) representing the fisheye model (coordinates
+        of all surface pixels passing through the fisheye lens model)
     """
 
     assert w > 0, "Argument w must be > 0"
@@ -6178,7 +6277,7 @@ cpdef tunnel_render32(
                 dest_array[dest_ofs + 2] = scr_data[pix_ofs + 0] * shade
                 dest_array[dest_ofs + 3] = 255
 
-    return pygame.image.frombuffer(dest_array, (screen_width, screen_height), "RGBA")
+    return pygame.image.frombuffer(dest_array, (screen_width, screen_height), "RGBA").convert_alpha()
 
 
 
@@ -6922,7 +7021,7 @@ cdef fire_surface24_c(
     with nogil:
         # POPULATE TO THE BASE OF THE FIRE (THIS WILL CONFIGURE THE FLAME ASPECT)
         for x in prange(min_, max_, schedule='static', num_threads=THREADS):
-                fire[height-1, x] = randRange(intensity, 260)
+                fire[height-1, x] = randRange(intensity, 260) #260
 
 
         # DILUTE THE FLAME EFFECT (DECREASE THE MAXIMUM INT VALUE) WHEN THE FLAME TRAVEL UPWARD
@@ -6937,8 +7036,9 @@ cdef fire_surface24_c(
                        + fire[c1, (x + 1) % width]
                        + fire[(y + 2) % height, c2]) * factor
 
-                    d = d - <float>(rand() * 0.0001)
-
+                    d = d - <float>(rand() * 0.0001) # 0.0001
+                    
+                    
                     # Cap the values
                     if d <0:
                         d = 0.0
@@ -7395,7 +7495,14 @@ cdef inline shader_fire_effect_c(
         try:
             # fire_surface_smallest = shader_bloom_fast(
             #     fire_surface_smallest, bpf_threshold_, fast_=fast_bloom_, factor_=1)
-            shader_bloom_fast1(fire_surface_smallest, threshold_=bpf_threshold_, smooth_=0, saturation_=True)
+
+            shader_bloom_fast1(
+                fire_surface_smallest,
+                threshold_ = bpf_threshold_,
+                smooth_    = 0,
+                saturation_= False
+            )
+
         except ValueError:
             raise ValueError(
                 "The surface is too small and cannot be bloomed with shader_bloom_fast1.\n"
@@ -8471,7 +8578,10 @@ cdef inline void dirt_lens_c(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-cdef object dithering_c(float [:, :, :] rgb_array_, int factor_):
+cdef object dithering_c(
+    float [:, :, :] rgb_array_, 
+    int factor_
+    ):
 
     """
     Dithering is used in computer graphics to create the illusion of "color depth" in images with
@@ -8502,9 +8612,10 @@ cdef object dithering_c(float [:, :, :] rgb_array_, int factor_):
         float oldr, oldg, oldb
 
     rgb_array_ = rgb_array_.astype(dtype=numpy.float32)
+    
     with nogil:
 
-        for y in prange(1, h, schedule='static', num_threads=THREADS, chunksize=2**8):
+        for y in prange(1, h, schedule='static', num_threads=THREADS, chunksize=256):
 
             for x in range(1, w):
 
@@ -8563,7 +8674,10 @@ cdef object dithering_c(float [:, :, :] rgb_array_, int factor_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-cdef inline void dithering_int_c(unsigned char[:, :, :] rgb_array_, int factor_):
+cdef inline void dithering_int_c(
+    unsigned char[:, :, :] rgb_array_, 
+    int factor_ = 2
+    ):
 
 
     cdef Py_ssize_t w, h
@@ -9379,6 +9493,7 @@ cpdef object chromatic(
     cdef Py_ssize_t w, h
     w, h = surface_.get_size()
 
+
     if w == 0 or h == 0:
         raise ValueError("Surface width or height cannot be null!")
 
@@ -9522,3 +9637,131 @@ cpdef object zoom(surface_, unsigned int delta_x, unsigned int delta_y, float zx
 
 
     return frombuffer(new_array, (w, h), 'RGB').convert()
+
+
+
+cpdef void shader_rgb_to_yiq_inplace(object surface_):
+    """
+    CONVERT IMAGE INTO GREYSCALE USING YIQ (LUMA INFORMATION)
+    
+    :param surface_: pygame.Surface; 
+    :return: void
+    """
+
+    shader_rgb_to_yiq_inplace_c(pixels3d(surface_))
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef inline void shader_rgb_to_yiq_inplace_c(unsigned char [:, :, :] rgb_array):
+
+    cdef Py_ssize_t w, h
+    w, h = rgb_array.shape[:2]
+
+    cdef:
+        int i=0, j=0
+        yiq yiq_
+        rgb rgb_
+        float h_
+        unsigned char *r
+        unsigned char *g
+        unsigned char *b
+
+
+    with nogil:
+        for j in prange(h, schedule='static', num_threads=THREADS):
+            for i in range(w):
+                r = &rgb_array[i, j, 0]
+                g = &rgb_array[i, j, 1]
+                b = &rgb_array[i, j, 2]
+                yiq_ = rgb_to_yiq(r[0] * <float>ONE_255, g[0] * <float>ONE_255, b[0] * <float>ONE_255)
+
+                r[0] = min(<unsigned char>(yiq_.y * <float>255.0), 255)
+                g[0] = min(<unsigned char>(yiq_.y * <float>255.0), 255)
+                b[0] = min(<unsigned char>(yiq_.y * <float>255.0), 255)
+
+
+
+cpdef void shader_rgb_to_yiq_i_comp_inplace(object surface_):
+    """
+    CONVERT IMAGE INTO YIQ MODEL (REPRESENT IN-PHASE VALUE)
+
+    :param surface_: pygame.Surface; 
+    :return: void
+    """
+
+    shader_rgb_to_yiq_i_comp_inplace_c(pixels3d(surface_))
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef inline void shader_rgb_to_yiq_i_comp_inplace_c(unsigned char [:, :, :] rgb_array):
+
+    cdef Py_ssize_t w, h
+    w, h = rgb_array.shape[:2]
+
+    cdef:
+        int i=0, j=0
+        yiq yiq_
+        rgb rgb_
+        float h_
+        unsigned char *r
+        unsigned char *g
+        unsigned char *b
+
+
+    with nogil:
+        for j in prange(h, schedule='static', num_threads=THREADS):
+            for i in range(w):
+                r = &rgb_array[i, j, 0]
+                g = &rgb_array[i, j, 1]
+                b = &rgb_array[i, j, 2]
+                yiq_ = rgb_to_yiq(r[0] * <float>ONE_255, g[0] * <float>ONE_255, b[0] * <float>ONE_255)
+                rgb_ = yiq_to_rgb(yiq_.y, yiq_.i, 0)
+                r[0] = <unsigned char>(rgb_.r * <float>255.0)
+                g[0] = <unsigned char>(rgb_.g * <float>255.0)
+                b[0] = <unsigned char>(rgb_.b * <float>255.0)
+
+cpdef void shader_rgb_to_yiq_q_comp_inplace(object surface_):
+    """
+    CONVERT IMAGE INTO YIQ MODEL (REPRESENT IN-PHASE VALUE)
+
+    :param surface_: pygame.Surface; 
+    :return: void
+    """
+
+    shader_rgb_to_yiq_q_comp_inplace_c(pixels3d(surface_))
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef inline void shader_rgb_to_yiq_q_comp_inplace_c(unsigned char [:, :, :] rgb_array):
+
+    cdef Py_ssize_t w, h
+    w, h = rgb_array.shape[:2]
+
+    cdef:
+        int i=0, j=0
+        yiq yiq_
+        rgb rgb_
+        float h_
+        unsigned char *r
+        unsigned char *g
+        unsigned char *b
+
+
+    with nogil:
+        for j in prange(h, schedule='static', num_threads=THREADS):
+            for i in range(w):
+                r = &rgb_array[i, j, 0]
+                g = &rgb_array[i, j, 1]
+                b = &rgb_array[i, j, 2]
+                yiq_ = rgb_to_yiq(r[0] * <float>ONE_255, g[0] * <float>ONE_255, b[0] * <float>ONE_255)
+                rgb_ = yiq_to_rgb(yiq_.y, 0, yiq_.q)
+                r[0] = <unsigned char>(rgb_.r * <float>255.0)
+                g[0] = <unsigned char>(rgb_.g * <float>255.0)
+                b[0] = <unsigned char>(rgb_.b * <float>255.0)
+

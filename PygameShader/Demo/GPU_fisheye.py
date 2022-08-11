@@ -59,8 +59,7 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-pygame.display.init()
-SCREEN = pygame.display.set_mode(SCREENRECT.size)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN, vsync=True)
 
 pygame.init()
 

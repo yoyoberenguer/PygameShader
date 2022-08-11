@@ -22,11 +22,11 @@ except ImportError:
     raise ImportError("\n<Pygame> library is missing on your system."
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
 
-try:
-    import cupy
-except ImportError:
-    raise ImportError("\n<Pygame> library is missing on your system."
-                      "\nTry: \n   C:\\pip install cupy on a window command prompt.")
+# try:
+#     import cupy
+# except ImportError:
+#     raise ImportError("\n<Pygame> library is missing on your system."
+#                       "\nTry: \n   C:\\pip install cupy on a window command prompt.")
 
 try:
     import PygameShader
@@ -56,8 +56,8 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-pygame.display.init()
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, 32)
+# pygame.display.init()
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, vsync=True)
 
 pygame.init()
 
@@ -80,6 +80,10 @@ get_pos = pygame.mouse.get_pos
 flip = pygame.display.flip
 
 STOP_GAME = True
+
+MOUSE_POS = Vector2()
+MOUSE_POS.x = 0
+MOUSE_POS.y = 0
 
 while STOP_GAME:
 

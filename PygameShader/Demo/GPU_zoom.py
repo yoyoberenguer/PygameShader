@@ -58,8 +58,7 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-pygame.display.init()
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, 32)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, vsync=True)
 
 pygame.init()
 
@@ -85,6 +84,10 @@ STOP_GAME = True
 
 grid, block = block_grid(width, height)
 block_and_grid_info(width, height)
+
+MOUSE_POS = pygame.math.Vector2()
+MOUSE_POS.x = 0
+MOUSE_POS.y = 0
 
 while STOP_GAME:
 

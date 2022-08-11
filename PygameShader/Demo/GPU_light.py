@@ -55,8 +55,7 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-pygame.display.init()
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, 32)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, vsync=True)
 
 pygame.init()
 
@@ -94,6 +93,10 @@ get_pos = pygame.mouse.get_pos
 flip = pygame.display.flip
 
 STOP_GAME = True
+
+MOUSE_POS = pygame.math.Vector2()
+MOUSE_POS.x = 0
+MOUSE_POS.y = 0
 
 while STOP_GAME:
 

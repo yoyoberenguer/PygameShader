@@ -47,11 +47,18 @@ cdef extern from 'Include/Shaderlib.c':
 
 cpdef object swap_channels24_c(object surface_, object model)
 
+
 cpdef create_horizontal_gradient_1d(
         int value,
         tuple start_color=*,
         tuple end_color=*
 )
+cpdef create_horizontal_gradient_1d_alpha(
+        int value,
+        tuple start_color=*,
+        tuple end_color=*
+)
+
 
 cpdef object horizontal_grad3d(
         int width,
@@ -59,10 +66,58 @@ cpdef object horizontal_grad3d(
         tuple start_color=*,
         tuple end_color=*
 )
+cpdef object horizontal_grad3d_alpha(
+        int width,
+        int height,
+        tuple start_color=*,
+        tuple end_color=*
+)
+
+cpdef create_radial_gradient(
+        int width_,
+        int height_,
+        float offset_x              = *,
+        float offset_y              = *,
+        tuple start_color_          = *,
+        tuple end_color_            = *,
+        object gradient_array_      = *,
+        float factor_               = *,
+        unsigned short int threads_ = *
+)
+cpdef create_radial_gradient_alpha(
+        int width_,
+        int height_,
+        float offset_x              = *,
+        float offset_y              = *,
+        tuple start_color_          = *,
+        tuple end_color_            = *,
+        object gradient_array_      = *,
+        float factor_               = *,
+        unsigned short int threads_ = *
+)
+
+cpdef create_quarter_radial_gradient(
+        int width_,
+        int height_,
+        tuple start_color_            = *,
+        tuple end_color_              = *,
+        object gradient_array_        = *,
+        float factor_                 = *,
+        unsigned short int threads_   = *
+)
+
+cpdef create_quarter_radial_gradient_alpha(
+        int width_,
+        int height_,
+        tuple start_color_            = *,
+        tuple end_color_              = *,
+        object gradient_array_        = *,
+        float factor_                 = *,
+        unsigned short int threads_   = *
+)
 
 cdef float color_dist_hsv(hsv hsv_1, hsv hsv_2)nogil
 cdef float color_dist_hsl(hsl hsl_1, hsl hsl_2)nogil
-
 
 cdef rgb color_diff_hsv(
         rgb color0,
@@ -88,5 +143,5 @@ cdef rgb close_color(
 cdef rgb use_palette(
         rgb colors,
         float [:, :] palette_,
-        Py_ssize_t w
+        unsigned int w = *
 )nogil

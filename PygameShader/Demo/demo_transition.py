@@ -31,12 +31,12 @@ except ImportError:
 # Set the display to 1024 x 768
 WIDTH = 1024
 HEIGHT = 768
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=True)
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, vsync=True)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 
 # Load the background image
-BACKGROUND = pygame.image.load("../Assets/Background.jpg").convert()
+BACKGROUND = pygame.image.load("../Assets/background.jpg").convert()
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
 DESTINATION = pygame.image.load("../Assets/Aliens.jpg").convert()

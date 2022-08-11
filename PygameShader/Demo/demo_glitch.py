@@ -9,7 +9,7 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=True)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 
-BACKGROUND = pygame.image.load("../Assets/Background.jpg").convert()
+BACKGROUND = pygame.image.load("../Assets/background.jpg").convert()
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
 FRAME = 0

@@ -40,6 +40,12 @@ warnings.filterwarnings("ignore", category=ImportWarning)
 
 cdef extern from 'Include/Shaderlib.c':
 
+    struct yiq:
+        float y;
+        float i;
+        float q;
+
+
     struct hsv:
         float h;
         float s;
@@ -70,17 +76,19 @@ cdef extern from 'Include/Shaderlib.c':
     rgb struct_hsv_to_rgb(float h, float s, float v)nogil;
     hsv struct_rgb_to_hsv(float r, float g, float b)nogil;
 
-    int *quickSort(int arr[], int low, int high)nogil;
+    yiq rgb_to_yiq(float r, float g, float b)nogil;
+    rgb yiq_to_rgb(float y, float i, float q)nogil;
+
+    int * quickSort(int arr[], int low, int high)nogil;
     float Q_inv_sqrt(float number)nogil;
     rgb_color_int wavelength_to_rgb(int wavelength, float gamma)nogil;
     rgb_color_int wavelength_to_rgb_custom(int wavelength, int arr[], float gamma)nogil;
-    float perlin(float x, float y)nogil;
     float randRangeFloat(float lower, float upper)nogil;
     int randRange(int lower, int upper)nogil;
     int get_largest(int arr[], int n)nogil;
     int min_c(int arr[], int n)nogil;
     float minf(float arr[ ], int n)nogil;
-    int get_max_and_min(int arr[], int n)nogil;
+
 
 
 
@@ -90,7 +98,10 @@ cdef float M_2PI =2 * 3.14159265358979323846
 cdef float RAD_TO_DEG=180.0/M_PI
 cdef float DEG_TO_RAD=M_PI/180.0
 
-cdef int THREADS = 6
+cdef int THREADS = 8
+
+cpdef tuple yiq_2_rgb(float y, float i, float q)
+cpdef tuple rgb_2_yiq(unsigned char r, unsigned char g, unsigned char b)
 
 cpdef void rgb_to_bgr(object surface_)
 cpdef void rgb_to_brg(object surface_)
@@ -104,6 +115,7 @@ cpdef void median(
         unsigned short int kernel_size_=*,
         bint fast_=*,
         unsigned short int reduce_factor_=*)except *
+        
 cpdef void median_grayscale(object surface_, int kernel_size_=*)
 
 cpdef void color_reduction(object surface_, int color_=*)
@@ -152,8 +164,8 @@ cpdef void bpf(object surface_, int threshold = *)
 
 cpdef void bloom(object surface_, int threshold_, bint fast_=*, object mask_=*)
 cpdef object shader_bloom_fast(surface_, int threshold_, bint fast_ = *, unsigned short int factor_ = *)
-cpdef object shader_bloom_fast1(
-        surface_,
+cpdef void shader_bloom_fast1(
+        object surface_,
         unsigned short int smooth_= *,
         unsigned int threshold_   = *,
         unsigned short int flag_  = *,
@@ -317,4 +329,9 @@ cpdef object zoom(
         unsigned int delta_y,
         float zx=*
 )
+
+cpdef void shader_rgb_to_yiq_inplace(object surface_)
+cpdef void shader_rgb_to_yiq_inplace_c(unsigned char [:, :, :] rgb_array)
+cpdef void shader_rgb_to_yiq_i_comp_inplace(object surface_)
+cpdef void shader_rgb_to_yiq_q_comp_inplace(object surface_)
 

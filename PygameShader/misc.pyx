@@ -165,7 +165,7 @@ cpdef create_horizontal_gradient_1d(
         tuple end_color=(0, 255, 0)
 ):
     """
-    CREATE AN ARRAY FILLED WITH A GRADIENT COLOR  
+    CREATE AN ARRAY FILLED WITH A GRADIENT COLOR (RGB) 
     
     :param value      : integer; Size of the gradient 1d width
     :param start_color: tuple; Tuple containing the starting RGB color 
@@ -173,6 +173,10 @@ cpdef create_horizontal_gradient_1d(
     :return           : numpy.ndarray 2D array shape (w, 3) of type uint8 (unsigned char) 
      containing all the pixels 
     """
+
+    if value <= 0:
+        raise ValueError("Argument value cannot be <= 1")
+
     cdef:
         float [:] diff_ =  \
             numpy.array(end_color, dtype=float32) - \
@@ -181,16 +185,60 @@ cpdef create_horizontal_gradient_1d(
         unsigned char [:, ::1] rgb_gradient = empty((value, 3), dtype=uint8)
         float [3] start = numpy.array(start_color, dtype=float32)
         int i=0
+        float * row_
 
     with nogil:
         for i in prange(value, schedule=SCHEDULE, num_threads=THREAD_NUMBER):
-               rgb_gradient[i, 0] = <unsigned char>(start[0] + row[i] * diff_[0])
-               rgb_gradient[i, 1] = <unsigned char>(start[1] + row[i] * diff_[1])
-               rgb_gradient[i, 2] = <unsigned char>(start[2] + row[i] * diff_[2])
+           row_ = &row[i]
+           rgb_gradient[i, 0] = <unsigned char>(start[0] + row_[0] * diff_[0])
+           rgb_gradient[i, 1] = <unsigned char>(start[1] + row_[0] * diff_[1])
+           rgb_gradient[i, 2] = <unsigned char>(start[2] + row_[0] * diff_[2])
 
     return asarray(rgb_gradient)
 
 
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef create_horizontal_gradient_1d_alpha(
+        int value,
+        tuple start_color=(255, 0, 0, 255),
+        tuple end_color=(0, 255, 0, 0)
+):
+    """
+    CREATE AN ARRAY FILLED WITH A GRADIENT COLOR (RGBA)
+
+    :param value      : integer; Size of the gradient 1d width
+    :param start_color: tuple; Tuple containing the starting RGB color 
+    :param end_color  : tuple; Tuple containing the RGB values of the final color
+    :return           : numpy.ndarray 2D array shape (w, 3) of type uint8 (unsigned char) 
+     containing all the pixels 
+    """
+
+    if value <= 0:
+        raise ValueError("Argument value cannot be <= 1")
+
+    cdef:
+        float [:] diff_ =  \
+            numpy.array(end_color, dtype=float32) - \
+            numpy.array(start_color, dtype=float32)
+        float [::1] row = numpy.arange(value, dtype=float32) / (value - 1.0)
+        unsigned char [:, ::1] rgba_gradient = empty((value, 4), dtype=uint8)
+        float [4] start = numpy.array(start_color, dtype=float32)
+        int i=0
+        float * row_
+
+    with nogil:
+        for i in prange(value, schedule=SCHEDULE, num_threads=THREAD_NUMBER):
+           row_ = &row[i]
+           rgba_gradient[i, 0] = <unsigned char>(start[0] + row_[0] * diff_[0])
+           rgba_gradient[i, 1] = <unsigned char>(start[1] + row_[0] * diff_[1])
+           rgba_gradient[i, 2] = <unsigned char>(start[2] + row_[0] * diff_[2])
+           rgba_gradient[i, 3] = <unsigned char>(start[3] + row_[0] * diff_[3])
+
+    return asarray(rgba_gradient)
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -203,32 +251,552 @@ cpdef object horizontal_grad3d(
         tuple end_color=(0, 255, 0)
 ):
     """
-    CREATE A GRADIENT FROM TWO COLORS
+    CREATE A 24-BIT GRADIENT FROM TWO COLORS
 
     :param width      : integer; width of the new surface in pixels
     :param height     : integer; height of the new surface in pixels
     :param start_color: tuple; Value RGB, Starting color
     :param end_color  : tuple; value RGB, ending color or final color
     :return           : Surface; pygame.Surface format 24 bit 
-    size width x height converted for fast blit
+    size width x height 
     """
     cdef:
         float [:] diff_ =  \
             numpy.array(end_color, dtype=float32) - \
             numpy.array(start_color, dtype=float32)
         float [::1] row = numpy.arange(width, dtype=float32) / (width - 1.0)
-        unsigned char [:, :, ::1] rgb_gradient = empty((width, height, 3), dtype=uint8)
+        unsigned char [:, :, ::1] rgb_gradient = empty((height, width, 3), dtype=uint8)
         float [3] start = numpy.array(start_color, dtype=float32)
         int i=0, j=0
+        float * row_
 
     with nogil:
-        for i in prange(width, schedule='static', num_threads=THREAD_NUMBER):
-            for j in range(height):
-               rgb_gradient[i, j, 0] = <unsigned char>(start[0] + row[i] * diff_[0])
-               rgb_gradient[i, j, 1] = <unsigned char>(start[1] + row[i] * diff_[1])
-               rgb_gradient[i, j, 2] = <unsigned char>(start[2] + row[i] * diff_[2])
+        for j in prange(height, schedule='static', num_threads=THREAD_NUMBER):
+            for i in range(width):
+                row_ = &row[i]
+                rgb_gradient[j, i, 0] = <unsigned char>(start[0] + row_[0] * diff_[0])
+                rgb_gradient[j, i, 1] = <unsigned char>(start[1] + row_[0] * diff_[1])
+                rgb_gradient[j, i, 2] = <unsigned char>(start[2] + row_[0] * diff_[2])
 
-    return make_surface(asarray(rgb_gradient)).convert()
+    return frombuffer(rgb_gradient, (width, height), "RGB")
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef object horizontal_grad3d_alpha(
+        int width,
+        int height,
+        tuple start_color=(255, 0, 0, 255),
+        tuple end_color=(0, 255, 0, 0)
+):
+    """
+    CREATE A 32-BIT GRADIENT WITH TRANSPARENCY FROM TWO COLORS (RGBA)
+
+    :param width      : integer; width of the new surface in pixels
+    :param height     : integer; height of the new surface in pixels
+    :param start_color: tuple; Value RGB, Starting color
+    :param end_color  : tuple; value RGB, ending color or final color
+    :return           : Surface; pygame.Surface format 32 bit 
+    size width x height 
+    """
+    cdef:
+        float [:] diff_ =  \
+            numpy.array(end_color, dtype=float32) - \
+            numpy.array(start_color, dtype=float32)
+        float [::1] row = numpy.arange(width, dtype=float32) / (width - 1.0)
+        unsigned char [:, :, ::1] rgb_gradient = empty((height, width, 4), dtype=uint8)
+        float [4] start = numpy.array(start_color, dtype=float32)
+        int i=0, j=0
+        float * row_
+
+    with nogil:
+        for j in prange(height, schedule='static', num_threads=THREAD_NUMBER):
+            for i in range(width):
+                row_ = &row[i]
+                rgb_gradient[j, i, 0] = <unsigned char>(start[0] + row_[0] * diff_[0])
+                rgb_gradient[j, i, 1] = <unsigned char>(start[1] + row_[0] * diff_[1])
+                rgb_gradient[j, i, 2] = <unsigned char>(start[2] + row_[0] * diff_[2])
+                rgb_gradient[j, i, 3] = <unsigned char> (start[2] + row_[0] * diff_[3])
+
+    return frombuffer(rgb_gradient, (width, height), "RGBA").convert_alpha()
+
+
+DEF r_max = 1.0 / 0.707106781 #inverse sqrt(0.5) or 1.0/cos45
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef create_radial_gradient(
+        int width_,
+        int height_,
+        float offset_x              = 0.5,
+        float offset_y              = 0.5,
+        tuple start_color_          = (255, 0, 0),
+        tuple end_color_            = (0, 0, 0),
+        object gradient_array_      = None,
+        float factor_               = 1.4,
+        unsigned short int threads_ = 8
+):
+    """
+    CREATE A RADIAL GRADIENT (24-BIT) OPAQUE 
+    
+    :param width_         : integer; surface width in pixels 
+    :param height_        : integer; surface height in pixels
+    :param offset_x       : float; Centre of the gradient within the surface default (0.5 centre)
+    :param offset_y       : float; Centre of the gradient within the surface default (0.5 centre)
+    :param end_color_     : tuple; Contains the start color of the radian (RGB values), default (255, 0, 0)
+    :param start_color_   : tuple; Contains the end color of the radian (RGB values), default (0, 0, 0)
+    :param gradient_array_: numpy.array; gradient array shape (w, 3) containing RGB colors (uint8) 
+    :param factor_        : float; Value must be > 0. Default is 1.4 
+    :param threads_       : integer; concurrent threads default 8
+    :return               : pygame.Surface; Return a radial gradient centre from the surface 
+        origin C(Width/2, height/2), surface is 24 bit 
+    """
+    assert r_max != 0, "Constant r_max cannot be null"
+    if factor_ <=0:
+        raise ValueError("Argument factor_ cannot be <= 0.0 default is 1.4")
+    assert width_ > 0, "Argument width cannot be <=0"
+    assert height_ > 0, "Argument height cannot be <=0"
+
+    cdef:
+        unsigned char [:, :, ::1] rgb_array = empty((height_, width_, 3), dtype=uint8)
+        float nx, ny
+        float w2 = <float>width_ * <float>factor_
+        float h2 = <float>height_ * <float>factor_
+        float r0 = <float>sqrt(w2 * w2 + h2 * h2)
+
+        int i, j
+        unsigned int x
+        float n1 = <float>1.0 / width_
+        float n2 = <float>1.0 / height_
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
+
+    cdef unsigned short int THREADS = threads_
+
+    cdef unsigned char [:, ::1] gradient_array__
+
+    if gradient_array_ is None:
+
+        gradient_array_ = create_horizontal_gradient_1d_alpha(
+            <int>sqrt(width_ * width_ + (height_ * 0.5) * (height_ * 0.5)),
+            start_color = start_color_,
+            end_color   = end_color_
+        )
+
+
+    gradient_array__ = gradient_array_
+    cdef unsigned int l = <object> gradient_array__.shape[0] - 1
+
+    with nogil:
+        for j in prange(height_, schedule=SCHEDULE, num_threads=THREADS):
+            ny = (<float> j * n2) - <float> offset_y
+            for i in range(width_):
+                nx = (<float>i * n1) - <float> offset_x
+
+                r = &rgb_array[j, i, 0]
+                g = &rgb_array[j, i, 1]
+                b = &rgb_array[j, i, 2]
+                # position in the gradient
+                x = <int>((<float>sqrt(nx * nx + ny * ny) * r0) * r_max)
+
+                # check if the radius is greater than the size of the gradient,
+                # in which case, the color is black
+                if x > l:
+                    r[0] = 0
+                    g[0] = 0
+                    b[0] = 0
+                # assign the gradient
+                else:
+                    r[0] = <unsigned char>gradient_array__[x, 0]
+                    g[0] = <unsigned char>gradient_array__[x, 1]
+                    b[0] = <unsigned char>gradient_array__[x, 2]
+
+    return frombuffer(rgb_array, (width_, height_), "RGB")
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef create_radial_gradient_alpha(
+        int width_,
+        int height_,
+        float offset_x              = 0.5,
+        float offset_y              = 0.5,
+        tuple start_color_          = (255, 0, 0, 255),
+        tuple end_color_            = (0, 0, 0, 0),
+        object gradient_array_      = None,
+        float factor_               = 1.4,
+        unsigned short int threads_ = 8
+):
+    """
+    CREATE A RADIAL GRADIENT (32-bit WITH TRANSPARENCY) 
+
+    
+    :param width_         : integer; surface width in pixels 
+    :param height_        : integer; surface height in pixels
+    :param offset_x       : float; Centre of the gradient within the surface default (0.5 centre)
+    :param offset_y       : float; Centre of the gradient within the surface default (0.5 centre)
+    :param end_color_     : tuple; Contains the start color of the radian (RGBA values), default (255, 0, 0, 255)
+    :param start_color_   : tuple; Contains the end color of the radian (RGBA values), default (0, 0, 0, 0)
+    :param gradient_array_: numpy.array; gradient array shape (w, 3) containing RGB colors (uint8) 
+    :param factor_        : float; Value must be > 0. Default is 1.4 
+    :param threads_       : integer; concurrent threads default 8
+    :return               : pygame.Surface; Return a radial gradient centre from the surface 
+        origin C(Width/2, height/2, surface is 32 bit containing per-pixel transparency
+    """
+
+    assert r_max != 0, "Constant r_max cannot be null"
+    if factor_ <=0:
+        raise ValueError("Argument factor_ cannot be <= 0.0 default is 1.4")
+    assert width_ > 0, "Argument width cannot be <=0"
+    assert height_ > 0, "Argument height cannot be <=0"
+
+    cdef:
+        unsigned char [:, :, ::1] rgb_array = empty((height_, width_, 4), dtype=uint8)
+        float nx, ny
+        float w2 = <float>width_ * <float>factor_
+        float h2 = <float>height_ * <float>factor_
+        float r0 = <float>sqrt(w2 * w2 + h2 * h2)
+
+        int i, j
+        unsigned int x
+
+        float n1 = <float>1.0 / width_
+        float n2 = <float>1.0 / height_
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
+        unsigned char * a
+
+    cdef unsigned short int THREADS = threads_
+
+    cdef unsigned char [:, ::1] gradient_array__
+
+    if gradient_array_ is None:
+
+        gradient_array_ = create_horizontal_gradient_1d_alpha(
+            <int>sqrt(width_ * width_ + (height_ * 0.5) * (height_ * 0.5)),
+            start_color = start_color_,
+            end_color   = end_color_
+        )
+
+
+    gradient_array__ = gradient_array_
+    cdef unsigned int l = <object> gradient_array__.shape[0] - 1
+
+    with nogil:
+        for j in prange(height_, schedule=SCHEDULE, num_threads=THREADS):
+            ny = (<float> j * n2) - <float> offset_y
+
+            for i in range(width_):
+                nx = (<float>i * n1) - <float> offset_x
+
+                r = &rgb_array[j, i, 0]
+                g = &rgb_array[j, i, 1]
+                b = &rgb_array[j, i, 2]
+                a = &rgb_array[j, i, 3]
+
+                # position in the gradient
+                x = <int>((<float>sqrt(nx * nx + ny * ny) * r0) * r_max)
+
+                # check if the radius is greater than the size of the gradient,
+                # in which case, the color is black
+                if x > l:
+                    r[0] = 0
+                    g[0] = 0
+                    b[0] = 0
+                    a[0] = 0
+                # assign the gradient
+                else:
+                    r[0] = <unsigned char>gradient_array__[x, 0]
+                    g[0] = <unsigned char>gradient_array__[x, 1]
+                    b[0] = <unsigned char>gradient_array__[x, 2]
+                    a[0] = <unsigned char>gradient_array__[x, 3]
+
+    return frombuffer(rgb_array, (width_, height_), "RGBA").convert_alpha()
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef create_quarter_radial_gradient(
+        int width_,
+        int height_,
+        tuple start_color_           = (255, 0, 0),
+        tuple end_color_             = (0, 0, 0),
+        object gradient_array_       = None,
+        float factor_                = 1.4,
+        unsigned short int threads_  = 8
+):
+    """
+    CREATE A RADIAL GRADIENT (24-bit OPAQUE)
+
+    Iterate over width/2 and height/2 (NW quarter of the surface) and mirror the 
+    pixels for the other blocks  (NE, SE, SW)
+    
+    :param width_         : integer; surface width in pixels 
+    :param height_        : integer; surface height in pixels
+    :param start_color_   : tuple; Contains the end color of the radian (RGB values), default (0, 0, 0)
+    :param end_color_     : tuple; Contains the start color of the radian (RGB values), default (255, 0, 0)
+    :param gradient_array_: numpy.array; gradient array shape (w, 3) containing RGB colors (uint8) 
+    :param factor_        : float; Value must be > 0. Default is 1.4 
+    :param threads_       : integer; concurrent threads default 8
+    :return               : pygame.Surface; Return a radial gradient centre from the surface 
+        origin C(Width/2, height/2)
+    """
+
+    assert r_max != 0, "Constant r_max cannot be null"
+    if factor_ <=0:
+        raise ValueError("Argument factor_ cannot be <= 0.0 default is 1.4")
+    assert width_ > 0, "Argument width cannot be <=0"
+    assert height_ > 0, "Argument height cannot be <=0"
+
+    cdef:
+
+        float nx, ny
+        float w2 = <float>width_ * <float>factor_
+        float h2 = <float>height_ * <float>factor_
+        float r0 = <float>sqrt(w2 * w2 + h2 * h2)
+        unsigned char [:, :, ::1] rgb_array = empty((height_, width_, 3), dtype=uint8)
+
+        int i, j
+        unsigned int x
+        float n1 = <float>1.0 / width_
+        float n2 = <float>1.0 / height_
+        unsigned char * g1
+        unsigned char * g2
+        unsigned char * g3
+        unsigned int width_1 = width_ - 1
+        unsigned int height_1 = height_ - 1
+        unsigned w_i
+        unsigned h_j
+
+    cdef unsigned short int THREADS = threads_
+
+    cdef unsigned char [:, ::1] gradient_array__
+
+    if gradient_array_ is None:
+
+        gradient_array_ = create_horizontal_gradient_1d(
+            <int>sqrt(width_ * width_ + (height_ * 0.5) * (height_ * 0.5)),
+            start_color=start_color_,
+            end_color=end_color_
+        )
+
+
+    gradient_array__ = gradient_array_
+    cdef unsigned int l = <object> gradient_array__.shape[0] - 1
+
+
+    with nogil:
+        for j in prange(height_ >> 1, schedule=SCHEDULE, num_threads=THREADS):
+            ny = (<float> j * n2) - <float> 0.5
+
+            for i in range(width_ >> 1):
+                nx = (<float>i * n1) - <float> 0.5
+
+                # position in the gradient
+                x = <int>((<float>sqrt(nx * nx + ny * ny) * r0) * r_max)
+
+                g1 = &gradient_array__[x, 0]
+                g2 = &gradient_array__[x, 1]
+                g3 = &gradient_array__[x, 2]
+
+                w_i = width_1 - i
+                h_j = height_1 - j
+
+                if x > l:
+                    # NW
+                    rgb_array[j, i, 0] = 0
+                    rgb_array[j, i, 1] = 0
+                    rgb_array[j, i, 2] = 0
+                    # NE
+                    rgb_array[j, w_i, 0] = 0
+                    rgb_array[j, w_i, 1] = 0
+                    rgb_array[j, w_i, 2] = 0
+
+                    # SE
+                    rgb_array[h_j, w_i, 0] = 0
+                    rgb_array[h_j, w_i, 1] = 0
+                    rgb_array[h_j, w_i, 2] = 0
+
+                    # SW
+                    rgb_array[h_j, i, 0] = 0
+                    rgb_array[h_j, i, 1] = 0
+                    rgb_array[h_j, i, 2] = 0
+
+                else:
+                    # NW
+                    rgb_array[j, i, 0] = g1[0]
+                    rgb_array[j, i, 1] = g2[0]
+                    rgb_array[j, i, 2] = g3[0]
+                    # NE
+                    rgb_array[j, w_i, 0] = g1[0]
+                    rgb_array[j, w_i, 1] = g2[0]
+                    rgb_array[j, w_i, 2] = g3[0]
+                    # SE
+                    rgb_array[h_j, w_i, 0] = g1[0]
+                    rgb_array[h_j, w_i, 1] = g2[0]
+                    rgb_array[h_j, w_i, 2] = g3[0]
+                    # SW
+                    rgb_array[h_j, i, 0] = g1[0]
+                    rgb_array[h_j, i, 1] = g2[0]
+                    rgb_array[h_j, i, 2] = g3[0]
+
+    return frombuffer(rgb_array, (width_, height_), "RGB")
+
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef create_quarter_radial_gradient_alpha(
+        int width_,
+        int height_,
+        tuple start_color_            = (255, 0, 0, 255),
+        tuple end_color_              = (0, 0, 0, 0),
+        object gradient_array_        = None,
+        float factor_                 = 1.4,
+        unsigned short int threads_   = 8
+):
+    """
+    CREATE A RADIAL GRADIENT (32-BIT WITH TRANSPARENCY)
+
+    Iterate over width/2 and height/2 (NW quarter of the surface) and mirror the 
+    pixels for the other blocks  (NE, SE, SW)
+
+    :param width_         : integer; surface width in pixels 
+    :param height_        : integer; surface height in pixels
+    :param end_color_     : tuple; Contains the start color of the radian (RGBA values), default (255, 0, 0, 255)
+    :param start_color_   : tuple; Contains the end color of the radian (RGBA values), default (0, 0, 0, 0)
+    :param gradient_array_: numpy.array; gradient array shape (w, 3) containing RGB colors (uint8) 
+    :param factor_        : float; Value must be > 0. Default is 1.4 
+    :param threads_       : integer; concurrent threads default 8
+    :return               : pygame.Surface; Return a radial gradient centre from the surface 
+        origin C(Width/2, height/2)
+    """
+
+    assert r_max != 0, "Constant r_max cannot be null"
+    if factor_ <=0:
+        raise ValueError("Argument factor_ cannot be <= 0.0 default is 1.4")
+    assert width_ > 0, "Argument width cannot be <=0"
+    assert height_ > 0, "Argument height cannot be <=0"
+
+    cdef:
+
+        float nx, ny
+        float w2 = <float>width_ * <float>factor_
+        float h2 = <float>height_ * <float>factor_
+        float r0 = <float>sqrt(w2 * w2 + h2 * h2)
+        unsigned char [:, :, ::1] rgb_array = empty((height_, width_, 4), dtype=uint8)
+
+        int i, j
+        unsigned int x
+        float n1 = <float>1.0 / width_
+        float n2 = <float>1.0 / height_
+        unsigned char * g1
+        unsigned char * g2
+        unsigned char * g3
+        unsigned char * g4
+        unsigned int width_1  = width_ - 1
+        unsigned int height_1 = height_ - 1
+        unsigned w_i
+        unsigned h_j
+
+    cdef unsigned short int THREADS = threads_
+
+    cdef unsigned char [:, ::1] gradient_array__
+
+    if gradient_array_ is None:
+
+        gradient_array_ = create_horizontal_gradient_1d_alpha(
+            <int>sqrt(width_ * width_ + (height_ * 0.5) * (height_ * 0.5)),
+            start_color=start_color_,
+            end_color=end_color_
+        )
+
+    gradient_array__ = gradient_array_
+    cdef unsigned int l = <object> gradient_array__.shape[0] - 1
+
+
+    with nogil:
+        for j in prange(height_ >> 1, schedule=SCHEDULE, num_threads=THREADS):
+            ny = (<float> j * n2) - <float> 0.5
+
+            for i in range(width_ >> 1):
+                nx = (<float>i * n1) - <float> 0.5
+
+                # position in the gradient
+                x = <int>((<float>sqrt(nx * nx + ny * ny) * r0) * r_max)
+
+                g1 = &gradient_array__[x, 0]
+                g2 = &gradient_array__[x, 1]
+                g3 = &gradient_array__[x, 2]
+                g4 = &gradient_array__[x, 3]
+
+                w_i = width_1 - i
+                h_j = height_1 - j
+
+                if x > l:
+                    # NW
+                    rgb_array[j, i, 0] = 0
+                    rgb_array[j, i, 1] = 0
+                    rgb_array[j, i, 2] = 0
+                    rgb_array[j, i, 3] = 0
+                    # NE
+                    rgb_array[j, w_i, 0] = 0
+                    rgb_array[j, w_i, 1] = 0
+                    rgb_array[j, w_i, 2] = 0
+                    rgb_array[j, w_i, 3] = 0
+
+                    # SE
+                    rgb_array[h_j, w_i, 0] = 0
+                    rgb_array[h_j, w_i, 1] = 0
+                    rgb_array[h_j, w_i, 2] = 0
+                    rgb_array[h_j, w_i, 3] = 0
+
+                    # SW
+                    rgb_array[h_j, i, 0] = 0
+                    rgb_array[h_j, i, 1] = 0
+                    rgb_array[h_j, i, 2] = 0
+                    rgb_array[h_j, i, 3] = 0
+
+                else:
+                    # NW
+                    rgb_array[j, i, 0] = g1[0]
+                    rgb_array[j, i, 1] = g2[0]
+                    rgb_array[j, i, 2] = g3[0]
+                    rgb_array[j, i, 3] = g4[0]
+                    # NE
+                    rgb_array[j, w_i, 0] = g1[0]
+                    rgb_array[j, w_i, 1] = g2[0]
+                    rgb_array[j, w_i, 2] = g3[0]
+                    rgb_array[j, w_i, 3] = g4[0]
+                    # SE
+                    rgb_array[h_j, w_i, 0] = g1[0]
+                    rgb_array[h_j, w_i, 1] = g2[0]
+                    rgb_array[h_j, w_i, 2] = g3[0]
+                    rgb_array[h_j, w_i, 3] = g4[0]
+                    # SW
+                    rgb_array[h_j, i, 0] = g1[0]
+                    rgb_array[h_j, i, 1] = g2[0]
+                    rgb_array[h_j, i, 2] = g3[0]
+                    rgb_array[h_j, i, 3] = g4[0]
+
+    return frombuffer(rgb_array, (width_, height_), "RGBA").convert_alpha()
 
 
 
@@ -493,7 +1061,7 @@ cdef rgb close_color(
 cdef rgb use_palette(
         rgb colors,
         float [:, :] palette_,
-        Py_ssize_t w
+        unsigned int w = 16
 )nogil:
     """
     PICKED RGB VALUES FROM A GIVEN PALETTE TO MATCH A GIVEN COLOR
@@ -507,7 +1075,7 @@ cdef rgb use_palette(
 
     :param colors  : struct; Contains RGB values integer values in range [0..255]
     :param palette_: numpy.array shape (w, 3) type float32 containing RGB colors values
-    :param w       : Size of the palette or number of colors available
+    :param w       : Size of the palette or number of colors available default is 16;
     :return        : Return a color RGB containing colors from the palette.
     """
 

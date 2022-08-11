@@ -18,7 +18,9 @@ Copyright Yoann Berenguer
 
 import warnings
 
-from PygameShader import array2d_normalized_c, filtering24_c, heatmap_convert
+from PygameShader import array2d_normalized_c, filtering24_c, heatmap_convert, shader_rgb_to_yiq_i_comp_inplace, \
+    shader_rgb_to_yiq_i_comp_inplace_c, shader_rgb_to_yiq_q_comp_inplace_c
+from PygameShader.shader import shader_bloom_fast1, shader_rgb_to_yiq_inplace_c
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -133,7 +135,7 @@ cpdef unsigned int get_max_grid_per_block():
 # USED BY block_grid
 cdef get_divisors(int n):
     l = []
-    for i in range(1, int(n / 2.0) + 1):
+    for i in range(1, int(n / <float>2.0) + 1):
         if n % i == 0:
             l.append(i)
     return l
@@ -1443,6 +1445,29 @@ cdef object color_reduction_cupy(
         cp.uint8).transpose(1, 0, 2).tobytes(), (w, h), "RGB").convert()
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cdef object color_reduction_cupy_inplace(
+        object gpu_array_,
+        cpu_array,
+        int color_number
+):
+    cdef:
+        Py_ssize_t w, h
+    w, h = gpu_array_.shape[0], gpu_array_.shape[1]
+
+    gpu_array_[:, :, 0], \
+    gpu_array_[:, :, 1], \
+    gpu_array_[:, :, 2] = color_reduction_kernel(
+        gpu_array_[:, :, 0], gpu_array_[:, :, 1], gpu_array_[:, :, 2], color_number)
+
+    cpu_array[:, :, 0] = gpu_array_[:, :, 0].get()
+    cpu_array[:, :, 1] = gpu_array_[:, :, 1].get()
+    cpu_array[:, :, 2] = gpu_array_[:, :, 2].get()
+
+
 rgb2hsv_cuda = r'''   
     extern "C"
     
@@ -1762,51 +1787,69 @@ cpdef object mult_downscale_gpu(
            downscale_x8, \
            downscale_x16
 
-
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-cpdef object downscale_gpu(object gpu_array_, int w, int h):
-
-    assert gpu_array_.dtype == cupy.uint8, \
-        "\nArgument gpu_array_ datatype must be uint8 got %s " % gpu_array_.dtype
-    assert w > 0, "Argument w cannot be < 0"
-    assert h > 0, "Argument h cannot be < 0"
-
-    cdef int w0, h0
-    w0, h0 = gpu_array_.shape[0], gpu_array_.shape[1]
-
-    downscale_ = cupyx.scipy.ndimage.zoom(
-        gpu_array_, (<float>w0/<float>w, <float>h0/<float>h, 1), order=0, mode='constant', cval=0.0)
-
-    cp.cuda.Stream.null.synchronize()
-
-    return downscale_
-
-
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-cpdef object upscale_gpu(object gpu_array_, int w, int h):
-
-    assert gpu_array_.dtype == cupy.uint8, \
-        "\nArgument gpu_array_ datatype must be uint8 got %s " % gpu_array_.dtype
-    assert w > 0, "Argument w cannot be < 0"
-    assert h > 0, "Argument h cannot be < 0"
-
-    cdef int w0, h0
-    w0, h0 = gpu_array_.shape[0], gpu_array_.shape[1]
-
-    gpu_array = cp.asarray(gpu_array_, dtype=cp.uint8)
-
-    upscale_array = cupyx.scipy.ndimage.zoom(
-        gpu_array, (<float>w/<float>w0, <float>h/<float>h0, 1), order=0, mode='constant', cval=0.0)
-
-    cp.cuda.Stream.null.synchronize()
-
-    return cp.asnumpy(upscale_array)
+#
+# @cython.boundscheck(False)
+# @cython.wraparound(False)
+# @cython.nonecheck(False)
+# @cython.cdivision(True)
+# cpdef object zoom_in_gpu(object surface_, int w, int h):
+#
+#     if not PyObject_IsInstance(surface_, pygame.Surface):
+#         raise TypeError('Argument surface_ must be a pygame Surface type got %s' % type(surface_))
+#
+#     assert w > 0, "Argument w cannot be < 0"
+#     assert h > 0, "Argument h cannot be < 0"
+#
+#     try:
+#         gpu_array_ = cp.asarray(pixels3d(surface_), dtype=cp.uint8)
+#
+#     except Exception as e:
+#         raise ValueError(
+#             "\nCannot reference source pixels into a 3d array.\n %s " % e)
+#
+#     cdef int w0, h0
+#     w0, h0 = gpu_array_.shape[0], gpu_array_.shape[1]
+#
+#     downscale_ = cupyx.scipy.ndimage.zoom(
+#         gpu_array_, (<float>w0/<float>w, <float>h0/<float>h, 1), order=0, mode='constant', cval=0.0)
+#
+#     cp.cuda.Stream.null.synchronize()
+#
+#     return frombuffer(downscale_.astype(
+#         dtype=cp.uint8).transpose(1, 0, 2).tobytes(),
+#                       (downscale_.shape[0], downscale_.shape[1]), "RGB")
+#
+#
+# @cython.boundscheck(False)
+# @cython.wraparound(False)
+# @cython.nonecheck(False)
+# @cython.cdivision(True)
+# cpdef object upscale_gpu(object surface_, int w, int h):
+#
+#     if not PyObject_IsInstance(surface_, pygame.Surface):
+#         raise TypeError('Argument surface_ must be a pygame Surface type got %s' % type(surface_))
+#
+#     assert w > 0, "Argument w cannot be < 0"
+#     assert h > 0, "Argument h cannot be < 0"
+#
+#     try:
+#         gpu_array_ = cp.asarray(pixels3d(surface_), dtype=cp.uint8)
+#
+#     except Exception as e:
+#         raise ValueError(
+#             "\nCannot reference source pixels into a 3d array.\n %s " % e)
+#
+#     cdef int w0, h0
+#     w0, h0 = gpu_array_.shape[0], gpu_array_.shape[1]
+#
+#     gpu_array = cp.asarray(gpu_array_, dtype=cp.uint8)
+#
+#     upscale_array = cupyx.scipy.ndimage.zoom(
+#         gpu_array, (<float>w/<float>w0, <float>h/<float>h0, 1), order=0, mode='constant', cval=0.0)
+#
+#     cp.cuda.Stream.null.synchronize()
+#
+#     return frombuffer(gpu_array_.astype(dtype=cp.uint8).transpose(1, 0, 2).tobytes(), (w, h), "RGB")
 
 
 
@@ -3396,100 +3439,6 @@ cdef bilateral_cupy(gpu_array_, unsigned int kernel_size_):
         cp.uint8).transpose(1, 0, 2).tobytes(), (w, h), "RGB").convert()
 
 
-# TODO TO BE CHECK (not so fast)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-cpdef object bilateral_fast_gpu(
-        surface_,
-        unsigned int kernel_size_
-):
-    """
-    BILATERAL FILTER (IMAGE SIZE DOWNSCALE PRIOR PROCESSING AND UPSCALE FOR OUTPUT)
-
-    A bilateral filter is a non-linear, edge-preserving, and noise-reducing
-    smoothing filter for images. It replaces the intensity of each pixel with a
-    weighted average of intensity values from nearby pixels. This weight can be
-    based on a Gaussian distribution.
-
-    * sigma_r & sigma_s are hard encoded in the GPU kernel 
-
-    :param surface_     : pygame.Surface 
-    :param kernel_size_ : int; Kernel size (or neighbours pixels to be included in the calculation) 
-    :return             : Return a pygame.Surface with bilateral effect
-    """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-
-    try:
-        cpu_array_ = pixels3d(surface_)
-
-    except Exception as e:
-        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
-
-    cdef:
-        Py_ssize_t w, h
-    w, h = cpu_array_.shape[0], cpu_array_.shape[1]
-
-    if w == 0 or h == 0:
-        raise ValueError("Surface width and height cannot be null!")
-
-    if kernel_size_ < 0:
-        raise ValueError("\nArgument kernel_size_ cannot be < 0")
-
-    return bilateral_fast_cupy(cp.asarray(cpu_array_), kernel_size_)
-
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-cdef bilateral_fast_cupy(gpu_array_, unsigned int kernel_size_):
-    """
-    :param gpu_array_   : cupy.ndarray containing the RGB pixels 
-    :param kernel_size_ : int; Kernel size (or neighbours pixels to be included in the calculation) 
-    :return             : Return a pygame.Surface with bilateral effect
-    """
-
-    cdef Py_ssize_t w, h, w2, h2
-
-    w, h = gpu_array_.shape[:2]
-    w2, h2 = w >> 1, h >>1
-
-    downscale_x2 = downscale_gpu(gpu_array_, w2, h2)
-
-    cp.cuda.Stream.null.synchronize()
-
-    r = downscale_x2[:, :, 0]
-    g = downscale_x2[:, :, 1]
-    b = downscale_x2[:, :, 2]
-
-    cp.cuda.Stream.null.synchronize()
-
-    bilateral_r = cupyx.scipy.ndimage.generic_filter(
-        r, bilateral_kernel, kernel_size_).astype(dtype=cp.uint8)
-
-    bilateral_g = cupyx.scipy.ndimage.generic_filter(
-        g, bilateral_kernel, kernel_size_).astype(dtype=cp.uint8)
-
-    bilateral_b = cupyx.scipy.ndimage.generic_filter(
-        b, bilateral_kernel, kernel_size_).astype(dtype=cp.uint8)
-
-    cp.cuda.Stream.null.synchronize()
-
-    downscale_x2[:, :, 0], \
-    downscale_x2[:, :, 1], \
-    downscale_x2[:, :, 2] = bilateral_r, bilateral_g, bilateral_b
-
-    cp.cuda.Stream.null.synchronize()
-
-    gpu_array_ = upscale_gpu(downscale_x2, w, h)
-
-    cp.cuda.Stream.null.synchronize()
-
-    return frombuffer(gpu_array_.astype(
-        cp.uint8).transpose(1, 0, 2).tobytes(), (w, h), "RGB").convert()
-
 
 
 
@@ -4741,6 +4690,19 @@ cpdef inline object chromatic_gpu(
         float zoom = 1.0,
         float fx = 0.05
 ):
+    """
+    
+    :param surface_: 
+    :param delta_x: 
+    :param delta_y: 
+    :param grid_    : tuple; grid values (grid_y, grid_x) e.g (25, 25). The grid values and block values must 
+        match the texture and array sizes. 
+    :param block_   : tuple; block values (block_y, block_x) e.g (32, 32). Maximum threads is 1024.
+        Max threads = block_x * block_y
+    :param zoom: 
+    :param fx: 
+    :return: 
+    """
 
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
@@ -4889,18 +4851,29 @@ cdef inline chromatic_cupy(
 @cython.cdivision(True)
 cpdef inline object rgb_split_gpu(
         object surface_,
-        unsigned int delta_x,
-        unsigned int delta_y,
+        float delta_x,
+        float delta_y,
         object grid_,
         object block_
 ):
+    """
+    
+    :param surface_: 
+    :param delta_x: 
+    :param delta_y: 
+    :param grid_    : tuple; grid values (grid_y, grid_x) e.g (25, 25). The grid values and block values must 
+        match the texture and array sizes. 
+    :param block_   : tuple; block values (block_y, block_x) e.g (32, 32). Maximum threads is 1024.
+        Max threads = block_x * block_y 
+    :return: 
+    """
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
     cdef Py_ssize_t prev_w, prev_h
     prev_w, prev_h = surface_.get_size()
 
-    new_surface = scale(surface_, (prev_w + delta_y, prev_h + delta_x)).convert()
+    new_surface = scale(surface_, (prev_w + delta_x * <float>3.0, prev_h + delta_y * <float>3.0)).convert()
 
     assert prev_w != 0, "Image width cannot be null !"
     assert prev_h != 0, "Image height cannot be null !"
@@ -4928,20 +4901,21 @@ rgb_split_kernel = cp.RawKernel(
 
     void rgb_split_kernel(unsigned char * destination, unsigned char * source,
         const int w, const int h, const int ww, const int hh, 
-        const unsigned int delta_x, const unsigned int delta_y)
+        double delta_x, double delta_y)
 {
 
     unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
     unsigned int j = blockIdx.y * blockDim.y + threadIdx.y;
 
     int index1 = j * h * 3 + i * 3;
+    int index2 = j * hh * 3  + i * 3;
     unsigned char local_memory[3]; 
 
     if (i < hh && j < ww) {
         
-        const int r = j * hh * 3 + i * 3 + 0; 
-        const int g = (j + delta_y) * hh * 3 + (i + delta_x) * 3 + 1;
-        const int b = (j + delta_y * 2) * hh * 3 + (i + delta_x) * 3 + 2;
+        const int r = (int)(j + delta_x * 1.0f) * hh * 3  + (int)(i + delta_y * 1.0f) * 3 + 0; 
+        const int g = (int)(j + delta_x * 2.0f) * hh * 3  + (int)(i + delta_y * 2.0f) * 3 + 1; 
+        const int b = (int)(j + delta_x * 3.0f) * hh * 3  + (int)(i + delta_y * 3.0f) * 3 + 2; 
         local_memory[0] = source[r];
         local_memory[1] = source[g];
         local_memory[2] = source[b];
@@ -4957,6 +4931,7 @@ rgb_split_kernel = cp.RawKernel(
     'rgb_split_kernel'
 )
 
+
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
@@ -4967,8 +4942,8 @@ cdef inline rgb_split_cupy(
         Py_ssize_t prev_h,
         object grid_,
         object block_,
-        unsigned int delta_x,
-        unsigned int delta_y
+        float delta_x,
+        float delta_y
 ):
     cdef:
         Py_ssize_t w, h
@@ -5000,6 +4975,18 @@ cpdef inline object zoom_gpu(
         object block_,
         float zoom = 0.9999
 ):
+    """
+    
+    :param surface_: 
+    :param delta_x: 
+    :param delta_y: 
+    :param grid_    : tuple; grid values (grid_y, grid_x) e.g (25, 25). The grid values and block values must 
+        match the texture and array sizes. 
+    :param block_   : tuple; block values (block_y, block_x) e.g (32, 32). Maximum threads is 1024.
+        Max threads = block_x * block_y
+    :param zoom: 
+    :return: 
+    """
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
@@ -5110,11 +5097,561 @@ cdef inline zoom_cupy(
 
     return frombuffer(destination.transpose(1, 0, 2).tobytes(), (w, h), "RGB").convert()
 
+# ---------------------------------------------------------------------------------------------------------------
 
 
 
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cdef wavelength_mapper(unsigned int wavelength_min, unsigned int wavelength_max):
+    """
+    RETURN AN RGB COLOR VALUE MATCHING A SPECIFIC WAVELENGTH
+
+    """
+    cdef:
+        rgb_color_int rgb_c
+        int i
+
+    REDMAP = [x for x in range(wavelength_min, wavelength_max)]
+
+    cdef int n = 0
+    for i in range(wavelength_min, wavelength_max):
+        rgb_c = wavelength_to_rgb(i, 1.0)
+        REDMAP[n] = (rgb_c.r, rgb_c.g, rgb_c.b)
+        n += 1
+
+    cdef float f_redmap = (<float> wavelength_max -
+                           <float> wavelength_min - <float> 1.0) / (<float> 255.0 * <float> 3.0)
+    cdef unsigned char[:, ::1] redmap_array = numpy.zeros((wavelength_max - wavelength_min, 3), numpy.uint8)
+
+    i = 0
+    for t in REDMAP:
+        redmap_array[i, 0] = t[0]
+        redmap_array[i, 1] = t[1]
+        redmap_array[i, 2] = t[2]
+        i += 1
+    return redmap_array, f_redmap
+
+"""
+Violet: 380–450 nm (688–789 THz frequency)
+Blue: 450–495 nm
+Green: 495–570 nm
+Yellow: 570–590 nm
+Orange: 590–620 nm
+Red: 620–750 nm (400–484 THz frequency)
+"""
+redmap_array,  f_redmap = wavelength_mapper(620, 750)
+greenmap_array,   f_greenmap = wavelength_mapper(495, 570)
+bluemap_array, f_bluemap = wavelength_mapper(450, 495)
+heatmap_array, f_heatmap = wavelength_mapper(450, 720)
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef inline object wavelength_map_gpu(
+        object surface_,
+        object grid_,
+        object block_,
+        unsigned short int layer_=0
+):
+    """
+    CONVERT AN IMAGE TO AN EQUIVALENT REDSCALE | GREENSCALE | BLUESCALE EFFECT
+    
+    
+    :param layer_   : integer; 0:red channel, 1:green, 2:blue 
+    :param surface_ : pygame.Surface;
+    :param grid_    : tuple; grid values (grid_y, grid_x) e.g (25, 25). The grid values and block values must 
+        match the texture and array sizes. 
+    :param block_   : tuple; block values (block_y, block_x) e.g (32, 32). Maximum threads is 1024.
+        Max threads = block_x * block_y
+    :return         : pygame.Surface with a redscale | greenscale | bluescale effect
+    """
+
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    cdef Py_ssize_t w, h
+    w, h = surface_.get_size()
+
+    assert w != 0, "Image width cannot be null !"
+    assert h != 0, "Image height cannot be null !"
+
+    try:
+        gpu_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    return wavelength_map_cupy(cupy.asarray(gpu_array), grid_, block_, layer_)
+
+
+wavelength_map_kernel = cp.RawKernel(
+
+    '''
+    extern "C" 
+
+    __global__  void wavelength_map_kernel(unsigned char * destination, unsigned char * source, unsigned char * map,
+        double map_c, const int w, const int h)
+{
+
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned int j = blockIdx.y * blockDim.y + threadIdx.y;
+
+    int index1 = j * h * 3 + i * 3;    
+    
+    unsigned int s = source[index1 + 0] + source[index1 + 1] + source[index1 + 2];
+    unsigned int index = (unsigned int)((float)s * map_c);  
+
+    if (i < h && j < w) {
+        
+        __syncthreads();
+        
+        destination[index1 + 0] = (unsigned char)map[index * 3 + 0];
+        destination[index1 + 1] = (unsigned char)map[index * 3 + 1];
+        destination[index1 + 2] = (unsigned char)map[index * 3 + 2];       
+    }
+}
+    ''',
+    'wavelength_map_kernel'
+)
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cdef inline wavelength_map_cupy(
+        object gpu_array,
+        object grid_,
+        object block_,
+        unsigned short int layer_
+):
+    cdef:
+        Py_ssize_t w, h
+    w, h = gpu_array.shape[:2]
+
+    destination = cupy.zeros((w, h, 3), dtype=cupy.uint8)
+
+    cdef float f_map
+
+
+    if layer_ == 0:
+        array_, f_map = redmap_array, f_redmap
+    if layer_ == 1:
+        array_, f_map = greenmap_array, f_greenmap
+    if layer_ == 2:
+        array_, f_map = bluemap_array, f_bluemap
+
+    wavelength_map_kernel(
+        grid_,
+        block_,
+        (destination, gpu_array, cupy.asarray(array_), f_map, w, h)
+    )
+
+    cp.cuda.Stream.null.synchronize()
+
+    return frombuffer(destination.transpose(1, 0, 2).tobytes(), (w, h), "RGB").convert()
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cdef inline wavelength_map_cupy_inplace(
+        object gpu_array,
+        cpu_array,
+        object grid_,
+        object block_,
+        unsigned short int layer_
+):
+    cdef:
+        Py_ssize_t w, h
+    w, h = gpu_array.shape[:2]
+
+    destination = cupy.zeros((w, h, 3), dtype=cupy.uint8)
+
+    cdef float f_map
+
+
+    if layer_ == 0:
+        array_, f_map = redmap_array, f_redmap
+    if layer_ == 1:
+        array_, f_map = greenmap_array, f_greenmap
+    if layer_ == 2:
+        array_, f_map = bluemap_array, f_bluemap
+
+    wavelength_map_kernel(
+        grid_,
+        block_,
+        (destination, gpu_array, cupy.asarray(array_), f_map, w, h)
+    )
+
+    cp.cuda.Stream.null.synchronize()
+
+    cpu_array[:, :, 0] = destination[:, :, 0].get()
+    cpu_array[:, :, 1] = destination[:, :, 1].get()
+    cpu_array[:, :, 2] = destination[:, :, 2].get()
 
 # ---------------------------------------------------------------------------------------------------------------
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef inline object heatmap_gpu(
+        object surface_,
+        object grid_,
+        object block_,
+        bint invert_ = False
+):
+    """
+    HEATMAP EffECT
+     
+    :param invert_ : boolean; Invert the effect  
+    :param surface_: pygame.Surface; 
+    :param grid_    : tuple; grid values (grid_y, grid_x) e.g (25, 25). The grid values and block values must 
+        match the texture and array sizes. 
+    :param block_   : tuple; block values (block_y, block_x) e.g (32, 32). Maximum threads is 1024.
+        Max threads = block_x * block_y
+    :return        : pygame.Surface
+    """
+
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    cdef Py_ssize_t w, h
+    w, h = surface_.get_size()
+
+    assert w != 0, "Image width cannot be null !"
+    assert h != 0, "Image height cannot be null !"
+
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    return heatmap_cupy(cupy.asarray(rgb_array), rgb_array, grid_, block_, invert_)
+
+heatmap_kernel = cp.RawKernel(
+
+    '''
+    extern "C" 
+
+    __global__  void heatmap_kernel(unsigned char * destination, unsigned char * source, unsigned char * map,
+        double map_c, bool invert, const int w, const int h)
+{
+
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned int j = blockIdx.y * blockDim.y + threadIdx.y;
+
+    int index1 = j * h * 3 + i * 3;    
+
+    unsigned int s = source[index1 + 0] + source[index1 + 1] + source[index1 + 2];
+    unsigned int index = (unsigned int)((float)s * map_c);  
+
+    if (i < h && j < w) {
+
+        __syncthreads();
+        if (invert == 1){
+        destination[index1 + 0] = (unsigned char)map[index * 3 + 0];
+        destination[index1 + 1] = (unsigned char)map[index * 3 + 1];
+        destination[index1 + 2] = (unsigned char)map[index * 3 + 2];
+        }
+        else {
+            destination[index1 + 0] = (unsigned char)map[index * 3 + 2];
+            destination[index1 + 1] = (unsigned char)map[index * 3 + 1];
+            destination[index1 + 2] = (unsigned char)map[index * 3 + 0];
+        }       
+    }
+}
+    ''',
+    'heatmap_kernel'
+)
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cdef inline heatmap_cupy(
+        object gpu_array,
+        rgb_array,
+        object grid_,
+        object block_,
+        bint invert_
+):
+    cdef:
+        Py_ssize_t w, h
+    w, h = gpu_array.shape[:2]
+
+    destination = cp.zeros((w, h, 3), dtype=cupy.uint8)
+
+    cdef float f_map
+
+    heatmap_kernel(
+        grid_,
+        block_,
+        (destination, gpu_array, cupy.asarray(heatmap_array), f_heatmap, int(invert_), w, h)
+    )
+
+    cp.cuda.Stream.null.synchronize()
+
+    return frombuffer(destination.transpose(1, 0, 2).tobytes(), (w, h), "RGB").convert()
+
+
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef void heatmap_gpu_inplace(
+        object surface_,
+        object grid_,
+        object block_,
+        bint invert_ = False
+):
+    """
+    HEATMAP EFFECT 
+    
+    * Apply effect inplace
+
+    :param invert_  : boolean; Invert the effect
+    :param surface_ : pygame.Surface
+    :param grid_    : tuple; grid values (grid_y, grid_x) e.g (25, 25). The grid values and block values must 
+        match the texture and array sizes. 
+    :param block_   : tuple; block values (block_y, block_x) e.g (32, 32). Maximum threads is 1024.
+        Max threads = block_x * block_y
+    :return         : void 
+    """
+
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    cdef Py_ssize_t w, h
+    w, h = surface_.get_size()
+
+    assert w != 0, "Image width cannot be null !"
+    assert h != 0, "Image height cannot be null !"
+
+    try:
+        rgb_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    heatmap_cupy_inplace(cupy.asarray(rgb_array), rgb_array, grid_, block_, invert_)
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cdef inline heatmap_cupy_inplace(
+        object gpu_array,
+        rgb_array,
+        object grid_,
+        object block_,
+        bint invert_
+):
+    cdef:
+        Py_ssize_t w, h
+    w, h = gpu_array.shape[:2]
+
+    destination = cp.zeros((w, h, 3), dtype=cupy.uint8)
+
+    cdef float f_map
+
+    heatmap_kernel(
+        grid_,
+        block_,
+        (destination, gpu_array, cupy.asarray(heatmap_array), f_heatmap, int(invert_), w, h)
+    )
+
+    cp.cuda.Stream.null.synchronize()
+
+    rgb_array[:, :, 0] = destination[:, :, 0].get()
+    rgb_array[:, :, 1] = destination[:, :, 1].get()
+    rgb_array[:, :, 2] = destination[:, :, 2].get()
+
+
+
+# --------------------------------------------------------------------------------------------------------------------
+
+cpdef inline predator_gpu(
+        object surface_,
+        grid_,
+        block_,
+        unsigned int bloom_smooth    = 50,
+        unsigned int bloom_threshold = 50,
+        bint inv_colormap            = False,
+        int blend                    = pygame.BLEND_RGB_ADD,
+        bint bloom_flag              = pygame.BLEND_RGB_ADD
+
+):
+    shader_bloom_fast1(surface_, smooth_=bloom_smooth, threshold_=bloom_threshold, flag_=bloom_flag, saturation_=True)
+
+    try:
+        cpu_array = pixels3d(surface_)
+        gpu_array = cupy.asarray(cpu_array)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    cdef Py_ssize_t w, h
+    w, h = surface_.get_size()
+
+    gpu_array_copy = gpu_array.copy()
+    sobel_cupy(gpu_array_copy)
+
+    gpu_array = grayscale__lum_cupy(gpu_array)
+
+    # cpu_arr = cp.asnumpy(gpu_array)
+    # shader_rgb_to_yiq_q_comp_inplace_c(cpu_arr)
+    # gpu_array = cp.asarray(cpu_arr)
+
+    heatmap_cupy_inplace(gpu_array, cpu_array, grid_, block_, invert_=inv_colormap)
+    surf = frombuffer(gpu_array_copy.transpose(1, 0, 2).tobytes(), (w, h), "RGB").convert()
+
+    del gpu_array_copy
+    del cpu_array
+
+    surface_.blit(surf, (0, 0), special_flags=blend)
+
+
+    return surface_.convert()
+
+
+# -------------------------------------------------------------------------------------------------------
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cpdef inline object downscale_surface_gpu(
+        object surface_,
+        object grid_,
+        object block_,
+        float zoom,
+        int w2,
+        int h2
+):
+
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    cdef Py_ssize_t w, h
+    w, h = surface_.get_size()
+
+    assert w != 0, "Image width cannot be null !"
+    assert h != 0, "Image height cannot be null !"
+
+    if zoom < 0 or <float> floor(zoom) > <float> 0.9999:
+        raise ValueError("Argument zoom must be in range [0.0 ... 0.9999]")
+
+    try:
+        gpu_array = pixels3d(surface_)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    return downscale_surface_cupy(cupy.asarray(gpu_array),
+                     grid_, block_, zoom, w2, h2)
+
+downscale_surface_kernel = cp.RawKernel(
+
+    '''
+
+    extern "C" 
+
+    __global__  void downscale_surface_kernel(unsigned char * destination, unsigned char * source,
+        const int w, const int h, const int w2, const int h2)
+{
+
+    unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+    unsigned int j = blockIdx.y * blockDim.y + threadIdx.y;
+    
+    float rj = (float)h2/(float)h; 
+
+    int index1 = j * h * 3 + i * 3;   
+    int index2 = (int)(j * rj) * h2 * 3 + (int)(i * rj) * 3;
+    
+    const unsigned int t_max = w * h * 3;  
+    unsigned char local_memory[3]; 
+   
+ 
+    if (i < h && j < w) {
+
+        const int r = index2 + 0; 
+        const int g = index2 + 1;
+        const int b = index2 + 2;
+
+        local_memory[0] = source[r];
+        local_memory[1] = source[g];
+        local_memory[2] = source[b];
+        
+        __syncthreads();
+        destination[index1 + 0] = local_memory[0];
+        destination[index1 + 1] = local_memory[1];
+        destination[index1 + 2] = local_memory[2]; 
+    }
+
+
+}
+    ''',
+    'downscale_surface_kernel'
+)
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+cdef inline downscale_surface_cupy(
+        object gpu_array,
+        object grid_,
+        object block_,
+        float zoom,
+        int w2,
+        int h2
+):
+    cdef:
+        Py_ssize_t w, h
+    w, h = gpu_array.shape[:2]
+
+    destination = cupy.zeros((w2, h2, 3), dtype=cupy.uint8)
+
+    downscale_surface_kernel(
+        grid_,
+        block_,
+        (destination, gpu_array, w2, h2, w, h, zoom)
+    )
+
+    cp.cuda.Stream.null.synchronize()
+
+    return frombuffer(destination.transpose(1, 0, 2).tobytes(), (w2, h2), "RGB").convert()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #

@@ -52,7 +52,7 @@ SCREEN.set_alpha(None)
 pygame.init()
 
 # Load the background image
-BACKGROUND = pygame.image.load("../Assets/Background.jpg").convert()
+BACKGROUND = pygame.image.load("../Assets/background.jpg").convert()
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
 image = BACKGROUND.copy()

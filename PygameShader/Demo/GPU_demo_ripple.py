@@ -58,7 +58,6 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-pygame.display.init()
 SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, 32)
 
 # from PygameShader.VideoRecording import capture_video, write_video
@@ -103,6 +102,10 @@ WaterDrop1    = pygame.mixer.Sound("..//Assets//ES_WaterDrip1.wav")
 WaterDrop2    = pygame.mixer.Sound("..//Assets//ES_WaterDrip2.wav")
 WaterDrop3    = pygame.mixer.Sound("..//Assets//ES_WaterDrip3.wav")
 WaterDrops    = [WaterDrop1, WaterDrop2, WaterDrop3]
+
+mouse_pos = pygame.math.Vector2()
+mouse_pos.x = 0
+mouse_pos.y = 0
 
 while STOP_GAME:
 

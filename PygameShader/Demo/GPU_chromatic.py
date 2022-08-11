@@ -58,11 +58,8 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-pygame.display.init()
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, 32)
-
-pygame.init()
-
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN, vsync=True)
+pygame.font.init()
 background = pygame.image.load('..//Assets//city.jpg')
 background = pygame.transform.smoothscale(background, (width, height))
 background.convert(32, RLEACCEL)
@@ -86,6 +83,9 @@ STOP_GAME = True
 grid, block = block_grid(width, height)
 block_and_grid_info(width, height)
 
+MOUSE_POS = Vector2()
+MOUSE_POS.x = 0
+MOUSE_POS.y = 0
 while STOP_GAME:
 
     event_pump()
