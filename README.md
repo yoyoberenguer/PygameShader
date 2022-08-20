@@ -134,6 +134,7 @@ pip3 install PygameShader-xxxxxx
 *Decompress the archive and enter PygameShader directory* 
 ```bash
 python setup.py bdist_wheel 
+cd dist
 pip install PygameShader-xxxxxx
 ```
 
