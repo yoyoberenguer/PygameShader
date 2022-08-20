@@ -143,5 +143,5 @@ cdef rgb close_color(
 cdef rgb use_palette(
         rgb colors,
         float [:, :] palette_,
-        unsigned int w = *
+        Py_ssize_t w
 )nogil

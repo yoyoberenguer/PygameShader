@@ -1,5 +1,4 @@
-# distutils: define_macros=NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
-
+# encoding: utf-8
 
 """
 Setup.py file
@@ -18,12 +17,39 @@ repository = https://upload.pypi.org/legacy/
 # twine upload --repository testpypi dist/*
 
 import setuptools
+try:
+    import Cython
+except ImportError:
+    raise ImportError("\n<Cython> library is missing on your system."
+          "\nTry: \n   C:\\pip install Cython")
+
+try:
+    import numpy
+except ImportError:
+    raise ImportError("\n<numpy> library is missing on your system."
+          "\nTry: \n   C:\\pip install numpy")
+
+
+try:
+    import pygame
+except ImportError:
+    raise ImportError("\n<pygame> library is missing on your system."
+          "\nTry: \n   C:\\pip install pygame")
+
+__CUPY = False
+try:
+    import cupy
+    __CUPY = True
+except ImportError:
+    print("\n**CUPY is not installed on your system**")
+
 from Cython.Build import cythonize
 from setuptools import Extension
 import platform
 import warnings
 import sys
 
+print("\n---PYTHON COPYRIGHT---\n")
 print(sys.copyright)
 
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -45,9 +71,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
 # version 1.0.1 Yank, latest version 1.0.2
 # pypitest latest version 1.0.17
 
-OPENMP = False
+OPENMP = True
+OPENMP_PROC = "-fopenmp" # "-lgomp"
 __VERSION__ = "1.0.8"  # check the file shader.pyx and make sure the version is identical
-
+LANGUAGE = "c++"
+ext_link_args = ""
 
 py_requires = "PygameShader requires python3 version 3.6 or above."
 py_minor_versions = [x for x in range(6, 11)]
@@ -95,88 +123,93 @@ else:
 if plat.startswith("WINDOWS"):
     ext_compile_args = ["/openmp" if OPENMP else "", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"]
 
+
 elif plat.startswith("LINUX"):
     if OPENMP:
         ext_compile_args = \
             ["-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
-             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-Wall", "-lgomp"]
+             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-Wall", OPENMP_PROC, "-static"]
+        ext_link_args = [OPENMP_PROC]
     else:
         ext_compile_args = \
             ["-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
-             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-Wall"]
+             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-Wall", "-static"]
+        ext_link_args = ""
 else:
     raise ValueError("PygameShader can be build on Windows and Linux systems only.")
 
 
+print("\n---COMPILATION---\n")
+print("SYSTEM                : %s " % plat)
+print("BUILD                 : %s " % proc_arch_bits)
+print("FLAGS                 : %s " % ext_compile_args)
+print("EXTRA LINK FLAGS      : %s " % ext_link_args)
+print("LANGUAGE              : %s " % LANGUAGE)
+print("MULTITPROCESSING      : %s " % OPENMP)
+print("MULTITPROCESSING FLAG : %s " % OPENMP_PROC)
+
+print("\n")
+print("PYTHON VERSION        : %s.%s " % (sys.version_info.major, sys.version_info.minor))
+print("SETUPTOOLS VERSION    : %s " % setuptools.__version__)
+print("CYTHON VERSION        : %s " % Cython.__version__)
+print("NUMPY VERSION         : %s " % numpy.__version__)
+print("PYGAME VERSION        : %s " % pygame.__version__)
+if __CUPY:
+    print("CUPY VERSION          : %s " % cupy.__version__)
+try:
+    print("SDL VERSION           : %s.%s.%s " % pygame.version.SDL)
+except:
+    pass # ignore SDL versioning issue
+
+print("\n*** BUILDING PYGAMESHADER VERSION ***  : %s \n" % __VERSION__)
+
+# define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
 setuptools.setup(
     name="PygameShader",
     version= __VERSION__,       # testing version "1.0.27",
     author="Yoann Berenguer",
     author_email="yoyoberenguer@hotmail.com",
-    description="Pygame CPU/GPU shader effects for 2D video game and arcade game",
+    description="Pygame effects for 2D video game and arcade game",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/yoyoberenguer/PygameShader",
     # packages=setuptools.find_packages(),
     packages=['PygameShader'],
-    ext_modules=cythonize([
+    ext_modules=cythonize(module_list=[
         Extension("PygameShader.shader", ["PygameShader/shader.pyx"],
-                  extra_compile_args=ext_compile_args,
-                  language="c"),
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE),
         Extension("PygameShader.misc", ["PygameShader/misc.pyx"],
-                  extra_compile_args=ext_compile_args,
-                  language="c"),
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE),
         Extension("PygameShader.gaussianBlur5x5", ["PygameShader/gaussianBlur5x5.pyx"],
-                  extra_compile_args=ext_compile_args,
-                  language="c"),
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE),
         Extension("PygameShader.Palette", ["PygameShader/Palette.pyx"],
-                  extra_compile_args=ext_compile_args,
-                  language="c"),
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE),
         Extension("PygameShader.shader_gpu", ["PygameShader/shader_gpu.pyx"],
-                  extra_compile_args=ext_compile_args,
-                  language="c"),
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE)
     ]),
 
     include_dirs=[numpy.get_include()],
-    define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
     license='GNU General Public License v3.0',
 
-    classifiers=[  # Optional
-        # How mature is this project? Common values are
-        #   3 - Alpha
-        #   4 - Beta
-        #   5 - Production/Stable
+    classifiers=[
         'Development Status :: 4 - Beta',
 
-        # Indicate who your project is intended for
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         "Operating System :: Microsoft :: Windows",
-        "Operating System :: Unix",
-        # "Operating System :: MacOS",
 
-        # Pick your license as you wish
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
 
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate you support Python 3. These classifiers are *not*
-        # checked by 'pip install'. See instead 'python_requires' below.
-        # 'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        "Programming Language :: Python :: Implementation :: CPython",
-        'Programming Language :: Python',
-        'Programming Language :: Cython',
-        'Programming Language :: C',
-
-        'Topic :: Software Development :: Libraries :: Python Modules'
-        "Topic :: Multimedia :: Graphics",
-        "Topic :: Multimedia :: Graphics :: Capture :: Digital Camera",
-        "Topic :: Multimedia :: Graphics :: Capture :: Screen Capture",
-        "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+        'Programming Language :: Python :: 3.10'
     ],
 
     install_requires=[

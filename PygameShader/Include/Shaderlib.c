@@ -245,9 +245,9 @@ inline float Q_inv_sqrt( float number )
 {
 	long i;
 	float x2, y;
-	const float threehalfs = 1.5f;
+	const float threehalfs = 1.5F;
 
-	x2 = number * 0.5f;
+	x2 = number * 0.5F;
 	y  = number;
 	i  = * ( long * ) &y;                       // evil floating point bit level hacking
 	i  = 0x5f3759df - ( i >> 1 );               // what the fuck?
@@ -298,7 +298,10 @@ inline struct hsl struct_rgb_to_hsl(float r, float g, float b)
     assert ((0.0<= g) <= 1.0);
     assert ((0.0<= b) <= 1.0);
 
-    struct hsl hsl_={.h=0.0f, .s=0.0f, .l=0.0f};
+    struct hsl hsl_;
+    hsl_.h=0.0f;
+    hsl_.s=0.0f;
+    hsl_.l=0.0f;
 
     float cmax=0.0f, cmin=0.0f, delta=0.0f, t;
 
@@ -355,7 +358,10 @@ inline struct hsl struct_rgb_to_hsl(float r, float g, float b)
 inline struct rgb struct_hsl_to_rgb(float h, float s, float l)
 {
 
-    struct rgb rgb_={.r=0.0f, .g=0.0f, .b=0.0f};
+    struct rgb rgb_;
+    rgb_.r=0.0f;
+    rgb_.g=0.0f;
+    rgb_.b=0.0f;
 
     float m2=0.0f, m1=0.0f;
 
@@ -446,7 +452,10 @@ inline struct rgb struct_hsv_to_rgb(float h, float s, float v)
 
     int i;
     float f, p, q, t;
-    struct rgb rgb_={.r=0.0, .g=0.0, .b=0.0};
+    struct rgb rgb_;
+    rgb_.r=0.0f;
+    rgb_.g=0.0f;
+    rgb_.b=0.0f;
 
     if (s == 0.0f){
         rgb_.r = v;
@@ -506,7 +515,10 @@ inline struct rgb struct_hsv_to_rgb(float h, float s, float v)
 
 inline struct yiq rgb_to_yiq(float r, float g, float b){
 
-    struct yiq yiq_={.y=0.0, .i=0.0, .q=0.0};
+    struct yiq yiq_;
+    yiq_.y=0.0f;
+    yiq_.i=0.0f;
+    yiq_.q=0.0f;
 
     yiq_.y = (float)0.299*r + (float)0.587*g + (float)0.114*b;
     yiq_.i = (float)0.5959*r - (float)0.2746*g - (float)0.3213*b;
@@ -518,7 +530,10 @@ inline struct yiq rgb_to_yiq(float r, float g, float b){
 
 inline struct rgb yiq_to_rgb(float y, float i, float q){
 
-    struct rgb rgb_={.r=0.0, .g=0.0, .b=0.0};
+    struct rgb rgb_;
+    rgb_.r=0.0f;
+    rgb_.g=0.0f;
+    rgb_.b=0.0f;
 
     float r = y + (float)0.956*i + (float)0.619*q;
     float g = y - (float)0.272*i - (float)0.647*q;
@@ -578,7 +593,11 @@ inline struct rgb_color_int wavelength_to_rgb(int wavelength, float gamma){
     http://www.physics.sfasu.edu/astro/color/spectra.html
     */
 
-    struct rgb_color_int color = {.r=0, .g=0, .b=0};
+    struct rgb_color_int color;
+    color.r=(int)0;
+    color.g=(int)0;
+    color.b=(int)0;
+
     float attenuation=0;
 
     // VIOLET
@@ -636,7 +655,11 @@ inline struct rgb_color_int wavelength_to_rgb(int wavelength, float gamma){
 inline struct rgb_color_int wavelength_to_rgb_custom(int wavelength, int arr[], float gamma)
 {
 
-    struct rgb_color_int color = {.r=0, .g=0, .b=0};
+    struct rgb_color_int color;
+    color.r = (int)0;
+    color.g = (int)0;
+    color.b = (int)0;
+
     float attenuation=0;
 
     // VIOLET

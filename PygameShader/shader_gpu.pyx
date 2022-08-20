@@ -1,6 +1,11 @@
-# encoding: utf-8
 # cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
 # cython: optimize.use_switch=True
+# cython: warn.maybe_uninitialized=False
+# cython: warn.unused=False
+# cython: warn.unused_result=False
+# cython: warn.unused_arg=False
+# cython: language_level=3
+# encoding: utf-8
 
 
 
@@ -135,7 +140,7 @@ cpdef unsigned int get_max_grid_per_block():
 # USED BY block_grid
 cdef get_divisors(int n):
     l = []
-    for i in range(1, int(n / <float>2.0) + 1):
+    for i in range(1, int(n / 2.0) + 1):
         if n % i == 0:
             l.append(i)
     return l
@@ -1041,7 +1046,7 @@ cdef object gaussian_3x3_cupy(gpu_array_):
 
 
 sobel_kernel = cp.RawKernel(
-    '''   
+    '''   d
     extern "C" __global__
     
     __constant__ double gx[9] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};

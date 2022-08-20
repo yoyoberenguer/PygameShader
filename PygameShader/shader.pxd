@@ -115,7 +115,7 @@ cpdef void median(
         unsigned short int kernel_size_=*,
         bint fast_=*,
         unsigned short int reduce_factor_=*)except *
-        
+
 cpdef void median_grayscale(object surface_, int kernel_size_=*)
 
 cpdef void color_reduction(object surface_, int color_=*)

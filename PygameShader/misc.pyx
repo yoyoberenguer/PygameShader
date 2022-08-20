@@ -1061,7 +1061,7 @@ cdef rgb close_color(
 cdef rgb use_palette(
         rgb colors,
         float [:, :] palette_,
-        unsigned int w = 16
+        Py_ssize_t w
 )nogil:
     """
     PICKED RGB VALUES FROM A GIVEN PALETTE TO MATCH A GIVEN COLOR
@@ -1075,7 +1075,7 @@ cdef rgb use_palette(
 
     :param colors  : struct; Contains RGB values integer values in range [0..255]
     :param palette_: numpy.array shape (w, 3) type float32 containing RGB colors values
-    :param w       : Size of the palette or number of colors available default is 16;
+    :param w       : Size of the palette or number of colors available
     :return        : Return a color RGB containing colors from the palette.
     """
 

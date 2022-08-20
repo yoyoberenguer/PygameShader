@@ -2889,7 +2889,7 @@ cdef inline float gauss(float x, float c, float sigma=1.0, float mu=0.0)nogil:
     :return: 
     """
     x -= c
-    return (1.0 / sigma * C1_) * exp(-0.5 * ((x - mu) * (x - mu)) / (sigma * sigma))
+    return <float>((1.0 / sigma * C1_) * exp(-0.5 * ((x - mu) * (x - mu)) / (sigma * sigma)))
 
 
 @cython.boundscheck(False)
@@ -3247,8 +3247,7 @@ cdef inline void heap_sort(unsigned char [::1] nums, int n)nogil:
 @cython.nonecheck(False)
 @cython.cdivision(True)
 cdef inline void shader_median_filter24_inplace_heapsort_c(
-        unsigned char [:, :, :] rgb_array_, 
-        int kernel_size_ =2):
+        unsigned char [:, :, :] rgb_array_, int kernel_size_=2):
 
     """
     SHADER MEDIAN FILTER
@@ -3333,9 +3332,7 @@ cdef inline void shader_median_filter24_inplace_heapsort_c(
 @cython.nonecheck(False)
 @cython.cdivision(True)
 cdef inline void shader_median_filter24_inplace_c(
-        unsigned char [:, :, :] rgb_array_, 
-        int kernel_size_=2
-        ):
+        unsigned char [:, :, :] rgb_array_, int kernel_size_=2):
 
     """
     SHADER MEDIAN FILTER
@@ -3432,9 +3429,7 @@ cdef inline void shader_median_filter24_inplace_c(
 @cython.nonecheck(False)
 @cython.cdivision(True)
 cdef inline void shader_median_grayscale_filter24_inplace_c(
-        unsigned char [:, :, :] rgb_array_, 
-        int kernel_size_=2
-        ):
+        unsigned char [:, :, :] rgb_array_, int kernel_size_=2):
 
     """
     SHADER MEDIAN FILTER
@@ -3471,6 +3466,7 @@ cdef inline void shader_median_grayscale_filter24_inplace_c(
         # int [64] tmp_  = empty(64, numpy.int16, order='C')
         int *tmp_   = <int *> malloc(k_size * sizeof(int))
         int index = 0
+        unsigned char *v
 
 
     with nogil:
@@ -3754,7 +3750,7 @@ cdef inline void shader_sobel24_fast_inplace_c(
     """
 
     cdef:
-        Py_ssize_t w, h, w_1, h_1
+        int w, h, w_1, h_1
     w, h = surface_.get_size()
 
     cdef:
@@ -4954,9 +4950,9 @@ cdef inline void shader_horizontal_glitch24_inplace_c(
 
     cdef:
         int i=0, j=0
-        float rad = <float>(3.14/180.0)
-        float angle = 0
-        float angle1 = 0
+        float rad = <float>(<float>3.14/<float>180.0)
+        float angle = <float>0.0
+        float angle1 = <float>0.0
         unsigned char [:, :, :] rgb_array_copy = numpy.array(rgb_array_, copy=True)
         int ii=0
 
@@ -5480,7 +5476,7 @@ cpdef void shader_bloom_fast1(
     """
 
     cdef:
-        Py_ssize_t  w, h
+        int  w, h
         unsigned int bit_size
         unsigned int  w16, h16
         int r
@@ -6140,22 +6136,22 @@ cpdef tunnel_modeling32(Py_ssize_t screen_width, Py_ssize_t screen_height):
     cdef int s_height = 512
     surface = smoothscale(surface, (s_width, s_height))
     cdef unsigned char [::1] scr_data = surface.get_buffer()
-
-    cdef  int x, y, i = 0
+    cdef float sqy, sqx
+    cdef int x, y, i = 0
 
 
     for y in range(0, screen_height * 2):
-        sqy = pow(y - screen_height, 2)
+        sqy = <float>pow(y - screen_height, 2)
         for x in range(0, screen_width * 2):
-            sqx = pow(x - screen_width, 2)
+            sqx = <float>pow(x - screen_width, 2)
             if (sqx + sqy) == 0:
                 distances[i] = 1
             else:
-                distances[i] = <int>(floor(
-                    32 * <float>s_height / <float>sqrt(sqx + sqy))) % s_height
-            angles[i]    = <int>round_c(<float>s_width * atan2(y - screen_height,
-                                                             x - screen_width) / (<float>M_PI))
-            shades[i]    = <int>min(sqrt(sqx + sqy)*10, 255)
+                distances[i] = <int>(<float>floor(
+                    <float>32.0 * <float>s_height / <float>sqrt(sqx + sqy))) % s_height
+            angles[i]    = <int>round_c(<float>s_width * <float>atan2(<float>y - <float>screen_height,
+                                                             <float>x - <float>screen_width) / (<float>M_PI))
+            shades[i]    = <int>min(<float>sqrt(sqx + sqy)* <float>10.0, 255)
             i = i + 1
 
     return distances, angles, shades, scr_data
@@ -6263,7 +6259,7 @@ cpdef tunnel_render32(
             for x in range(0, screen_width):
 
                 src_ofs = y * stride + centerx + centery * stride + x
-                dest_ofs = (y * screen_height + x) << 2
+                dest_ofs = (y * <int>screen_height + x) << 2
 
                 u = (distances[src_ofs] + shiftx) & 0xff
                 v = (angles[src_ofs] + shifty) & 0xff
@@ -7021,7 +7017,7 @@ cdef fire_surface24_c(
     with nogil:
         # POPULATE TO THE BASE OF THE FIRE (THIS WILL CONFIGURE THE FLAME ASPECT)
         for x in prange(min_, max_, schedule='static', num_threads=THREADS):
-                fire[height-1, x] = randRange(intensity, 260) #260
+                fire[height-1, x] = randRange(intensity, 260)
 
 
         # DILUTE THE FLAME EFFECT (DECREASE THE MAXIMUM INT VALUE) WHEN THE FLAME TRAVEL UPWARD
@@ -7036,15 +7032,14 @@ cdef fire_surface24_c(
                        + fire[c1, (x + 1) % width]
                        + fire[(y + 2) % height, c2]) * factor
 
-                    d = d - <float>(rand() * 0.0001) # 0.0001
-                    
-                    
+                    d = d - <float>(<float>rand() * <float>0.0001)
+
                     # Cap the values
-                    if d <0:
-                        d = 0.0
+                    if d < 0:
+                        d = <float>0.0
 
                     # CAP THE VALUE TO 255
-                    if d>255.0:
+                    if d > 255:
                         d = <float>255.0
                     fire[y, x] = d
 
@@ -8578,10 +8573,7 @@ cdef inline void dirt_lens_c(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-cdef object dithering_c(
-    float [:, :, :] rgb_array_, 
-    int factor_
-    ):
+cdef object dithering_c(float [:, :, :] rgb_array_, int factor_):
 
     """
     Dithering is used in computer graphics to create the illusion of "color depth" in images with
@@ -8612,10 +8604,9 @@ cdef object dithering_c(
         float oldr, oldg, oldb
 
     rgb_array_ = rgb_array_.astype(dtype=numpy.float32)
-    
     with nogil:
 
-        for y in prange(1, h, schedule='static', num_threads=THREADS, chunksize=256):
+        for y in prange(1, h, schedule='static', num_threads=THREADS, chunksize=2**8):
 
             for x in range(1, w):
 
@@ -8674,10 +8665,7 @@ cdef object dithering_c(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-cdef inline void dithering_int_c(
-    unsigned char[:, :, :] rgb_array_, 
-    int factor_ = 2
-    ):
+cdef inline void dithering_int_c(unsigned char[:, :, :] rgb_array_, int factor_):
 
 
     cdef Py_ssize_t w, h
@@ -8689,8 +8677,8 @@ cdef inline void dithering_int_c(
         unsigned char new_red, new_green, new_blue
         int quantization_error_red, quantization_error_green, quantization_error_blue
         unsigned char oldr, oldg, oldb
-        float c5 = <float>255.0 / <float>(factor_ -1)
-        float c6 = <float>(factor_ -1) * ONE_255
+        float c5 = <float>255.0 / <float>(factor_ - 1)
+        float c6 = <float>(factor_ - 1) * <float>ONE_255
 
 
     with nogil:
@@ -8944,16 +8932,16 @@ cdef bilateral_filter24_c(
         unsigned char *r
         unsigned char *g
         unsigned char *b
-        float sigma_i2 = 2 * sigma_i_ * sigma_i_
-        float sigma_s2 = 2 * sigma_s_ * sigma_s_
+        float sigma_i2 = <float>2.0 * sigma_i_ * sigma_i_
+        float sigma_s2 = <float>2.0 * sigma_s_ * sigma_s_
 
     with nogil:
 
         for x in prange(0, w, schedule='static', num_threads=THREADS):
             for y in range(0, h):
 
-                ir, ig, ib = 0, 0, 0
-                wpr, wpg, wpb = 0, 0, 0
+                ir, ig, ib = <float>0.0, <float>0.0, <float>0.0
+                wpr, wpg, wpb = <float>0.0, <float>0.0, <float>0.0
 
                 for ky in range(-k, k + 1):
 
@@ -8972,7 +8960,7 @@ cdef bilateral_filter24_c(
                         elif yy > h:
                             yy = h
 
-                        gs = gaussian_(distance_(kx, ky), sigma_s2)
+                        gs = gaussian_(distance_(<float>kx, <float>ky), sigma_s2)
 
                         r = &rgb_array_[xx, yy, 0]
                         g = &rgb_array_[xx, yy, 1]
@@ -9006,11 +8994,11 @@ cdef bilateral_filter24_c(
 
 EMBOSS_KERNEL = \
     numpy.array((
-        [-1, -1, -1, -1, 0],
-        [-1, -1, -1, 0,  1],
-        [-1, -1,  0, 1,  1],
-        [-1,  0,  1, 1,  1],
-        [ 0,  1,  1, 1,  1])).astype(dtype=numpy.float32, order='C')
+        [-1.0, -1.0, -1.0, -1.0, 0.0],
+        [-1.0, -1.0, -1.0, 0.0,  1.0],
+        [-1.0, -1.0,  0.0, 1.0,  1.0],
+        [-1.0,  0.0,  1.0, 1.0,  1.0],
+        [ 0.0,  1.0,  1.0, 1.0,  1.0])).astype(dtype=numpy.float32, order='C')
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -9018,12 +9006,12 @@ EMBOSS_KERNEL = \
 @cython.cdivision(True)
 cdef object emboss5x5_c(unsigned char [:, :, :] rgb_array_):
 
-    k_weight = numpy.sum(EMBOSS_KERNEL)
-    k_length = len(EMBOSS_KERNEL)
-    half_kernel = len(EMBOSS_KERNEL) >> 1
+    cdef float k_weight = numpy.sum(EMBOSS_KERNEL)
+    cdef int k_length = len(EMBOSS_KERNEL)
+    cdef int half_kernel = len(EMBOSS_KERNEL) >> 1
 
     # texture sizes
-    cdef Py_ssize_t w, h
+    cdef int w, h
     w = <object>rgb_array_.shape[0]
     h = <object>rgb_array_.shape[1]
 
@@ -9434,10 +9422,10 @@ cpdef area24_c(int x, int y, np.ndarray[np.uint8_t, ndim=3] background_rgb,
     with nogil:
         for i in prange(ax, schedule='static', num_threads=THREADS):
             for j in range(ay):
-                f = alpha[i, j] * ONE_255 * intensity
-                new_array[j, i, 0] = <unsigned char>fmin(rgb[i, j, 0] * f * color[0], 255.0)
-                new_array[j, i, 1] = <unsigned char>fmin(rgb[i, j, 1] * f * color[1], 255.0)
-                new_array[j, i, 2] = <unsigned char>fmin(rgb[i, j, 2] * f * color[2], 255.0)
+                f = alpha[i, j] * <float>ONE_255 * intensity
+                new_array[j, i, 0] = <unsigned char>fmin(rgb[i, j, 0] * f * color[0], <float>255.0)
+                new_array[j, i, 1] = <unsigned char>fmin(rgb[i, j, 1] * f * color[1], <float>255.0)
+                new_array[j, i, 2] = <unsigned char>fmin(rgb[i, j, 2] * f * color[2], <float>255.0)
 
     ay, ax = new_array.shape[:2]
 
@@ -9449,7 +9437,7 @@ cpdef area24_c(int x, int y, np.ndarray[np.uint8_t, ndim=3] background_rgb,
 
     if heat:
         new_array = heatwave_array24_horiz_c(numpy.asarray(new_array).transpose(1, 0, 2),
-            alpha, frequency, (frequency % 8) / 1000.0, attenuation=100, threshold=10)
+            alpha, frequency, (frequency % 8) / <float>1000.0, attenuation=100, threshold=10)
 
     surface = pygame.image.frombuffer(new_array, (ax, ay), "RGB")
 
@@ -9677,9 +9665,9 @@ cpdef inline void shader_rgb_to_yiq_inplace_c(unsigned char [:, :, :] rgb_array)
                 b = &rgb_array[i, j, 2]
                 yiq_ = rgb_to_yiq(r[0] * <float>ONE_255, g[0] * <float>ONE_255, b[0] * <float>ONE_255)
 
-                r[0] = min(<unsigned char>(yiq_.y * <float>255.0), 255)
-                g[0] = min(<unsigned char>(yiq_.y * <float>255.0), 255)
-                b[0] = min(<unsigned char>(yiq_.y * <float>255.0), 255)
+                r[0] = <unsigned char>min(<unsigned char>(yiq_.y * <float>255.0), 255)
+                g[0] = <unsigned char>min(<unsigned char>(yiq_.y * <float>255.0), 255)
+                b[0] = <unsigned char>min(<unsigned char>(yiq_.y * <float>255.0), 255)
 
 
 

@@ -1,11 +1,11 @@
 # Pygame Shaders Library 
 
 
-*New Version 1.0.7 - 1.0.6*
+*New Version 1.0.8
 
 
 ```
-pip install PygameShader==1.0.7
+pip install PygameShader==1.0.8
 ```
 
 Some scripts have been ported to GPU using CUPY and CUDA raw Kernels for running 
@@ -50,11 +50,6 @@ from PygameShader.shader_gpu import *
 
 ---
 
-*New version 1.0.4* and WIKI available here https://github.com/yoyoberenguer/PygameShader/wiki
-```
-pip install PygameShader==1.0.4
-```
-
 
 Pygame shader project is a `2D game library` written in Python and Cython containing
 `special effects` for development of multimedia applications like video games, arcade game, 
@@ -80,132 +75,71 @@ then the overall processing time should be extremely fast due to code optimizati
 cython. Nevertheless, to keep a good frame rate, it is advised to keep the sprites below
 the screen display resolution e,g 200x200 texture size.
 
-The shaders effect can be placed into 5 different categories
-* Color variations
-* Filters
-* Transformations
-* Ambiances
-* Special effects
- 
-Some effects can be used for interaction with the player(s) (ex the player is being hit
-and receive damages, use the shader blood effect to turn your screen red).
-Screen shacking after an explosion, check the shader dampening effect (horizontal or zoom in/out)
-Player is pausing the game, use the blur effect to blur the background image.
-You need to change the brightness of a scene uses the shader brightness.
-Sprite texture colors can be changed over time with the HSL algorithm.
-Your game needs to look a bit more retro, use the reduction shader to decrease the amount
-of colors in your texture or display
-etc
-
 PygameShader provide tools to improve your overall game appearance by changing 
 Sprites texture/surface and or by using great special effects that will affect 
 the entire screen. 
 
-This version contains the following shaders:  
+The project is under the `GNU GENERAL PUBLIC LICENSE Version 3`
 
-* `Color variations`
-  
-  - RGB to BGR (Change your game display from RGB to a BGR model) 
-  - RGB to BRG (Change your game display from RGB to a BRG model) 
-  - grayscale mode
-  - sepia; Sepia mode  
-  - color reduction, decrease the amount of color 
-  - hsl Rotate the colors
-  - invert (Invert the game display negative color)
-  - plasma (Add a plasma effect to your display)
-  - heatmap conversion
-
-* `Filters`
-  - median* 
-  - sobel effect (edge display)
-  - gaussian blur 5x5 (add a blur effect to your game)
-  - sharpen filter (increase the image sharpness)
-  - bright pass filter (bpf) 
-  
-* `Transformations`
-  - wave effect, create a wave effect to your game display
-  - swirl, swirl the entire screen or texture 
-  - horizontal glitch, create a glitch effect affecting 
-    your display
-  - mirroring 
-  - lateral dampening (lateral dampening effect that can 
-    be used  for explosions)
-  - dampening effect (zoom in and out dampening effect)
-  - fisheye your game display is turned into a fisheye model
-  - heatwave 
-
-* `Ambiances`
-  - brightness, increase / decrease the brightness of your
-    texture or game display in real time
-  - saturation, increase / decrease the level of saturation 
-
-* `Special effects` 
-  - bloom effect, real time bloom effect for your display
-  - water ripple effect, create water ripple effect in real 
-    time on your game display 
-  - tunnel effect, show a tunnel effect 
-  - tv scanline, TV scanline effect
-  - blood effect, use a red vignette to color your screen 
-    each time your player is taking damage 
-  - predator vision, create a predator vision mode
-  - fire effect, Display an amazing fire effect onto your 
-    game display or texture in real time
-  - smoke/cloud effect, create a smoke effect or moving cloud 
-  - RGB split, split all the RGB channels separately and display 
-    the R, G and B channel with an offset
-  - rain (bubble effect), You can generate a hundred bubbles or 
-    water droplets on your game display, the droplets/bubbles will 
-    reflect the game display in real time
- 
-* New in version 1.0.3 
-  - Added blending mode for `Predator mode`                  
-  - New algorithm `dirt_lens effect` bokeh effect (texture available in Assets directory)
-  - `Dithering` The classic dithering effect to create a retro image effect
-  - `Color_palette` to convert image into Amstrad CPC 6128
-     COMMODORE C64, ZX SPECTRUM etc 
-  - `Bilateral filter`Blur effect that conserve the edge of an image 
-  - `Emboss filter` Emboss an image or create relief 
-  - `Pixelation` Pixelate an image
-  - `Convert to 27 colors` Similar to color_reduction effect but cap the reduction to 27 colors
-  - `Spectrum surface` Create a pygame surface that contains the light spectrum (colors)
-  - `Horizontal gradient (unit misc.pyx)` New algorithms to create custom 2D - 3D gradient colors surface
-  - `New transition effect (blend effect)` Transistion between two images
-
+---
 ## Demo
-
-Youtube : https://youtu.be/XgLF2BWP0Rs
 
 In the PygameShader `Demo` directory 
 
 (press ESC to quit the demo)
 
-```commandline
+```bash
 C:\>python demo_fire.py
 C:\>python demo_cartoon.py
 C:\>python demo_wave.py
 ```
+*if cupy and CUDA are installed correctly on your system you can run the GPU shaders*
+```bash
+C:\>python gpu_chromatic.py
+C:\>python gpu_zoom.py
+C:\>python gpu_wave.py
 
+```
+---
 
-The project is under the `GNU GENERAL PUBLIC LICENSE Version 3`
-
-## Installation 
+## Installation from pip
 check the link for newest version https://pypi.org/project/PygameShader/
 
 * Available python build 3.6, 3.7, 3.8, 3.9, 3.10 and source build
+* Compatible WINDOWS and LINUX for platform x86, x86_64
 ```
 pip install PygameShader 
-# or version 1.0.2  
-pip install PygameShader==1.0.2
 ```
 
-* version installed 
-* Imported module is case sensitive 
+* Checking the installed version 
+  (*Imported module is case sensitive*) 
 ```python
 >>>from PygameShader.shader import __VERSION__
 >>>__VERSION__
 ```
+---
+## Installation from source code
 
-## Building cython code
+*Download the source code and decompress the Tar or zip file*
+* Linux
+```bash
+tar -xvf source-1.0.8.tar.gz
+cd PygameShader-1.0.8
+python3 setup.py bdist_wheel
+cd dist 
+pip3 install PygameShader-xxxxxx 
+```
+* Windows 
+
+*Decompress the archive and enter PygameShader directory* 
+```bash
+python setup.py bdist_wheel 
+pip install PygameShader-xxxxxx
+```
+
+---
+
+## Building Cython & C code 
 
 #### When do you need to compile the cython code ? 
 
@@ -222,46 +156,79 @@ version, make sure to reference the right python version
 in (`python38 setup_shader.py build_ext --inplace`)
 
 If the compilation fail, refers to the requirement section and 
-make sure cython and a C-compiler are correctly install on your
+make sure Cython and a C-compiler are correctly install on your
  system.
 - A compiler such visual studio, MSVC, CGYWIN setup correctly on 
   your system.
   - a C compiler for windows (Visual Studio, MinGW etc) install 
-  on your system and linked to your windows environment.
+  on your system and linked to your Windows environment.
   Note that some adjustment might be needed once a compiler is 
   install on your system, refer to external documentation or 
-  tutorial in order to setup this process.e.g https://devblogs.
-  microsoft.com/python/unable-to-find-vcvarsall-bat/
+  tutorial in order to setup this process.e.g :
+    
+https://devblogs.microsoft.com/python/unable-to-find-vcvarsall-bat/
 
-## OPENMP 
-In the main project directory, locate the file ```setup_shader.py```.
-The compilation flag /openmp is used by default.
-To override the OPENMP feature and disable the multi-processing remove the flag ```/openmp```
-
-####
-```setup_shader.py```
+*Edit the file setup_shader.py and check the variable OPENMP.*
+*You can enable or disable multi-processing*
 ```python
-
-ext_modules=cythonize(Extension(
-        "*", ['*.pyx'],
-        extra_compile_args=["/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"], language="c"
+# Build the cython code with mutli-processing (OPENMP) 
+OPENMP = True
 ```
-Save the change and build the cython code with the following instruction:
-
-```python setup_shader.py build_ext --inplace --force```
-
-If the project build successfully, the compilation will end up with the following lines
+*Save the change and build the cython code with the following instruction:*
+```bash
+C:\PygameShader\PygameShader\python setup_shader.py build_ext --inplace --force
+````
+*If the project build successfully, the compilation will end up with the following lines*
 ```
 Generating code
 Finished generating code
 ```
-If you have any compilation error refer to the section ```Building cython code```, make sure 
+If you have any compilation error(s) refer to the section ```Building cython code```, make sure 
 your system has the following program & libraries installed. Check also that the code is not 
 running in a different thread.  
 - Pygame version >3
 - numpy >= 1.18
 - cython >=0.29.21 (C extension for python) 
 - A C compiler for windows (Visual Studio, MinGW etc)
+---
+## OPENMP for Linux and Windows
+
+The pip packages (including LINUX architectures i686 and x86_64), are build by default with multiprocessing for 
+the CPU's shader. If you need to build the package without multiprocessing, you can change the flag OPENMP  
+in the setup.py file such as :
+
+To build the package without multiprocessing (OPENMP=False)
+
+
+*in the setup.py file*
+```bash
+# True enable the multiprocessing
+OPENMP = False
+OPENMP_PROC = "-fopenmp" 
+__VERSION__ = "1.0.8" 
+LANGUAGE = "c++"
+ext_link_args = ""
+
+
+```
+*Then compile the code (e.g : Version 1.0.8, 64-bit python3.7)*
+```cmdline
+C:\PygameShader\python setup.py bdist_wheel 
+cd dist
+pip install PygameShader-1.0.8-cp37-cp37m-win_amd64.whl
+```
+
+*The same variable `OPENMP` exist also in the setup_config.py file when building the Cython code*
+
+* Building PygameShader package will automatically check and compile the source code, you do not 
+need to build the Cython code.
+---
+
+
+In the main project directory, locate the file ```setup_shader.py```.
+The compilation flag /openmp is used by default.
+To override the OPENMP feature and disable the multi-processing remove the flag ```/openmp```
+
 
 ## Credit
 Yoann Berenguer 
@@ -271,6 +238,7 @@ Yoann Berenguer
 numpy >= 1.18
 pygame >=2.0.0
 cython >=0.29.21
+Cupy*  Used for GPU shader (not compulsory during installation) 
 ```
 
 ## License :
