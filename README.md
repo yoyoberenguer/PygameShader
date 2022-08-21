@@ -90,7 +90,7 @@ C:\>python demo_fire.py
 C:\>python demo_transition.py
 C:\>python demo_wave.py
 ```
-*if cupy and CUDA are installed correctly on your system you can run the GPU shaders*
+*if `CUPY` and `CUDA` are installed correctly on your system you can run the GPU shaders*
 ```bash
 C:\>python gpu_chromatic.py
 C:\>python gpu_zoom.py
