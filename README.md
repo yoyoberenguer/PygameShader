@@ -36,17 +36,14 @@ CUDA is essentially just a way to run compute shaders without the graphics API a
 without requiring a particular language. CUDA programs are compiled into PTX (NVIDIA's
 analoque to x86 assembly for the GPU.
 
-For the curious, please check this excellent post 
-https://carpentries-incubator.github.io/lesson-gpu-programming/aio/index.html
-to have an overview of CUPY and CUDA 
+For the curious, please check this excellent post :
+
+https://carpentries-incubator.github.io/lesson-gpu-programming/aio/index.html 
 
 *In python*
 ```
 from PygameShader.shader_gpu import *
 ```
-
-`A wiki page will be soon available for the GPU shaders`
-
 
 ---
 
@@ -90,7 +87,7 @@ In the PygameShader `Demo` directory
 
 ```bash
 C:\>python demo_fire.py
-C:\>python demo_cartoon.py
+C:\>python demo_transition.py
 C:\>python demo_wave.py
 ```
 *if cupy and CUDA are installed correctly on your system you can run the GPU shaders*
@@ -103,7 +100,7 @@ C:\>python gpu_wave.py
 ---
 
 ## Installation from pip
-check the link for newest version https://pypi.org/project/PygameShader/
+Check the link for newest version https://pypi.org/project/PygameShader/
 
 * Available python build 3.6, 3.7, 3.8, 3.9, 3.10 and source build
 * Compatible WINDOWS and LINUX for platform x86, x86_64
@@ -144,7 +141,7 @@ pip install PygameShader-xxxxxx
 
 #### When do you need to compile the cython code ? 
 
-Each time you are modifying any of the following files 
+Each time you are modifying any of the pyx files such as 
 shader.pyx, shader.pxd, __init__.pxd or any external C code if applicable
 
 1) open a terminal window
@@ -222,14 +219,8 @@ pip install PygameShader-1.0.8-cp37-cp37m-win_amd64.whl
 *The same variable `OPENMP` exist also in the setup_config.py file when building the Cython code*
 
 * Building PygameShader package will automatically check and compile the source code, you do not 
-need to build the Cython code.
+need to build manually the Cython code.
 ---
-
-
-In the main project directory, locate the file ```setup_shader.py```.
-The compilation flag /openmp is used by default.
-To override the OPENMP feature and disable the multi-processing remove the flag ```/openmp```
-
 
 ## Credit
 Yoann Berenguer 
@@ -239,8 +230,10 @@ Yoann Berenguer
 numpy >= 1.18
 pygame >=2.0.0
 cython >=0.29.21
-Cupy*  Used for GPU shader (not compulsory during installation) 
+*Cupy   
 ```
+(*) Used for GPU shader (not compulsory during installation). In order to use the GPU shaders 
+you would need to have a NVIDIA graphic card, CUDA and CUPY install sucessfully on your platform. 
 
 ## License :
 
