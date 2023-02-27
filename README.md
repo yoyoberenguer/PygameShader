@@ -20,6 +20,14 @@
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/swirl.gif?raw=true">
 </p>
 
+<p align="center">
+    <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/fire.gif?raw=true">
+</p>
+
+<p align="center">
+    <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/bloom.gif?raw=true">
+</p>
+
 *New Version 1.0.8
 
 
