@@ -8,6 +8,10 @@
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/zoom1.gif?raw=true">
 </p>
 
+<p align="center">
+    <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/predator.gif?raw=true">
+</p>
+
 *New Version 1.0.8
 
 
