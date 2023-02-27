@@ -1,5 +1,8 @@
 # Pygame Shaders Library 
 
+<p align="center">
+    <img src="https://github.com/yoyoberenguer/PygameShader/blob/master/chromatic.gif">
+</p>
 
 *New Version 1.0.8
 
