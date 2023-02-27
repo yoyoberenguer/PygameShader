@@ -4,6 +4,9 @@
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/Chromatic.gif?raw=true">
 </p>
 
+<p align="center">
+    <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/zoom1.gif?raw=true">
+</p>
 
 *New Version 1.0.8
 
