@@ -41,6 +41,8 @@
 ```
 pip install PygameShader==1.0.8
 ```
+`WIKI page` 
+https://github.com/yoyoberenguer/PygameShader/wiki
 
 Some scripts have been ported to GPU using CUPY and CUDA raw Kernels for running 
 on NVIDIA graphics cards (NVIDIA CUDA GPU with the compute Capability 3.0 or larger.). 
