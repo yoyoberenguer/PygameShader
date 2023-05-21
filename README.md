@@ -1,29 +1,36 @@
 # Pygame Shaders Library 
 
+### Chromatic effect
 <p align="center">
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/Chromatic.gif?raw=true">
 </p>
 
+### Texture Zoom effect
 <p align="center">
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/zoom1.gif?raw=true">
 </p>
 
+### Predator vision
 <p align="center">
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/Predator.gif?raw=true">
 </p>
 
+### Lens effect
 <p align="center">
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/lens.gif?raw=true">
 </p>
 
+### Swirl effect
 <p align="center">
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/swirl.gif?raw=true">
 </p>
 
+### Fire effect 
 <p align="center">
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/fire.gif?raw=true">
 </p>
 
+### Bloom effect
 <p align="center">
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/bloom.gif?raw=true">
 </p>
