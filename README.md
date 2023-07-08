@@ -35,11 +35,11 @@
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/bloom.gif?raw=true">
 </p>
 
-*New Version 1.0.8
+*New Version 1.0.9
 
 
 ```
-pip install PygameShader==1.0.8
+pip install PygameShader==1.0.9
 ```
 `WIKI page` 
 https://github.com/yoyoberenguer/PygameShader/wiki
