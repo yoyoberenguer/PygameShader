@@ -57,7 +57,7 @@ height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
 # pygame.display.init()
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN, vsync=True)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.SCALED)
 
 pygame.init()
 
@@ -98,16 +98,22 @@ while STOP_GAME:
 
         if event.type == pygame.MOUSEMOTION:
             MOUSE_POS = Vector2(event.pos)
+            if MOUSE_POS.x < 0:MOUSE_POS.x = 0
+            if MOUSE_POS.x > width:MOUSE_POS.x = width
+            if MOUSE_POS.y < 0:MOUSE_POS.y = 0
+            if MOUSE_POS.y > height:MOUSE_POS.y = height
 
     surf = chromatic(background, MOUSE_POS.x, MOUSE_POS.y, 0.999, fx=0.04)
 
     SCREEN.blit(surf, (0, 0))
+
     t = clock.get_fps()
     avg.append(t)
     show_fps(SCREEN, t, avg)
     pygame.display.flip()
     clock.tick()
     FRAME += 1
+    avg = avg[10:]
 
     pygame.display.set_caption(
         "Demo chromatic aberration CPU %s fps"

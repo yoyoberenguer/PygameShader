@@ -1,4 +1,4 @@
-# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
+# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True, profile=False
 # cython: optimize.use_switch=True
 # encoding: utf-8
 

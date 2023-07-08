@@ -36,11 +36,11 @@ except ImportError:
     raise ImportError("\n<pygame> library is missing on your system."
           "\nTry: \n   C:\\pip install pygame")
 
-__CUPY = False
+__CUPY = True
 try:
     import cupy
-    __CUPY = True
 except ImportError:
+    __CUPY = False
     print("\n**CUPY is not installed on your system**")
 
 from Cython.Build import cythonize
@@ -68,17 +68,17 @@ except ImportError:
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-# version 1.0.1 Yank, latest version 1.0.2
-# pypitest latest version 1.0.17
+# version 1.0.1 Yank, latest version 1.0.9
+# pypitest latest version 1.0.29
 
 OPENMP = True
-OPENMP_PROC = "-fopenmp" # "-lgomp"
-__VERSION__ = "1.0.8"  # check the file shader.pyx and make sure the version is identical
+OPENMP_PROC = "-fopenmp"  # "-lgomp"
+__VERSION__ = "1.0.9"  # check the file shader.pyx and make sure the version is identical
 LANGUAGE = "c++"
 ext_link_args = ""
 
 py_requires = "PygameShader requires python3 version 3.6 or above."
-py_minor_versions = [x for x in range(6, 11)]
+py_minor_versions = [x for x in range(6, 12)]
 
 if hasattr(sys, 'version_info'):
     try:
@@ -128,7 +128,8 @@ elif plat.startswith("LINUX"):
     if OPENMP:
         ext_compile_args = \
             ["-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
-             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-Wall", OPENMP_PROC, "-static"]
+             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3",
+             "-Wall", OPENMP_PROC, "-static"]
         ext_link_args = [OPENMP_PROC]
     else:
         ext_compile_args = \
@@ -159,7 +160,7 @@ if __CUPY:
 try:
     print("SDL VERSION           : %s.%s.%s " % pygame.version.SDL)
 except:
-    pass # ignore SDL versioning issue
+    pass  # ignore SDL versioning issue
 
 print("\n*** BUILDING PYGAMESHADER VERSION ***  : %s \n" % __VERSION__)
 
@@ -271,17 +272,20 @@ setuptools.setup(
              'PygameShader/Assets/Bokeh__Lens_Dirt_50.jpg',
              'PygameShader/Assets/Bokeh__Lens_Dirt_54.jpg',
              'PygameShader/Assets/Bokeh__Lens_Dirt_67.jpg',
-             'PygameShader/Assets/Parrot.jpg'
+             'PygameShader/Assets/Parrot.jpg',
+             'PygameShader/Assets/space2_seamless_alpha.jpg'
 
          ]),
         ('./lib/site-packages/PygameShader/Demo',
          [
              'PygameShader/Demo/cloud_smoke_effect.py',
+             'PygameShader/Demo/demo_chromatic.py',
              'PygameShader/Demo/demo_bloom.py',
              'PygameShader/Demo/demo_fire.py',
              'PygameShader/Demo/demo_glitch.py',
              'PygameShader/Demo/demo_transition.py',
              'PygameShader/Demo/demo_wave.py',
+             'PygameShader/Demo/demo_zoom.py',
              'PygameShader/Demo/GPU_chromatic.py',
              'PygameShader/Demo/GPU_demo_ripple.py',
              'PygameShader/Demo/GPU_fisheye.py',

@@ -79,7 +79,7 @@ LANGUAGE = "c++"
 ext_link_args = ""
 
 py_requires = "PygameShader requires python3 version 3.6 or above."
-py_minor_versions = [x for x in range(6, 11)]
+py_minor_versions = [x for x in range(6, 12)]
 
 if hasattr(sys, 'version_info'):
     try:
@@ -167,6 +167,16 @@ print("\wn*** BUILDING PYGAMESHADER VERSION ***  : %s \n" % __VERSION__)
 # define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
 setuptools.setup(
     name="PygameShader",
+    version= __VERSION__,       # testing version "1.0.27",
+    author="Yoann Berenguer",
+    author_email="yoyoberenguer@hotmail.com",
+    description="Pygame effects for 2D video game and arcade game",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/yoyoberenguer/PygameShader",
+    # packages=setuptools.find_packages(),
+    packages=['PygameShader'],
+
     ext_modules=cythonize(module_list=
 
         [

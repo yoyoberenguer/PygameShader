@@ -37,9 +37,17 @@ gcc -shared -o libhello.so -fPIC hello.c
 #include <omp.h>
 
 inline double * my_sort(double buffer[], int filter_size);
+
 inline void swap(int* a, int* b);
 inline int partition (int arr[], int low, int high);
 inline int * quickSort(int arr[], int low, int high);
+
+inline void new_swap(int* a, int* b);
+inline int new_partition (unsigned char arr[], int low, int high);
+inline unsigned char * new_quickSort(unsigned char arr[], int low, int high);
+
+
+
 inline float Q_inv_sqrt(float number );
 inline float hue_to_rgb(float m1, float m2, float hue);
 
@@ -238,6 +246,80 @@ inline int * quickSort(int arr[], int low, int high)
 	}
 return arr;
 }
+
+
+
+
+// A utility function to swap two elements
+inline void new_swap(unsigned char* a, unsigned char* b)
+{
+	unsigned char t = *a;
+	*a = *b;
+	*b = t;
+}
+
+/* This function takes last element as pivot, places
+the pivot element at its correct position in sorted
+	array, and places all smaller (smaller than pivot)
+to left of pivot and all greater elements to right
+of pivot */
+inline int new_partition (unsigned char arr[], int low, int high)
+{
+	unsigned char pivot = arr[high]; // pivot
+	int i = (low - 1); // Index of smaller element
+    int j = 0;
+//    #pragma omp parallel shared(j, arr, pivot, i, low, high) //shared(total_Sum)
+//    {
+//    #pragma omp parallel
+//    {
+    for (j = low; j <= high- 1; j++)
+    {
+        // If current element is smaller than the pivot
+        if (arr[j] < pivot)
+        {
+            i++; // increment index of smaller element
+            new_swap(&arr[i], &arr[j]);
+        }
+    }
+//    }
+//    }
+	new_swap(&arr[i + 1], &arr[high]);
+	return (i + 1);
+}
+
+/* The main function that implements QuickSort
+arr[] --> Array to be sorted,
+low --> Starting index,
+high --> Ending index */
+inline unsigned char * new_quickSort(unsigned char arr[], int low, int high)
+{
+	if (low < high)
+	{
+		/* pi is partitioning index, arr[p] is now
+		at right place */
+		int pi = new_partition(arr, low, high);
+
+		// Separately sort elements before
+		// partition and after partition
+		new_quickSort(arr, low, pi - 1);
+		new_quickSort(arr, pi + 1, high);
+	}
+return arr;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

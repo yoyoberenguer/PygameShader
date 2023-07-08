@@ -1,4 +1,4 @@
-# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
+# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True, profile=False
 # cython: optimize.use_switch=True
 # encoding: utf-8
 
@@ -90,6 +90,7 @@ if OPENMP is True:
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef swap_channels24_c(surface_, model):
     """
     THIS PLUGIN ALLOW YOU TO SWAP CHANNEL OF AN IMAGE 
@@ -159,6 +160,7 @@ cpdef swap_channels24_c(surface_, model):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef create_horizontal_gradient_1d(
         int value,
         tuple start_color=(255, 0, 0),
@@ -202,6 +204,7 @@ cpdef create_horizontal_gradient_1d(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef create_horizontal_gradient_1d_alpha(
         int value,
         tuple start_color=(255, 0, 0, 255),
@@ -244,6 +247,7 @@ cpdef create_horizontal_gradient_1d_alpha(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object horizontal_grad3d(
         int width,
         int height,
@@ -286,6 +290,7 @@ cpdef object horizontal_grad3d(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object horizontal_grad3d_alpha(
         int width,
         int height,
@@ -332,6 +337,7 @@ DEF r_max = 1.0 / 0.707106781 #inverse sqrt(0.5) or 1.0/cos45
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef create_radial_gradient(
         int width_,
         int height_,
@@ -386,7 +392,7 @@ cpdef create_radial_gradient(
     if gradient_array_ is None:
 
         gradient_array_ = create_horizontal_gradient_1d_alpha(
-            <int>sqrt(width_ * width_ + (height_ * 0.5) * (height_ * 0.5)),
+            <int>sqrt(width_ * width_ + (height_ * <float>0.5) * (height_ * <float>0.5)),
             start_color = start_color_,
             end_color   = end_color_
         )
@@ -427,6 +433,7 @@ cpdef create_radial_gradient(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef create_radial_gradient_alpha(
         int width_,
         int height_,
@@ -485,7 +492,7 @@ cpdef create_radial_gradient_alpha(
     if gradient_array_ is None:
 
         gradient_array_ = create_horizontal_gradient_1d_alpha(
-            <int>sqrt(width_ * width_ + (height_ * 0.5) * (height_ * 0.5)),
+            <int>sqrt(width_ * width_ + (height_ * <float>0.5) * (height_ * <float>0.5)),
             start_color = start_color_,
             end_color   = end_color_
         )
@@ -530,6 +537,7 @@ cpdef create_radial_gradient_alpha(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef create_quarter_radial_gradient(
         int width_,
         int height_,
@@ -589,7 +597,7 @@ cpdef create_quarter_radial_gradient(
     if gradient_array_ is None:
 
         gradient_array_ = create_horizontal_gradient_1d(
-            <int>sqrt(width_ * width_ + (height_ * 0.5) * (height_ * 0.5)),
+            <int>sqrt(width_ * width_ + (height_ * <float>0.5) * (height_ * <float>0.5)),
             start_color=start_color_,
             end_color=end_color_
         )
@@ -663,6 +671,7 @@ cpdef create_quarter_radial_gradient(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef create_quarter_radial_gradient_alpha(
         int width_,
         int height_,
@@ -723,7 +732,7 @@ cpdef create_quarter_radial_gradient_alpha(
     if gradient_array_ is None:
 
         gradient_array_ = create_horizontal_gradient_1d_alpha(
-            <int>sqrt(width_ * width_ + (height_ * 0.5) * (height_ * 0.5)),
+            <int>sqrt(width_ * width_ + (height_ * <float>0.5) * (height_ * <float>0.5)),
             start_color=start_color_,
             end_color=end_color_
         )
@@ -804,6 +813,7 @@ cpdef create_quarter_radial_gradient_alpha(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef float color_dist_hsv(hsv hsv_1, hsv hsv_2)nogil:
     return (hsv_1.h - hsv_2.h) ** 2 + (hsv_1.s - hsv_2.s) ** 2 + (hsv_1.v - hsv_2.v) ** 2
 
@@ -812,6 +822,7 @@ cdef float color_dist_hsv(hsv hsv_1, hsv hsv_2)nogil:
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef float color_dist_hsl(hsl hsl_1, hsl hsl_2)nogil:
     return (hsl_1.h - hsl_2.h) ** 2 + (hsl_1.s - hsl_2.s) ** 2 + (hsl_1.l - hsl_2.l) ** 2
 
@@ -820,6 +831,7 @@ cdef float color_dist_hsl(hsl hsl_1, hsl hsl_2)nogil:
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef rgb color_diff_hsv(
         rgb color0,
         float [:, :] palette_,
@@ -892,6 +904,7 @@ cdef rgb color_diff_hsv(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef rgb color_diff_hsl(
         rgb color0,
         float [:, :] palette_,
@@ -963,6 +976,7 @@ cdef rgb color_diff_hsl(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef rgb close_color(
         rgb colors,
         float [:, :] palette_,
@@ -1058,6 +1072,7 @@ cdef rgb close_color(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef rgb use_palette(
         rgb colors,
         float [:, :] palette_,

@@ -1,4 +1,4 @@
-# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
+# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True, profile=False
 # cython: optimize.use_switch=True
 # cython: warn.maybe_uninitialized=False
 # cython: warn.unused=False
@@ -23,9 +23,8 @@ Copyright Yoann Berenguer
 
 import warnings
 
-from PygameShader import array2d_normalized_c, filtering24_c, heatmap_convert, shader_rgb_to_yiq_i_comp_inplace, \
-    shader_rgb_to_yiq_i_comp_inplace_c, shader_rgb_to_yiq_q_comp_inplace_c
-from PygameShader.shader import shader_bloom_fast1, shader_rgb_to_yiq_inplace_c
+from PygameShader import array2d_normalized_c, filtering24_c, heatmap_convert
+from PygameShader.shader import shader_bloom_fast1
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -140,7 +139,7 @@ cpdef unsigned int get_max_grid_per_block():
 # USED BY block_grid
 cdef get_divisors(int n):
     l = []
-    for i in range(1, int(n / 2.0) + 1):
+    for i in range(1, int(n / <float>2.0) + 1):
         if n % i == 0:
             l.append(i)
     return l
@@ -215,6 +214,7 @@ cpdef get_gpu_info():
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object invert_gpu(surface_):
     """
     SHADER INVERT, 
@@ -248,6 +248,7 @@ cpdef object invert_gpu(surface_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object invert_cupy(gpu_array_):
 
     cdef:
@@ -270,6 +271,7 @@ cdef object invert_cupy(gpu_array_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef void invert_inplace_cupy(cpu_array_):
 
     """
@@ -313,6 +315,7 @@ cpdef void invert_inplace_cupy(cpu_array_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object sepia_gpu(object surface_):
     """
     SEPIA SHADER, 
@@ -372,6 +375,7 @@ sepia_kernel = cp.ElementwiseKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object sepia_cupy(gpu_array_):
     """
     
@@ -392,6 +396,7 @@ cdef object sepia_cupy(gpu_array_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef void sepia_inplace_cupy(cpu_array_):
     """
     SEPIA INPLACE  
@@ -465,6 +470,7 @@ grey_luminosity_kernel = cp.ElementwiseKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object bpf_gpu(
         object surface_,
         unsigned int threshold_ = 128
@@ -525,6 +531,7 @@ bpf_kernel = cp.ElementwiseKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object bpf_cupy(gpu_array_, unsigned int threshold_):
 
 
@@ -542,6 +549,7 @@ cdef object bpf_cupy(gpu_array_, unsigned int threshold_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object bpf1_gpu(
         object surface_,
         grid_,
@@ -628,6 +636,7 @@ bpf_kernel1 = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object bpf1_cupy(object gpu_array_, unsigned int threshold_, object grid_, object block_):
 
     cdef:
@@ -654,6 +663,7 @@ cdef object bpf1_cupy(object gpu_array_, unsigned int threshold_, object grid_, 
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object grayscale_gpu(object surface_):
     """
     GRAYSCALE  
@@ -687,6 +697,7 @@ cpdef object grayscale_gpu(object surface_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object grayscale_cupy(gpu_array_):
 
     gpu_array_[:, :, 0], gpu_array_[:, :, 1], gpu_array_[:, :, 2] = \
@@ -703,6 +714,7 @@ cdef object grayscale_cupy(gpu_array_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object grayscale_lum_gpu(object surface_):
     """
     GRAYSCALE  
@@ -735,6 +747,7 @@ cpdef object grayscale_lum_gpu(object surface_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object grayscale__lum_cupy(gpu_array_):
 
     gpu_array_[:, :, 0], gpu_array_[:, :, 1], gpu_array_[:, :, 2] = \
@@ -750,6 +763,7 @@ cdef object grayscale__lum_cupy(gpu_array_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object median_gpu(
         object surface_,
         unsigned int size_ = 5
@@ -793,6 +807,7 @@ cpdef object median_gpu(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object median_cupy(gpu_array_, unsigned int size_=5):
 
     gpu_array_[:, :, 0] = cupyx.scipy.ndimage.median_filter(gpu_array_[:, :, 0], size_)
@@ -836,6 +851,7 @@ median_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object median1_gpu(
         object surface_,
         unsigned int size_ = 5
@@ -880,6 +896,7 @@ cpdef object median1_gpu(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object median1_cupy(gpu_array_, unsigned int size_=5):
 
     r = cupyx.scipy.ndimage.generic_filter(
@@ -903,6 +920,7 @@ cdef object median1_cupy(gpu_array_, unsigned int size_=5):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object gaussian_5x5_gpu(object surface_):
     """
     GAUSSIAN BLUR KERNEL 5x5
@@ -937,6 +955,7 @@ cpdef object gaussian_5x5_gpu(object surface_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object gaussian_5x5_cupy(gpu_array_):
 
     cdef:
@@ -977,6 +996,7 @@ cdef object gaussian_5x5_cupy(gpu_array_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object gaussian_3x3_gpu(object surface_):
     """
     GAUSSIAN BLUR KERNEL 3x3
@@ -1011,6 +1031,7 @@ cpdef object gaussian_3x3_gpu(object surface_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object gaussian_3x3_cupy(gpu_array_):
 
     cdef:
@@ -1046,7 +1067,7 @@ cdef object gaussian_3x3_cupy(gpu_array_):
 
 
 sobel_kernel = cp.RawKernel(
-    '''   d
+    '''   
     extern "C" __global__
     
     __constant__ double gx[9] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
@@ -1164,6 +1185,7 @@ canny_smooth = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object sobel_gpu(object surface_):
     """
     SOBEL EDGE DETECTION 
@@ -1204,6 +1226,7 @@ cpdef object sobel_gpu(object surface_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object sobel_cupy(gpu_array_):
 
     cdef:
@@ -1232,6 +1255,7 @@ cdef object sobel_cupy(gpu_array_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object prewitt_gpu(object surface_):
     """
     PREWITT EDGE DETECTION
@@ -1272,6 +1296,7 @@ cpdef object prewitt_gpu(object surface_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object prewitt_cupy(gpu_array_):
     cdef:
         Py_ssize_t w, h
@@ -1298,6 +1323,7 @@ cdef object prewitt_cupy(gpu_array_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object canny_gpu(object surface_):
     """
     CANNY EDGE DETECTION 
@@ -1338,6 +1364,7 @@ cpdef object canny_gpu(object surface_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object canny_cupy(gpu_array_):
 
     cdef:
@@ -1392,6 +1419,7 @@ color_reduction_kernel = cp.ElementwiseKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object color_reduction_gpu(
         object surface_,
         int color_number = 8):
@@ -1433,6 +1461,7 @@ cpdef object color_reduction_gpu(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object color_reduction_cupy(
         object gpu_array_,
         int color_number
@@ -1454,6 +1483,7 @@ cdef object color_reduction_cupy(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object color_reduction_cupy_inplace(
         object gpu_array_,
         cpu_array,
@@ -1622,6 +1652,7 @@ rgb2hsv_cuda = r'''
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object hsv_gpu(
         object surface_,
         float val_,
@@ -1673,6 +1704,7 @@ cpdef object hsv_gpu(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object hsv_cupy(
         object cupy_array,
         object grid_,
@@ -1690,15 +1722,15 @@ cdef object hsv_cupy(
         b = cp.zeros((w, h), dtype=cp.float32)
 
 
-    r = (cupy_array[:, :, 0] * ONE_255)
-    g = (cupy_array[:, :, 1] * ONE_255)
-    b = (cupy_array[:, :, 2] * ONE_255)
+    r = (cupy_array[:, :, 0] * <float>ONE_255)
+    g = (cupy_array[:, :, 1] * <float>ONE_255)
+    b = (cupy_array[:, :, 2] * <float>ONE_255)
 
     rgb_to_hsv_(grid_, block_, (r, g, b, w, h, val_))
 
-    cupy_array[:, :, 0] = cp.multiply(r, 255.0)
-    cupy_array[:, :, 1] = cp.multiply(g, 255.0)
-    cupy_array[:, :, 2] = cp.multiply(b, 255.0)
+    cupy_array[:, :, 0] = cp.multiply(r, <float>255.0)
+    cupy_array[:, :, 1] = cp.multiply(g, <float>255.0)
+    cupy_array[:, :, 2] = cp.multiply(b, <float>255.0)
 
     cp.cuda.Stream.null.synchronize()
 
@@ -1758,6 +1790,7 @@ downscale_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object mult_downscale_gpu(
         object gpu_array
 
@@ -1776,13 +1809,13 @@ cpdef object mult_downscale_gpu(
         "\nArgument gpu_array_ datatype must be uint8 got %s " % gpu_array.dtype
 
     downscale_x2 = cupyx.scipy.ndimage.zoom(
-        gpu_array, (1.0 / 2.0, 1.0 / 2.0, 1), order=0, mode='constant', cval=0.0)
+        gpu_array, (<float>1.0 / <float>2.0, <float>1.0 / <float>2.0, 1), order=0, mode='constant', cval=0.0)
     downscale_x4 = cupyx.scipy.ndimage.zoom(
-        downscale_x2, (1.0 / 2.0, 1.0 / 2.0, 1), order=0, mode='constant', cval=0.0)
+        downscale_x2, (<float>1.0 / <float>2.0, <float>1.0 / <float>2.0, 1), order=0, mode='constant', cval=0.0)
     downscale_x8 = cupyx.scipy.ndimage.zoom(
-        downscale_x4, (1.0 / 2.0, 1.0 / 2.0, 1), order=0, mode='constant', cval=0.0)
+        downscale_x4, (<float>1.0 / <float>2.0, <float>1.0 / <float>2.0, 1), order=0, mode='constant', cval=0.0)
     downscale_x16 = cupyx.scipy.ndimage.zoom(
-        downscale_x8, (1.0 / 2.0, 1.0 / 2.0, 1), order=0, mode='constant', cval=0.0)
+        downscale_x8, (<float>1.0 / <float>2.0, <float>1.0 / <float>2.0, 1), order=0, mode='constant', cval=0.0)
 
     cp.cuda.Stream.null.synchronize()
 
@@ -1921,6 +1954,7 @@ cdef void bpf_c(object gpu_array_, int w, int h, unsigned int threshold_=128):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 # BLUR GAUSSIAN 3x3 FOR BLOOM EFFECT
 cdef gaussian_3x3_c(gpu_array_, int w, int h):
 
@@ -1952,6 +1986,7 @@ cdef gaussian_3x3_c(gpu_array_, int w, int h):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 #BLUR GAUSSIAN 5x5 FOR BLOOM
 cdef gaussian_5x5_c(gpu_array_, int w, int h):
 
@@ -1986,6 +2021,7 @@ cdef gaussian_5x5_c(gpu_array_, int w, int h):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 # ARRAY UPSCALE FOR BLOOM EFFECT
 cpdef object upscale_c(object gpu_array_, int new_width, int new_height, int order_=0):
 
@@ -2009,6 +2045,7 @@ cpdef object upscale_c(object gpu_array_, int new_width, int new_height, int ord
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object bloom_gpu(
         object surface_,
         unsigned int threshold_=128,
@@ -2169,6 +2206,7 @@ cpdef object bloom_gpu(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object bloom_array(
         object gpu_array_,
         unsigned int threshold_=128,
@@ -2290,6 +2328,7 @@ cpdef object bloom_array(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object cartoon_gpu(
         object surface_,
         int sobel_threshold_ = 128,
@@ -2326,6 +2365,7 @@ k = cp.array([[2, 4, 5, 4, 2, ],
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object canny_cupy_c(gpu_array_, int w, int h):
 
     r = cupyx.scipy.ndimage.convolve(gpu_array_[:, :, 0], k, mode='constant', cval=0.0)
@@ -2342,6 +2382,7 @@ cdef object canny_cupy_c(gpu_array_, int w, int h):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object sobel_cupy_c(gpu_array_, int w, int h):
 
     sobel2d_r = cupyx.scipy.ndimage.generic_filter(
@@ -2358,6 +2399,7 @@ cdef object sobel_cupy_c(gpu_array_, int w, int h):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object median_cupy_c(gpu_array_, int w, int h, unsigned int size_=5):
 
     gpu_array_[:, :, 0] = cupyx.scipy.ndimage.median_filter(gpu_array_[:, :, 0], size_)
@@ -2371,6 +2413,7 @@ cdef object median_cupy_c(gpu_array_, int w, int h, unsigned int size_=5):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object color_reduction_cupy_c(
         object gpu_array_,
         int color_number,
@@ -2387,6 +2430,7 @@ cdef object color_reduction_cupy_c(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object cartoon_cupy(
         object surface_,
         int sobel_threshold_,
@@ -2473,7 +2517,7 @@ alpha_blending_kernel = cp.ElementwiseKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-
+@cython.profile(False)
 cpdef object blending_gpu(object source_, object destination_, float percentage_):
     """
     BLEND A SOURCE TEXTURE TOWARD A DESTINATION TEXTURE (TRANSITION EFFECT)
@@ -2507,7 +2551,7 @@ cpdef object blending_gpu(object source_, object destination_, float percentage_
         source_array = numpy.frombuffer(
             tostring(source_, "RGBA_PREMULT"), dtype=numpy.uint8)
         source_array = cp.asarray(source_array, dtype=cp.uint8)
-        source_array = (source_array.reshape(w, h, 4)/255.0).astype(dtype=float32)
+        source_array = (source_array.reshape(w, h, 4)/<float>255.0).astype(dtype=float32)
 
     except Exception as e:
         raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
@@ -2517,7 +2561,7 @@ cpdef object blending_gpu(object source_, object destination_, float percentage_
         destination_array = numpy.frombuffer(
             tostring(destination_, "RGBA_PREMULT"), dtype=numpy.uint8)
         destination_array = cp.asarray(destination_array, dtype=cp.uint8)
-        destination_array = (destination_array.reshape(w, h, 4) / 255.0).astype(dtype=float32)
+        destination_array = (destination_array.reshape(w, h, 4) / <float>255.0).astype(dtype=float32)
     except Exception as e:
         raise ValueError("\nCannot reference destination pixels into a 3d array.\n %s " % e)
     cdef:
@@ -2570,6 +2614,7 @@ sharpen_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object sharpen_gpu(object surface_):
     """
     SHARPEN FILTER (GENERIC_FILTER)
@@ -2728,6 +2773,7 @@ ripple_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef ripple_effect_gpu(
        object grid,
        object block,
@@ -2855,6 +2901,7 @@ sharpen1_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object sharpen1_gpu(object surface_, grid_, block_):
     """
     SHARPEN AN IMAGE (RAWKERNEL)
@@ -2906,6 +2953,7 @@ cpdef object sharpen1_gpu(object surface_, grid_, block_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object mirroring_gpu(
         object surface_,
         object grid_,
@@ -3035,6 +3083,7 @@ mirror_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline mirroring_cupy(object gpu_array_, object grid_, object block_, bint format_=0):
 
     cdef:
@@ -3064,6 +3113,7 @@ cdef inline mirroring_cupy(object gpu_array_, object grid_, object block_, bint 
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object saturation_gpu(
         object surface_,
         object grid_,
@@ -3278,6 +3328,7 @@ saturation_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object saturation_cupy(
         object cupy_array,
         object grid_,
@@ -3311,6 +3362,7 @@ cdef object saturation_cupy(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object bilateral_gpu(surface_, unsigned int kernel_size_):
     """
     BILATERAL FILTER 
@@ -3411,6 +3463,7 @@ bilateral_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef bilateral_cupy(gpu_array_, unsigned int kernel_size_):
     """
     :param gpu_array_   : cupy.ndarray containing the RGB pixels 
@@ -3451,6 +3504,7 @@ cdef bilateral_cupy(gpu_array_, unsigned int kernel_size_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object emboss5x5_gpu(surface_):
     """
     EMBOSS 
@@ -3513,6 +3567,7 @@ emboss_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object emboss5x5_cupy(gpu_array_):
     """
     
@@ -3554,6 +3609,7 @@ cdef object emboss5x5_cupy(gpu_array_):
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef area24_gpu(int x, int y, object background_rgb, object mask_alpha, float intensity=1.0,
               color=cupy.array([128.0, 128.0, 128.0], dtype=cupy.float32, copy=False)):
 
@@ -3618,7 +3674,7 @@ cpdef area24_gpu(int x, int y, object background_rgb, object mask_alpha, float i
     ax, ay = rgb.shape[:2]
     new_array = cupy.empty((ax, ay, 3), cupy.uint8)
 
-    f = cupy.multiply(alpha, ONE_255 * intensity, dtype=cupy.float32)
+    f = cupy.multiply(alpha, <float>ONE_255 * intensity, dtype=cupy.float32)
 
     new_array[:, :, 0] = cupy.minimum(rgb[:, :, 0] * f, 255).astype(dtype=cupy.uint8)
     new_array[:, :, 1] = cupy.minimum(rgb[:, :, 1] * f, 255).astype(dtype=cupy.uint8)
@@ -3637,6 +3693,7 @@ cpdef area24_gpu(int x, int y, object background_rgb, object mask_alpha, float i
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object brightness_gpu(
         object surface_,
         float val_,
@@ -3898,6 +3955,7 @@ brightness_cuda = r'''
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object brightness_cupy(
         object cupy_array,
         object grid_,
@@ -3929,15 +3987,15 @@ cdef object brightness_cupy(
         b = cp.zeros((w, h), dtype=cp.float32)
 
 
-    r = (cupy_array[:, :, 0] * ONE_255)
-    g = (cupy_array[:, :, 1] * ONE_255)
-    b = (cupy_array[:, :, 2] * ONE_255)
+    r = (cupy_array[:, :, 0] * <float>ONE_255)
+    g = (cupy_array[:, :, 1] * <float>ONE_255)
+    b = (cupy_array[:, :, 2] * <float>ONE_255)
 
     bright(grid_, block_, (r, g, b, w, h, val_))
 
-    cupy_array[:, :, 0] = cp.multiply(r, 255.0)
-    cupy_array[:, :, 1] = cp.multiply(g, 255.0)
-    cupy_array[:, :, 2] = cp.multiply(b, 255.0)
+    cupy_array[:, :, 0] = cp.multiply(r, <float>255.0)
+    cupy_array[:, :, 1] = cp.multiply(g, <float>255.0)
+    cupy_array[:, :, 2] = cp.multiply(b, <float>255.0)
 
     cp.cuda.Stream.null.synchronize()
 
@@ -3949,6 +4007,7 @@ cdef object brightness_cupy(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object hsl_gpu(
         object surface_,
         float val_,
@@ -4192,6 +4251,7 @@ rgb2hsl_cuda = r'''
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef object hsl_cupy(
         object cupy_array,
         object grid_,
@@ -4209,15 +4269,15 @@ cdef object hsl_cupy(
         b = cp.zeros((w, h), dtype=cp.float32)
 
 
-    r = (cupy_array[:, :, 0] * ONE_255)
-    g = (cupy_array[:, :, 1] * ONE_255)
-    b = (cupy_array[:, :, 2] * ONE_255)
+    r = (cupy_array[:, :, 0] * <float>ONE_255)
+    g = (cupy_array[:, :, 1] * <float>ONE_255)
+    b = (cupy_array[:, :, 2] * <float>ONE_255)
 
     rgb_to_hsl_(grid_, block_, (r, g, b, w, h, val_))
 
-    cupy_array[:, :, 0] = cp.multiply(r, 255.0)
-    cupy_array[:, :, 1] = cp.multiply(g, 255.0)
-    cupy_array[:, :, 2] = cp.multiply(b, 255.0)
+    cupy_array[:, :, 0] = cp.multiply(r, <float>255.0)
+    cupy_array[:, :, 1] = cp.multiply(g, <float>255.0)
+    cupy_array[:, :, 2] = cp.multiply(b, <float>255.0)
 
     cp.cuda.Stream.null.synchronize()
 
@@ -4250,15 +4310,14 @@ r'''
         
         const int col = h * 3;
         
-        
         float old_red   = (float)source[index1 % t_max1      ];
         float old_green = (float)source[(index1 + 1) % t_max1];
         float old_blue  = (float)source[(index1 + 2) % t_max1];
         __syncthreads();            
               
-        float new_red   = (float)roundf(old_red   * factor_/255.0f) * 255.0f/factor_;   
-        float new_green = (float)roundf(old_green * factor_/255.0f) * 255.0f/factor_;    
-        float new_blue  = (float)roundf(old_blue  * factor_/255.0f) * 255.0f/factor_;    
+        float new_red   = (float)roundf(old_red);   
+        float new_green = (float)roundf(old_green);    
+        float new_blue  = (float)roundf(old_blue);    
 
         
         source[index1 % t_max1       ] = (unsigned char)new_red;
@@ -4270,24 +4329,24 @@ r'''
         float quantization_error_green = (float)(old_green - new_green);
         float quantization_error_blue  = (float)(old_blue  - new_blue);
 
-        destination[(index1 + 3)%t_max1] = (float)(destination[(index1 + 3)% t_max1] + quantization_error_red   * c1);
-        destination[(index1 + 4)%t_max1] = (float)(destination[(index1 + 4)% t_max1] + quantization_error_green * c1);
-        destination[(index1 + 5)%t_max1] = (float)(destination[(index1 + 5)% t_max1] + quantization_error_blue  * c1);
+        destination[(index1 + 3)%t_max1] = (float)(destination[(index1 + 3)% t_max1] + quantization_error_red   * c1)* 255.0f;
+        destination[(index1 + 4)%t_max1] = (float)(destination[(index1 + 4)% t_max1] + quantization_error_green * c1)* 255.0f;
+        destination[(index1 + 5)%t_max1] = (float)(destination[(index1 + 5)% t_max1] + quantization_error_blue  * c1)* 255.0f;
         
         
-        destination[(index1 + col - 3)% t_max1] = (float)(destination[(index1 + col - 3)% t_max1] + quantization_error_red   * c2);
-        destination[(index1 + col - 2)% t_max1] = (float)(destination[(index1 + col - 2)% t_max1] + quantization_error_green * c2);
-        destination[(index1 + col - 1)% t_max1] = (float)(destination[(index1 + col - 1)% t_max1] + quantization_error_blue  * c2);
+        destination[(index1 + col - 3)% t_max1] = (float)(destination[(index1 + col - 3)% t_max1] + quantization_error_red   * c2)* 255.0f;
+        destination[(index1 + col - 2)% t_max1] = (float)(destination[(index1 + col - 2)% t_max1] + quantization_error_green * c2)* 255.0f;
+        destination[(index1 + col - 1)% t_max1] = (float)(destination[(index1 + col - 1)% t_max1] + quantization_error_blue  * c2)* 255.0f;
         
         
-        destination[(index1 + col    )% t_max1] = (float)(destination[(index1 + col    )% t_max1] + quantization_error_red   * c3);
-        destination[(index1 + col + 1)% t_max1] = (float)(destination[(index1 + col + 1)% t_max1] + quantization_error_green * c3);
-        destination[(index1 + col + 2)% t_max1] = (float)(destination[(index1 + col + 2)% t_max1] + quantization_error_blue  * c3);
+        destination[(index1 + col    )% t_max1] = (float)(destination[(index1 + col    )% t_max1] + quantization_error_red   * c3)* 255.0f;
+        destination[(index1 + col + 1)% t_max1] = (float)(destination[(index1 + col + 1)% t_max1] + quantization_error_green * c3)* 255.0f;
+        destination[(index1 + col + 2)% t_max1] = (float)(destination[(index1 + col + 2)% t_max1] + quantization_error_blue  * c3)* 255.0f;
          
         
-        destination[(index1 + col + 3)% t_max1] = (float)(destination[(index1 + col + 3)% t_max1] + quantization_error_red   * c4);
-        destination[(index1 + col + 4)% t_max1] = (float)(destination[(index1 + col + 4)% t_max1] + quantization_error_green * c4);
-        destination[(index1 + col + 5)% t_max1] = (float)(destination[(index1 + col + 5)% t_max1] + quantization_error_blue  * c4);
+        destination[(index1 + col + 3)% t_max1] = (float)(destination[(index1 + col + 3)% t_max1] + quantization_error_red   * c4) * 255.0f;
+        destination[(index1 + col + 4)% t_max1] = (float)(destination[(index1 + col + 4)% t_max1] + quantization_error_green * c4) * 255.0f;
+        destination[(index1 + col + 5)% t_max1] = (float)(destination[(index1 + col + 5)% t_max1] + quantization_error_blue  * c4) * 255.0f;
         
     __syncthreads();        
     }
@@ -4301,6 +4360,7 @@ r'''
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef object dithering_gpu(
         object gpu_array_,
         object grid_,
@@ -4325,7 +4385,7 @@ cpdef object dithering_gpu(
     dithering_kernel(
         (grid_[0], grid_[1]),
         (block_[0], block_[1]),
-        (gpu_array_, destination.astype(dtype=cp.float32), w, h, <float>factor_)
+        (gpu_array_/<float>255.0, destination.astype(dtype=cp.float32), w, h, <float>factor_)
     )
 
     cp.cuda.Stream.null.synchronize()
@@ -4340,6 +4400,7 @@ cpdef object dithering_gpu(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef inline object fisheye_gpu(
         object surface_,
         float focal,
@@ -4430,7 +4491,7 @@ fisheye_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-
+@cython.profile(False)
 cdef inline fisheye_cupy(
         object gpu_array, float focal, float focal_texture,
         object grid_, object block_
@@ -4460,6 +4521,7 @@ cdef inline fisheye_cupy(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef inline object swirl_gpu(
         object surface_,
         float rad,
@@ -4552,6 +4614,7 @@ swirl_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline swirl_cupy(
         object gpu_array,
         float rad,
@@ -4584,6 +4647,7 @@ cdef inline swirl_cupy(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef inline object wave_gpu(object surface_, float rad_, int size_, object grid_, object block_):
     """
     CREATE A WAVE EFFECT
@@ -4657,6 +4721,7 @@ wave_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline wave_cupy(
         object gpu_array, float rad_, int size_,
         object grid_, object block_
@@ -4686,6 +4751,7 @@ cdef inline wave_cupy(
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
+@cython.profile(False)
 cpdef inline object chromatic_gpu(
         object surface_,
         unsigned int delta_x,
@@ -4823,6 +4889,7 @@ chromatic_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline chromatic_cupy(
         object gpu_array,
         object grid_,
@@ -4854,6 +4921,7 @@ cdef inline chromatic_cupy(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef inline object rgb_split_gpu(
         object surface_,
         float delta_x,
@@ -4941,6 +5009,7 @@ rgb_split_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline rgb_split_cupy(
         object gpu_array,
         Py_ssize_t prev_w,
@@ -4972,6 +5041,7 @@ cdef inline rgb_split_cupy(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef inline object zoom_gpu(
         object surface_,
         unsigned int delta_x,
@@ -5078,6 +5148,7 @@ zoom_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline zoom_cupy(
         object gpu_array,
         object grid_,
@@ -5111,6 +5182,7 @@ cdef inline zoom_cupy(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef wavelength_mapper(unsigned int wavelength_min, unsigned int wavelength_max):
     """
     RETURN AN RGB COLOR VALUE MATCHING A SPECIFIC WAVELENGTH
@@ -5158,6 +5230,7 @@ heatmap_array, f_heatmap = wavelength_mapper(450, 720)
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef inline object wavelength_map_gpu(
         object surface_,
         object grid_,
@@ -5229,6 +5302,7 @@ wavelength_map_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline wavelength_map_cupy(
         object gpu_array,
         object grid_,
@@ -5266,6 +5340,7 @@ cdef inline wavelength_map_cupy(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline wavelength_map_cupy_inplace(
         object gpu_array,
         cpu_array,
@@ -5308,6 +5383,7 @@ cdef inline wavelength_map_cupy_inplace(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef inline object heatmap_gpu(
         object surface_,
         object grid_,
@@ -5383,6 +5459,7 @@ heatmap_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline heatmap_cupy(
         object gpu_array,
         rgb_array,
@@ -5415,6 +5492,7 @@ cdef inline heatmap_cupy(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef void heatmap_gpu_inplace(
         object surface_,
         object grid_,
@@ -5456,6 +5534,7 @@ cpdef void heatmap_gpu_inplace(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline heatmap_cupy_inplace(
         object gpu_array,
         rgb_array,
@@ -5538,6 +5617,7 @@ cpdef inline predator_gpu(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef inline object downscale_surface_gpu(
         object surface_,
         object grid_,
@@ -5616,6 +5696,7 @@ downscale_surface_kernel = cp.RawKernel(
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cdef inline downscale_surface_cupy(
         object gpu_array,
         object grid_,

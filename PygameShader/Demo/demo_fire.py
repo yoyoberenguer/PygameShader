@@ -49,7 +49,7 @@ def show_fps(screen_, fps_, avg_) -> None:
 # Set the display to 1024 x 768
 WIDTH = 800
 HEIGHT = 600
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, vsync=True)
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 
@@ -85,7 +85,7 @@ def palette_array() -> tuple:
 
     heatmap = [custom_map(i - 20, arr, 1.0) for i in range(380, 800)]
     heatmap_array = numpy.zeros((800 - 380, 3), uint8)
-    heatmap_rescale = numpy.zeros(255, numpy.uint)
+    heatmap_rescale = numpy.zeros(255, numpy.uint32)
 
     i = 0
     for t in heatmap:
@@ -170,6 +170,6 @@ while GAME:
     pygame.display.set_caption(
         "Test fire_effect %s fps "
         "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-
+    avg = avg[ 10: ]
 
 pygame.quit()

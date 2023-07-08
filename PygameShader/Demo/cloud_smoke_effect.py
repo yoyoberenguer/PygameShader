@@ -48,7 +48,7 @@ def show_fps(screen_, fps_, avg_) -> None:
 # Set the display to 1024 x 768
 WIDTH = 800
 HEIGHT = 600
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, vsync=True)
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 
@@ -59,7 +59,7 @@ BACKGROUND = pygame.image.load("../Assets/img.png").convert()
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
 image = BACKGROUND.copy()
-pygame.display.set_caption("demo fire effect")
+pygame.display.set_caption("Clound & smoke effect")
 
 FRAME = 0
 CLOCK = pygame.time.Clock()
@@ -72,11 +72,11 @@ arr = numpy.array([0, 1,  # violet
                            2, 619,  # yellow
                            620, 650,  # orange
                            651, 660],  # red
-                          numpy.int)
+                          numpy.uint32)
 
 CLOUD_ARRAY = numpy.zeros((HEIGHT, WIDTH), dtype=numpy.float32)
 
-heatmap_rescale = numpy.zeros(256 * 2 * 3, numpy.uint)
+heatmap_rescale = numpy.zeros(256 * 2 * 3, numpy.uint32)
 
 arr1 = create_horizontal_gradient_1d(255, (0, 0, 0), (255, 255, 255))
 arr2 = create_horizontal_gradient_1d(255, (255, 255, 255), (0, 0, 0))
@@ -130,7 +130,10 @@ while GAME:
         delta *= -1
 
     pygame.display.set_caption(
-        "Test fire_effect %s fps "
+        "Clound & smoke effect %s fps "
         "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+
+    avg = avg[ 10: ]
+
 
     image = BACKGROUND.copy()

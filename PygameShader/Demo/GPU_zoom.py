@@ -58,7 +58,7 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, vsync=True)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED)
 
 pygame.init()
 
@@ -102,8 +102,13 @@ while STOP_GAME:
 
         if event.type == pygame.MOUSEMOTION:
             MOUSE_POS = Vector2(event.pos)
+            if MOUSE_POS.x < 0:MOUSE_POS.x = 0
+            if MOUSE_POS.x > width:MOUSE_POS.x = width
+            if MOUSE_POS.y < 0:MOUSE_POS.y = 0
+            if MOUSE_POS.y > height:MOUSE_POS.y = height
 
-    surf = zoom_gpu(background, MOUSE_POS.x, MOUSE_POS.y, grid, block, 0.9999 - ((FRAME % 255) / 255.0))
+    surf = zoom_gpu(background, MOUSE_POS.x, MOUSE_POS.y, grid,
+                    block, 0.9999 - ((FRAME % 255) / 255.0))
 
     SCREEN.blit(surf, (0, 0))
     t = clock.get_fps()

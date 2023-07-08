@@ -46,7 +46,7 @@ def show_fps(screen_, fps_, avg_) -> None:
 # Set the display to 1024 x 768
 WIDTH = 800
 HEIGHT = 600
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, vsync=True)
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 pygame.init()
@@ -77,7 +77,7 @@ while GAME:
             GAME = False
             break
 
-    wave(image, ANGLE * math.pi / 180.0, 10)
+    wave(image, ANGLE * math.pi / 180.0, 12)
     image = scale(image, (WIDTH + 90, HEIGHT + 90))
     SCREEN.blit(image, (-50, -50))
 
@@ -96,5 +96,5 @@ while GAME:
         "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
 
     image = BACKGROUND.copy()
-
+    avg = avg[10:]
 pygame.quit()

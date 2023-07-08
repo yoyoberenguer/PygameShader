@@ -1,4 +1,4 @@
-# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
+# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True, profile=False
 # cython: optimize.use_switch=True
 # encoding: utf-8
 
@@ -32,7 +32,7 @@ Copyright Yoann Berenguer
 
 
 import warnings
-
+cimport numpy as np
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -80,6 +80,7 @@ cdef extern from 'Include/Shaderlib.c':
     rgb yiq_to_rgb(float y, float i, float q)nogil;
 
     int * quickSort(int arr[], int low, int high)nogil;
+    unsigned char * new_quickSort(unsigned char arr[ ], int low, int high)nogil;
     float Q_inv_sqrt(float number)nogil;
     rgb_color_int wavelength_to_rgb(int wavelength, float gamma)nogil;
     rgb_color_int wavelength_to_rgb_custom(int wavelength, int arr[], float gamma)nogil;
@@ -187,7 +188,19 @@ cpdef object rgb_split_clean(object surface_, int offset_=*)
 cpdef tuple ripple(int rows_, int cols_, float [:, ::1] previous_, float [:, ::1] current_,
            unsigned char [:, :, ::1] array_)
 
-cpdef tunnel_modeling32(Py_ssize_t screen_width, Py_ssize_t screen_height)
+cpdef tunnel_modeling24(int screen_width, int screen_height, object surface_)
+cpdef tunnel_render24(int t,
+                    int screen_width,
+                    int screen_height,
+                    int screen_w2,
+                    int screen_h2,
+                    int [:] distances,
+                    int [:] angles,
+                    int [:] shades,
+                    unsigned char [:] scr_data,
+                    unsigned char [:] dest_array)
+
+cpdef tunnel_modeling32(Py_ssize_t screen_width, Py_ssize_t screen_height, object surface_)
 cpdef tunnel_render32(int t,
                     Py_ssize_t screen_width,
                     Py_ssize_t screen_height,
@@ -269,10 +282,14 @@ cpdef tuple dampening(
         object surface_, int frame_, int display_width, int display_height_,
         float amplitude_=*, int duration_=*, float freq_=*)
 
-# Added version 1.0.2
-cpdef object blend(object source_, object destination_, float percentage_)
 
-# Added version 1.0.2
+cpdef object blend(object source_, object destination_, float percentage_)
+cpdef void blend_inplace(
+        object source_,
+        object destination_,
+        float percentage_
+        )
+
 cpdef cartoon(
         object surface_,
         int sobel_threshold_ = *,
@@ -288,8 +305,8 @@ cpdef void dirt_lens(
         float light_ = *
 )
 
-cpdef object dithering(object surface_, int factor_=*)
-cpdef void dithering_int(object surface_, int factor_=*)
+cpdef object dithering(object surface_)
+cpdef void dithering_inplace(object surface_)
 
 cpdef object spectrum(int width, int height, float gamma=*)
 
@@ -330,8 +347,35 @@ cpdef object zoom(
         float zx=*
 )
 
-cpdef void shader_rgb_to_yiq_inplace(object surface_)
-cpdef void shader_rgb_to_yiq_inplace_c(unsigned char [:, :, :] rgb_array)
-cpdef void shader_rgb_to_yiq_i_comp_inplace(object surface_)
-cpdef void shader_rgb_to_yiq_q_comp_inplace(object surface_)
+cpdef void Luma_GreyScale(object surface_)
+cpdef void Luma_GreyScale_c(unsigned char [:, :, :] rgb_array)
 
+cpdef void RGB_TO_YIQ_Q0_inplace(object surface_)
+cpdef void RGB_TO_YIQ_Q0_inplace_c(unsigned char [:, :, :] rgb_array)
+
+cpdef void RGB_TO_YIQ_I0_inplace(object surface_)
+cpdef void RGB_TO_YIQ_I0_inplace_c(unsigned char [:, :, :] rgb_array)
+
+cpdef void RGB_TO_YIQ_Y0_inplace(object surface_)
+cpdef void RGB_TO_YIQ_Y0_inplace_c(unsigned char [:, :, :] rgb_array)
+
+
+cpdef area24_c(int x, int y, np.ndarray[np.uint8_t, ndim=3] background_rgb,
+              np.ndarray[np.uint8_t, ndim=2] mask_alpha, float intensity=*,
+              float [:] color=*,
+              bint smooth=*, bint saturation=*, float sat_value=*, bint bloom=*,
+              bint heat=*, float frequency=*)
+
+cpdef area24_cc(int x, int y, np.ndarray[np.uint8_t, ndim=3] background_rgb,
+              np.ndarray[np.uint8_t, ndim=2] mask_alpha, float intensity=*,
+              float [::1] color=*,
+              bint smooth=*, bint saturation=*, float sat_value=*, bint bloom=*,
+              unsigned char bloom_threshold=*, bint heat=*, float frequency=*)
+
+
+cdef void shader_bloom_effect_array24_c(
+        surface_,
+        int threshold_,
+        bint fast_ = *,
+        object mask_ = *
+)

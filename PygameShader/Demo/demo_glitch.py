@@ -5,7 +5,7 @@ from PygameShader.shader import horizontal_glitch
 
 WIDTH = 1024
 HEIGHT = 768
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=True)
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 
@@ -29,14 +29,16 @@ while GAME:
             GAME = False
             break
 
-    horizontal_glitch(image, 0.5, 0.08, FRAME % 20)
-
     SCREEN.blit(image, (0, 0))
+
+    horizontal_glitch(SCREEN, 0.5, 0.08, FRAME % 20)
 
     pygame.display.flip()
     CLOCK.tick()
     FRAME += 1
 
-    image = BACKGROUND.copy()
+    pygame.display.set_caption(
+        "Test glitch effect %s fps "
+        "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
 
 pygame.quit()

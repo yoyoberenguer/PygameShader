@@ -1,4 +1,4 @@
-# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
+# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True, profile=False
 # cython: optimize.use_switch=True
 # cython: warn.maybe_uninitialized=False
 # cython: warn.unused=False
@@ -60,6 +60,7 @@ if OPENMP is True:
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 cpdef blur5x5_array24_inplace_c(unsigned char [:, :, :] rgb_array_):
     """
     # Gaussian kernel 5x5
@@ -156,7 +157,11 @@ cpdef blur5x5_array24_inplace_c(unsigned char [:, :, :] rgb_array_):
                     <unsigned char>r, <unsigned char>g, <unsigned char>b
 
 
-
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
 cdef blur5x5_surface24_inplace_c(surface_):
     """
     # Gaussian kernel 5x5
@@ -259,7 +264,11 @@ cdef blur5x5_surface24_inplace_c(surface_):
                 rgb_array_[x, y, 0], rgb_array_[x, y, 1], rgb_array_[x, y, 2] = \
                     <unsigned char>r, <unsigned char>g, <unsigned char>b
 
-
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
 cpdef canny_blur5x5_surface24_c(surface_):
     """
     # Gaussian kernel 5x5
@@ -341,15 +350,15 @@ cpdef canny_blur5x5_surface24_c(surface_):
                         g += green * k
                         b += blue * k
 
-                r = r / 25
-                g = g / 25
-                b = b / 25
+                r = r / <float>25.0
+                g = g / <float>25.0
+                b = b / <float>25.0
                 if r > 255.0:
-                    r = 255.0
+                    r = <float>255.0
                 if g > 255.0:
-                    g = 255.0
+                    g = <float>255.0
                 if b > 255.0:
-                    b = 255.0
+                    b = <float>255.0
 
                 output_array[x, y, 0] = r
                 output_array[x, y, 1] = g
@@ -358,7 +367,11 @@ cpdef canny_blur5x5_surface24_c(surface_):
     return asarray(output_array).astype(dtype=uint8)
 
 
-
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
 cpdef canny_blur5x5_surface32_c(surface_):
     """
     # Gaussian kernel 5x5
@@ -446,11 +459,11 @@ cpdef canny_blur5x5_surface32_c(surface_):
                         b += blue * k
 
                 if r > 255.0:
-                    r = 255.0
+                    r = <float>255.0
                 if g > 255.0:
-                    g = 255.0
+                    g = <float>255.0
                 if b > 255.0:
-                    b = 255.0
+                    b = <float>255.0
 
                 output_array[y, x, 0] = <unsigned char>r
                 output_array[y, x, 1] = <unsigned char>g

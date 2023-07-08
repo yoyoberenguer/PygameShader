@@ -21,7 +21,7 @@ def show_fps(screen_, fps_, avg_) -> None:
 
 WIDTH = 800
 HEIGHT = 600
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN, vsync=True)
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 pygame.init()
@@ -51,22 +51,20 @@ while GAME:
             GAME = False
             break
 
-    # image = shader_bloom_fast(image, BPF, fast_=False, factor_=3)
-    shader_bloom_fast1(image, threshold_=BPF, smooth_=0)
-
     SCREEN.blit(image, (0, 0))
+
+    shader_bloom_fast1(SCREEN, threshold_=BPF, smooth_=0)
+
     t = CLOCK.get_fps()
     avg.append(t)
     show_fps(SCREEN, t, avg)
-
+    avg = avg[ 10: ]
     CLOCK.tick()
     FRAME += 1
 
     pygame.display.flip()
 
     # capture_video(SCREEN, WIDTH, HEIGHT, compression_=False)
-
-    image = background.copy()
 
     if BPF >= 255.0:
         V *= -1

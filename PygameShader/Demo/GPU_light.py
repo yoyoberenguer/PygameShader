@@ -55,7 +55,7 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, vsync=True)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED)
 
 pygame.init()
 
@@ -111,6 +111,10 @@ while STOP_GAME:
 
         if event.type == pygame.MOUSEMOTION:
             MOUSE_POS = event.pos
+            if MOUSE_POS[0] < 0:MOUSE_POS[0] = 0
+            if MOUSE_POS[0] > width:MOUSE_POS[0] = width
+            if MOUSE_POS[1] < 0:MOUSE_POS[1] = 0
+            if MOUSE_POS[1] > height:MOUSE_POS[1] = height
 
     lit_surface, sw, sh = area24_gpu(
         MOUSE_POS[0], MOUSE_POS[1], background_rgb, lalpha, intensity=3.0, color=c)

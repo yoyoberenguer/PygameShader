@@ -17,15 +17,15 @@ try:
 except ImportError:
     raise ImportError("\n<misc> library is missing on your system.")
 
-from PygameShader.shader_gpu import invert_gpu, sepia_gpu, \
-    bpf_gpu, gaussian_5x5_gpu, sobel_gpu, canny_gpu, gaussian_3x3_gpu, median_gpu, median1_gpu, \
-    color_reduction_gpu, hsv_gpu, grayscale_gpu, grayscale_lum_gpu, bloom_gpu, \
-    prewitt_gpu, cartoon_gpu, invert_inplace_cupy, sepia_inplace_cupy, blending_gpu, sharpen_gpu, ripple_effect_gpu, \
-    sharpen1_gpu, block_grid, bpf1_gpu, mirroring_gpu, saturation_gpu, bilateral_gpu, emboss5x5_gpu, \
-    mult_downscale_gpu, get_max_grid_per_block, get_gpu_free_mem, get_gpu_maxmem, get_gpu_pci_bus_id, \
-    get_compute_capability, block_and_grid_info, get_gpu_info, hsl_gpu, brightness_gpu, \
-    fisheye_gpu, swirl_gpu, wave_gpu, rgb_split_gpu, zoom_gpu, chromatic_gpu, dithering_gpu, wavelength_map_gpu, \
-    heatmap_gpu, heatmap_gpu_inplace, predator_gpu, downscale_surface_gpu
+# from PygameShader.shader_gpu import invert_gpu, sepia_gpu, \
+#     bpf_gpu, gaussian_5x5_gpu, sobel_gpu, canny_gpu, gaussian_3x3_gpu, median_gpu, median1_gpu, \
+#     color_reduction_gpu, hsv_gpu, grayscale_gpu, grayscale_lum_gpu, bloom_gpu, \
+#     prewitt_gpu, cartoon_gpu, invert_inplace_cupy, sepia_inplace_cupy, blending_gpu, sharpen_gpu, ripple_effect_gpu, \
+#     sharpen1_gpu, block_grid, bpf1_gpu, mirroring_gpu, saturation_gpu, bilateral_gpu, emboss5x5_gpu, \
+#     mult_downscale_gpu, get_max_grid_per_block, get_gpu_free_mem, get_gpu_maxmem, get_gpu_pci_bus_id, \
+#     get_compute_capability, block_and_grid_info, get_gpu_info, hsl_gpu, brightness_gpu, \
+#     fisheye_gpu, swirl_gpu, wave_gpu, rgb_split_gpu, zoom_gpu, chromatic_gpu, dithering_gpu, wavelength_map_gpu, \
+#     heatmap_gpu, heatmap_gpu_inplace, predator_gpu, downscale_surface_gpu
 
 try:
     import numpy
@@ -39,7 +39,8 @@ numpy.set_printoptions(threshold=sys.maxsize)
 # PYGAME IS REQUIRED
 try:
     import pygame
-    from pygame import Surface, RLEACCEL, QUIT, K_SPACE, BLEND_RGB_ADD, DOUBLEBUF, FULLSCREEN
+    from pygame import Surface, RLEACCEL, QUIT, K_SPACE, BLEND_RGB_ADD, DOUBLEBUF, FULLSCREEN, BLEND_RGB_SUB, \
+        BLEND_RGB_MULT
 
 except ImportError:
     raise ImportError("\n<Pygame> library is missing on your system."
@@ -47,7 +48,7 @@ except ImportError:
 
 # Set the display to 1024 x 768
 WIDTH = 800
-HEIGHT = 600
+HEIGHT = 1280
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), DOUBLEBUF, vsync=False)
 pygame.init()
 #SCREEN.convert(32, RLEACCEL)
@@ -81,10 +82,12 @@ except ImportError:
 import colorsys
 from colorsys import *
 
+
 def load_image(im="aliens.jpg"):
     image = pygame.image.load("../Assets/" + im).convert()
     image = pygame.transform.smoothscale(image, (WIDTH, HEIGHT))
     return image
+
 
 import timeit
 BCK = pygame.image.load("../Assets/Aliens.jpg").convert()
@@ -92,7 +95,71 @@ BCK = pygame.transform.smoothscale(BCK, (WIDTH, HEIGHT))
 
 blood_surface = pygame.image.load("../Assets/redvignette.png").convert_alpha()
 blood_surface = pygame.transform.smoothscale(blood_surface, (WIDTH, HEIGHT))
-BLOOD_MASK = numpy.asarray(pygame.surfarray.pixels_alpha(blood_surface) / 255.0, numpy.float32)
+BLOOD_MASK = numpy.asarray(
+    pygame.surfarray.pixels_alpha(blood_surface) / float(255.0), numpy.float32)
+
+
+brightness_exclude(BCK, 0.1, (0, 0, 0))
+SCREEN.blit(BCK, (0, 0))
+pygame.display.flip()
+
+t = timeit.timeit("brightness_exclude(BCK, 0.8, (0, 0, 0))",
+                  "from __main__ import brightness_exclude, BCK", number=1000)
+print("cython : ", t/1000)
+
+
+IMAGE = load_image(im="Capture.png")
+# palette_change(IMAGE, SILVER)
+IMAGE = pygame.transform.smoothscale(IMAGE, (256, 256))
+# pygame.image.save(IMAGE, "../Assets/Capture.jpg")
+
+
+
+# IMAGE = pygame.image.load("C:\\Users\\yoyob\\Desktop\\jt00c0tnu60b1.webp")
+#IMAGE = load_image("city.jpg")
+#IMAGE = pygame.transform.smoothscale(IMAGE, (WIDTH, HEIGHT))
+# Luma_GreyScale(IMAGE)
+saturation(IMAGE, 2)
+# pygame.image.save(IMAGE, "../Assets/CaptureY0.png")
+grid, block = block_grid(IMAGE.get_width(), IMAGE.get_height())
+# IMAGE = predator_gpu(
+#     IMAGE,
+#     grid, block,
+# )
+#
+#
+SCREEN.blit(IMAGE, (0, 0))
+pygame.display.flip()
+#
+#
+# while 1:
+#     SCREEN.blit(IMAGE, (0, 0))
+#     pygame.display.flip()
+#
+#     pass
+#
+t = timeit.timeit("dithering_inplace(IMAGE)", "from __main__ import dithering_inplace, IMAGE", number=1000)
+print("cython : ", t/1000)
+#
+# t = timeit.timeit("dithering(IMAGE)", "from __main__ import dithering, IMAGE", number=100)
+# print("cython : ", t/100)
+
+# while 1:
+#     SCREEN.blit(IMAGE, (0, 0))
+#     pygame.display.flip()
+#     pass
+
+
+
+#
+# BCK = pygame.transform.smoothscale(BCK, (2048, 2048))
+# T = 200
+# import timeit
+# t = timeit.timeit(
+#     "blur(BCK)",
+#     "from __main__ import blur, BCK",
+#     number=T)
+# print("cython : ", t/T)
 
 
 T = 1000
@@ -273,6 +340,7 @@ pred_play = False
 vision_swap = pygame.mixer.Sound("../Assets/vision_swap.ogg")
 vision_swap_play = False
 vision_swap_play1 = False
+vision_swap_play2 = False
 
 FISHEYE_MODEL = fisheye_footprint(WIDTH, HEIGHT, 400, 300)
 
@@ -291,9 +359,10 @@ ti = time.time()
 
 grad = create_horizontal_gradient_1d(math.sqrt(800 * 800 + 300 * 300), start_color=(255, 255, 220), end_color=(0, 0, 0))
 
-b = test1()
-print([w for w in b], f'\tlength: {len(b)}')
-print(b)
+#
+# IMAGE = pygame.image.load("C:\\Users\\yoyob\\Desktop\\jt00c0tnu60b1.webp").convert()
+# IMAGE = pygame.transform.smoothscale(IMAGE, (WIDTH, HEIGHT))
+
 
 while GAME:
     # IMAGE = make_surface(hsv_gpu(cp.asarray(pixels3d(IMAGE).astype(dtype=cp.float32)), 0.1))
@@ -439,7 +508,7 @@ while GAME:
     #     start_color=((255 - (thresh + 12)) % 255, (0 + thresh + 2) % 255 , (255 + (thresh + 8) ) % 255 ),
     #     end_color=(0, 0, 0))
 
-    SCREEN.blit(BCK, (0, 0))
+    # SCREEN.blit(BCK, (0, 0))
     #SCREEN.fill((0, 0, 0, 0))
 
     # surf = create_quarter_radial_gradient_alpha\
@@ -452,44 +521,73 @@ while GAME:
     # )
 
 
-    blood(SCREEN, BLOOD_MASK, hsv)
+
+    # blood(SCREEN, BLOOD_MASK, hsv)
+
+
+    IMAGE_COPY = IMAGE.copy()
+    # shader_bloom_fast1(SCREEN, smooth_=2, threshold_=0, flag_=BLEND_RGB_ADD, saturation_=True)
+
+    #IMAGE = zoom(IMAGE, 360, 550, zx=0.291)
+    #IMAGE = bilateral_gpu(IMAGE, 8)
+    #bloom(IMAGE, 128)
+    SCREEN.blit(IMAGE, (0, 0))
+
+
+    if 4 < time.time() - ti <= 9:
+
+        if not pred_play:
+            pred.play()
+        IMAGE = predator_gpu(
+            IMAGE,
+            grid, block,
+            bloom_smooth = 10,
+            bloom_threshold = int(bl),
+            inv_colormap=True,
+            blend = pygame.BLEND_RGB_MAX,
+            bloom_flag = pygame.BLEND_RGB_ADD
+        )
+        pred_play = True
 
 
 
+    elif 10 < time.time() -ti < 16:
+        if vision_swap_play is False:
+            pred.stop()
+            pred.play()
+        shader_bloom_fast1(IMAGE, smooth_=int(bl), threshold_=0, flag_=pygame.BLEND_RGB_ADD,
+                           saturation_=True)
+        IMAGE = wavelength_map_gpu(IMAGE, grid, block, 2)
+        vision_swap_play = True
 
 
-    # if 4 < time.time() - ti <= 9:
-    #         pred.play()
-    #     IMAGE = predator_gpu(
-    #         IMAGE,
-    #         grid, block,
-    #         bloom_smooth = int(bl),
-    #         bloom_threshold = 0,
-    #         inv_colormap=True,
-    #         blend = pygame.BLEND_RGB_MAX,
-    #         bloom_flag = pygame.BLEND_RGB_ADD
-    #     )
-    #     pred_play = True
-    #
-    # elif 10 < time.time() -ti < 16:
-    #     if vision_swap_play is False:
-    #         pred.stop()
-    #         pred.play()
-    #     shader_bloom_fast1(IMAGE, smooth_=int(bl), threshold_=0, flag_=pygame.BLEND_RGB_ADD,
-    #                        saturation_=True)
-    #     IMAGE = wavelength_map_gpu(IMAGE, grid, block, 2)
-    #     vision_swap_play = True
-    #
-    #
-    # elif 17 < time.time() -ti < 22:
-    #     if vision_swap_play1 is False:
-    #         pred.stop()
-    #         pred.play()
-    #     blur(IMAGE, t_=4)
-    #     shader_bloom_fast1(IMAGE, smooth_=int(bl), threshold_=0, flag_=pygame.BLEND_RGB_ADD,
-    #                        saturation_=True)
-    #     IMAGE = wavelength_map_gpu(IMAGE, grid, block, 0)
-    #     vision_swap_play1 = True
+    elif 17 < time.time() -ti < 22:
+        if vision_swap_play1 is False:
+            pred.stop()
+            pred.play()
+        blur(IMAGE, t_=4)
+        shader_bloom_fast1(IMAGE, smooth_=int(bl), threshold_=0, flag_=pygame.BLEND_RGB_ADD,
+                           saturation_=True)
+        IMAGE = wavelength_map_gpu(IMAGE, grid, block, 0)
+        vision_swap_play1 = True
+
+
+    elif 24 < time.time() -ti < 50:
+        if vision_swap_play2 is False:
+            pred.stop()
+            pred.play()
+        blur(IMAGE, t_=4)
+        shader_bloom_fast1(IMAGE, smooth_=int(bl), threshold_=0, flag_=pygame.BLEND_RGB_ADD,
+                           saturation_=True)
+        # IMAGE = wavelength_map_gpu(IMAGE, grid, block, 1)
+
+        IMAGE = bpf_gpu(IMAGE, threshold_=150)
+
+        #IMAGE = sobel_gpu(IMAGE)
+        #IMAGE.blit(IMAGE_, (0,0), special_flags=pygame.BLEND_RGB_SUB)
+        vision_swap_play2 = True
+
+    SCREEN.blit(IMAGE, (0, 0))
 
     if bl>=50:
         vbl = -1
@@ -547,14 +645,21 @@ while GAME:
     avg.append(t)
     show_fps(SCREEN, t, avg)
 
-    # IMAGE = IMAGE_COPY.copy()
+    IMAGE = IMAGE_COPY.copy()
 
     FRAME += 1
     pygame.display.flip()
 
 
 pygame.quit()
+
+
+
+
 raise SystemExit
+
+
+
 
 v = 0.01
 hsv = 0
@@ -955,7 +1060,7 @@ import time
 # pygame.image.save(new_IMAGE,  "../Assets/Aliens_PIXELATE.jpg")
 
 IMAGE = load_image(im="parrot.jpg")
-palette_change(IMAGE, PICO_8_CUSTOM)
+palette_change(IMAGE, PICO_8)
 pygame.image.save(IMAGE, "../Assets/parrot_PICO_8_CUSTOM.png")
 t = timeit.timeit("palette_change(IMAGE, PICO_8_CUSTOM)",
               "from __main__ import palette_change, IMAGE, PICO_8_CUSTOM",

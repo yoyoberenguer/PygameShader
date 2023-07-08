@@ -8,13 +8,19 @@ import unittest
 import os
 import time
 from random import uniform, randint, random
-import cupy
+
+
+_CUPY = True
+try:
+    import cupy
+except ImportError:
+    _CUPY = False
 
 import cython
 import numpy
 from numpy import uint8, asarray
 from pygame.freetype import STYLE_NORMAL
-from pygame.surfarray import make_surface
+from pygame.surfarray import make_surface, pixels3d
 from pygame.transform import scale, smoothscale
 
 from PygameShader.misc import create_horizontal_gradient_1d
@@ -23,7 +29,8 @@ import pygame
 from pygame import BLEND_RGB_ADD, RLEACCEL, BLEND_RGB_MAX, BLEND_RGB_MIN, BLEND_RGB_SUB, \
     BLEND_RGB_MULT, freetype
 
-from PygameShader.shader import rgb_to_bgr, rgb_to_brg, \
+import PygameShader
+from PygameShader import rgb_to_bgr, rgb_to_brg, \
     greyscale, sepia, \
     color_reduction, sobel, \
     sobel_fast, invert, \
@@ -37,14 +44,17 @@ from PygameShader.shader import rgb_to_bgr, rgb_to_brg, \
     dampening, lateral_dampening, mirroring, cloud_effect, \
     tunnel_render32, tunnel_modeling32, ripple, rgb_split, \
     heatwave_vertical, horizontal_glitch, plasma, \
-    rain_fisheye, rain_footprint, area24_c, stack_buffer_c
+    rain_fisheye, rain_footprint, area24_c, stack_buffer_c, \
+    cartoon, blend, dirt_lens, area24_cc, tunnel_modeling24, tunnel_render24
 
-import PygameShader
-from PygameShader import cartoon, blend, dirt_lens
-from PygameShader.shader_gpu import ripple_effect_gpu, block_grid, area24_gpu
+if _CUPY:
+    try:
+        from PygameShader.shader_gpu import area24_gpu, ripple_effect_gpu, block_grid
+    except:
+        _CUPY = False
 
 PROJECT_PATH = list(PygameShader.__path__)
-os.chdir(PROJECT_PATH[0] + "\\tests")
+os.chdir(PROJECT_PATH[0] + "/tests")
 
 WIDTH = 800
 HEIGHT = 600
@@ -52,6 +62,7 @@ HEIGHT = 600
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=True)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
+
 
 
 shader_list =\
@@ -659,7 +670,7 @@ class TestShaderPlasmaInplace(unittest.TestCase):
                            2, 619,  # yellow
                            620, 650,  # orange
                            651, 660],  # red
-                          numpy.int)
+                          numpy.int32)
 
         HEATMAP = [custom_map(i - 20, arr, 1.0) for i in range(380, 800)]
         heatmap_array = numpy.zeros((800 - 380, 3), uint8)
@@ -1198,7 +1209,7 @@ class TestShaderBloodInplace(unittest.TestCase):
 
         :return:  void
         """
-        background = pygame.image.load("../Assets/aliens.jpg").convert()
+        background = pygame.image.load("../Assets/Aliens.jpg").convert()
         background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
         background.convert(32, RLEACCEL)
         image = background.copy()
@@ -1402,7 +1413,7 @@ class TestshaderFireEffect1(unittest.TestCase):
                            2, 619,  # yellow
                            620, 650,  # orange
                            651, 660],  # red
-                          numpy.int)
+                          numpy.int32)
 
         HEATMAP = [custom_map(i - 20, arr, 1.0) for i in range(380, 800)]
         heatmap_array = numpy.zeros((800 - 380, 3), uint8)
@@ -1635,7 +1646,7 @@ class TestShaderCloudEffect(unittest.TestCase):
                            2, 619,  # yellow
                            620, 650,  # orange
                            651, 660],  # red
-                          numpy.int)
+                          numpy.int32)
 
         CLOUD_ARRAY = numpy.zeros((HEIGHT, WIDTH), dtype=numpy.float32)
 
@@ -1684,6 +1695,73 @@ class TestShaderCloudEffect(unittest.TestCase):
                 break
 
 
+class TestTunnelRender24(unittest.TestCase):
+    """
+    Test tunnel_render24
+    """
+
+    # pylint: disable=too-many-statements
+    @staticmethod
+    def runTest() -> None:
+        """
+
+        :return:  void
+        """
+        WIDTH = 800
+        HEIGHT = 800
+
+        BCK1 =  pygame.image.load("../Assets/space2.jpg").convert()
+        BCK1 = pygame.transform.smoothscale(BCK1, (WIDTH, HEIGHT))
+        BACKGROUND = pygame.image.load("../Assets/space1.jpg")
+        BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
+
+        FRAME = 0
+        CLOCK = pygame.time.Clock()
+        GAME = True
+
+        distances, angles, shades, scr_data = tunnel_modeling24(WIDTH, HEIGHT, BACKGROUND)
+        dest_array = numpy.empty((WIDTH * HEIGHT * 4), numpy.uint8)
+        t= time.time()
+        while GAME:
+
+            pygame.event.pump()
+            for event in pygame.event.get():
+
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_ESCAPE]:
+                    GAME = False
+                    break
+
+            SCREEN.blit(BCK1, (0, 0))
+            # SCREEN.fill((0, 0, 0, 0))
+            surface_ = tunnel_render24(
+                FRAME * 25,
+                WIDTH,
+                HEIGHT,
+                WIDTH >> 1,
+                HEIGHT >> 1,
+                distances,
+                angles,
+                shades,
+                scr_data,
+                dest_array
+            )
+            # pygame.time.delay(15)
+            SCREEN.blit(surface_, (0, 0), special_flags=pygame.BLEND_RGB_ADD)
+
+            pygame.display.flip()
+            CLOCK.tick()
+            FRAME += 1
+            pygame.display.set_caption(
+                "Test tunnel %s fps "
+                "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
+            if time.time() - t > 5:
+                break
+
+
+
+
 class TestTunnelRender32(unittest.TestCase):
     """
     Test tunnel_render32
@@ -1699,14 +1777,17 @@ class TestTunnelRender32(unittest.TestCase):
         WIDTH = 800
         HEIGHT = 800
 
-        BACKGROUND = pygame.image.load("../Assets/space2.jpg").convert()
+        BCK1 =  pygame.image.load("../Assets/space2.jpg").convert()
+        BCK1 = pygame.transform.smoothscale(BCK1, (WIDTH, HEIGHT))
+        BACKGROUND = pygame.image.load("../Assets/space2_seamless_alpha.jpg")
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
         GAME = True
 
-        distances, angles, shades, scr_data = tunnel_modeling32(WIDTH, HEIGHT)
+
+        distances, angles, shades, scr_data = tunnel_modeling32(WIDTH, HEIGHT, BACKGROUND)
         dest_array = numpy.empty((WIDTH * HEIGHT * 4), numpy.uint8)
         t= time.time()
         while GAME:
@@ -1720,8 +1801,8 @@ class TestTunnelRender32(unittest.TestCase):
                     GAME = False
                     break
 
-            SCREEN.blit(BACKGROUND, (0, 0))
-
+            SCREEN.blit(BCK1, (0, 0))
+            # SCREEN.fill((0, 0, 0, 0))
             surface_ = tunnel_render32(
                 FRAME * 25,
                 WIDTH,
@@ -1734,8 +1815,8 @@ class TestTunnelRender32(unittest.TestCase):
                 scr_data,
                 dest_array
             )
-
-            SCREEN.blit(surface_, (0, 0))  # , special_flags=pygame.BLEND_RGB_MAX)
+            # pygame.time.delay(15)
+            SCREEN.blit(surface_, (0, 0), special_flags=pygame.BLEND_RGB_ADD)
 
             pygame.display.flip()
             CLOCK.tick()
@@ -2035,7 +2116,7 @@ class TestShaderHorizontalGlitch24Inplace(unittest.TestCase):
                     GAME = False
                     break
 
-            horizontal_glitch(image, 0.5, 0.08, FRAME % 20)
+            horizontal_glitch(image, 1, 0.08, FRAME % 100)
 
             SCREEN.blit(image, (0, 0))
 
@@ -2119,7 +2200,7 @@ class TestShaderCartoon(unittest.TestCase):
         """
 
         # Load the background image
-        BACKGROUND = pygame.image.load("../Assets/Background.jpg").convert()
+        BACKGROUND = pygame.image.load("../Assets/background.jpg").convert()
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
         image = BACKGROUND.copy()
@@ -2141,10 +2222,10 @@ class TestShaderCartoon(unittest.TestCase):
                     GAME = False
                     break
 
-            surface_ = cartoon(image, sobel_threshold_=128, median_kernel_=3, color_=4,
-                               flag_=BLEND_RGB_ADD)
+            surf = cartoon(image, sobel_threshold_=128, median_kernel_=5, color_=4,
+                flag_=BLEND_RGB_ADD)
 
-            SCREEN.blit(surface_, (0, 0), special_flags=0)
+            SCREEN.blit(surf, (0, 0), special_flags=0)
 
             pygame.display.flip()
             CLOCK.tick()
@@ -2155,7 +2236,7 @@ class TestShaderCartoon(unittest.TestCase):
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
 
             image = BACKGROUND.copy()
-            if time.time() - t > 5:
+            if time.time() - t > 100006:
                 break
 
 
@@ -2173,15 +2254,15 @@ class TestShaderBlend24(unittest.TestCase):
         """
 
         # Load the background image
-        BACKGROUND = pygame.image.load("../Assets/Background.jpg").convert()
+        BACKGROUND = pygame.image.load("../Assets/background.jpg").convert()
         BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
         DESTINATION = pygame.image.load("../Assets/Aliens.jpg").convert()
         DESTINATION = pygame.transform.smoothscale(DESTINATION, (WIDTH, HEIGHT))
-
+        DESTINATION_ARRAY = pixels3d(DESTINATION)
         assert BACKGROUND.get_size() == DESTINATION.get_size()
 
-        pygame.display.set_caption("demo wave effect")
+        pygame.display.set_caption("demo blend inplace")
 
         FRAME = 0
         CLOCK = pygame.time.Clock()
@@ -2201,9 +2282,10 @@ class TestShaderBlend24(unittest.TestCase):
                     break
 
             transition = blend(
-                source_=BACKGROUND, destination_=DESTINATION, percentage_=VALUE)
+                source_=BACKGROUND, destination_=DESTINATION_ARRAY, percentage_=VALUE)
 
             SCREEN.blit(transition, (0, 0))
+
 
             pygame.display.flip()
             CLOCK.tick()
@@ -2317,7 +2399,7 @@ class TestLight_CPU(unittest.TestCase):
         pygame.display.init()
         SCREEN = pygame.display.set_mode(SCREENRECT.size,  pygame.DOUBLEBUF, 32)
         pygame.init()
-        background = pygame.image.load('..//Assets//Aliens.jpg').convert()
+        background = pygame.image.load('../Assets/Aliens.jpg').convert()
         background.set_alpha(None)
 
         background = pygame.transform.smoothscale(background, (800, 800))
@@ -2329,7 +2411,7 @@ class TestLight_CPU(unittest.TestCase):
 
         pygame.display.set_caption("demo light effect")
 
-        light = pygame.image.load('..//Assets//Radial8.png').convert_alpha()
+        light = pygame.image.load('../Assets/Radial8.png').convert_alpha()
         light = pygame.transform.smoothscale(light, (600, 600))
         lw, lh = light.get_size()
         lw2, lh2 = lw >> 1, lh >> 1
@@ -2354,10 +2436,9 @@ class TestLight_CPU(unittest.TestCase):
                     GAME = False
                     break
 
-            lit_surface, sw, sh = area24_c(
+            lit_surface, sw, sh = area24_cc(
                 MOUSE_POS[0], MOUSE_POS[1], background_rgb, lalpha, intensity=8.0, color=c,
-                smooth=False, saturation=False, sat_value=0.4, bloom=False, heat=False, frequency=1000)
-
+                smooth=False, saturation=False, sat_value=0.4, bloom=False, heat=False, frequency=100)
 
             if sw < lw and MOUSE_POS[0] <= lw - lw2:
                 xx = 0
@@ -2385,6 +2466,7 @@ class TestLight_CPU(unittest.TestCase):
 
 
 
+
 class TestLight_GPU(unittest.TestCase):
     """
     Test Light
@@ -2402,7 +2484,7 @@ class TestLight_GPU(unittest.TestCase):
         SCREEN = pygame.display.set_mode(SCREENRECT.size,  pygame.DOUBLEBUF, 32)
         pygame.init()
 
-        background = pygame.image.load('..//Assets//Aliens.jpg').convert()
+        background = pygame.image.load('../Assets/Aliens.jpg').convert()
         background.set_alpha(None)
 
         background = pygame.transform.smoothscale(background, (800, 800))
@@ -2413,9 +2495,9 @@ class TestLight_GPU(unittest.TestCase):
         back = background.copy()
         back.set_alpha(255)
 
-        pygame.display.set_caption("demo light effect")
+        pygame.display.set_caption("demo GPU light effect")
 
-        light = pygame.image.load('..//Assets//Radial8.png').convert_alpha()
+        light = pygame.image.load('../Assets/Radial8.png').convert_alpha()
         light = pygame.transform.smoothscale(light, (600, 600))
         lalpha = cupy.asarray(pygame.surfarray.pixels_alpha(light), dtype=cupy.uint8)
 
@@ -2467,227 +2549,11 @@ class TestLight_GPU(unittest.TestCase):
                 "Demo light GPU %s fps"
                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
 
-import pyglet
 from os import path
 FULL_VIDEO = []
 PATH_TEXTURE = '../Assets/'
 VIDEO_FLAGS  = pygame.HWSURFACE | pygame.RLEACCEL
 SCREEN_BIT_DEPTH = 32
-
-
-def play_intro():
-
-    path_join = path.join
-    media_player = pyglet.media.Player()
-
-    ffmpeg = pyglet.media.have_ffmpeg()
-    if not ffmpeg:
-        print('\nFFmpeg library is missing on your system.')
-        print('Video intro is skipped.')
-        return
-    try:
-
-        video_name = "demo.avi"
-        source = pyglet.media.load(path_join(PATH_TEXTURE, video_name))
-        video_format = source.video_format
-        source_info = source.info
-        duration = source.duration
-        width = video_format.width
-        height = video_format.height
-        sample_aspect = video_format.sample_aspect
-        frame_rate = int(video_format.frame_rate)
-        print("Length            : %ss " % round(duration, 2))
-        print("Resolution        : %sx%s " % (width, height))
-        print("Aspect resolution : %s " % sample_aspect)
-        print("Frame rate        : %s fps" % frame_rate)
-    except FileNotFoundError:
-        print('\nVideo %s not found in %s ' % (video_name, PATH_TEXTURE))
-        # IGNORE THE ERROR
-        return
-
-    pygame.init()
-    vformat = source.video_format
-    media_player.queue(source)
-    media_player.play()
-    screen = pygame.display.set_mode(
-        (vformat.width, vformat.height), VIDEO_FLAGS, SCREEN_BIT_DEPTH)
-
-    frame = 0
-    running = True
-
-    display_flip = pygame.display.flip
-    media_get_texture = media_player.get_texture
-    event_pump = pygame.event.pump
-
-    screen.fill((0, 0, 0, 255))
-
-    print('\nBuffering video \nPlease wait...(ESC to abort)')
-    while running:
-
-        event_pump()
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_ESCAPE]:
-            running = False
-            pygame.event.clear()
-            break
-        media_player.play()
-
-        texture = media_get_texture()
-
-        if texture is not None:
-
-            raw = texture.get_image_data().get_data('RGBA', texture.width << 2)
-            buff = numpy.frombuffer(raw, dtype=uint8).reshape(texture.height, texture.width, 4)
-            # buff[:, :, :3] keep RGB no alpha channel
-            # After removing the alpha channel (loosing alpha channel information).
-            # The final result is a 24 bit pygame Surface.
-            # Applying convert_alpha() will have no effect has the alpha channel has been removed
-            # (the image will be converted to a 32 bit format with a layer set at
-            # maximum opacity, 255 values).
-            # If you wish to apply transparency to the surface use the method
-            # set_colorkey to apply transparency
-            # based on color key.
-            arr = buff[:, :, :3].transpose(1, 0, 2)
-            # blit_array(screen, arr)
-
-            surf = pygame.surfarray.make_surface(arr).convert()
-            # surf.set_colorkey((0, 0, 0), RLEACCEL)
-            # surf = pygame.transform.scale(surf, (GL.SCREENRECT_W, GL.SCREENRECT_H))
-            FULL_VIDEO.append(surf)
-
-            pyglet.clock.tick(frame_rate)
-
-            frame += 1
-            if frame >= 200:
-                running = False
-        else:
-            running = False
-        try:
-            media_player.seek_next_frame()
-        except:
-            pass
-
-    print('[Done]')
-
-    # ----- RESIZE VIDEO HERE ---------
-    new_size = (1024, 768)
-    i = 0
-    for frame in FULL_VIDEO:
-        FULL_VIDEO[i] = pygame.transform.smoothscale(frame, new_size)
-        i += 1
-
-    # ------ RESET THE DISPLAY WITH THE NEW SIZE
-    screen = pygame.display.set_mode(
-        new_size, VIDEO_FLAGS, SCREEN_BIT_DEPTH)
-
-
-    frame = 0
-
-    clock = pygame.time.Clock()
-    running = True
-
-    if running:
-        # SOUND EFFECT
-        # PLAY HERE
-
-        # time per frame (T period)
-        timing = duration / len(FULL_VIDEO)
-        fps = 1.0 / timing
-
-    # PLAY THE VIDEO FROM THE BUFFER
-    while running:
-        try:
-            event_pump()
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_ESCAPE]:
-                running = False
-                pygame.event.clear()
-                # CONTROL SOUND HERE
-                # HERE
-                break
-            surface = FULL_VIDEO[frame]
-            screen.blit(surface, (0, 0))
-
-            display_flip()
-            clock.tick(60)
-
-            frame += 1
-
-        except IndexError as e:
-            running = False
-
-
-# class TestShaderMultiFisheyes(unittest.TestCase):
-#     """
-#         Test RainDrops
-#         """
-#
-#     # pylint: disable=too-many-statements
-#     @staticmethod
-#     def runTest() -> None:
-#         """
-#
-#         :return:  void
-#         """
-#
-#         play_intro()
-#
-#         pygame.display.set_caption("Test RainDrops")
-#
-#         FRAME = 0
-#         CLOCK = pygame.time.Clock()
-#         GAME = True
-#
-#         TEXTURE_SIZE = 512
-#         s, arr = rain_footprint(TEXTURE_SIZE, TEXTURE_SIZE)
-#
-#         RAIN_LIST = []
-#
-#         for i in range(2):
-#             RAIN_LIST.append((randint(0, 1024), randint(0, 200)))
-#
-#
-#         t = time.time()
-#
-#         while GAME:
-#
-#             pygame.event.pump()
-#             for event in pygame.event.get():
-#
-#                 keys = pygame.key.get_pressed()
-#
-#                 if keys[pygame.K_ESCAPE]:
-#                     GAME = False
-#                     break
-#
-#             surface = FULL_VIDEO[FRAME % len(FULL_VIDEO)]
-#             SCREEN.blit(surface, (0, 0))
-#
-#             ss = pygame.transform.scale(
-#                 SCREEN, (TEXTURE_SIZE, TEXTURE_SIZE))
-#             rain_fisheye(ss, arr)
-#             p = ss.get_at((0, 0))
-#             ss.set_colorkey(p)
-#
-#             surf = pygame.Surface((TEXTURE_SIZE, TEXTURE_SIZE)).convert()
-#             surf.fill((0, 0, 0))
-#             surf.blit(ss, (0, 0))
-#
-#             for i in range(2):
-#                 SCREEN.blit(surf,
-#                             (RAIN_LIST[i][0], RAIN_LIST[i][1]), special_flags=pygame.BLEND_RGB_MAX)
-#
-#
-#             pygame.display.flip()
-#             CLOCK.tick(60)
-#             FRAME += 1
-#
-#             pygame.display.set_caption(
-#                 "Test fisheye %s fps "
-#                 "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-#
-#             # if time.time() - t > 200:
-#             #     break
 
 
 def run_testsuite():
@@ -2736,25 +2602,27 @@ def run_testsuite():
         TestDampeningEffect(),
         TestMirroringInplace(),
         TestShaderCloudEffect(),
+        TestTunnelRender24(),
         TestTunnelRender32(),
         TestShaderRipple(),
-        TestShaderRippleGpu(),
         TestRgbSplit(),
         TestShaderHorizontalGlitch24Inplace(),
         TestShaderHeatwave24VerticalInplace(),
         TestShaderCartoon(),
         TestShaderBlend24(),
         TestDirtLens(),
-        TestLight_CPU(),
-        TestLight_GPU()
+
     ])
+
+    if _CUPY:
+        suite.addTests([TestLight_GPU(), TestShaderRippleGpu()])
+
 
     unittest.TextTestRunner().run(suite)
     sys.exit(0)
 
 
 if __name__ == '__main__':
-    # play_intro()
     run_testsuite()
     sys.exit(0)
 

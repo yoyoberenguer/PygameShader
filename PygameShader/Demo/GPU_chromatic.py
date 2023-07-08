@@ -58,7 +58,7 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN, vsync=True)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.SCALED)
 pygame.font.init()
 background = pygame.image.load('..//Assets//city.jpg')
 background = pygame.transform.smoothscale(background, (width, height))
@@ -99,6 +99,10 @@ while STOP_GAME:
 
         if event.type == pygame.MOUSEMOTION:
             MOUSE_POS = Vector2(event.pos)
+            if MOUSE_POS.x < 0:MOUSE_POS.x = 0
+            if MOUSE_POS.x > width:MOUSE_POS.x = width
+            if MOUSE_POS.y < 0:MOUSE_POS.y = 0
+            if MOUSE_POS.y > height:MOUSE_POS.y = height
 
     surf = chromatic_gpu(background, MOUSE_POS.x, MOUSE_POS.y, grid, block, 0.999, fx=0.04)
 

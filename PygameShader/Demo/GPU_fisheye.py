@@ -59,7 +59,7 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN, vsync=True)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.SCALED)
 
 pygame.init()
 
@@ -107,7 +107,7 @@ while STOP_GAME:
     # transition = blend(
     #     source_=background, destination_=city, percentage_=VALUE)
 
-    image = IMAGE = fisheye_gpu(background, VALUE/49.0, 0.35, grid, block)
+    image = fisheye_gpu(background, VALUE/49.0, 0.35, grid, block)
     SCREEN.blit(image, (0, 0))
 
     t = clock.get_fps()
