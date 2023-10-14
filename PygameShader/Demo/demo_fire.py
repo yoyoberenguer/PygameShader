@@ -30,33 +30,42 @@ except ImportError:
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
 
 
-def show_fps(screen_, fps_, avg_) -> None:
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 15)
+
+
+def show_fps(screen_, fps_, avg_) -> list:
     """ Show framerate in upper left corner """
-    font = pygame.font.SysFont("Arial", 15)
+
     fps = str(f"CPU fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
 
-    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    fps_text = font.render(fps, True, pygame.Color("coral"))
     screen_.blit(fps_text, (10, 0))
     if av != 0:
         av = str(f"avg:{av:.3f}")
-        avg_text = font.render(av, 1, pygame.Color("coral"))
+        avg_text = font.render(av, True, pygame.Color("coral"))
         screen_.blit(avg_text, (120, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
-
+    return avg_
 
 # Set the display to 1024 x 768
 WIDTH = 800
 HEIGHT = 600
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED, 32)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 
 pygame.init()
 
 # Load the background image
-BACKGROUND = pygame.image.load("../Assets/img.png").convert()
+try:
+    BACKGROUND = pygame.image.load("../Assets/img.jpg").convert()
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file city.jpg is missing from the Assets directory.')
+
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
 BACKGROUND_COPY = BACKGROUND.copy()
@@ -67,7 +76,7 @@ CLOCK = pygame.time.Clock()
 GAME = True
 
 
-def palette_array() -> tuple:
+def palette_array():
     """
     Create a C - buffer type data 1D array containing the
     fire color palette (mapped RGB color, integer)
@@ -114,6 +123,35 @@ delta = +0.1
 # grid, block = block_grid(WIDTH, HEIGHT)
 # block_and_grid_info(WIDTH, HEIGHT)
 
+
+TmpSurface = pygame.Surface((150, 112)).convert()
+
+
+SAMPLERATE = 48000
+MODE       = -32
+CHANNELS   = 2
+
+pygame.mixer.quit()
+pygame.mixer.pre_init(SAMPLERATE, -MODE, CHANNELS, 4095)
+
+if pygame.version.vernum < (2, 0):
+    pygame.mixer.init(SAMPLERATE, -MODE, CHANNELS)
+else:
+    pygame.mixer.init(SAMPLERATE, -MODE, CHANNELS, allowedchanges=0)
+
+print("\nMixer settings :")
+print("    ...frequency = %s" % SAMPLERATE)
+print("    ...mode      = %s" % MODE)
+print("    ...channels  = %s" % CHANNELS)
+print("\n")
+
+try:
+    fire_sound = pygame.mixer.Sound("../Assets/firepit.ogg")
+    fire_sound.play(-1)
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nSound file firepit.ogg is missing from the Assets directory.')
+
 while GAME:
 
     pygame.event.pump()
@@ -135,30 +173,33 @@ while GAME:
     surface_ = fire_effect(
         WIDTH,
         HEIGHT,
-        3.97 + uniform(-0.012, 0.012),
+        3.97 + uniform(-0.035, 0.012),
         fire_palette,
         fire_array,
         fire_intensity_         =randint(0, 32),
         reduce_factor_          =3,
         bloom_                  =True,
-        fast_bloom_             =False,
-        bpf_threshold_          = bpf,
+        fast_bloom_             =True,
+        bpf_threshold_          =bpf,
         brightness_             =True,
-        brightness_intensity_   = 0.095 + uniform(0.055, 0.09),
+        brightness_intensity_   =0.065 + uniform(0.055, 0.09),
         transpose_              =False,
         border_                 =False,
-        low_                    =30,
-        high_                   =WIDTH-30,
+        low_                    =10,
+        high_                   =WIDTH-10,
         blur_                   =True,
-        smooth_                 =True
-    ).convert(32, RLEACCEL)
+        smooth_                 =True,
+        surface_                =TmpSurface,
 
-    SCREEN.blit(surface_, (0, 0), special_flags=BLEND_RGB_ADD)
+    )
+
+    SCREEN.blit(surface_, (0, 0), special_flags=pygame.BLEND_RGB_ADD)
+    CLOCK.tick(800)
     t = CLOCK.get_fps()
     avg.append(t)
-    show_fps(SCREEN, t, avg)
+    avg = show_fps(SCREEN, t, avg)
     pygame.display.flip()
-    CLOCK.tick()
+
     FRAME += 1
 
     bpf += delta
@@ -170,6 +211,6 @@ while GAME:
     pygame.display.set_caption(
         "Test fire_effect %s fps "
         "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-    avg = avg[ 10: ]
+
 
 pygame.quit()

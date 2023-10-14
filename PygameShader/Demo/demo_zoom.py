@@ -22,34 +22,33 @@ except ImportError:
     raise ImportError("\n<Pygame> library is missing on your system."
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
 
-# try:
-#     import cupy
-# except ImportError:
-#     raise ImportError("\n<Pygame> library is missing on your system."
-#                       "\nTry: \n   C:\\pip install cupy on a window command prompt.")
-
 try:
     import PygameShader
-    from PygameShader.shader import zoom
+    from PygameShader.shader import zoom, bilinear
 except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
                       "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
 
 
-def show_fps(screen_, fps_, avg_) -> None:
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 15)
+
+
+def show_fps(screen_, fps_, avg_) -> list:
     """ Show framerate in upper left corner """
-    font = pygame.font.SysFont("Arial", 15)
+
     fps = str(f"fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
 
-    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    fps_text = font.render(fps, True, pygame.Color("coral"))
     screen_.blit(fps_text, (10, 0))
     if av != 0:
         av = str(f"avg:{av:.3f} MOVE YOUR MOUSE")
-        avg_text = font.render(av, 1, pygame.Color("coral"))
+        avg_text = font.render(av, True, pygame.Color("coral"))
         screen_.blit(avg_text, (100, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
+    return avg_
 
 
 width = 800
@@ -61,7 +60,12 @@ SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.SCA
 SCREEN.set_alpha(None)
 pygame.init()
 
-background = pygame.image.load('..//Assets//city.jpg')
+try:
+    background = pygame.image.load('..//Assets//space5.jpg')
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file space5.jpg is missing from the Assets directory.')
+
 background = pygame.transform.smoothscale(background, (width, height))
 background.convert(32, RLEACCEL)
 background.set_alpha(None)
@@ -85,6 +89,7 @@ MOUSE_POS = Vector2()
 MOUSE_POS.x = 0
 MOUSE_POS.y = 0
 
+prev_surface = background
 while STOP_GAME:
 
     event_pump()
@@ -103,12 +108,14 @@ while STOP_GAME:
             if MOUSE_POS.y < 0:MOUSE_POS.y = 0
             if MOUSE_POS.y > height:MOUSE_POS.y = height
 
-    surf = zoom(background, MOUSE_POS.x, MOUSE_POS.y, 0.9999 - ((FRAME % 255) / 255.0))
+    z = 0.9999 - ((FRAME % 255) / 255.0)
+
+    surf = zoom(background, MOUSE_POS.x, MOUSE_POS.y, z)
 
     SCREEN.blit(surf, (0, 0))
     t = clock.get_fps()
     avg.append(t)
-    show_fps(SCREEN, t, avg)
+    avg = show_fps(SCREEN, t, avg)
     pygame.display.flip()
     clock.tick()
     FRAME += 1
@@ -117,5 +124,6 @@ while STOP_GAME:
         "Demo zoom CPU %s fps"
         "(%sx%s)" % (round(clock.get_fps(), 2), width, height))
     avg = avg[10:]
+
 
 pygame.quit()

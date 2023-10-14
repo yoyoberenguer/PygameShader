@@ -41,13 +41,14 @@ try:
     import cupy
 except ImportError:
     __CUPY = False
-    print("\n**CUPY is not installed on your system**")
+    print("\n** CUPY is not installed on your system **")
 
 from Cython.Build import cythonize
 from setuptools import Extension
 import platform
 import warnings
 import sys
+from config import THREAD_NUMBER, OPENMP, OPENMP_PROC, LANGUAGE, __VERSION__
 
 print("\n---PYTHON COPYRIGHT---\n")
 print(sys.copyright)
@@ -71,13 +72,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 # version 1.0.1 Yank, latest version 1.0.9
 # pypitest latest version 1.0.29
 
-OPENMP = True
-OPENMP_PROC = "-fopenmp"  # "-lgomp"
-__VERSION__ = "1.0.9"  # check the file shader.pyx and make sure the version is identical
-LANGUAGE = "c++"
 ext_link_args = ""
 
 py_requires = "PygameShader requires python3 version 3.6 or above."
+# If you are building the project from source with a python version
+# > python 3.11 you can extend the range to force the build process
+# e.g py_minor_versions = [x for x in range(6, 15)] ** compatible until
+# python 3.14
 py_minor_versions = [x for x in range(6, 12)]
 
 if hasattr(sys, 'version_info'):
@@ -128,13 +129,14 @@ elif plat.startswith("LINUX"):
     if OPENMP:
         ext_compile_args = \
             ["-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
-             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3",
+             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "ffast-math", "--param=max-vartrack-size=1500000",
              "-Wall", OPENMP_PROC, "-static"]
         ext_link_args = [OPENMP_PROC]
     else:
         ext_compile_args = \
             ["-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
-             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-Wall", "-static"]
+             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "ffast-math", "-Wall", "-static", 
+	     "--param=max-vartrack-size=1500000"]
         ext_link_args = ""
 else:
     raise ValueError("PygameShader can be build on Windows and Linux systems only.")
@@ -148,6 +150,8 @@ print("EXTRA LINK FLAGS      : %s " % ext_link_args)
 print("LANGUAGE              : %s " % LANGUAGE)
 print("MULTITPROCESSING      : %s " % OPENMP)
 print("MULTITPROCESSING FLAG : %s " % OPENMP_PROC)
+if OPENMP:
+    print("MAX THREADS           : %s " % THREAD_NUMBER)
 
 print("\n")
 print("PYTHON VERSION        : %s.%s " % (sys.version_info.major, sys.version_info.minor))
@@ -157,12 +161,25 @@ print("NUMPY VERSION         : %s " % numpy.__version__)
 print("PYGAME VERSION        : %s " % pygame.__version__)
 if __CUPY:
     print("CUPY VERSION          : %s " % cupy.__version__)
+else:
+    print("CUPY IS NOT INSTALL")
+
+
 try:
     print("SDL VERSION           : %s.%s.%s " % pygame.version.SDL)
 except:
     pass  # ignore SDL versioning issue
 
 print("\n*** BUILDING PYGAMESHADER VERSION ***  : %s \n" % __VERSION__)
+
+print(
+    "GPU SHADERS INFO"
+    "\nIn order to use the GPU shaders the library CUPY has to be installed on your system\n"
+    "in addition to CUDA Toolkit: v10.2 / v11.0 / v11.1 / v11.2 / v11.3 / v11.4 / v11.5 / "
+    "v11.6 or above.\n"
+    "Please refer to the below link for the full installation guide https://docs.cupy.dev/"
+    "en/stable/install.html\n"
+    "To check if CUDA is installed type nvcc --version in a command prompt.\n")
 
 # define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
 setuptools.setup(
@@ -191,6 +208,15 @@ setuptools.setup(
                   language=LANGUAGE),
         Extension("PygameShader.shader_gpu", ["PygameShader/shader_gpu.pyx"],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE),
+        Extension("PygameShader.BurstSurface", ["PygameShader/BurstSurface.pyx"],
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE),
+        Extension("PygameShader.BlendFlags", ["PygameShader/BlendFlags.pyx"],
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE),
+        Extension("PygameShader.Sprites", ["PygameShader/Sprites.pyx"],
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
                   language=LANGUAGE)
     ]),
 
@@ -203,6 +229,8 @@ setuptools.setup(
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Cython",
 
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
 
@@ -210,7 +238,9 @@ setuptools.setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10'
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Topic :: Software Development :: Libraries :: pygame'
     ],
 
     install_requires=[
@@ -233,15 +263,25 @@ setuptools.setup(
           'requirements.txt',
           'PygameShader/__init__.py',
           'PygameShader/__init__.pxd',
+          'PygameShader/Dithering.py',
           'PygameShader/setup_shader.py',
+          'PygameShader/BlendFlags.pxd',
+          'PygameShader/BlendFlags.pyx',
           'PygameShader/shader.pyx',
           'PygameShader/shader.pxd',
           'PygameShader/misc.pyx',
           'PygameShader/misc.pxd',
           'PygameShader/gaussianBlur5x5.pyx',
+          'PygameShader/gaussianBlur5x5.pxd',
           'PygameShader/Palette.pyx',
+          'PygameShader/Palette.pxd',
           'PygameShader/shader_gpu.pyx',
-          'PygameShader/shader_gpu.pxd'
+          'PygameShader/shader_gpu.pxd',
+          'PygameShader/config.py',
+          'PygameShader/BurstSurface.pxd',
+          'PygameShader/BurstSurface.pyx',
+          'PygameShader/Sprites.pxd',
+          'PygameShader/Sprites.pyx'
           ]),
         ('./lib/site-packages/PygameShader/Include',
          ['PygameShader/Include/Shaderlib.c'
@@ -254,17 +294,24 @@ setuptools.setup(
         ('./lib/site-packages/PygameShader/Assets',
          [
              'PygameShader/Assets/Aliens.jpg',
+             'PygameShader/Assets/AliensLuma.png',
              'PygameShader/Assets/background.jpg',
              'PygameShader/Assets/background2.jpg',
              'PygameShader/Assets/city.jpg',
              'PygameShader/Assets/ES_WaterDrip1.wav',
              'PygameShader/Assets/ES_WaterDrip2.wav',
              'PygameShader/Assets/ES_WaterDrip3.wav',
-             'PygameShader/Assets/img.png',
+             'PygameShader/Assets/film_strip2.png',
+             'PygameShader/Assets/firepit.ogg',
+             'PygameShader/Assets/jump_flight.ogg',
+             'PygameShader/Assets/predator.ogg',
+             'PygameShader/Assets/vision_swap.ogg',
+             'PygameShader/Assets/img.jpg',
              'PygameShader/Assets/Radial4.png',
              'PygameShader/Assets/Radial8.png',
              'PygameShader/Assets/redvignette.png',
              'PygameShader/Assets/space1.jpg',
+             'PygameShader/Assets/space1_alpha.jpg',
              'PygameShader/Assets/space2.jpg',
              'PygameShader/Assets/Bokeh__Lens_Dirt_9.jpg',
              'PygameShader/Assets/Bokeh__Lens_Dirt_38.jpg',
@@ -273,19 +320,40 @@ setuptools.setup(
              'PygameShader/Assets/Bokeh__Lens_Dirt_54.jpg',
              'PygameShader/Assets/Bokeh__Lens_Dirt_67.jpg',
              'PygameShader/Assets/Parrot.jpg',
-             'PygameShader/Assets/space2_seamless_alpha.jpg'
+             'PygameShader/Assets/space2_seamless_alpha.jpg',
+             'PygameShader/Assets/space2_seamless.jpg',
+             'PygameShader/Assets/space3.jpg',
+             'PygameShader/Assets/space5.jpg',
+             'PygameShader/Assets/space7.jpg'
 
          ]),
         ('./lib/site-packages/PygameShader/Demo',
          [
+             'PygameShader/Demo/__init__.py',
              'PygameShader/Demo/cloud_smoke_effect.py',
-             'PygameShader/Demo/demo_chromatic.py',
              'PygameShader/Demo/demo_bloom.py',
+             'PygameShader/Demo/demo_burst.py',
+             'PygameShader/Demo/demo_burst_exp.py',
+             'PygameShader/Demo/demo_chromatic.py',
              'PygameShader/Demo/demo_fire.py',
+             'PygameShader/Demo/demo_fire_border.py',
+             'PygameShader/Demo/demo_fisheye.py',
              'PygameShader/Demo/demo_glitch.py',
+             'PygameShader/Demo/demo_light.py',
+             'PygameShader/Demo/demo_magnifier.py',
+             'PygameShader/Demo/demo_predator.py',
+             'PygameShader/Demo/demo_rain.py',
+             'PygameShader/Demo/demo_ripple.py',
+             'PygameShader/Demo/demo_ripple1.py',
+             'PygameShader/Demo/demo_ripple_seabed.py',
+             'PygameShader/Demo/demo_scroll.py',
              'PygameShader/Demo/demo_transition.py',
+             'PygameShader/Demo/demo_transition_inplace.py',
+             'PygameShader/Demo/demo_tunnel.py',
              'PygameShader/Demo/demo_wave.py',
+             'PygameShader/Demo/demo_wave_static.py',
              'PygameShader/Demo/demo_zoom.py',
+
              'PygameShader/Demo/GPU_chromatic.py',
              'PygameShader/Demo/GPU_demo_ripple.py',
              'PygameShader/Demo/GPU_fisheye.py',
@@ -293,6 +361,7 @@ setuptools.setup(
              'PygameShader/Demo/GPU_light.py',
              'PygameShader/Demo/GPU_wave.py',
              'PygameShader/Demo/GPU_zoom.py'
+
          ])
     ],
 

@@ -33,21 +33,25 @@ except ImportError:
                       "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
 
 
-def show_fps(screen_, fps_, avg_) -> None:
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 15)
+
+
+def show_fps(screen_, fps_, avg_) -> list:
     """ Show framerate in upper left corner """
-    font = pygame.font.SysFont("Arial", 15)
+
     fps = str(f"Move your mouse - fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
 
-    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    fps_text = font.render(fps, True, pygame.Color("coral"))
     screen_.blit(fps_text, (10, 0))
     if av != 0:
         av = str(f"avg:{av:.3f}")
-        avg_text = font.render(av, 1, pygame.Color("coral"))
+        avg_text = font.render(av, True, pygame.Color("coral"))
         screen_.blit(avg_text, (200, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
-
+    return avg_
 
 get_gpu_info()
 
@@ -55,11 +59,17 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED)
+SCREEN = pygame.display.set_mode(
+    SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED)
 
 pygame.init()
 
-background = pygame.image.load('..//Assets//background2.jpg').convert()
+try:
+    background = pygame.image.load('..//Assets//background2.jpg').convert()
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file background2.jpg is missing from the Assets directory.')
+
 background = pygame.transform.smoothscale(background, (800, 800))
 background.set_alpha(10)
 background_rgb = cupy.asarray(pygame.surfarray.pixels3d(background), dtype=cupy.uint8)
@@ -71,7 +81,12 @@ back = background.copy()
 
 pygame.display.set_caption("GPU demo light effect")
 
-light = pygame.image.load('..//Assets//Radial8.png').convert_alpha()
+try:
+    light = pygame.image.load('..//Assets//Radial8.png').convert_alpha()
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file Radial8.png is missing from the Assets directory.')
+
 light = pygame.transform.smoothscale(light, (400, 400))
 lalpha = cupy.asarray(pygame.surfarray.pixels_alpha(light), dtype=cupy.uint8)
 
@@ -110,7 +125,7 @@ while STOP_GAME:
             break
 
         if event.type == pygame.MOUSEMOTION:
-            MOUSE_POS = event.pos
+            MOUSE_POS = list(event.pos)
             if MOUSE_POS[0] < 0:MOUSE_POS[0] = 0
             if MOUSE_POS[0] > width:MOUSE_POS[0] = width
             if MOUSE_POS[1] < 0:MOUSE_POS[1] = 0
@@ -136,7 +151,7 @@ while STOP_GAME:
 
     t = clock.get_fps()
     avg.append(t)
-    show_fps(SCREEN, t, avg)
+    avg = show_fps(SCREEN, t, avg)
 
     clock.tick()
     FRAME += 1

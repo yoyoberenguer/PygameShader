@@ -1,4 +1,5 @@
-# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True, profile=False
+# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
+# profile=False, initializedcheck=False
 # cython: optimize.use_switch=True
 # cython: warn.maybe_uninitialized=False
 # cython: warn.unused=False

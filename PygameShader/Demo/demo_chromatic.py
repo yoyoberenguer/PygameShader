@@ -21,47 +21,51 @@ try:
 except ImportError:
     raise ImportError("\n<Pygame> library is missing on your system."
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
-#
-# try:
-#     import cupy
-# except ImportError:
-#     raise ImportError("\n<Pygame> library is missing on your system."
-#                       "\nTry: \n   C:\\pip install cupy on a window command prompt.")
+
 
 try:
     import PygameShader
-    from PygameShader.shader import chromatic
+    from PygameShader.shader import chromatic, chromatic_inplace
 except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
                       "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
 
 
-def show_fps(screen_, fps_, avg_) -> None:
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 15)
+
+
+def show_fps(screen_, fps_, avg_) -> list:
     """ Show framerate in upper left corner """
-    font = pygame.font.SysFont("Arial", 15)
+
     fps = str(f"fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
 
-    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    fps_text = font.render(fps, True, pygame.Color("coral"))
     screen_.blit(fps_text, (10, 0))
     if av != 0:
         av = str(f"avg:{av:.3f} MOVE YOUR MOUSE")
-        avg_text = font.render(av, 1, pygame.Color("coral"))
+        avg_text = font.render(av, True, pygame.Color("coral"))
         screen_.blit(avg_text, (100, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
-
+    return avg_
 
 width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
 # pygame.display.init()
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.SCALED)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, 32)
 
 pygame.init()
 
-background = pygame.image.load('..//Assets//city.jpg')
+try:
+    background = pygame.image.load('..//Assets//city.jpg')
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file city.jpg is missing from the Assets directory.')
+
 background = pygame.transform.smoothscale(background, (width, height))
 background.convert(32, RLEACCEL)
 background.set_alpha(None)
@@ -109,11 +113,10 @@ while STOP_GAME:
 
     t = clock.get_fps()
     avg.append(t)
-    show_fps(SCREEN, t, avg)
+    avg = show_fps(SCREEN, t, avg)
     pygame.display.flip()
     clock.tick()
     FRAME += 1
-    avg = avg[10:]
 
     pygame.display.set_caption(
         "Demo chromatic aberration CPU %s fps"

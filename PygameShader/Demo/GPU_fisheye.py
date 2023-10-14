@@ -36,21 +36,25 @@ except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
                       "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
 
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 15)
 
-def show_fps(screen_, fps_, avg_) -> None:
+
+def show_fps(screen_, fps_, avg_) -> list:
     """ Show framerate in upper left corner """
-    font = pygame.font.SysFont("Arial", 15)
+
     fps = str(f"fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
 
-    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    fps_text = font.render(fps, True, pygame.Color("coral"))
     screen_.blit(fps_text, (10, 0))
     if av != 0:
         av = str(f"avg:{av:.3f}")
-        avg_text = font.render(av, 1, pygame.Color("coral"))
+        avg_text = font.render(av, True, pygame.Color("coral"))
         screen_.blit(avg_text, (90, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
+    return avg_
 
 
 get_gpu_info()
@@ -59,15 +63,25 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.SCALED)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN)
 
 pygame.init()
 
-background = pygame.image.load('..//Assets//Aliens.jpg').convert()
+try:
+    background = pygame.image.load('..//Assets//Aliens.jpg').convert()
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file Aliens.jpg is missing from the Assets directory.')
+
 background = pygame.transform.smoothscale(background, (800, 600))
 background_copy = background.copy()
 
-city = pygame.image.load('..//Assets//city.jpg').convert()
+try:
+    city = pygame.image.load('..//Assets//city.jpg').convert()
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file city.jpg is missing from the Assets directory.')
+
 city = pygame.transform.smoothscale(city, (800, 600))
 
 MOUSE_POS = [0, 0]
@@ -112,7 +126,7 @@ while STOP_GAME:
 
     t = clock.get_fps()
     avg.append(t)
-    show_fps(SCREEN, t, avg)
+    avg = show_fps(SCREEN, t, avg)
     clock.tick()
     FRAME += 1
 

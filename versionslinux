@@ -7,22 +7,14 @@ rm *.pyd
 rm *.so
 cd ..
 
-python3.6 setup.py build_ext --inplace && python3.6 setup.py sdist bdist_wheel
+python3.6 setup.py build_ext --inplace && python3.6 setup.py bdist_wheel
 
 cd PygameShader
 rm *.cpp
 rm *.so
 cd ..
 
-python3.7 setup.py build_ext --inplace && python3.7 setup.py sdist bdist_wheel
-
-
-cd PygameShader
-rm *.cpp
-rm *.so
-cd ..
-
-python3.8 setup.py build_ext --inplace && python3.8 setup.py sdist bdist_wheel
+python3.7 setup.py build_ext --inplace && python3.7 setup.py bdist_wheel
 
 
 cd PygameShader
@@ -30,7 +22,7 @@ rm *.cpp
 rm *.so
 cd ..
 
-python3.9 setup.py build_ext --inplace && python3.9 setup.py sdist bdist_wheel
+python3.8 setup.py build_ext --inplace && python3.8 setup.py bdist_wheel
 
 
 cd PygameShader
@@ -38,7 +30,15 @@ rm *.cpp
 rm *.so
 cd ..
 
-python3.10 setup.py build_ext --inplace && python3.10 setup.py sdist bdist_wheel
+python3.9 setup.py build_ext --inplace && python3.9 setup.py bdist_wheel
+
+
+cd PygameShader
+rm *.cpp
+rm *.so
+cd ..
+
+python3.10 setup.py build_ext --inplace && python3.10 setup.py bdist_wheel
 
 
 cd PygameShader

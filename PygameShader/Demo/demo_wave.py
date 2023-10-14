@@ -26,33 +26,41 @@ except ImportError:
     raise ImportError("\n<Pygame> library is missing on your system."
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
 
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 15)
 
-def show_fps(screen_, fps_, avg_) -> None:
+
+def show_fps(screen_, fps_, avg_) -> list:
     """ Show framerate in upper left corner """
-    font = pygame.font.SysFont("Arial", 15)
+
     fps = str(f"CPU fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
 
-    fps_text = font.render(fps, 1, pygame.Color("green"))
+    fps_text = font.render(fps, True, pygame.Color("green"))
     screen_.blit(fps_text, (10, 0))
     if av != 0:
         av = str(f"avg:{av:.3f}")
-        avg_text = font.render(av, 1, pygame.Color("green"))
+        avg_text = font.render(av, True, pygame.Color("green"))
         screen_.blit(avg_text, (120, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
-
+    return avg_
 
 # Set the display to 1024 x 768
 WIDTH = 800
 HEIGHT = 600
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED, 32)
 SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 pygame.init()
 
 # Load the background image
-BACKGROUND = pygame.image.load("../Assets/background.jpg").convert()
+try:
+    BACKGROUND = pygame.image.load("../Assets/background2.jpg").convert()
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file background2.jpg is missing from the Assets directory.')
+
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
 image = BACKGROUND.copy()
@@ -83,7 +91,7 @@ while GAME:
 
     t = CLOCK.get_fps()
     avg.append(t)
-    show_fps(SCREEN, t, avg)
+    avg = show_fps(SCREEN, t, avg)
 
     pygame.display.flip()
     CLOCK.tick()
@@ -96,5 +104,5 @@ while GAME:
         "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
 
     image = BACKGROUND.copy()
-    avg = avg[10:]
+
 pygame.quit()

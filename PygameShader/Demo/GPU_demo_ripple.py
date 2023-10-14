@@ -36,20 +36,25 @@ except ImportError:
                       "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
 
 
-def show_fps(screen_, fps_, avg_) -> None:
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 15)
+
+
+def show_fps(screen_, fps_, avg_) -> list:
     """ Show framerate in upper left corner """
-    font = pygame.font.SysFont("Arial", 15)
+
     fps = str(f"Move your mouse - fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
 
-    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    fps_text = font.render(fps, True, pygame.Color("coral"))
     screen_.blit(fps_text, (10, 0))
     if av != 0:
         av = str(f"avg:{av:.3f}")
-        avg_text = font.render(av, 1, pygame.Color("coral"))
+        avg_text = font.render(av, True, pygame.Color("coral"))
         screen_.blit(avg_text, (200, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
+    return avg_
 
 
 get_gpu_info()
@@ -58,17 +63,27 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED, 32)
+SCREEN = pygame.display.set_mode(
+    SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED, 32)
 
 # from PygameShader.VideoRecording import capture_video, write_video
 
+try:
+    texture = pygame.image.load('../Assets/background2.jpg').convert()
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file background2.jpg is missing from the Assets directory.')
 
-texture = pygame.image.load('../Assets/background2.jpg').convert()
 texture = pygame.transform.smoothscale(texture, (width, height))
 texture.set_colorkey((0, 0, 0, 0), pygame.RLEACCEL)
 texture.set_alpha(None)
 
-BACKGROUND = pygame.image.load("../Assets/background2.jpg").convert()
+try:
+    BACKGROUND = pygame.image.load("../Assets/background2.jpg").convert()
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file background2.jpg is missing from the Assets directory.')
+
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (width, height))
 BACKGROUND.set_colorkey((0, 0, 0, 0), pygame.RLEACCEL)
 BACKGROUND_COPY = BACKGROUND.copy()
@@ -98,9 +113,23 @@ block_and_grid_info(width, height)
 
 avg = []
 STOP_GAME = True
-WaterDrop1    = pygame.mixer.Sound("..//Assets//ES_WaterDrip1.wav")
-WaterDrop2    = pygame.mixer.Sound("..//Assets//ES_WaterDrip2.wav")
-WaterDrop3    = pygame.mixer.Sound("..//Assets//ES_WaterDrip3.wav")
+try:
+    WaterDrop1 = pygame.mixer.Sound("..//Assets//ES_WaterDrip1.wav")
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nSound file ES_WaterDrip1.wav is missing from the Assets directory.')
+
+try:
+    WaterDrop2 = pygame.mixer.Sound("..//Assets//ES_WaterDrip2.wav")
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nSound file ES_WaterDrip2.wav is missing from the Assets directory.')
+
+try:
+    WaterDrop3 = pygame.mixer.Sound("..//Assets//ES_WaterDrip3.wav")
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nSound file ES_WaterDrip2.wav is missing from the Assets directory.')
 WaterDrops    = [WaterDrop1, WaterDrop2, WaterDrop3]
 
 mouse_pos = pygame.math.Vector2()
@@ -142,11 +171,10 @@ while STOP_GAME:
 
     SCREEN.blit(surf, (0, 0), special_flags=0)
 
-
     clock.tick(120)
     t = clock.get_fps()
     avg.append(t)
-    show_fps(SCREEN, t, avg)
+    avg = show_fps(SCREEN, t, avg)
     FRAME += 1
 
     # capture_video(SCREEN, width, height, compression_=False)

@@ -18,34 +18,36 @@ repository = https://upload.pypi.org/legacy/
 # twine upload --repository testpypi dist/*
 
 import setuptools
+
 try:
     import Cython
 except ImportError:
     raise ImportError("\n<Cython> library is missing on your system."
-          "\nTry: \n   C:\\pip install Cython")
+                      "\nTry: \n   C:\\pip install Cython")
 
 try:
     import numpy
 except ImportError:
     raise ImportError("\n<numpy> library is missing on your system."
-          "\nTry: \n   C:\\pip install numpy")
-
+                      "\nTry: \n   C:\\pip install numpy")
 
 try:
     import pygame
 except ImportError:
     raise ImportError("\n<pygame> library is missing on your system."
-          "\nTry: \n   C:\\pip install pygame")
+                      "\nTry: \n   C:\\pip install pygame")
 
 __CUPY = False
 try:
     import cupy
+
     __CUPY = True
 except ImportError:
     print("\n**CUPY is not installed on your system**")
 
 from Cython.Build import cythonize
 from setuptools import Extension
+from config import THREAD_NUMBER, OPENMP, OPENMP_PROC, LANGUAGE, __VERSION__
 import platform
 import warnings
 import sys
@@ -65,21 +67,13 @@ except ImportError:
     raise ImportError("\n<numpy> library is missing on your system."
                       "\nTry: \n   C:\\pip install numpy on a window command prompt.")
 
-
-with open("../README.md", "r", encoding="utf-8") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-# version 1.0.1 Yank, latest version 1.0.2
-# pypitest latest version 1.0.17
-
-OPENMP = True
-OPENMP_PROC = "-fopenmp" # "-lgomp"
-__VERSION__ = "1.0.8"  # check the file shader.pyx and make sure the version is identical
-LANGUAGE = "c++"
 ext_link_args = ""
 
 py_requires = "PygameShader requires python3 version 3.6 or above."
-py_minor_versions = [x for x in range(6, 12)]
+py_minor_versions = [ x for x in range(6, 12) ]
 
 if hasattr(sys, 'version_info'):
     try:
@@ -96,18 +90,17 @@ else:
 if py_major_ver != 3 or py_minor_ver not in py_minor_versions:
     raise SystemExit(
         "PygameShader support python3 versions 3.6 or above got version %s"
-        % str(py_major_ver)+"."+str(py_minor_ver))
+        % str(py_major_ver) + "." + str(py_minor_ver))
 
 if hasattr(platform, "architecture"):
     arch = platform.architecture()
     if isinstance(arch, tuple):
-        proc_arch_bits = arch[0].upper()
-        proc_arch_type = arch[1].upper()
+        proc_arch_bits = arch[ 0 ].upper()
+        proc_arch_type = arch[ 1 ].upper()
     else:
         raise AttributeError("Platform library is not install correctly")
 else:
     raise AttributeError("Platform library is missing attribute <architecture>")
-
 
 if hasattr(platform, "machine"):
     machine_type = platform.machine().upper()
@@ -120,25 +113,24 @@ if hasattr(platform, "platform"):
 else:
     raise AttributeError("Platform library is missing attribute <platform>")
 
-
 if plat.startswith("WINDOWS"):
-    ext_compile_args = ["/openmp" if OPENMP else "", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"]
+    ext_compile_args = [ "/openmp" if OPENMP else "", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot" ]
 
 
 elif plat.startswith("LINUX"):
     if OPENMP:
         ext_compile_args = \
             ["-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
-             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-Wall", OPENMP_PROC, "-static"]
-        ext_link_args = [OPENMP_PROC]
+              "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-Wall", OPENMP_PROC,
+              "-static"]
+        ext_link_args = [ OPENMP_PROC ]
     else:
         ext_compile_args = \
             ["-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
-             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-Wall", "-static"]
+              "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-Wall", "-static"]
         ext_link_args = ""
 else:
     raise ValueError("PygameShader can be build on Windows and Linux systems only.")
-
 
 print("\n---COMPILATION---\n")
 print("SYSTEM                : %s " % plat)
@@ -160,14 +152,14 @@ if __CUPY:
 try:
     print("SDL VERSION           : %s.%s.%s " % pygame.version.SDL)
 except:
-    pass # ignore SDL versioning issue
+    pass  # ignore SDL versioning issue
 
-print("\wn*** BUILDING PYGAMESHADER VERSION ***  : %s \n" % __VERSION__)
+print("\n*** BUILDING PYGAMESHADER VERSION ***  : %s \n" % __VERSION__)
 
 # define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
 setuptools.setup(
     name="PygameShader",
-    version= __VERSION__,       # testing version "1.0.27",
+    version=__VERSION__,  # testing version "1.0.27",
     author="Yoann Berenguer",
     author_email="yoyoberenguer@hotmail.com",
     description="Pygame effects for 2D video game and arcade game",
@@ -175,27 +167,36 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/yoyoberenguer/PygameShader",
     # packages=setuptools.find_packages(),
-    packages=['PygameShader'],
+    packages=[ 'PygameShader' ],
 
     ext_modules=cythonize(module_list=
 
-        [
+    [
 
-        Extension("shader", ["shader.pyx"],
+        Extension("shader", [ "shader.pyx" ],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
                   language=LANGUAGE),
-        Extension("misc", ["misc.pyx"],
+        Extension("misc", [ "misc.pyx" ],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
                   language=LANGUAGE),
-        Extension("gaussianBlur5x5", ["gaussianBlur5x5.pyx"],
+        Extension("gaussianBlur5x5", [ "gaussianBlur5x5.pyx" ],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
                   language=LANGUAGE),
-        Extension("Palette", ["Palette.pyx"],
+        Extension("Palette", [ "Palette.pyx" ],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
                   language=LANGUAGE),
-        Extension("shader_gpu", ["shader_gpu.pyx"],
+        Extension("shader_gpu", [ "shader_gpu.pyx" ],
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE),
+        Extension("BurstSurface", [ "BurstSurface.pyx" ],
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE),
+        Extension("BlendFlags", [ "BlendFlags.pyx" ],
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE),
+        Extension("Sprites", ["Sprites.pyx"],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
                   language=LANGUAGE)
     ]),
 
-    include_dirs=[numpy.get_include()])
+    include_dirs=[ numpy.get_include() ])

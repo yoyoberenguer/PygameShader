@@ -1,5 +1,11 @@
-# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True, profile=False
+# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
+# profile=False, initializedcheck=False
 # cython: optimize.use_switch=True
+# cython: warn.maybe_uninitialized=False
+# cython: warn.unused=False
+# cython: warn.unused_result=False
+# cython: warn.unused_arg=False
+# cython: language_level=3
 # encoding: utf-8
 
 """
@@ -62,10 +68,10 @@ except ImportError:
     raise ImportError("\n<numpy> library is missing on your system."
           "\nTry: \n   C:\\pip install numpy on a window command prompt.")
 
-from shader cimport hsv, rgb, minf, struct_rgb_to_hsv
-from libc.math cimport round as round_c
-from libc.math cimport floor as floor_c, sqrt
-from libc.math cimport fabs as abs_c
+from PygameShader.shader cimport hsv, rgb, struct_rgb_to_hsv
+from libc.math cimport roundf as round_c
+from libc.math cimport floorf  as floor_c, sqrtf as sqrt
+from libc.math cimport fabsf as abs_c
 from libc.stdlib cimport malloc, free
 from libc.stdio cimport printf
 
@@ -74,16 +80,13 @@ import numpy
 cimport numpy as np
 
 DEF SCHEDULE = 'static'
+from PygameShader.config import OPENMP, THREAD_NUMBER, __VERSION__
 
-DEF OPENMP = True
-# num_threads – The num_threads argument indicates how many threads the team should consist of.
-# If not given, OpenMP will decide how many threads to use.
-# Typically this is the number of cores available on the machine. However,
-# this may be controlled through the omp_set_num_threads() function,
-# or through the OMP_NUM_THREADS environment variable.
-DEF THREAD_NUMBER = 1
-if OPENMP is True:
-    DEF THREAD_NUMBER = 8
+cdef int THREADS = 1
+
+if OPENMP:
+     THREADS = THREAD_NUMBER
+
 
 
 @cython.boundscheck(False)
@@ -91,6 +94,7 @@ if OPENMP is True:
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef swap_channels24_c(surface_, model):
     """
     THIS PLUGIN ALLOW YOU TO SWAP CHANNEL OF AN IMAGE 
@@ -116,7 +120,7 @@ cpdef swap_channels24_c(surface_, model):
     width, height = surface_.get_size()
 
     try:
-        rgb_ = pixels3d(surface_)
+        rgb_ = surface_.get_view('3')
     except (pygame.error, ValueError):
         try:
             rgb_ = array3d(surface_)
@@ -134,7 +138,7 @@ cpdef swap_channels24_c(surface_, model):
     bi = order[bb]
 
     with nogil:
-        for i in prange(width, schedule=SCHEDULE, num_threads=THREAD_NUMBER):
+        for i in prange(width, schedule=SCHEDULE, num_threads=THREADS):
             for j in range(height):
                 if ri == -1:
                     new_array[j, i, 0] = 0
@@ -161,6 +165,7 @@ cpdef swap_channels24_c(surface_, model):
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef create_horizontal_gradient_1d(
         int value,
         tuple start_color=(255, 0, 0),
@@ -190,7 +195,7 @@ cpdef create_horizontal_gradient_1d(
         float * row_
 
     with nogil:
-        for i in prange(value, schedule=SCHEDULE, num_threads=THREAD_NUMBER):
+        for i in prange(value, schedule=SCHEDULE, num_threads=THREADS):
            row_ = &row[i]
            rgb_gradient[i, 0] = <unsigned char>(start[0] + row_[0] * diff_[0])
            rgb_gradient[i, 1] = <unsigned char>(start[1] + row_[0] * diff_[1])
@@ -205,6 +210,7 @@ cpdef create_horizontal_gradient_1d(
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef create_horizontal_gradient_1d_alpha(
         int value,
         tuple start_color=(255, 0, 0, 255),
@@ -234,7 +240,7 @@ cpdef create_horizontal_gradient_1d_alpha(
         float * row_
 
     with nogil:
-        for i in prange(value, schedule=SCHEDULE, num_threads=THREAD_NUMBER):
+        for i in prange(value, schedule=SCHEDULE, num_threads=THREADS):
            row_ = &row[i]
            rgba_gradient[i, 0] = <unsigned char>(start[0] + row_[0] * diff_[0])
            rgba_gradient[i, 1] = <unsigned char>(start[1] + row_[0] * diff_[1])
@@ -248,6 +254,7 @@ cpdef create_horizontal_gradient_1d_alpha(
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef object horizontal_grad3d(
         int width,
         int height,
@@ -275,7 +282,7 @@ cpdef object horizontal_grad3d(
         float * row_
 
     with nogil:
-        for j in prange(height, schedule='static', num_threads=THREAD_NUMBER):
+        for j in prange(height, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(width):
                 row_ = &row[i]
                 rgb_gradient[j, i, 0] = <unsigned char>(start[0] + row_[0] * diff_[0])
@@ -291,6 +298,7 @@ cpdef object horizontal_grad3d(
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef object horizontal_grad3d_alpha(
         int width,
         int height,
@@ -318,7 +326,7 @@ cpdef object horizontal_grad3d_alpha(
         float * row_
 
     with nogil:
-        for j in prange(height, schedule='static', num_threads=THREAD_NUMBER):
+        for j in prange(height, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(width):
                 row_ = &row[i]
                 rgb_gradient[j, i, 0] = <unsigned char>(start[0] + row_[0] * diff_[0])
@@ -338,6 +346,7 @@ DEF r_max = 1.0 / 0.707106781 #inverse sqrt(0.5) or 1.0/cos45
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef create_radial_gradient(
         int width_,
         int height_,
@@ -434,6 +443,7 @@ cpdef create_radial_gradient(
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef create_radial_gradient_alpha(
         int width_,
         int height_,
@@ -538,6 +548,7 @@ cpdef create_radial_gradient_alpha(
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef create_quarter_radial_gradient(
         int width_,
         int height_,
@@ -672,6 +683,7 @@ cpdef create_quarter_radial_gradient(
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef create_quarter_radial_gradient_alpha(
         int width_,
         int height_,
@@ -808,13 +820,31 @@ cpdef create_quarter_radial_gradient_alpha(
     return frombuffer(rgb_array, (width_, height_), "RGBA").convert_alpha()
 
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+cpdef float _test_color_dist_hsv(list rgb1, list rgb2):
+    """
+    TEST ONLY
+    """
+    cdef hsv hsv_1, hsv_2
+    hsv_1 = struct_rgb_to_hsv(<float>rgb1[0]/255.0, <float>rgb1[1]/255.0, <float>rgb1[2]/255.0)
+    hsv_2 = struct_rgb_to_hsv(<float>rgb2[0]/255.0, <float>rgb2[1]/255.0, <float>rgb2[2]/255.0)
+    return color_dist_hsv(hsv_1, hsv_2)
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cdef float color_dist_hsv(hsv hsv_1, hsv hsv_2)nogil:
+    """
+    DETERMINE THE DISTANCE BETWEEN TWO COLORS IN DOMAIN HSV
+    """
     return (hsv_1.h - hsv_2.h) ** 2 + (hsv_1.s - hsv_2.s) ** 2 + (hsv_1.v - hsv_2.v) ** 2
 
 
@@ -823,8 +853,15 @@ cdef float color_dist_hsv(hsv hsv_1, hsv hsv_2)nogil:
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
-cdef float color_dist_hsl(hsl hsl_1, hsl hsl_2)nogil:
-    return (hsl_1.h - hsl_2.h) ** 2 + (hsl_1.s - hsl_2.s) ** 2 + (hsl_1.l - hsl_2.l) ** 2
+@cython.initializedcheck(False)
+cpdef float _test_color_dist_hsl(list rgb1, list rgb2):
+    """
+    TEST ONLY
+    """
+    cdef hsl hsl_1, hsl_2
+    hsl_1 = struct_rgb_to_hsl(<float>rgb1[0]/255.0, <float>rgb1[1]/255.0, <float>rgb1[2]/255.0)
+    hsl_2 = struct_rgb_to_hsl(<float>rgb2[0]/255.0, <float>rgb2[1]/255.0, <float>rgb2[2]/255.0)
+    return color_dist_hsl(hsl_1, hsl_2)
 
 
 @cython.boundscheck(False)
@@ -832,11 +869,44 @@ cdef float color_dist_hsl(hsl hsl_1, hsl hsl_2)nogil:
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
+cdef float color_dist_hsl(hsl hsl_1, hsl hsl_2)nogil:
+    """
+    DETERMINE THE DISTANCE BETWEEN TWO COLORS IN DOMAIN HSV
+    """
+    return (hsl_1.h - hsl_2.h) ** 2 + (hsl_1.s - hsl_2.s) ** 2 + (hsl_1.l - hsl_2.l) ** 2
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+cpdef _test_color_diff_hsv(list rgb__, palette_):
+    """
+    TEST ONLY
+    """
+    cdef rgb rgb_
+    rgb_.r = <float>rgb__[0]/<float>255.0
+    rgb_.g = <float>rgb__[1]/<float>255.0
+    rgb_.b = <float>rgb__[2]/<float>255.0
+    cdef Py_ssize_t l = len(palette_)
+    return color_diff_hsv(rgb_, palette_, l)
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
 cdef rgb color_diff_hsv(
         rgb color0,
         float [:, :] palette_,
-        Py_ssize_t p_length
-)nogil:
+        Py_ssize_t p_length)nogil:
+
     """
     FIND THE CLOSEST MATCH FOR A GIVEN COLOR (color0) FROM 
     A COLOR PALETTE (palette_). 
@@ -845,11 +915,10 @@ cdef rgb color_diff_hsv(
     Each colors from the palette are compare with the HSV value of the given color
     and the minimal difference between HSV values represent the closest match. 
     
-    :param color0  : struct RGB containing the pixel color 
-    :param palette_: numpy.ndarray shape (w, 3) type float32 containing the palette colors RGB 
-    range [0 ... 255] 
+    :param color0  : struct RGB containing the pixel color (normalized)
+    :param palette_: numpy.ndarray shape (w, 3) type float32 containing the palette colors RGB normalized
     :param p_length: integer; size of the given palette or number of colors
-    :return: struct RGB containing the new pixel values RGB 
+    :return: struct RGB containing the new pixel values RGB range [0..255]
     """
 
     cdef:
@@ -862,22 +931,13 @@ cdef rgb color_diff_hsv(
 
 
     # THE RGB TO HSV VALUE NEVER CHANGE INSIDE THE LOOP
-    hsv1 = struct_rgb_to_hsv(
-        <float>color0.r / <float>255.0,
-        <float>color0.g / <float>255.0,
-        <float>color0.b / <float>255.0)
-
+    hsv1 = struct_rgb_to_hsv(<float>color0.r,<float>color0.g,<float>color0.b)
 
     for i in range(p_length):
-
-        hsv2 = struct_rgb_to_hsv(
-            <float>palette_[ i, 0 ]/ <float>255.0,
-            <float>palette_[ i, 1 ]/ <float>255.0,
-            <float>palette_[ i, 2 ]/ <float>255.0)
-
+        hsv2 = struct_rgb_to_hsv(<float>palette_[ i, 0 ],<float>palette_[ i, 1 ],<float>palette_[ i, 2 ])
         hsv_values[i] = <float>color_dist_hsv(hsv1, hsv2)
 
-    minimum = <float>minf(hsv_values, p_length)
+    minimum = <float>min_f(hsv_values, p_length)
 
     cdef bint found = False
     for i in range(p_length):
@@ -890,9 +950,9 @@ cdef rgb color_diff_hsv(
         color1.g = palette_[ i, 1 ]
         color1.b = palette_[ i, 2 ]
     else:
-        color1.r = 0.0
-        color1.g = 0.
-        color1.b = 0.
+        color1.r = <float>0.0
+        color1.g = <float>0.0
+        color1.b = <float>0.0
 
     free(hsv_values)
 
@@ -900,30 +960,48 @@ cdef rgb color_diff_hsv(
 
 
 
+@cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
+cpdef _test_color_diff_hsl(list rgb__, palette_):
+    """
+    TEST ONLY
+    """
+    cdef rgb rgb_
+    rgb_.r = <float>rgb__[0]/<float>255.0
+    rgb_.g = <float>rgb__[1]/<float>255.0
+    rgb_.b = <float>rgb__[2]/<float>255.0
+    cdef Py_ssize_t l = len(palette_)
+    return color_diff_hsl(rgb_, palette_, l)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
 cdef rgb color_diff_hsl(
         rgb color0,
         float [:, :] palette_,
-        Py_ssize_t p_length
-)nogil:
-    """
+        Py_ssize_t p_length)nogil:
 
-    FIND THE CLOSEST MATCH FOR A GIVEN COLOR (color0) FROM 
-    A COLOR PALETTE (palette_). 
-    
-    This method is using HSL color space to find the closest color from the palette.
-    Each colors from the palette are compare with the HSL values of the given color
-    and the minimal difference between HSL values represent the closest match. 
-    
-    :param color0  : struct RGB containing the pixel color 
-    :param palette_: numpy.ndarray shape (w, 3) type float32 containing the palette colors RGB 
-    range [0 ... 255] 
+    """
+    FIND THE CLOSEST RGB COLOR (COLOR0) FROM A GIVEN PALETTE (PALETTE_)
+
+    This method is using HSL space to find the closest color from the palette.
+    Each colors from the palette are compare with the HSL value of the given color
+    and the minimal difference between HSL values represent the closest match.
+
+    :param color0  : struct RGB containing the pixel color (normalized colors)
+    :param palette_: numpy.ndarray shape (w, 3) type float32 containing the normalized palette colors
     :param p_length: integer; size of the given palette or number of colors
-    :return: struct RGB containing the new pixel values RGB 
+    :return: struct RGB containing the new pixel values RGB range [0..255]
     """
 
     cdef:
@@ -936,25 +1014,18 @@ cdef rgb color_diff_hsl(
 
 
     # THE RGB TO HSL VALUE NEVER CHANGE INSIDE THE LOOP
-    hsl1 = struct_rgb_to_hsl(
-        <float>color0.r / <float>255.0,
-        <float>color0.g / <float>255.0,
-        <float>color0.b / <float>255.0)
+    hsl1 = struct_rgb_to_hsl(<float>color0.r, <float>color0.g, <float>color0.b)
 
-    for i in prange(p_length):
-
-        hsl2 = struct_rgb_to_hsl(
-            <float>palette_[ i, 0 ]/ <float>255.0,
-            <float>palette_[ i, 1 ]/ <float>255.0,
-            <float>palette_[ i, 2 ]/ <float>255.0)
-
+    for i in range(p_length):
+        hsl2 = struct_rgb_to_hsl(<float>palette_[ i, 0 ], <float>palette_[ i, 1 ], <float>palette_[ i, 2 ])
         hsl_values[i] = <float>color_dist_hsl(hsl1, hsl2)
 
-    minimum = <float>minf(hsl_values, p_length)
+    minimum = <float>min_f(hsl_values, p_length)
 
     cdef bint found = False
 
     for i in range(p_length):
+
         if minimum == hsl_values[i]:
             found = True
             break
@@ -972,29 +1043,52 @@ cdef rgb color_diff_hsl(
 
     return color1
 
+
+
+
+@cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
+cpdef _test_close_color(list rgb__, palette_):
+    """
+    TEST ONLY
+    """
+    cdef rgb rgb_
+    rgb_.r = <float>rgb__[0]/<float>255.0
+    rgb_.g = <float>rgb__[1]/<float>255.0
+    rgb_.b = <float>rgb__[2]/<float>255.0
+    cdef Py_ssize_t l = len(palette_)
+    return close_color(rgb_, palette_, l)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
 cdef rgb close_color(
         rgb colors,
         float [:, :] palette_,
-        Py_ssize_t w
-)nogil:
+        Py_ssize_t w)nogil:
+
     """
     FIND THE NEAREST COLOR MATCHING A GIVEN COLOR 
     
     Iterate over a 2d color palette filled with RGB values (array shape, 
     w, 3) type float32. The palette is not normalised and contains values 
     in range [0...255] 
-    During the iteration, the given color is compare with the palette values 
-    subtracting each components and summed up to be able to find the smallest 
-    value. The original color 'colors' will be replaced with a new color
+    During the iteration, the given color is compared with the palette values
+    The original color 'colors' will be replaced with a new color
     from the palette (new RGB components). 
-    This algorithm will work if the color palette contains unique RGB components
-    For palettes with duplicate color, the algorithm will select the first color 
-    corresponding to the sum of the RGB difference between each components
+    This algorithm will work if the color palette contains unique RGB components.
+    For palettes with duplicate colors, the algorithm will select the first color
+    corresponding to the sum of the RGB (difference between each components)
     
     :param colors  : struct RGB; float; Colors define with a struct type of data  
     :param palette_: numpy.array; Palette containing the RGB color values range [0...255]  
@@ -1005,53 +1099,66 @@ cdef rgb close_color(
 
     cdef:
         int i
-        float * tmp_v    = <float *> malloc(w * sizeof(float))
+        float * tmp_v = <float *> malloc(w * sizeof(float))
         rgb rgb_
         float v_min,
-
-    # SUM ALL RGB DIFFERENCES
-    for i in prange(w):
-        tmp_v[ i ] = sqrt((
-            colors.r - palette_[ i, 0 ]) ** 2 + \
-           (colors.g - palette_[ i, 1 ]) ** 2 + \
-           (colors.b - palette_[ i, 2 ]) ** 2)
-    # THE MINIMUM VALUE IS THE CLOSEST RGB MATCH
-    v_min = <float> minf(tmp_v, w)
+        unsigned int s1 = 0
+        unsigned int s2 = 0
 
 
-    cdef int s1 = 0
-    cdef int s2 = 0
+    # Iterate over the palette colors an calculate the
+    # distance between both colors (palette and current pixels RGB colors),
+    # Place the difference into an 1d buffer.
+    for i in prange(w, schedule=SCHEDULE, num_threads=THREADS):
+        tmp_v[ i ] =\
+           (colors.r - <float>palette_[ i, 0 ]) ** 2 + \
+           (colors.g - <float>palette_[ i, 1 ]) ** 2 + \
+           (colors.b - <float>palette_[ i, 2 ]) ** 2
 
-    # CHECK FIRST SOLUTION
+    # Find the min value from 1D buffer tmp_v,
+    # The min value is the closest color to the pixel value
+    # !!!! The array is run through from the right to the left !!!!
+    # This method does not check for multiple solutions as two values
+    # in the array can be identical. The value returned will always be the first
+    # minimal value encounter within the array.
+    # All values from the array are by default rounded (no significant
+    # decimal point values).
+    v_min = <float> min_f(tmp_v, w)
+
+    # Run through the 1D buffer to find the color and
+    # the index value
     for i in range(w):
-        if round_c(v_min) == round_c(tmp_v[i]):
-            s1 = i
-            break
-
-    # CHECK FOR COLORS WITH SAME DISTANCE
-    for i in range(w):
-        if round_c(v_min) == round_c(tmp_v[i]):
-            if i != s1:
+        if v_min == tmp_v[i]:
+            if s1 == 0:
+                s1 = i
+            else:
                 s2 = i
+                break
 
     cdef:
         hsv color0_hsv
         hsv hsv1
         hsv hsv2
 
-    if s1!= 0 and s2 != 0:
+    # at lease two solution
+    if s1!= 0 and s2!= 0:
+
         color0_hsv = struct_rgb_to_hsv(
             colors.r/<float>255.0,
             colors.g/<float>255.0,
             colors.b/<float>255.0)
+
         hsv1 = struct_rgb_to_hsv(
             palette_[ s1, 0 ]/<float>255.0,
-            palette_[ s1, 0 ]/<float>255.0,
-            palette_[ s1, 0 ]/<float>255.0)
+            palette_[ s1, 1 ]/<float>255.0,
+            palette_[ s1, 2 ]/<float>255.0)
+
         hsv2 = struct_rgb_to_hsv(
-            palette_[ s2, 0 ] / <float> 255.0,
-            palette_[ s2, 0 ] / <float> 255.0,
-            palette_[ s2, 0 ] / <float> 255.0)
+            palette_[ s2, 0 ]/<float>255.0,
+            palette_[ s2, 1 ]/<float>255.0,
+            palette_[ s2, 2 ]/<float>255.0)
+
+
         if (color0_hsv.h - hsv1.h) ** 2 <  (color0_hsv.h - hsv2.h) ** 2:
             i = s1
         else:
@@ -1063,21 +1170,26 @@ cdef rgb close_color(
     rgb_.g = palette_[ i, 1 ]
     rgb_.b = palette_[ i, 2 ]
 
+    free(tmp_v)
+
     return rgb_
 
 
 
 
+
+@cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cdef rgb use_palette(
         rgb colors,
         float [:, :] palette_,
-        Py_ssize_t w
-)nogil:
+        Py_ssize_t w)nogil:
+
     """
     PICKED RGB VALUES FROM A GIVEN PALETTE TO MATCH A GIVEN COLOR
     ** PAINTING MODE **
@@ -1112,9 +1224,9 @@ cdef rgb use_palette(
     # THE FINAL R, G, B VALUES WILL BE A PICKED
     # COLOR FROM EACH CHANNELS CLOSE TO THE ORIGINAL PIXEL
     # VALUE
-    r_min = <float> minf(v_red, w)
-    g_min = <float> minf(v_green, w)
-    b_min = <float> minf(v_blue, w)
+    r_min = <float> min_f(v_red, w)
+    g_min = <float> min_f(v_green, w)
+    b_min = <float> min_f(v_blue, w)
 
     # FIND A RED COLOR FROM THE PALETTE
     # CLOSE TO THE ORIGINAL RED VALUE
@@ -1143,4 +1255,446 @@ cdef rgb use_palette(
     free(v_blue)
 
     return rgb_
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+cpdef object scroll24(surface, short int dx=0, short int dy=0):
+    """
+    SCROLL SURFACE HORIZONTALLY
+
+    create and return a new surface
+
+    :param surface: pygame Surface 24, 32-bit format compatible.
+    :param dx: scroll the array horizontally (-dx left, +dx right)
+    :param dy: scroll the array vertically (-dy up, +dy down)
+    :return: void
+    """
+    return scroll24_c(surface, dx, dy)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+cdef scroll24_c(surface, short int dx, short int dy):
+    """
+    SCROLL SURFACE HORIZONTALLY
+
+    create and return a new surface
+
+    :param surface: pygame Surface 24, 32-bit format compatible.
+    :param dx: scroll the array horizontally (-dx left, +dx right)
+    :param dy: scroll the array vertically (-dy up, +dy down)
+    :return: void
+    """
+
+    if not isinstance(dx, int):
+        raise TypeError('dx, an integer is required (got type %s)' % type(dx))
+
+    if not isinstance(dy, int):
+        raise TypeError('dy, an integer is required (got type %s)' % type(dy))
+
+    if not isinstance(surface, pygame.Surface):
+        raise TypeError('surface, a pygame.Surface is required (got type %s)' % type(surface))
+
+    cdef:
+        int w, h, dim
+        unsigned char [:, :, :] rgb_array
+
+    try:
+        # array = pixels3d(surface)
+        rgb_array = surface.get_view('3')
+
+    except (ValueError, pygame.error) as e:
+            raise ValueError('\nIncompatible pixel format.')
+
+    try:
+        w, h, dim = (<object> rgb_array).shape[:3]
+    except (ValueError, pygame.error) as e:
+        raise ValueError('\nArray shape not compatible.')
+
+    cdef:
+        int i=0, j=0, ii=0, jj=0
+        unsigned char [:, :, ::1] new_array = numpy.empty((h, w, 3), dtype=numpy.uint8)
+
+    if dx==0 and dy==0:
+        return surface
+
+    with nogil:
+
+        if dx !=0 and dy != 0:
+
+            for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+                    for i in range(w):
+
+                        ii = (i + dx) % w
+                        jj = (j + dy) % h
+                        if ii < 0: ii = ii + w
+                        if jj < 0: jj = jj + h
+                        new_array[jj, ii, 0] = rgb_array[i, j, 0]
+                        new_array[jj, ii, 1] = rgb_array[i, j, 1]
+                        new_array[jj, ii, 2] = rgb_array[i, j, 2]
+
+        elif dx != 0:
+
+            for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+                for i in range(w):
+
+                    ii = (i + dx) % w
+                    if ii < 0: ii = ii + w
+
+                    new_array[j, ii, 0] = rgb_array[i, j, 0]
+                    new_array[j, ii, 1] = rgb_array[i, j, 1]
+                    new_array[j, ii, 2] = rgb_array[i, j, 2]
+
+        elif dy != 0:
+
+            for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+                for i in range(w):
+
+                    jj = (j + dy) % h
+                    if jj < 0:
+                        jj = jj + h
+
+                    new_array[jj, i, 0] = rgb_array[i, j, 0]
+                    new_array[jj, i, 1] = rgb_array[i, j, 1]
+                    new_array[jj, i, 2] = rgb_array[i, j, 2]
+
+    return frombuffer(new_array, (w, h), 'RGB')
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+cpdef void scroll24_inplace(surface, short int dx=0, short int dy=0):
+    """
+    SCROLL SURFACE HORIZONTALLY
+
+    Transformation is applied inplace
+
+    :param surface: pygame Surface 24, 32-bit format compatible.
+    :param dx: scroll the array horizontally (-dx left, +dx right)
+    :param dy: scroll the array vertically (-dy up, +dy down)
+    :return: void
+    """
+    scroll24_inplace_c(surface, dx, dy)
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+cdef void scroll24_inplace_c(surface, short int dx, short int dy):
+    """
+    SCROLL SURFACE HORIZONTALLY
+
+    Transformation is applied inplace
+
+    :param surface: pygame Surface 24, 32-bit format compatible.
+    :param dx: scroll the array horizontally (-dx left, +dx right)
+    :param dy: scroll the array vertically (-dy up, +dy down)
+    :return: void
+    """
+
+    if not isinstance(dx, int):
+        raise TypeError('dx, an short integer is required (got type %s)' % type(dx))
+
+    if not isinstance(dy, int):
+        raise TypeError('dy, an short integer is required (got type %s)' % type(dy))
+
+    if not isinstance(surface, pygame.Surface):
+        raise TypeError('surface, a pygame.Surface is required (got type %s)' % type(surface))
+
+    cdef int w, h, dim
+
+    cdef:
+        unsigned char [:, :, :] rgb_array
+
+    try:
+        rgb_array = surface.get_view('3')
+
+    except (ValueError, pygame.error) as e:
+            raise ValueError('\nIncompatible pixel format.')
+
+    try:
+        w, h, dim = (<object> rgb_array).shape[:3]
+    except (ValueError, pygame.error) as e:
+        raise ValueError('\nArray shape not compatible.')
+
+
+
+    cdef:
+        int i=0, j=0, ii=0, jj=0
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
+
+
+    with nogil:
+
+        if dx==0 and dy==0:
+            return
+
+        if dx > 0:
+            for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+                for i in range(w):
+
+                    ii = (i + dx) % w
+                    if ii < 0: ii = ii + w
+
+                    r = &rgb_array[i, j, 0]
+                    g = &rgb_array[i, j, 1]
+                    b = &rgb_array[i, j, 2]
+
+                    r[0] = rgb_array[ii, j, 0]
+                    g[0] = rgb_array[ii, j, 1]
+                    b[0] = rgb_array[ii, j, 2]
+
+        else:
+            for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+                for i in range(w-1, -1, -1):
+
+                    ii = (i + dx) % w
+                    if ii < 0: ii = ii + w
+
+                    r = &rgb_array[i, j, 0]
+                    g = &rgb_array[i, j, 1]
+                    b = &rgb_array[i, j, 2]
+
+                    r[0] = rgb_array[ii, j, 0]
+                    g[0] = rgb_array[ii, j, 1]
+                    b[0] = rgb_array[ii, j, 2]
+        if dy > 0:
+            for i in prange(w, schedule=SCHEDULE, num_threads=THREADS):
+                for j in range(h):
+
+                    jj = (j + dy) % h
+                    if jj < 0: jj = jj + h
+
+                    r = &rgb_array[i, j, 0]
+                    g = &rgb_array[i, j, 1]
+                    b = &rgb_array[i, j, 2]
+
+                    r[0] = rgb_array[i, jj, 0]
+                    g[0] = rgb_array[i, jj, 1]
+                    b[0] = rgb_array[i, jj, 2]
+
+        else:
+            for i in prange(w, schedule=SCHEDULE, num_threads=THREADS):
+                for j in range(h-1, -1, -1):
+
+                    jj = (j + dy) % h
+                    if jj < 0: jj = jj + h
+
+                    r = &rgb_array[i, j, 0]
+                    g = &rgb_array[i, j, 1]
+                    b = &rgb_array[i, j, 2]
+
+                    r[0] = rgb_array[i, jj, 0]
+                    g[0] = rgb_array[i, jj, 1]
+                    b[0] = rgb_array[i, jj, 2]
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+cpdef void scroll24_arr_inplace(
+    unsigned char [:, :, :] rgb_array,
+    short int dx=0,
+    short int dy=0
+    ):
+    """
+    SCROLL ARRAY/SURFACE HORIZONTALLY
+
+    Transformation is applied inplace
+
+    :param rgb_array: numpy.ndarray containing RGB pixels (the array must reference all the pixels)
+    :param dx: short int; scroll the array horizontally (-dx left, +dx right)
+    :param dy: short int; scroll the array vertically (-dy up, +dy down)
+    :return: void
+    """
+    scroll24_arr_inplace_c(rgb_array, dx, dy)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+cdef void scroll24_arr_inplace_c(
+    unsigned char [:, :, :] rgb_array,
+    short int dx,
+    short int dy
+    ):
+    """
+    SCROLL ARRAY/SURFACE HORIZONTALLY
+
+    Transformation is applied inplace
+
+    :param rgb_array: numpy.ndarray containing RGB pixels (the array must reference all the pixels)
+    :param dx: short int; scroll the array horizontally (-dx left, +dx right)
+    :param dy: short int; scroll the array vertically (-dy up, +dy down)
+    :return: void
+    """
+
+    if not isinstance(dx, int):
+        raise TypeError('dx, an integer is required (got type %s)' % type(dx))
+
+    if not isinstance(dy, int):
+        raise TypeError('dy, an integer is required (got type %s)' % type(dy))
+
+    cdef int w, h, dim
+
+    try:
+        w, h, dim = (<object> rgb_array).shape[:3]
+    except (ValueError, pygame.error) as e:
+        raise ValueError('\rgb_array shape not compatible.')
+
+
+    cdef:
+        int i=0, j=0, ii=0, jj=0
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
+
+
+    with nogil:
+
+        if dx==0 and dy==0:
+            return
+
+        if dx > 0:
+            for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+                for i in range(w):
+
+                    ii = (i + dx) % w
+                    if ii < 0: ii = ii + w
+
+                    r = &rgb_array[i, j, 0]
+                    g = &rgb_array[i, j, 1]
+                    b = &rgb_array[i, j, 2]
+
+                    r[0] = rgb_array[ii, j, 0]
+                    g[0] = rgb_array[ii, j, 1]
+                    b[0] = rgb_array[ii, j, 2]
+
+        else:
+            for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+                for i in range(w-1, -1, -1):
+
+                    ii = (i + dx) % w
+                    if ii < 0: ii = ii + w
+
+                    r = &rgb_array[i, j, 0]
+                    g = &rgb_array[i, j, 1]
+                    b = &rgb_array[i, j, 2]
+
+                    r[0] = rgb_array[ii, j, 0]
+                    g[0] = rgb_array[ii, j, 1]
+                    b[0] = rgb_array[ii, j, 2]
+
+        if dy > 0:
+            for i in prange(w, schedule=SCHEDULE, num_threads=THREADS):
+                for j in range(h):
+
+                    jj = (j + dy) % h
+                    if jj < 0: jj = jj + h
+
+                    r = &rgb_array[i, j, 0]
+                    g = &rgb_array[i, j, 1]
+                    b = &rgb_array[i, j, 2]
+
+                    r[0] = rgb_array[i, jj, 0]
+                    g[0] = rgb_array[i, jj, 1]
+                    b[0] = rgb_array[i, jj, 2]
+
+        else:
+            for i in prange(w, schedule=SCHEDULE, num_threads=THREADS):
+                for j in range(h-1, -1, -1):
+
+                    jj = (j + dy) % h
+                    if jj < 0: jj = jj + h
+
+                    r = &rgb_array[i, j, 0]
+                    g = &rgb_array[i, j, 1]
+                    b = &rgb_array[i, j, 2]
+
+                    r[0] = rgb_array[i, jj, 0]
+                    g[0] = rgb_array[i, jj, 1]
+                    b[0] = rgb_array[i, jj, 2]
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+cpdef object surface_copy(object surface_):
+    """
+    HOOK METHOD FOR SURFACE COPY
+    """
+    return surface_copy_c(surface_)
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+cdef inline object surface_copy_c(object surface_):
+    """
+    EQUIVALENT TO PYGAME SURFACE COPY 
+    """
+
+    cdef unsigned char [:, :, :] array_
+
+    try:
+        array_ = surface_.get_view('3')
+
+    except Exception as e:
+        raise ValueError(
+        "Cannot reference source pixels into a 3d array.\n %s " % e)
+
+    cdef:
+        int i, j
+        int w = <object>(array_.shape[0])
+        int h = <object>(array_.shape[1])
+        unsigned char [:, :, ::1] array_copy =\
+            numpy.empty((h, w, 3), dtype=uint8)
+
+    with nogil:
+        for j in prange (h, schedule=SCHEDULE, num_threads=THREADS):
+            for i in range(w):
+                array_copy[j, i, 0] = array_[i, j, 0]
+                array_copy[j, i, 1] = array_[i, j, 1]
+                array_copy[j, i, 2] = array_[i, j, 2]
+
+    return frombuffer(array_copy, (w, h), "RGB")
+
+
 

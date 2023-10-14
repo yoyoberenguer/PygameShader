@@ -1,4 +1,5 @@
-# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True, profile=False
+# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
+# profile=False, initializedcheck=False
 # cython: optimize.use_switch=True
 # cython: warn.maybe_uninitialized=False
 # cython: warn.unused=False
@@ -41,19 +42,14 @@ except ImportError:
     raise ImportError("\n<cython> library is missing on your system."
           "\nTry: \n   C:\\pip install cython on a window command prompt.")
 
+from PygameShader.config import OPENMP, THREAD_NUMBER, __VERSION__
 
+cdef int THREADS = 1
+
+if OPENMP:
+     THREADS = THREAD_NUMBER
 
 DEF SCHEDULE = 'static'
-
-DEF OPENMP = True
-# num_threads – The num_threads argument indicates how many threads the team should consist of.
-# If not given, OpenMP will decide how many threads to use.
-# Typically this is the number of cores available on the machine. However,
-# this may be controlled through the omp_set_num_threads() function,
-# or through the OMP_NUM_THREADS environment variable.
-DEF THREAD_NUMBER = 1
-if OPENMP is True:
-    DEF THREAD_NUMBER = 8
 
 
 @cython.boundscheck(False)
@@ -61,6 +57,7 @@ if OPENMP is True:
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef blur5x5_array24_inplace_c(unsigned char [:, :, :] rgb_array_):
     """
     # Gaussian kernel 5x5
@@ -97,7 +94,7 @@ cpdef blur5x5_array24_inplace_c(unsigned char [:, :, :] rgb_array_):
 
     with nogil:
         # horizontal convolution
-        for y in prange(0, h, schedule=SCHEDULE, num_threads=THREAD_NUMBER):  # range [0..h-1)
+        for y in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):  # range [0..h-1)
 
             for x in range(0, w):  # range [0..w-1]
 
@@ -129,7 +126,7 @@ cpdef blur5x5_array24_inplace_c(unsigned char [:, :, :] rgb_array_):
                     <unsigned char>g, <unsigned char>b
 
         # Vertical convolution
-        for x in prange(0,  w, schedule=SCHEDULE, num_threads=THREAD_NUMBER):
+        for x in prange(0,  w, schedule=SCHEDULE, num_threads=THREADS):
 
             for y in range(0, h):
                 r, g, b = 0, 0, 0
@@ -162,6 +159,7 @@ cpdef blur5x5_array24_inplace_c(unsigned char [:, :, :] rgb_array_):
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cdef blur5x5_surface24_inplace_c(surface_):
     """
     # Gaussian kernel 5x5
@@ -179,7 +177,7 @@ cdef blur5x5_surface24_inplace_c(surface_):
     """
     cdef unsigned char [:, :, :] rgb_array_
     try:
-        rgb_array_ = pixels3d(surface_)
+        rgb_array_ = surface_.get_view('3')
     except:
         raise ValueError(
             'Invalid pygame surface, compatible with 24bit only got %s ' % surface_.get_bitsize())
@@ -205,7 +203,7 @@ cdef blur5x5_surface24_inplace_c(surface_):
 
     with nogil:
         # horizontal convolution
-        for y in prange(0, h, schedule=SCHEDULE, num_threads=THREAD_NUMBER):  # range [0..h-1)
+        for y in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):  # range [0..h-1)
 
             for x in range(0, w):  # range [0..w-1]
 
@@ -237,7 +235,7 @@ cdef blur5x5_surface24_inplace_c(surface_):
                     <unsigned char>g, <unsigned char>b
 
         # Vertical convolution
-        for x in prange(0,  w, schedule=SCHEDULE, num_threads=THREAD_NUMBER):
+        for x in prange(0,  w, schedule=SCHEDULE, num_threads=THREADS):
 
             for y in range(0, h):
                 r, g, b = 0, 0, 0
@@ -269,6 +267,7 @@ cdef blur5x5_surface24_inplace_c(surface_):
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef canny_blur5x5_surface24_c(surface_):
     """
     # Gaussian kernel 5x5
@@ -297,7 +296,7 @@ cpdef canny_blur5x5_surface24_c(surface_):
     w, h = surface_.get_size()
 
     try:
-        rgb_array_ = pixels3d(surface_)
+        rgb_array_ = surface_.get_view('3')
     except (surface_.error, ValueError):
         raise ValueError('\nTexture/image is not compatible.')
 
@@ -316,7 +315,7 @@ cpdef canny_blur5x5_surface24_c(surface_):
 
     with nogil:
 
-        for x in prange(0, w, schedule=SCHEDULE, num_threads=THREAD_NUMBER):
+        for x in prange(0, w, schedule=SCHEDULE, num_threads=THREADS):
 
             for y in range(0, h):
 
@@ -350,14 +349,15 @@ cpdef canny_blur5x5_surface24_c(surface_):
                         g += green * k
                         b += blue * k
 
-                r = r / <float>25.0
-                g = g / <float>25.0
-                b = b / <float>25.0
-                if r > 255.0:
+                r = r * <float>0.04
+                g = g * <float>0.04
+                b = b * <float>0.04
+
+                if r > 255:
                     r = <float>255.0
-                if g > 255.0:
+                if g > 255:
                     g = <float>255.0
-                if b > 255.0:
+                if b > 255:
                     b = <float>255.0
 
                 output_array[x, y, 0] = r
@@ -372,6 +372,7 @@ cpdef canny_blur5x5_surface24_c(surface_):
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
 cpdef canny_blur5x5_surface32_c(surface_):
     """
     # Gaussian kernel 5x5
@@ -400,7 +401,7 @@ cpdef canny_blur5x5_surface32_c(surface_):
     w, h = surface_.get_size()
 
     try:
-        rgb_array_ = pixels3d(surface_)
+        rgb_array_ = surface_.get_view('3')
         array_alpha_ = array_alpha(surface_)
 
     except (surface_.error, ValueError):
@@ -424,7 +425,7 @@ cpdef canny_blur5x5_surface32_c(surface_):
 
     with nogil:
 
-        for x in prange(0, w, schedule=SCHEDULE, num_threads=THREAD_NUMBER):
+        for x in prange(0, w, schedule=SCHEDULE, num_threads=THREADS):
 
             for y in range(0, h):
 
@@ -458,11 +459,11 @@ cpdef canny_blur5x5_surface32_c(surface_):
                         g += green * k
                         b += blue * k
 
-                if r > 255.0:
+                if r > 255:
                     r = <float>255.0
-                if g > 255.0:
+                if g > 255:
                     g = <float>255.0
-                if b > 255.0:
+                if b > 255:
                     b = <float>255.0
 
                 output_array[y, x, 0] = <unsigned char>r

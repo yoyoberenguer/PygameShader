@@ -1,5 +1,7 @@
 """
 PygameShader SMOKE DEMO
+
+This demo use the CPU power only to generate a cloud effect
 """
 
 from random import uniform, randint
@@ -28,21 +30,25 @@ except ImportError:
     raise ImportError("\n<Pygame> library is missing on your system."
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
 
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 15)
 
-def show_fps(screen_, fps_, avg_) -> None:
+
+def show_fps(screen_, fps_, avg_) -> list:
     """ Show framerate in upper left corner """
-    font = pygame.font.SysFont("Arial", 15)
+
     fps = str(f"CPU fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
 
-    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    fps_text = font.render(fps, True, pygame.Color("coral"))
     screen_.blit(fps_text, (10, 0))
     if av != 0:
         av = str(f"avg:{av:.3f}")
-        avg_text = font.render(av, 1, pygame.Color("coral"))
+        avg_text = font.render(av, True, pygame.Color("coral"))
         screen_.blit(avg_text, (120, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
+    return avg_
 
 
 # Set the display to 1024 x 768
@@ -55,30 +61,28 @@ SCREEN.set_alpha(None)
 pygame.init()
 
 # Load the background image
-BACKGROUND = pygame.image.load("../Assets/img.png").convert()
+
+try:
+    BACKGROUND = pygame.image.load("../Assets/img.png").convert()
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file img.png is missing from the Assets directory.')
+
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
 image = BACKGROUND.copy()
-pygame.display.set_caption("Clound & smoke effect")
+pygame.display.set_caption("Cloud & smoke effect")
 
 FRAME = 0
 CLOCK = pygame.time.Clock()
 GAME = True
 
 
-arr = numpy.array([0, 1,  # violet
-                           0, 1,  # blue
-                           0, 1,  # green
-                           2, 619,  # yellow
-                           620, 650,  # orange
-                           651, 660],  # red
-                          numpy.uint32)
-
 CLOUD_ARRAY = numpy.zeros((HEIGHT, WIDTH), dtype=numpy.float32)
 
 heatmap_rescale = numpy.zeros(256 * 2 * 3, numpy.uint32)
 
-arr1 = create_horizontal_gradient_1d(255, (0, 0, 0), (255, 255, 255))
+arr1 = create_horizontal_gradient_1d(255, (0, 0, 0), (150, 150, 150))
 arr2 = create_horizontal_gradient_1d(255, (255, 255, 255), (0, 0, 0))
 arr3 = numpy.concatenate((arr1, arr2), axis=None)
 i = 0
@@ -105,20 +109,20 @@ while GAME:
     SCREEN.blit(BACKGROUND, (0, 0))
 
     surface_ = cloud_effect(
-        WIDTH, HEIGHT, 3.9650 + uniform(0.002, 0.008),
+        WIDTH, HEIGHT, 3.9650 + uniform(-0.012, 0.008),
         heatmap_rescale,
         CLOUD_ARRAY,
-        reduce_factor_=3, cloud_intensity_=randint(60, 128),
+        reduce_factor_=3, cloud_intensity_=randint(0, 128),
         smooth_=True, bloom_=True, fast_bloom_=True,
         bpf_threshold_=bpf, low_=0, high_=WIDTH, brightness_=True,
-        brightness_intensity_=-0.15,
-        transpose_=False, surface_=None, blur_=True
+        brightness_intensity_=-0.05,
+        transpose_=False, surface_=None, blur_=False
     ).convert(32, RLEACCEL)
 
     SCREEN.blit(surface_, (0, 0), special_flags=BLEND_RGB_MAX)
     t = CLOCK.get_fps()
     avg.append(t)
-    show_fps(SCREEN, t, avg)
+    avg = show_fps(SCREEN, t, avg)
     pygame.display.flip()
     CLOCK.tick()
     FRAME += 1
@@ -132,8 +136,5 @@ while GAME:
     pygame.display.set_caption(
         "Clound & smoke effect %s fps "
         "(%sx%s)" % (round(CLOCK.get_fps(), 2), WIDTH, HEIGHT))
-
-    avg = avg[ 10: ]
-
 
     image = BACKGROUND.copy()

@@ -1,4 +1,5 @@
-# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True, profile=False
+# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
+# profile=False, initializedcheck=False
 # cython: optimize.use_switch=True
 # cython: warn.maybe_uninitialized=False
 # cython: warn.unused=False
@@ -6,6 +7,8 @@
 # cython: warn.unused_arg=False
 # cython: language_level=3
 # encoding: utf-8
+
+from PygameShader.config import __VERSION__
 
 """
 Enum of common palettes based on https://en.wikipedia.org/wiki/List_of_color_palettes
@@ -224,7 +227,7 @@ _TELETEXT_NORMALIZED = numpy.array([
     [ 255.0/255.0, 255.0/255.0, 0.0 ],
     [ 255.0/255.0, 255.0/255.0, 255.0/255.0]
 ], dtype=numpy.float32)
-TELETEXT = numpy.multiply(_TELETEXT_NORMALIZED, 255.0).astype(numpy.float32)
+TELETEXT =_TELETEXT_NORMALIZED * <float>255.0
 
 BBC_MICRO = TELETEXT
 
@@ -234,7 +237,7 @@ _CGA_MODE4_PAL1_NORMALIZED_LOW = numpy.array([
     [ 0.66666, 0., 0.6666 ],
     [ 0.66666, 0.6666, 0.66666 ]
 ], dtype=numpy.float32)
-CGA_MODE4_PAL1_LOW = numpy.multiply(_CGA_MODE4_PAL1_NORMALIZED_LOW, 255.0).astype(numpy.float32)
+CGA_MODE4_PAL1_LOW =_CGA_MODE4_PAL1_NORMALIZED_LOW * <float>255.0
 
 _CGA_MODE4_PAL1_NORMALIZED_HIGH = numpy.array([
     [ 0., 0., 0. ],
@@ -242,7 +245,7 @@ _CGA_MODE4_PAL1_NORMALIZED_HIGH = numpy.array([
     [ 255.0/255.0, 85.0/255.0, 255.0/255.0 ],
     [ 255.0/255.0, 255.0/255.0, 255.0/255.0 ]
 ], dtype=numpy.float32)
-CGA_MODE4_PAL1_HIGH = numpy.multiply(_CGA_MODE4_PAL1_NORMALIZED_HIGH, 255.0).astype(numpy.float32)
+CGA_MODE4_PAL1_HIGH =_CGA_MODE4_PAL1_NORMALIZED_HIGH * <float>255.0
 
 
 _CGA_MODE4_PAL2_NORMALIZED_LOW = numpy.array([
@@ -251,7 +254,7 @@ _CGA_MODE4_PAL2_NORMALIZED_LOW = numpy.array([
     [ 170.0/255.0, 0.0, 0.0 ],
     [ 170.0/255.0, 85.0/255.0, 0.0 ]
 ], dtype=numpy.float32)
-CGA_MODE4_PAL2_LOW = numpy.multiply(_CGA_MODE4_PAL2_NORMALIZED_LOW, 255.0).astype(numpy.float32)
+CGA_MODE4_PAL2_LOW =_CGA_MODE4_PAL2_NORMALIZED_LOW * <float>255.0
 
 _CGA_MODE4_PAL2_NORMALIZED_HIGH = numpy.array([
     [ 0., 0., 0. ],
@@ -259,7 +262,7 @@ _CGA_MODE4_PAL2_NORMALIZED_HIGH = numpy.array([
     [ 255.0/255.0, 85.0/255.0, 85.0/255.0 ],
     [ 255.0/255.0, 255.0/255.0, 85.0/255.0 ]
 ], dtype=numpy.float32)
-CGA_MODE4_PAL2_HIGH = numpy.multiply(_CGA_MODE4_PAL2_NORMALIZED_HIGH, 255.0).astype(numpy.float32)
+CGA_MODE4_PAL2_HIGH =_CGA_MODE4_PAL2_NORMALIZED_HIGH * <float>255.0
 
 
 _CGA_MODE5_NORMALIZED_LOW = numpy.array([
@@ -268,7 +271,7 @@ _CGA_MODE5_NORMALIZED_LOW = numpy.array([
     [ 170.0/255.0, 0.0, 0.0 ],
     [ 170.0/255.0, 170.0/255.0, 170.0/255.0 ]
 ], dtype=numpy.float32)
-CGA_MODE5_LOW = numpy.multiply(_CGA_MODE5_NORMALIZED_LOW, 255.0).astype(numpy.float32)
+CGA_MODE5_LOW =_CGA_MODE5_NORMALIZED_LOW * <float>255.0
 
 _CGA_MODE5_NORMALIZED_HIGH = numpy.array([
     [ 0., 0., 0. ],
@@ -276,7 +279,7 @@ _CGA_MODE5_NORMALIZED_HIGH = numpy.array([
     [ 255.0/255.0, 85.0/255.0, 85.0/255.0 ],
     [ 255.0/255.0, 255.0/255.0, 255.0/255.0 ]
 ], dtype=numpy.float32)
-CGA_MODE5_HIGH = numpy.multiply(_CGA_MODE5_NORMALIZED_HIGH, 255.0).astype(numpy.float32)
+CGA_MODE5_HIGH =_CGA_MODE5_NORMALIZED_HIGH * <float>255.0
 
 
 _ZX_SPECTRUM_NORMALIZED_LOW = numpy.array([
@@ -289,7 +292,7 @@ _ZX_SPECTRUM_NORMALIZED_LOW = numpy.array([
      [ 192.0/255.0, 192.0/255.0, 0.0 ],
      [ 192.0/255.0, 192.0/255.0, 192.0/255.0 ]
 ], dtype=numpy.float32)
-ZX_SPECTRUM_LOW = numpy.multiply(_ZX_SPECTRUM_NORMALIZED_LOW, 255.0).astype(numpy.float32)
+ZX_SPECTRUM_LOW =_ZX_SPECTRUM_NORMALIZED_LOW * <float>255.0
 
 
 _ZX_SPECTRUM_NORMALIZED_HIGH = numpy.array([
@@ -302,7 +305,7 @@ _ZX_SPECTRUM_NORMALIZED_HIGH = numpy.array([
      [ 255.0/255.0, 255.0/255.0, 0.0 ],
      [ 255.0/255.0, 255.0/255.0, 255.0/255.0 ]
 ], dtype=numpy.float32)
-ZX_SPECTRUM_HIGH = numpy.multiply(_ZX_SPECTRUM_NORMALIZED_HIGH, 255.0).astype(numpy.float32)
+ZX_SPECTRUM_HIGH =_ZX_SPECTRUM_NORMALIZED_HIGH * <float>255.0
 
 
 _APPLE_II_LOW_NORMALIZED = numpy.array([
@@ -315,7 +318,7 @@ _APPLE_II_LOW_NORMALIZED = numpy.array([
     [ 38.0/255.0, 151.0/255.0, 240.0/255.0 ],
     [ 191.0/255.0, 180.0/255.0, 248.0/255.0]
 ], dtype=numpy.float32)
-APPLE_II_LOW = numpy.multiply(_APPLE_II_LOW_NORMALIZED, 255.0).astype(numpy.float32)
+APPLE_II_LOW =_APPLE_II_LOW_NORMALIZED * <float>255.0
 
 _APPLE_II_HIGH_NORMALIZED = numpy.array([
     [ 64.0/255.0, 75.0/255.0, 7.0/255.0 ],
@@ -327,7 +330,7 @@ _APPLE_II_HIGH_NORMALIZED = numpy.array([
     [ 147.0/255.0, 214.0/255.0, 191.0/255.0 ],
     [ 255.0/255.0, 255.0/255.0, 255.0/255.0]
 ], dtype=numpy.float32)
-APPLE_II_HIGH = numpy.multiply(_APPLE_II_HIGH_NORMALIZED, 255.0).astype(numpy.float32)
+APPLE_II_HIGH =_APPLE_II_HIGH_NORMALIZED * <float>255.0
 
 _APPLE_II_NORMALIZED = numpy.array([
     [ 0., 0., 0. ],
@@ -346,7 +349,7 @@ _APPLE_II_NORMALIZED = numpy.array([
     [ 147.0/255.0, 214.0/255.0, 191.0/255.0 ],
     [ 255.0/255.0, 255.0/255.0, 255.0/255.0]
 ], dtype=numpy.float32)
-APPLE_II = numpy.multiply(_APPLE_II_NORMALIZED, 255.0).astype(numpy.float32)
+APPLE_II =_APPLE_II_NORMALIZED * <float>255.0
 
 
 _COMMODORE_64_NORMALIZED = numpy.array([
@@ -367,7 +370,7 @@ _COMMODORE_64_NORMALIZED = numpy.array([
     [ 0.0, 136.0/255.0, 255.0/255.0 ],
     [ 187.0/255.0, 187.0/255.0, 187.0/255.0 ]
 ], dtype=numpy.float32)
-COMMODORE_64 = numpy.multiply(_COMMODORE_64_NORMALIZED, 255.0).astype(numpy.float32)
+COMMODORE_64 =_COMMODORE_64_NORMALIZED * <float>255.0
 
 
 _AMSTRAD_CPC_NORMALIZED = numpy.array(
@@ -399,7 +402,7 @@ _AMSTRAD_CPC_NORMALIZED = numpy.array(
     [255/255.0, 255/255.0, 128/255.0],
     [255/255.0, 255/255.0, 255/255.0]], dtype=numpy.float32)
 
-AMSTRAD_CPC = numpy.multiply(_AMSTRAD_CPC_NORMALIZED, 255.0).astype(numpy.float32)
+AMSTRAD_CPC =_AMSTRAD_CPC_NORMALIZED * <float>255.0
 
 
 _MSX_NORMALIZED = numpy.array([
@@ -420,7 +423,7 @@ _MSX_NORMALIZED = numpy.array([
     [ 204/255.0, 204/255.0, 204/255.0],
     [ 255.0/255.0, 255.0/255.0, 255.0/255.0 ]
 ], dtype=numpy.float32)
-MSX = numpy.multiply(_MSX_NORMALIZED, 255.0).astype(numpy.float32)
+MSX =_MSX_NORMALIZED * <float>255.0
 
 
 
@@ -442,7 +445,7 @@ _TO7_NORMALIZED = numpy.array([
     [ 221.0/255.0, 119.0/255.0, 239.0/255.0],
     [ 187.0/255.0, 187.0/255.0, 187.0/255.0 ]
 ], dtype=numpy.float32)
-TO7 = numpy.multiply(_TO7_NORMALIZED, 255.0).astype(numpy.float32)
+TO7 =_TO7_NORMALIZED * <float>255.0
 
 _PICO_8_NORMALIZED = numpy.array([
     [ 0., 0., 0. ],
@@ -462,7 +465,7 @@ _PICO_8_NORMALIZED = numpy.array([
     [  255/255.0, 119/255.0, 168/255.0],
     [  255/255.0, 204/255.0, 170/255.0]
 ], dtype=numpy.float32)
-PICO_8 = numpy.multiply(_PICO_8_NORMALIZED, 255.0).astype(numpy.float32)
+PICO_8 =_PICO_8_NORMALIZED * <float>255.0
 
 
 _PICO_8_CUSTOM_NORMALIZED = numpy.array([
@@ -483,7 +486,7 @@ _PICO_8_CUSTOM_NORMALIZED = numpy.array([
     [  255/255.0, 110/255.0, 89/255.0],
     [  255/255.0, 157/255.0, 129/255.0]
 ], dtype=numpy.float32)
-PICO_8_CUSTOM = numpy.multiply(_PICO_8_CUSTOM_NORMALIZED, 255.0).astype(numpy.float32)
+PICO_8_CUSTOM =_PICO_8_CUSTOM_NORMALIZED * <float>255.0
 
 
 
@@ -505,7 +508,7 @@ _MICROSOFT_WINDOWS_16_NORMALIZED = numpy.array([
     [ 0., 1., 1. ],
     [ 1., 1., 1. ]
 ], dtype=numpy.float32)
-MICROSOFT_WINDOWS_16 = numpy.multiply(_MICROSOFT_WINDOWS_16_NORMALIZED, 255.0).astype(numpy.float32)
+MICROSOFT_WINDOWS_16 =_MICROSOFT_WINDOWS_16_NORMALIZED * <float>255.0
 
 _MICROSOFT_WINDOWS_20_NORMALIZED = numpy.array([
     [ 0., 0., 0. ],
@@ -529,7 +532,7 @@ _MICROSOFT_WINDOWS_20_NORMALIZED = numpy.array([
     [ 0., 1., 1. ],
     [ 1., 1., 1. ]
 ], dtype=numpy.float32)
-MICROSOFT_WINDOWS_20 = numpy.multiply(_MICROSOFT_WINDOWS_20_NORMALIZED, 255.0).astype(numpy.float32)
+MICROSOFT_WINDOWS_20 =_MICROSOFT_WINDOWS_20_NORMALIZED * <float>255.0
 
 _MICROSOFT_WINDOWS_PAINT_NORMALIZED = numpy.array([
     [ 0., 0., 0. ],
@@ -557,8 +560,7 @@ _MICROSOFT_WINDOWS_PAINT_NORMALIZED = numpy.array([
     [ 0., 0.48235294, 1. ],
     [ 1., 0.17254902, 0.48235294 ]
 ], dtype=numpy.float32)
-MICROSOFT_WINDOWS_PAINT = numpy.multiply(
-    _MICROSOFT_WINDOWS_PAINT_NORMALIZED, 255.0).astype(numpy.float32)
+MICROSOFT_WINDOWS_PAINT =_MICROSOFT_WINDOWS_PAINT_NORMALIZED * <float>255.0
 
 # https://superuser.com/questions/361297/what-colour-is-t
 # he-dark-green-on-old-fashioned-green-screen-computer-displays/1206781#1206781
@@ -566,36 +568,31 @@ _MONO_PHOSPHOR_AMBER_NORMALIZED = numpy.array([
     [ 0.15686275, 0.15686275, 0.15686275 ],
     [ 1., 0.69019608, 0. ]
 ], dtype=numpy.float32)
-MONO_PHOSPHOR_AMBER = numpy.multiply(
-    _MONO_PHOSPHOR_AMBER_NORMALIZED, 255.0).astype(numpy.float32)
+MONO_PHOSPHOR_AMBER =_MONO_PHOSPHOR_AMBER_NORMALIZED * <float>255.0
 
 _MONO_PHOSPHOR_LTAMBER_NORMALIZED = numpy.array([
     [ 0.15686275, 0.15686275, 0.15686275 ],
     [ 1., 0.8, 0. ]
 ], dtype=numpy.float32)
-MONO_PHOSPHOR_LTAMBER = numpy.multiply(
-    _MONO_PHOSPHOR_LTAMBER_NORMALIZED, 255.0).astype(numpy.float32)
+MONO_PHOSPHOR_LTAMBER =_MONO_PHOSPHOR_LTAMBER_NORMALIZED * <float>255.0
 
 _MONO_PHOSPHOR_GREEN1_NORMALIZED = numpy.array([
     [ 0.15686275, 0.15686275, 0.15686275 ],
     [ 0.2, 1., 0. ]
 ], dtype=numpy.float32)
-MONO_PHOSPHOR_GREEN1 = numpy.multiply(
-    _MONO_PHOSPHOR_GREEN1_NORMALIZED, 255.0).astype(numpy.float32)
+MONO_PHOSPHOR_GREEN1 =_MONO_PHOSPHOR_GREEN1_NORMALIZED * <float>255.0
 
 _MONO_PHOSPHOR_GREEN2_NORMALIZED = numpy.array([
     [ 0.15686275, 0.15686275, 0.15686275 ],
     [ 0, 1., 0.2 ]
 ], dtype=numpy.float32)
-MONO_PHOSPHOR_GREEN2 = numpy.multiply(
-    _MONO_PHOSPHOR_GREEN2_NORMALIZED, 255.0).astype(numpy.float32)
+MONO_PHOSPHOR_GREEN2 =_MONO_PHOSPHOR_GREEN2_NORMALIZED * <float>255.0
 
 _MONO_PHOSPHOR_GREEN3_NORMALIZED = numpy.array([
     [ 0.15686275, 0.15686275, 0.15686275 ],
     [ 0, 1., 0.4 ]
 ], dtype=numpy.float32)
-MONO_PHOSPHOR_GREEN3 = numpy.multiply(
-    _MONO_PHOSPHOR_GREEN3_NORMALIZED, 255.0).astype(numpy.float32)
+MONO_PHOSPHOR_GREEN3 =_MONO_PHOSPHOR_GREEN3_NORMALIZED * <float>255.0
 
 # Created by Adigun A. Polack
 # https://lospec.com/palette-list/aap-64
@@ -665,7 +662,7 @@ _AAP64_NORMALIZED = numpy.array([
     [0.35294117647058826, 0.3058823529411765, 0.26666666666666666],
     [0.25882352941176473, 0.2235294117647059, 0.20392156862745098]
 ], dtype=numpy.float32)
-AAP64 = numpy.multiply(_AAP64_NORMALIZED, 255.0).astype(numpy.float32)
+AAP64 =_AAP64_NORMALIZED * <float>255.0
 
 # https://lospec.com/palette-list/apollo
 # Created by AdamCYounis
@@ -717,7 +714,7 @@ _APOLLO_NORMALIZED = numpy.array([
 [0.7803921568627451, 0.8117647058823529, 0.8],
 [0.9215686274509803, 0.9294117647058824, 0.9137254901960784]
 ], dtype=numpy.float32)
-APOLLO = numpy.multiply(_APOLLO_NORMALIZED, 255.0).astype(numpy.float32)
+APOLLO =_APOLLO_NORMALIZED * <float>255.0
 
 #https://lospec.com/palette-list/funkyfuture-8
 # Created by Shamaboy
@@ -731,7 +728,7 @@ _FUNKYFUTURE_NORMALIZED = numpy.array([
 [0.2,0.40784313725490196,0.8627450980392157],
 [0.28627450980392155,0.9058823529411765,0.9254901960784314]
 ], dtype=numpy.float32)
-FUNKYFUTURE = numpy.multiply(_FUNKYFUTURE_NORMALIZED, 255.0).astype(numpy.float32)
+FUNKYFUTURE =_FUNKYFUTURE_NORMALIZED * <float>255.0
 
 # https://lospec.com/palette-list/vinik24
 # Created by Vinik
@@ -761,7 +758,7 @@ _VINIK24_NORMALIZED = numpy.array([
 [0.36470588235294116,0.40784313725490196,0.4470588235294118],
 [0.2627450980392157,0.20392156862745098,0.3333333333333333]
 ], dtype=numpy.float32)
-VINIK24 = numpy.multiply(_VINIK24_NORMALIZED, 255.0).astype(numpy.float32)
+VINIK24 =_VINIK24_NORMALIZED * <float>255.0
 
 # https://lospec.com/palette-list/twilioquest-76
 # Created by Kerrie Lake
@@ -843,7 +840,7 @@ _TWILIOQUEST76_NORMALIZED = numpy.array([
 [0.4823529411764706,0.5137254901960784,0.5098039215686274],
 [0.37254901960784315,0.37254901960784315,0.43137254901960786]
 ], dtype=numpy.float32)
-TWILIOQUEST76 = numpy.multiply(_TWILIOQUEST76_NORMALIZED, 255.0).astype(numpy.float32)
+TWILIOQUEST76 =_TWILIOQUEST76_NORMALIZED * <float>255.0
 
 
 
@@ -899,7 +896,7 @@ _IRIDESCENTCRYSTAL_NORMALIZED = numpy.array([
 [0.8313725490196079,0.6627450980392157,0.7725490196078432],
 [0.9372549019607843,0.796078431372549,0.8901960784313725]
 ], dtype=numpy.float32)
-IRIDESCENTCRYSTAL = numpy.multiply(_IRIDESCENTCRYSTAL_NORMALIZED, 255.0).astype(numpy.float32)
+IRIDESCENTCRYSTAL =_IRIDESCENTCRYSTAL_NORMALIZED * <float>255.0
 
 
 # https://lospec.com/palette-list/aap-splendor128
@@ -1034,7 +1031,7 @@ _AAPSPLENDOR128_NORMALIZED = numpy.array([
 [0.39215686274509803,0.21176470588235294,0.29411764705882354],
 [0.16470588235294117,0.11764705882352941,0.13725490196078433]
 ], dtype=numpy.float32)
-AAPSPLENDOR128 = numpy.multiply(_AAPSPLENDOR128_NORMALIZED, 255.0).astype(numpy.float32)
+AAPSPLENDOR128 =_AAPSPLENDOR128_NORMALIZED * <float>255.0
 
 
 
@@ -1085,7 +1082,7 @@ _LOSPEC500_NORMALIZED = numpy.array([
 [0.9647058823529412,0.9098039215686274,0.8784313725490196],
 [1.0,1.0,1.0]
 ], dtype=numpy.float32)
-LOSPEC500 = numpy.multiply(_LOSPEC500_NORMALIZED, 255.0).astype(numpy.float32)
+LOSPEC500 =_LOSPEC500_NORMALIZED * <float>255.0
 
 
 
@@ -1159,7 +1156,7 @@ _FAMICUBE_NORMALIZED = numpy.array([
 [0.00784313725490196,0.2901960784313726,0.792156862745098],
 [0.0,0.09019607843137255,0.49019607843137253]
 ], dtype=numpy.float32)
-FAMICUBE = numpy.multiply(_FAMICUBE_NORMALIZED, 255.0).astype(numpy.float32)
+FAMICUBE =_FAMICUBE_NORMALIZED * <float>255.0
 
 
 # https://lospec.com/palette-list/smooth-polished-silver
@@ -1172,4 +1169,4 @@ _SILVER_NORMALIZED = numpy.array([
 [0.9490196078431372,0.8392156862745098,0.8862745098039215],
 [1.0,1.0,1.0]
 ], dtype=numpy.float32)
-SILVER = numpy.multiply(_SILVER_NORMALIZED, 255.0).astype(numpy.float32)
+SILVER =_SILVER_NORMALIZED * <float>255.0

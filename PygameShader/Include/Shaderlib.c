@@ -36,7 +36,7 @@ gcc -shared -o libhello.so -fPIC hello.c
 #include <time.h>
 #include <omp.h>
 
-inline double * my_sort(double buffer[], int filter_size);
+inline float * my_sort(float buffer[], int filter_size);
 
 inline void swap(int* a, int* b);
 inline int partition (int arr[], int low, int high);
@@ -70,8 +70,10 @@ inline float perlin(float x, float y);
 inline float randRangeFloat(float lower, float upper);
 inline int randRange(int lower, int upper);
 inline int get_largest(int arr[], int n);
-inline float minf(float arr[], int n);
+inline float min_f(float arr[], unsigned int n);
+inline struct s_min minf_struct(float arr[], unsigned int n);
 inline int min_c(int arr[], int n);
+inline unsigned int min_index(float arr[], unsigned int n);
 
 #define ONE_SIX 1.0/6.0
 #define ONE_THIRD 1.0 / 3.0
@@ -112,6 +114,11 @@ struct rgb_color_int{
 struct extremum{
     int min;
     int max;
+};
+
+struct s_min{
+    float value;
+    unsigned int index;
 };
 
 void init_clock(){
@@ -169,8 +176,8 @@ inline float fmin_rgb_value(float red, float green, float blue)
 }
 
 
-inline double * my_sort(double buffer[], int filter_size){
-double temp=0;
+inline float * my_sort(float buffer[], int filter_size){
+float temp=0;
 int i, j;
 for (i = 0; i < (filter_size - 1); ++i)
     {
@@ -343,11 +350,11 @@ inline float Q_inv_sqrt( float number )
 
 inline float hue_to_rgb(float m1, float m2, float h)
 {
-    if ((fabs(h) > 1.0f) && (h > 0.0f)) {
-      h = (float)fmod(h, 1.0f);
+    if ((fabsf(h) > 1.0f) && (h > 0.0f)) {
+      h = (float)fmodf(h, 1.0f);
     }
     else if (h < 0.0f){
-    h = 1.0f - (float)fabs(h);
+    h = 1.0f - (float)fabsf(h);
     }
 
     if (h < ONE_SIX){
@@ -366,10 +373,10 @@ inline float hue_to_rgb(float m1, float m2, float h)
 
 // HSL: Hue, Saturation, Luminance
 // H: position in the spectrum
-// L: color lightness
 // S: color saturation
+// L: color lightness
 // all inputs have to be float precision, (python float) in range [0.0 ... 1.0]
-// outputs is a C array containing HSL values (float precision) normalized.
+// Outputs is a struct containing HSL values (float precision) normalized
 // h (°) = h * 360
 // s (%) = s * 100
 // l (%) = l * 100
@@ -393,7 +400,7 @@ inline struct hsl struct_rgb_to_hsl(float r, float g, float b)
 
 
     float h=0.0f, l, s=0.0f;
-    l = (cmax + cmin) / 2.0f;
+    l = (cmax + cmin) * 0.5f;
 
     if (delta == 0) {
     h = 0.0f;
@@ -402,11 +409,11 @@ inline struct hsl struct_rgb_to_hsl(float r, float g, float b)
     else {
     	  if (cmax == r){
     	        t = (g - b) / delta;
-    	        if ((fabs(t) > 6.0f) && (t > 0.0f)) {
-                  t = (float)fmod(t, 6.0f);
+    	        if ((fabsf(t) > 6.0f) && (t > 0.0f)) {
+                  t = (float)fmodf(t, 6.0f);
                 }
                 else if (t < 0.0f){
-                t = 6.0f - (float)fabs(t);
+                t = 6.0f - (float)fabsf(t);
                 }
 
 	            h = 60.0f * t;
@@ -436,7 +443,7 @@ inline struct hsl struct_rgb_to_hsl(float r, float g, float b)
 
 // Convert HSL color model into RGB (red, green, blue)
 // all inputs have to be float precision, (python float) in range [0.0 ... 1.0]
-// outputs is a C array containing RGB values (float precision) normalized.
+// outputs is a struct containing RGB values (float precision) normalized.
 inline struct rgb struct_hsl_to_rgb(float h, float s, float l)
 {
 
@@ -496,13 +503,13 @@ inline struct hsv struct_rgb_to_hsv(float r, float g, float b)
         h = 0.0f;}
     // The conversion to (int) approximate the final result
     else if (mx == r){
-	    h = (float)fmod(60.0f * ((g-b) * df_) + 360.0f, 360);
+	    h = (float)fmodf(60.0f * ((g-b) * df_) + 360.0f, 360);
 	}
     else if (mx == g){
-	    h = (float)fmod(60.0f * ((b-r) * df_) + 120.0f, 360);
+	    h = (float)fmodf(60.0f * ((b-r) * df_) + 120.0f, 360);
 	}
     else if (mx == b){
-	    h = (float)fmod(60.0f * ((r-g) * df_) + 240.0f, 360);
+	    h = (float)fmodf(60.0f * ((r-g) * df_) + 240.0f, 360);
     }
     if (mx == 0){
         s = 0.0f;
@@ -686,39 +693,39 @@ inline struct rgb_color_int wavelength_to_rgb(int wavelength, float gamma){
     if ((wavelength >= 380) & (wavelength <= 440))
     {
       attenuation = 0.3f + 0.7f * (wavelength - 380.0f) / 60.0f;
-      color.r = (int)fmax((pow((((380 - wavelength) / 60.0f) * attenuation), gamma) * 255.0f), 0);
+      color.r = (int)fmaxf((powf((((380 - wavelength) / 60.0f) * attenuation), gamma) * 255.0f), 0);
 
-      color.b = (int)(pow(attenuation, gamma + 3.0f) * 255.0f);
+      color.b = (int)(powf(attenuation, gamma + 3.0f) * 255.0f);
     }
 
     // BLUE
     else if((wavelength >=440) && (wavelength <= 490))
     {
-      color.g = (int)((float)pow((wavelength - 440) / 50.0f, gamma) * 255.0f);
+      color.g = (int)((float)powf((wavelength - 440) / 50.0f, gamma) * 255.0f);
       color.b = 255;
     }
 
     // GREEN
     else if ((wavelength>=490) && (wavelength <= 510)){
       color.g = 255;
-      color.b = (int)((float)pow((510 - wavelength) / 20.0f, gamma) * 255.0f);
+      color.b = (int)((float)powf((510 - wavelength) / 20.0f, gamma) * 255.0f);
     }
 
     // YELLOW
     else if ((wavelength>=510) && (wavelength <= 580)){
-      color.r = (int)((float)pow((wavelength - 510) / 70.0f, gamma) * 255.0f);
+      color.r = (int)((float)powf((wavelength - 510) / 70.0f, gamma) * 255.0f);
       color.g = 255;
 
     }
     // ORANGE
     else if ((wavelength>=580) && (wavelength <= 645)){
       color.r = 255;
-      color.g = (int)((float)pow((645 - wavelength) / 65.0f, gamma) * 255.0f);
+      color.g = (int)((float)powf((645 - wavelength) / 65.0f, gamma) * 255.0f);
     }
     // RED
     else if ((wavelength>=645) && (wavelength <= 750)){
       attenuation = 0.3f + 0.7f * (750 - wavelength) / 105.0f;
-      color.r = (int)((float)pow(attenuation, gamma) * 255.0f);
+      color.r = (int)((float)powf(attenuation, gamma) * 255.0f);
 
     }
 
@@ -748,15 +755,15 @@ inline struct rgb_color_int wavelength_to_rgb_custom(int wavelength, int arr[], 
     if ((wavelength >= arr[0]) & (wavelength <= arr[1]))
     {
       attenuation = 0.3f + 0.7f * (wavelength - (float)arr[0]) / (float)(arr[1] - arr[0]);
-      color.r = (int)fmax((pow(((((float)arr[0] - wavelength) /
+      color.r = (int)fmaxf((pow(((((float)arr[0] - wavelength) /
       (float)(arr[1] - arr[0])) * attenuation), gamma) * 255.0f), 0);
-      color.b = (int)(pow(attenuation, gamma + 3.0f) * 255.0f);
+      color.b = (int)(powf(attenuation, gamma + 3.0f) * 255.0f);
     }
 
     // BLUE
     else if((wavelength >=arr[2]) && (wavelength <= arr[3]))
     {
-      color.g = (int)((float)pow((wavelength - (float)arr[2]) /
+      color.g = (int)((float)powf((wavelength - (float)arr[2]) /
       (float)(arr[3] - arr[2]), gamma) * 255.0f);
       color.b = 255;
     }
@@ -765,14 +772,14 @@ inline struct rgb_color_int wavelength_to_rgb_custom(int wavelength, int arr[], 
     // GREEN
     else if ((wavelength>=arr[4]) && (wavelength <= arr[5])){
       color.g = 255;
-      color.b = (int)(pow(((float)arr[5] - wavelength) /(float)(arr[5] - arr[4]), gamma) * 255.0f);
+      color.b = (int)(powf(((float)arr[5] - wavelength) /(float)(arr[5] - arr[4]), gamma) * 255.0f);
     }
 
 
 
     // YELLOW
     else if ((wavelength>=arr[6]) && (wavelength <= arr[7])){
-      color.r = (int)(pow((wavelength - (float)arr[6]) / (float)(arr[7] - arr[6]), gamma) * 255.0f);
+      color.r = (int)(powf((wavelength - (float)arr[6]) / (float)(arr[7] - arr[6]), gamma) * 255.0f);
       color.g = 255;
 
     }
@@ -781,22 +788,22 @@ inline struct rgb_color_int wavelength_to_rgb_custom(int wavelength, int arr[], 
     // ORANGE
     else if ((wavelength>=arr[8]) && (wavelength <= arr[9])){
       color.r = 255;
-      color.g = (int)(pow(((float)arr[9] - wavelength) / (float)(arr[9] - arr[8]), gamma) * 255.0f);
+      color.g = (int)(powf(((float)arr[9] - wavelength) / (float)(arr[9] - arr[8]), gamma) * 255.0f);
     }
 
 
     // RED
     else if ((wavelength>=arr[10]) && (wavelength <= arr[11])){
       attenuation = 0.3f + 0.7f * ((float)arr[11] - wavelength) / (float)(arr[11] - arr[10]);
-      color.r = (int)(pow(attenuation, gamma) * 255.0f);
+      color.r = (int)(powf(attenuation, gamma) * 255.0f);
 
     }
     else
     {
-    wavelength = (float)fmax(wavelength, 1000);
+    wavelength = (float)fmaxf(wavelength, 1000);
     attenuation = (float)(0.99f * (float)(1000 - wavelength) / (float)(1000 - arr[11]));
     color.r = (int)attenuation;
-    color.r = (int)(pow(attenuation, gamma) * 255.0f);
+    color.r = (int)(powf(attenuation, gamma) * 255.0f);
     color.g = 0;
     color.b = 0;
     }
@@ -840,7 +847,7 @@ vector2 randomGradient(int ix, int iy) {
     a *= 2048419325;
     float random = a * (3.14159265f / ~(~0u >> 1)); // in [0, 2*Pi]
     vector2 v;
-    v.x = (float)sin(random); v.y = (float)cos(random);
+    v.x = (float)sinf(random); v.y = (float)cosf(random);
     return v;
 }
 
@@ -904,6 +911,7 @@ inline int get_largest(int arr[], int n)
 
 
 // C function to find minimum in arr[] of size n
+// Integer array values
 inline int min_c(int arr[], int n)
 {
     int i;
@@ -921,23 +929,65 @@ inline int min_c(int arr[], int n)
 }
 
 
+
 // C function to find minimum in arr[] of size n
-inline float minf(float arr[], int n)
+// float array values
+inline float min_f(float arr[], unsigned int n)
 {
-    int i;
+    unsigned int i=0;
 
     // Initialize minimum element
     float min = arr[0];
 
-    // Traverse array elements from second and
-    // compare every element with current min
+    // Find min value from array
+    for (i = 1; i < n; i++)
+        if (arr[i] < min)
+            min = arr[i];
+    return min;
+}
+
+
+// C function to find minimum in arr[] of size n
+// float array values
+inline struct s_min minf_struct(float arr[], unsigned int n)
+{
+    unsigned int i=0;
+
+    struct s_min s_min_f;
+    s_min_f.value = (float)0.0;
+    s_min_f.index = (unsigned int)0;
+
+    // Initialize minimum element
+    float min = arr[0];
+
+    // Find min value from array
     for (i = 1; i < n; i++)
         if (arr[i] < min)
             min = arr[i];
 
-    return min;
+    s_min_f.value = min;
+    s_min_f.index = i;
+    return s_min_f;
 }
 
+
+
+inline unsigned int min_index(float arr[], unsigned int n)
+{
+    register unsigned int i=0;
+
+    // Initialize minimum element
+    register unsigned int index = 0;
+    float min = arr[0];
+
+    // Find min value from array
+    for (i = 1; i < n; i++)
+        if (arr[i] < min){
+            min = arr[i];
+            index = i;
+            }
+    return index;
+}
 
 
 int main(){

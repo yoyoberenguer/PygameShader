@@ -35,20 +35,25 @@ except ImportError:
                       "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
 
 
-def show_fps(screen_, fps_, avg_) -> None:
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 15)
+
+
+def show_fps(screen_, fps_, avg_) -> list:
     """ Show framerate in upper left corner """
-    font = pygame.font.SysFont("Arial", 15)
+
     fps = str(f"fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
 
-    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    fps_text = font.render(fps, True, pygame.Color("coral"))
     screen_.blit(fps_text, (10, 0))
     if av != 0:
         av = str(f"avg:{av:.3f}")
-        avg_text = font.render(av, 1, pygame.Color("coral"))
+        avg_text = font.render(av, True, pygame.Color("coral"))
         screen_.blit(avg_text, (100, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
+    return avg_
 
 
 get_gpu_info()
@@ -57,11 +62,16 @@ width = 800
 height = 600
 
 SCREENRECT = pygame.Rect(0, 0, width, height)
-SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.SCALED, 32)
+SCREEN = pygame.display.set_mode(SCREENRECT.size, pygame.FULLSCREEN | pygame.DOUBLEBUF, 32)
 
 pygame.init()
 
-background = pygame.image.load('..//Assets//city.jpg')
+try:
+    background = pygame.image.load('..//Assets//city.jpg')
+except FileNotFoundError:
+    raise FileNotFoundError(
+        '\nImage file city.jpg is missing from the Assets directory.')
+
 background = pygame.transform.smoothscale(background, (width, height))
 background.convert(32, RLEACCEL)
 background.set_alpha(None)
@@ -104,7 +114,7 @@ while STOP_GAME:
     SCREEN.blit(image, (0, 0))
     t = clock.get_fps()
     avg.append(t)
-    show_fps(SCREEN, t, avg)
+    avg = show_fps(SCREEN, t, avg)
     pygame.display.flip()
     clock.tick()
     FRAME += 1
