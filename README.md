@@ -8,6 +8,27 @@
 pip install PygameShader==1.0.10
 ```
 
+<p align="left">
+    <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/zoom1.gif?raw=true">
+</p>
+
+<p align="left">
+    <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/lens.gif?raw=true">
+</p>
+
+<p align="left">
+    <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/bloom.gif?raw=true">
+</p>
+
+<p align="left">
+    <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/fire.gif?raw=true">
+</p>
+
+<p align="left">
+    <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/swirl.gif?raw=true">
+</p>
+
+
 Some scripts have been ported to GPU using CUPY and CUDA raw Kernels for running 
 on NVIDIA graphics cards (NVIDIA CUDA GPU with the compute Capability 3.0 or larger.). 
 These shaders are only compatible with NVIDIA chipset.
