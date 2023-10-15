@@ -28,6 +28,107 @@ pip install PygameShader==1.0.10
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/swirl.gif?raw=true">
 </p>
 
+## Version 1.0.10 is out 
+Fastest and improved version of **PygameShader**, 15-20% faster CPU algorithms
+
+**New CPU demonstrations available:** 
+- demo_burst
+- demo_burst_exp (experimental)
+- demo_fire_border
+- demo_predator
+- demo_magnifier
+- demo_rain 
+- demo_ripple
+- demo_transition_inplace
+- demo_tunnel
+- demo_wave_static
+
+Added following Cython flags to all libraries and methods
+```
+@cython.profile(False)
+@cython.initializedcheck(False)
+```
+Fast math operations by using C float precision e.g cosf, sinf, atanf etc.<br>
+This changes apply only for windows version AMD64 and Win32 (all libraries using libc.math).<br>
+Linux versions is still using double precision<br>
+
+Added Fast RGB to HSL color conversion model for a given color
+```
+cpdef inline hsl _rgb_to_hsl(unsigned char r, unsigned char g, unsigned char b)nogil
+cpdef inline rgb _hsl_to_rgb(float h, float s, float l)nogil
+```
+Added fast RGB to HSV color conversion model for a given color
+```
+cpdef inline hsv _rgb_to_hsv(unsigned char r, unsigned char g, unsigned char b)nogil
+cpdef inline rgb _hsv_to_rgb(float h, float s, float v)nogil
+```
+
+## What's changed
+Renamed various Cython methods (cdef & cpdef methods) to simplify
+
+Improved and simplified many CPU algorithms. 
+Version 1.0.10 is 10-20% faster than 1.0.9
+
+### New BlendFlags library. 
+This library is similar to Pygame special flags attribute.<br>
+Unlike Pygame, where only surface can be blend together, this library allow you to blend directly 3d arrays(w, h, 3) 
+and 2d arrays shape (w, h) together (texture vs texture or alpha channels vs alpha). <br>
+Blending array together is much faster than converting both surfaces into equivalent arrays or converting 
+arrays into Surfaces to blend pixels together. <br>
+Removing unnecessary steps improved the performances and can make your game or code run much faster when you
+need to apply transformation to the array level.<br>
+```
+Added blit_s function (blend a sprite to an image or surface)
+Added blend_add_surface (blend surfaces, equivalent to BLEND_RGB_ADD)
+Added blend_add_array (blend two 3d arrays together, equivalent to BLEND_RGB_ADD for arrays)
+Added blend_add_alpha (blend two 2d arrays together, equivalent to BLEND_RGB_ADD  for alpha channels)
+Added blend_sub_surface (blend surfaces, equivalent to BLEND_RGB_SUB)
+Added blend_sub_array (same for arrays)
+Added blend_min_surface (blend surfaces, equ to BLEND_ADD_MIN)
+Added blend_min_array (same for arrays)
+Added blend_max_surface (blend surface with BLEND_RGB_MAX flag)
+Added blend_max_array (same for arrays)
+```
+### New BurstSurface library
+This library provides new tools to transform PNG & JPG images into multiple sub-surfaces or pixels block.<br>
+It contains tools to produce images explosion/burst into pixels or pixel's block, check the demo `demo_burst` and <br>
+`demo_burt_exp` (experimental version with _sdl library).<br>
+Tools for disassembling or reassembling images from exploded pixels<br>
+```
+Added pixel_block_rgb (extract sprites from a sprite-sheet) 
+Added surface_split used by burst method to decompose an image into pixel blocks)
+Added burst (explode a Pygame surface into multiple sub-surface )
+Added display_burst (Display an exploded image on the Pygame display)
+Added rebuild_from_frame (Rebuild an exploded image)
+Added burst_into_memory (Burst image in memory)
+Added rebuild_from_memory (Rebuild image from memory)
+
+-- experimental with _sdl library--
+Added burst_experimental (explode a surface into multiple sub-surfaces)
+Added db_experimental (display burst)
+Added rff_experimental (rebuild from a specific frame number)
+Added rfm_experimental (rebuild from memory)
+Added build_surface_inplace (build a surface from a sprite group inplace)
+Added build_surface_inplace_fast (build surface from a sprite group, same than above but faster)
+```
+### New library Sprites
+This is the Pygame sprite module Cythonized 
+
+### Library misc
+New algorithm for scrolling surfaces or arrays, check demo `demo_scroll` 
+```
+Added scroll24 (scroll surface horizontally / vertically)
+Added scroll24_inplace (same but inplace)
+Added scroll24_arr_inplace (same but for 3d arrays)
+Added surface_copy (equivalent tp pygame surface copy)
+```
+### Library Palette
+Changed the palettes arrays to with dataset float32 types<br>
+Changed C file Shaderlib.c to perform fast math operations instead of double <br>
+
+
+
+---
 
 Some scripts have been ported to GPU using CUPY and CUDA raw Kernels for running 
 on NVIDIA graphics cards (NVIDIA CUDA GPU with the compute Capability 3.0 or larger.). 
