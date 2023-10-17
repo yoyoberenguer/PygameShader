@@ -240,7 +240,7 @@ pip install PygameShader
 ## Installation from source code
 
 *Download the source code and decompress the Tar or zip file*
-* Linux
+* ### Linux
 ```bash
 tar -xvf source-1.0.8.tar.gz
 cd PygameShader-1.0.8
@@ -248,7 +248,7 @@ python3 setup.py bdist_wheel
 cd dist 
 pip3 install PygameShader-xxxxxx 
 ```
-* Windows 
+* ### Windows 
 
 *Decompress the archive and enter PygameShader directory* 
 ```bash
