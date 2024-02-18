@@ -1,2 +1,5 @@
 * linguist-vendored
+*.pxd linguist-language=Cython
+*.pyx linguist-language=Cython
+
 
