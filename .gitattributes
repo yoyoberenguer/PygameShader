@@ -1,5 +1,10 @@
 * linguist-vendored
 *.pxd linguist-language=Cython
 *.pyx linguist-language=Cython
+*.java linguist-detectable=false
+*.js linguist-detectable=false
+*.html linguist-detectable=false
+*.xml linguist-detectable=false
+*.py linguist-detectable=true
 
 
