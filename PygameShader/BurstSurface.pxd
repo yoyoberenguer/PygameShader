@@ -20,6 +20,51 @@ Copyright Yoann Berenguer
 """
 
 
+"""
+.. _cython_graphics_lib:
+
+Cython Graphics Library
+=======================
+
+Key Features
+------------
+This library provides advanced tools for image manipulation and rendering in graphical applications.
+Built on pygame and other low-level rendering techniques, it enables efficient handling of surfaces,
+sprites, and pixel-based effects. The key features include:
+
+- Splitting images into smaller blocks for sprite sheets and tile maps.
+- Applying dynamic effects like bursts and controlled rebuilding of images.
+- Storing and manipulating graphical elements in memory for optimized rendering.
+- Enhancing performance in real-time applications through optimized functions.
+- Supporting experimental features for advanced graphical effects and debugging.
+
+Library Functional Overview
+---------------------------
+The library consists of a set of functions that facilitate various graphical transformations
+and effects. It focuses on the efficient handling of pixel-based surfaces, allowing developers
+to create complex visual effects such as explosions, dynamic surface reconstruction, and optimized
+sprite manipulations.
+
+Target Applications
+-------------------
+This library is particularly useful for:
+
+- Game development: Enabling real-time effects like explosions, animations, and sprite transformations.
+- Graphics simulations: Creating dynamic visual effects that require image manipulation.
+- Image processing: Splitting, reconstructing, and modifying images for artistic or technical purposes.
+- Research and experimentation: Testing new graphical rendering techniques and optimization strategies.
+
+Summary
+-------
+This library is designed to enhance the capabilities of graphical applications, particularly
+in game development and advanced image manipulation. By offering optimized functions for handling
+surfaces, splitting images, applying burst effects, and rebuilding images, it provides a flexible
+and efficient toolset for developers. Experimental functions add further possibilities for exploring
+novel rendering techniques. The library is a valuable resource for those looking to implement complex
+graphical transformations efficiently.
+
+"""
+
 cdef unsigned char [:, :, ::1] pixel_block_rgb_c(
         unsigned char [:, :, :] array_, int start_x, int start_y,
         int w, int h, unsigned char [:, :, ::1] block) nogil

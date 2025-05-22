@@ -1,11 +1,12 @@
 # cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
-# profile=False, initializedcheck=False
+# profile=False, initializedcheck=False, exceptval(check=False)
 # cython: optimize.use_switch=True
 # cython: warn.maybe_uninitialized=False
 # cython: warn.unused=False
 # cython: warn.unused_result=False
 # cython: warn.unused_arg=False
 # cython: language_level=3
+# cython: write_stub_file = True
 # encoding: utf-8
 
 """
@@ -17,6 +18,317 @@
  of this license document, but changing it is not allowed.
 
 Copyright Yoann Berenguer
+"""
+
+"""
+# **Image Processing Library in Cython**
+
+## **Purpose**
+This Cython library is designed for **high-performance image processing and manipulation**. 
+It provides a wide range of functions to transform, filter, and enhance images, leveraging Cython's 
+ability to combine Python's ease of use with C-like performance. The library is optimized for
+real-time or computationally intensive tasks, making it suitable for applications in game development,
+computer vision, artistic effects, and scientific visualization.
+
+---
+
+## **Key Functionalities**
+
+### **1. Color Manipulation**
+- **Color Space Conversions**:
+  - `bgr`, `brg`: Convert images between BGR and BRG color formats.
+  - `grey`: Convert images to grayscale.
+  - `sepia`: Apply a sepia tone effect.
+  - `hsl_effect`, `hsv_effect`: Transform images using HSL (Hue, Saturation, Lightness) and 
+        HSV (Hue, Saturation, Value) color spaces.
+- **Brightness and Saturation**:
+  - `brightness`: Adjust the brightness of an image.
+  - `saturation`: Adjust the saturation of an image.
+  - `brightness_exclude`, `brightness_bpf`: Apply brightness adjustments with exclusions 
+        or based on specific thresholds.
+- **Inversion**:
+  - `invert`: Invert the colors of an image.
+
+---
+
+### **2. Visual Effects**
+- **Filters**:
+  - `median`: Apply median filtering for noise reduction.
+  - `sobel`: Perform edge detection using the Sobel operator.
+  - `bloom`: Add a bloom effect to highlight bright areas.
+  - `posterize_surface`: Reduce the number of colors for a posterized effect.
+- **Distortions**:
+  - `wave`, `swirl`, `fisheye`: Apply wave, swirl, and fisheye distortions.
+  - `horizontal_glitch`, `horizontal_sglitch`: Simulate horizontal glitch effects.
+- **Artistic Effects**:
+  - `painting`, `cartoon`: Apply artistic effects to mimic painting or cartoon styles.
+  - `dithering`, `dithering_atkinson`: Apply dithering algorithms to reduce color 
+        depth while preserving visual quality.
+
+---
+
+### **3. Advanced Image Processing**
+- **Edge Detection and Sharpening**:
+  - `sobel`, `sobel_fast`: Detect edges using the Sobel operator.
+  - `sharpen`, `sharpen32`: Sharpen images to enhance details.
+- **Blending and Compositing**:
+  - `blend`, `alpha_blending`: Blend two images with adjustable opacity or blending modes.
+- **Heatmap and Predator Vision**:
+  - `heatmap`: Generate heatmap visualizations.
+  - `predator_vision`: Simulate a predator-like vision effect with edge detection and color mapping.
+
+---
+
+### **4. Physical Simulations**
+- **Ripple Effects**:
+  - `ripple`, `ripple_seabed`: Simulate ripple effects on water surfaces.
+- **Heat Convection**:
+  - `heatconvection`: Simulate heat convection effects on images.
+- **Plasma Effects**:
+  - `plasma`, `plasma_config`: Generate dynamic plasma effects.
+
+---
+
+### **5. Utility Functions**
+- **Image Transformations**:
+  - `mirroring`: Mirror images horizontally or vertically.
+  - `pixelation`: Pixelate images by reducing resolution.
+  - `bilinear`: Perform bilinear interpolation for resizing images.
+- **Color Mapping**:
+  - `wavelength2rgb`, `custom_map`: Convert wavelengths to RGB colors or apply custom color mappings.
+- **Performance-Oriented Functions**:
+  - Many functions (e.g., `bgr_1d`, `grey_1d`) are optimized for 1D or 3D pixel arrays, 
+        enabling efficient processing of large datasets.
+
+---
+
+### **6. Special Effects**
+- **TV Scanlines**:
+  - `tv_scan`: Simulate old TV scanline effects.
+- **Blood Effects**:
+  - `blood`: Apply blood-like effects to images.
+- **Dirt and Lens Effects**:
+  - `dirt_lens`: Simulate dirt or lens distortion effects.
+
+---
+
+### **7. Performance and Optimization**
+- **Memory Efficiency**:
+  - Functions like `bgr_1d`, `grey_1d`, and `invert1d` are designed to work with 1D or 
+        3D arrays, ensuring efficient memory usage.
+- **Parallel Processing**:
+  - Many functions use `nogil` to release the Global Interpreter Lock (GIL), 
+        enabling multi-threaded execution for faster processing.
+
+---
+
+## **Target Use Cases**
+This library is ideal for:
+- **Game Development**: Real-time image effects (e.g., distortions, filters, blending).
+- **Computer Vision**: Preprocessing images for machine learning or analysis.
+- **Artistic Applications**: Applying creative effects to images or videos.
+- **Scientific Visualization**: Simulating physical phenomena (e.g., heat convection, ripples).
+
+---
+
+## **Summary**
+The library is a **powerful and versatile toolkit** for image processing, 
+combining **performance optimization** with a **wide range of visual effects and transformations**. 
+It is well-suited for applications requiring real-time or high-performance image manipulation, 
+such as games, simulations, and computer vision tasks.
+
+"""
+
+"""
+
+## 1. Color Space Conversions
+
+### **BGR/RGB Conversions**
+- `bgr`, `bgr_copy`, `bgr_3d`, `bgr_1d`, `bgr_1d_cp`
+- `brg`, `brg_copy`, `brg_3d`, `brg_1d`, `brg_1d_cp`
+
+### **Grayscale Conversions**
+- `grey`, `grey_copy`, `grey_2d`, `grey_3d`, `grey_1d`, `grey_1d_cp`
+
+### **Sepia Effect**
+- `sepia`, `sepia_copy`, `sepia_3d`, `sepia_1d`, `sepia_1d_cp`
+
+### **HSL/HSV Conversions**
+- `hsl_effect`, `hsl3d`, `hsl1d`, `hsl1d_cp`
+- `hsv_effect`, `hsv3d`, `hsv1d`, `hsv1d_cp`
+
+### **Brightness and Saturation**
+- `brightness`, `brightness3d`, `brightness1d`, `brightness1d_copy`, `brightness_copy`, `brightness_exclude`, `brightness_bpf`
+- `saturation`, `saturation3d`, `saturation1d`, `saturation1d_cp`
+
+### **Other Color Effects**
+- `convert_27`, `Luma_GreyScale`
+
+---
+
+## 2. Image Filtering and Effects
+
+### **Median Filter**
+- `median`, `median_fast`, `median_grayscale`
+
+### **Posterization**
+- `posterize_surface`
+
+### **Edge Detection (Sobel)**
+- `sobel`, `sobel_1d`, `sobel_fast`
+
+### **Inversion**
+- `invert`, `invert_copy`, `invert3d`, `invert1d`, `invert1d_cp`
+
+### **Wave and Swirl Effects**
+- `wave`, `wave32`, `wave_static`
+- `swirl`, `swirl32`, `swirlf`
+
+### **Plasma Effect**
+- `plasma_config`, `plasma`
+
+### **Heat Convection**
+- `heatconvection`
+
+### **Glitch Effects**
+- `horizontal_glitch`, `horizontal_sglitch`
+
+### **Bloom Effect**
+- `bloom`
+
+### **Dirt Lens Effect**
+- `dirt_lens`
+
+### **Sharpen**
+- `sharpen`, `sharpen_1d`, `sharpen_1d_cp`, `sharpen32`
+
+### **Emboss**
+- `emboss`, `emboss_inplace`, `emboss1d`, `emboss_gray`
+
+### **Bilateral Filter**
+- `bilateral`
+
+### **Cartoon Effect**
+- `cartoon`
+
+### **Chromatic Aberration**
+- `chromatic`, `chromatic_inplace`
+
+### **Zoom**
+- `zoom`, `zoom_inplace`
+
+### **Heatmap**
+- `heatmap`
+
+### **Predator Vision**
+- `predator_vision`
+
+### **Blood Effect**
+- `blood`
+
+### **Mirroring**
+- `mirroring_array`, `mirroring`
+
+### **Dithering**
+- `dithering`, `dithering_inplace`, `dithering1d`, `dithering1d_cp`, `dithering_atkinson`, `dithering_atkinson1d`
+
+### **Pixelation**
+- `pixelation`
+
+### **Blending**
+- `blend`, `blend1d`, `blend_inplace`, `alpha_blending`, `alpha_blending_inplace`
+
+---
+
+## 3. Image Manipulation and Transformation
+
+### **Bilinear Transformation**
+- `bilinear`
+
+### **Tunnel Effects**
+- `tunnel_modeling24`, `tunnel_render24`, `tunnel_modeling32`, `tunnel_render32`
+
+### **Split Channels**
+- `split_channels`, `split_channels_inplace`
+
+### **Ripple Effects**
+- `ripple`, `ripple_seabed`
+
+### **Dampening Effects**
+- `dampening`, `lateral_dampening`
+
+### **Fisheye Effect**
+- `fisheye_footprint`, `fisheye_footprint_param`, `fisheye`
+
+### **TV Scan Effect**
+- `tv_scan`
+
+### **Render Light Effects**
+- `render_light_effect24`, `area24_cc`
+
+### **Heatwave Effect**
+- `heatwave_array24_horiz_c`
+
+---
+
+## 4. Utility and Helper Functions
+
+### **Color Mapping**
+- `wavelength2rgb`, `custom_map`, `blue_map`, `bluescale`, `red_map`, `redscale`
+
+### **Shader Effects**
+- `shader_bloom_fast`, `shader_bloom_fast1`
+
+---
+
+## 5. Special Effects and Shaders
+
+### **Plasma**
+- `plasma_config`, `plasma`
+
+### **Heat Convection**
+- `heatconvection`
+
+### **Glitch Effects**
+- `horizontal_glitch`, `horizontal_sglitch`
+
+### **Bloom**
+- `bloom`
+
+### **Chromatic Aberration**
+- `chromatic`, `chromatic_inplace`
+
+### **Zoom**
+- `zoom`, `zoom_inplace`
+
+### **Heatmap**
+- `heatmap`
+
+### **Predator Vision**
+- `predator_vision`
+
+### **Blood Effect**
+- `blood`
+
+### **Mirroring**
+- `mirroring_array`, `mirroring`
+
+### **Dithering**
+- `dithering`, `dithering_inplace`, `dithering1d`, `dithering1d_cp`, `dithering_atkinson`, `dithering_atkinson1d`
+
+### **Pixelation**
+- `pixelation`
+
+### **Blending**
+- `blend`, `blend1d`, `blend_inplace`, `alpha_blending`, `alpha_blending_inplace`
+
+"""
+
+
+
+
+"""
+# VERSION 1.0.11
 """
 
 
@@ -46,6 +358,10 @@ except ImportError:
           "\nTry: \n   C:\\pip install cython on a window command prompt.")
 
 # PYGAME IS REQUIRED
+
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
 try:
     import pygame
     from pygame import Color, Surface, SRCALPHA, RLEACCEL, BufferProxy, HWACCEL, HWSURFACE, \
@@ -53,16 +369,20 @@ try:
     from pygame.surfarray import pixels3d, array_alpha, pixels_alpha, array3d, \
         make_surface, blit_array, pixels_red, \
     pixels_green, pixels_blue
-    from pygame.image import frombuffer, fromstring, tostring
+    from pygame.image import frombuffer, fromstring 
     from pygame.math import Vector2
-    from pygame import _freetype
-    from pygame._freetype import STYLE_STRONG, STYLE_NORMAL
     from pygame.transform import scale, smoothscale, rotate, scale2x
     from pygame.pixelcopy import array_to_surface
 
 except ImportError:
     raise ImportError("\n<Pygame> library is missing on your system."
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
+
+try:
+    # python > 2.1.3
+    from pygame.image import tobytes 
+except:
+    from pygame.image import tostring as tobytes
 
 try:
     cimport cython
@@ -79,19 +399,22 @@ except ImportError:
     raise ImportError("\n<cython> library is missing on your system."
           "\nTry: \n   C:\\pip install cython on a window command prompt.")
 
-from PygameShader.gaussianBlur5x5 import canny_blur5x5_surface24_c
-from PygameShader.misc cimport color_diff_hsv, color_diff_hsl, close_color, min_index, \
-    surface_copy_c
+from PygameShader.misc cimport get_image_format, is_uint8, is_float64, is_int32
+from PygameShader.misc cimport is_type_memoryview
 from PygameShader.BlendFlags import blend_add_array
 from PygameShader.BlendFlags cimport blend_add_surface_c, blend_add_array_c
+from PygameShader.PygameTools cimport resize_array_c, make_rgba_array_c
+from PygameShader.gaussianBlur5x5 cimport blur3d_c, blur3d_cp_c, blur, blur4bloom_c, blur1d_cp_c, blur1d_c
 
 cimport numpy as np
 
 from libc.math cimport sqrtf as sqrt, atan2f as atan2, sinf as sin,\
     cosf as cos, nearbyintf as nearbyint, expf as exp, powf as pow, floorf as floor, \
-roundf as round_c, fminf as fmin, fmaxf as fmax, rintf
+roundf as round_c, fminf as fmin, fmaxf as fmax, rintf, fmodf
 
 from libc.stdlib cimport malloc, rand, free
+from libc.string cimport memcpy
+
 
 
 from libc.stdio cimport printf
@@ -117,6 +440,8 @@ cdef float C2 = <float>3.0/<float>16.0
 cdef float C3 = <float>5.0/<float>16.0
 cdef float C4 = <float>1.0/<float>16.0
 
+cdef float C1_ = <float>1.0 / <float>sqrt(M_2PI)
+
 
 DEF HALF         = 1.0/2.0
 DEF ONE_THIRD    = 1.0/3.0
@@ -136,6 +461,7 @@ DEF ONE_255      = 1.0/255.0
 DEF ONE_360      = 1.0/360.0
 DEF TWO_THIRD    = 2.0/3.0
 DEF ONE_1024     = 1.0/1024
+DEF ONE_65025    = 1.0/65025
 
 cdef float[360] COS_TABLE
 cdef float[360] SIN_TABLE
@@ -184,18 +510,9 @@ print("SCHEDULE %s " % SCHEDULE)
 cdef:
     float [:, :] COLORS_CPC64_C = numpy.divide(COLORS_CPC64, <float>255.0).astype(dtype=float32)
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline float _randf(float lower, float upper)nogil:
-    """
-    Equivalent to random.uniform (much faster)
-    """
-    return randRangeFloat(lower, upper)
+
+
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -204,212 +521,52 @@ cpdef inline float _randf(float lower, float upper)nogil:
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline int _randi(int lower, int upper)nogil:
-    """
-    Equivalent to random.randint (much faster)
-    """
-    return randRange(lower, upper)
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline hsl _rgb_to_hsl(unsigned char r, unsigned char g, unsigned char b)nogil:
-    """
-    CONVERT RGB color to HSL 
-    
-    """
-
-    cdef:
-        hsl hsl_
-    with gil:
-        assert 0 < r <255 and 0 < g < 255 and 0 < b < 255, \
-            "\nRGB values are unsigned char type, range [0 ... 255]"
-
-    # divide be 255.0
-    hsl_ = struct_rgb_to_hsl(
-        r * <float>ONE_255,
-        g * <float>ONE_255,
-        b * <float>ONE_255
-    ) # struct_rgb_to_hsl returns values between 0.0 ... 1.0
-
-    hsl_.h *= 360;
-    hsl_.s *= 100;
-    hsl_.l *= 100;
-
-    return hsl_
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline rgb _hsl_to_rgb(float h, float s, float l)nogil:
-    """
-    CONVERT HSL model to RGB
-    HSL values are normalized h/360, s/100, l/100
-    """
-    cdef:
-        rgb rgb_
-    with gil:
-        assert 0 < h <1.0 and 0 < s < 1.0 and 0 < h < 1.0, \
-            "\nHSL values are normalized float, range [0.0 ... 1.0]"
-
-    rgb_ = struct_hsl_to_rgb(
-        h, s, l
-    ) # struct_hsl_to_rgb returns values in range 0.0 ... 1.0
-
-    rgb_.r *= <float>255.0
-    rgb_.g *= <float>255.0
-    rgb_.b *= <float>255.0
-
-    return rgb_
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline hsv _rgb_to_hsv(unsigned char r, unsigned char g, unsigned char b)nogil:
-    """
-    CONVERT RGB color to HSV
-
-    """
-
-    cdef:
-        hsv hsv_
-    with gil:
-        assert 0 < r < 255 and 0 < g < 255 and 0 < b < 255, \
-            "\nRGB values are unsigned char type, range [0 ... 255]"
-
-    # divide be 255.0
-    hsv_ = struct_rgb_to_hsv(
-        r * <float> ONE_255,
-        g * <float> ONE_255,
-        b * <float> ONE_255
-    )  # struct_rgb_to_hsv returns values between 0.0 ... 1.0
-
-    hsv_.h *= 360;
-    hsv_.s *= 100;
-    hsv_.v *= 100;
-
-    return hsv_
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline rgb _hsv_to_rgb(float h, float s, float v)nogil:
-    """
-    CONVERT HSV model to RGB
-    HSV values are normalized h/360, s/100, v/100
-    """
-    cdef:
-        rgb rgb_
-    with gil:
-        assert 0 < h < 1.0 and 0 < s < 1.0 and 0 < v < 1.0, \
-            "\nHSL values are normalized float, range [0.0 ... 1.0]"
-
-    rgb_ = struct_hsv_to_rgb(
-        h, s, v
-    )  # struct_hsv_to_rgb returns values in range 0.0 ... 1.0
-
-    rgb_.r *= <float> 255.0
-    rgb_.g *= <float> 255.0
-    rgb_.b *= <float> 255.0
-
-    return rgb_
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef tuple rgb_2_yiq(unsigned char r, unsigned char g, unsigned char b):
-    """
-    CONVERT RGB VALUES INTO YIQ COLOR MODEL 
-    
-    * formulas NTSC 1953 
-    
-    :param r: integer; (unsigned char) red value in range [0.255]
-    :param g: integer; (unsigned char) green value in range [0.255]
-    :param b: integer; (unsigned char) blue value in range [0.255]
-    :return: tuple representing the color in YIQ color model
-    """
-    cdef yiq yiq_
-    yiq_ = rgb_to_yiq(r/<float>255.0, g/<float>255.0, b/<float>255.0)
-    return yiq_.y, yiq_.i, yiq_.q
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef tuple yiq_2_rgb(float y, float i, float q):
-    """
-    CONVERT YIQ COLOR MODEL INTO EQUIVALENT RGB VALUES
-    * NTSC 1953
-    
-    :param y: float; LUMA
-    :param i: float; I stands for in-phase
-    :param q: float; Q stands for quadrature, 
-    :return: tuple representing the RGB values [0...255] unsigned char values
-    """
-    cdef rgb rgb_
-
-    rgb_ = yiq_to_rgb(y, i, q)
-    return <unsigned char>(rgb_.r * <float>255.0), \
-           <unsigned char>(rgb_.g * <float>255.0), \
-           <unsigned char>(rgb_.b * <float>255.0)
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline void rgb_to_bgr(object surface_):
+@cython.exceptval(check=False)
+cpdef inline void bgr(object surface_):
     """  
-    SHADER RGB to BGR (INPLACE)
+    Convert an image from RGB(A) to BGR(A) format (in-place).
   
-    Convert your game display from RGB to BGR format (blue, green, red)
-    This algorithm can also be used to transform pygame surface in the equivalent bgr format
-    
+    Converts the game display, image, or surface from RGB(A) to BGR(A) format. 
+    The alpha channel will be ignored in the process, but it is retained in case 
+    of a 32-bit surface.
 
-    e.g:
-    rgb_to_bgr(surface)
+    RGB is commonly used in image editing and display applications, where the 
+    order is red, green, and blue. On the other hand, BGR is often used in image 
+    processing applications, where the order is blue, green, and red.
 
-    :param surface_    : Pygame surface or display surface compatible (image 24-32 bit with or 
-                         without per-pixel transparency / alpha channel)
-    :return             : void
+    **Note**: This function operates in-place, meaning it modifies the original surface.
+
+    **Example usage**:
+        bgr(surface)
+
+    :param surface_: 
+        Pygame surface (either display or image) with a compatible format 
+        (24-bit or 32-bit, with or without transparency/alpha channel).
+        
+    :return: 
+        void; modifies the surface in-place.
     """
+    # Assert that the input is a valid Pygame Surface
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
     cdef unsigned char [:, :, :] rgb_array
     try:
+
+        # Retrieve the pixel data view from the surface in RGB format.
+        # This assumes the surface is either 24-bit (RGB) or 32-bit (RGBA).
         rgb_array = surface_.get_view('3')
 
+
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Handle potential errors with providing the image format.
+        print("Surface is format 32-bit? %s" % get_image_format(surface_))
+        raise ValueError(
+            "\nCannot reference source pixels into a 3d array.\n %s " % e)
+    # Call the 'bgr_c' function to perform the actual RGB to BGR conversion.
+    bgr_c(rgb_array)
 
 
-    rgb_to_bgr_inplace_c(rgb_array)
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -418,31 +575,59 @@ cpdef inline void rgb_to_bgr(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void rgb_to_brg(object surface_):
-    """
-    SHADER RGB TO BRG (INPLACE)
+@cython.exceptval(check=False)
+cpdef bgr_copy(object surface_):
+    """  
+    Convert an image format from RGB(A) to BGR(A) and return a new surface (copy).
 
-    Convert your game display from RGB to BRG format (blue, red, green)
-    This algorithm can also be used to transform pygame texture in the equivalent BRG format
-    
+    This function converts the pixel data of an input image from RGB(A) to BGR(A) format.
+    The Alpha channel (if present) will be retained, but the order of the color channels 
+    is switched from RGB to BGR. This is useful when working with image processing libraries 
+    that expect the BGR format (such as OpenCV), while the RGB format is commonly used in 
+    display and image editing applications.
+
     e.g:
-    rgb_to_brg(surface)
+    new_surface = bgr_copy(surface)
 
-    :param surface_: Pygame surface or display surface compatible (image 24-32 bit with or without 
-                     per-pixel transparency / alpha channel)
-    :return: void 
+    :param surface_: 
+        A Pygame Surface object representing the image. The surface can be in 24-bit or 
+        32-bit format (with or without an alpha channel). The function assumes the image 
+        is in RGB(A) format and will convert it to BGR(A).
+
+    :return: 
+        Returns a new Pygame Surface object with the converted BGR(A) pixel format.
+
     """
+    # Ensure the input is a valid Pygame surface
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    cdef unsigned char [:, :, :] rgb_array
+    # Declare variables to store surface dimensions and bit size
+    cdef:
+        Py_ssize_t w, h       # Image width and height
+        int bit_size          # Number of bytes per pixel (bit depth)
+
+    # Get the width and height of the surface
+    w, h = surface_.get_size()
+
+    # Get the bit size of the surface (either 3 for RGB or 4 for RGBA)
+    bit_size = surface_.get_bytesize()
+
+    # Try to obtain the pixel buffer from the surface
+    cdef unsigned char [:] rgb_array
     try:
-        rgb_array = surface_.get_view('3')
+        rgb_array = surface_.get_buffer()  # Get the underlying pixel data as a memory view
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # If an error occurs during buffer extraction, print the error message and raise a ValueError
+        print("Surface is format 32-bit? %s" % get_image_format(surface_))
+        raise ValueError(
+            "\nCannot reference source pixels into a 1d memoryview slice.\n %s " % e)
 
-    rgb_to_brg_inplace_c(rgb_array)
+    # Create and return a new surface with the pixel data in BGR(A) format
+    # If bit_size is 4 (RGBA), use "BGRA" format; otherwise, use "BGR" format
+    return pygame.image.frombuffer(rgb_array, (w, h), "BGRA" if bit_size == 4 else "BGR")
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -451,31 +636,75 @@ cpdef inline void rgb_to_brg(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void greyscale(object surface_):
+@cython.exceptval(check=False)
+cpdef inline void bgr_3d(unsigned char [:, :, :] rgb_array):
     """
-    SHADER GRAYSCALE (INPLACE &CONSERVE LUMINOSITY)
+    Convert an RGB(A) array (shape: w, h, n) with uint8 data type to BGR(A) format (inplace).
 
-    This shader transform the game display or pygame surface into a grayscale
+    This function directly processes a 3D array (such as an image or surface) from RGB(A) format 
+    to BGR(A) format. It assumes that the input array is in RGB or RGBA format, and it switches 
+    the red and blue channels to convert it to BGR or BGRA format respectively. The operation 
+    is done in place, modifying the original array.
+
+    RGB is the common color order used in display and image editing applications, where the color 
+    channels are arranged as red, green, blue. On the other hand, BGR is often used in image 
+    processing applications, where the color channels are arranged as blue, green, red.
 
     e.g:
-    greyscale(surface)
+    bgr_3d(array)
 
-    :param surface_  : Pygame surface or display surface compatible (image 24-32 bit with 
-                       or without per-pixel transparency / alpha channel)
-    :return          : void
-    
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 3D numpy array of shape (w, h, n), where `w` is the width, `h` is the height, 
+        and `n` is the number of channels (3 for RGB, 4 for RGBA). The array should have 
+        uint8 data type (values between 0 and 255), and contain pixel data in RGB(A) format.
+
+    Returns
+    -------
+    void
+        This function modifies the input array in place and does not return any value.
+
+    Raises
+    ------
+    ValueError
+        If the input array shape is not compatible with RGB(A) (i.e., it does not have 
+        the shape (w, h, 3) or (w, h, 4)).
+
+    TypeError
+        If the input array does not have the uint8 (unsigned byte) data type.
     """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    cdef unsigned char [:, :, :] rgb_array
+    cdef:
+        Py_ssize_t w, h  # Width and height of the image
+        Py_ssize_t bit_size = 0  # Number of color channels (3 or 4)
+
     try:
-        rgb_array = surface_.get_view('3')
+        # Extract shape dimensions (width, height, and number of channels)
+        w, h, bit_size = rgb_array.shape[:3]
 
-    except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Check if the array has 3 or 4 channels (RGB or RGBA)
+        if bit_size not in (3, 4):
+            raise ValueError('\nIncorrect bit_size, only RGB(A) is supported.')
 
-    greyscale_luminosity24_inplace_c(rgb_array)
+    except ValueError as e:
+        # Handle ValueError and print array flags for debugging
+        if is_type_memoryview(rgb_array):
+            print(numpy.array(rgb_array).flags)
+        else:
+            print(rgb_array.flags)
+
+        raise ValueError(
+            "\n%s\nExpecting array shape (w, h, n), RGB(A), got (%s, %s, %s)" % (e, w, h, len(rgb_array[:3])))
+
+    # Ensure the array is of uint8 data type (unsigned bytes)
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type, got %s" % rgb_array.dtype)
+
+    # Perform the BGR conversion in place by calling the helper function
+    bgr_c(rgb_array)
+
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -484,20 +713,802 @@ cpdef inline void greyscale(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void bgr_1d(unsigned char [::1] rgb_array, bint format_32=False):
+    """
+    Convert a 1D array of uint8 data type from RGB(A) to BGR(A) format (inplace).
+
+    This function processes a 1D array directly, converting the color channels from 
+    the RGB(A) format to the BGR(A) format. The conversion is done in place, modifying 
+    the original array. The `format_32` flag determines whether the input is in RGB 
+    (24-bit) or RGBA (32-bit) format.
+
+    RGB is the standard color order used in many image editing and display applications, 
+    where the order of the color channels is red, green, and blue. In contrast, BGR is 
+    often used in image processing, where the color channels are arranged as blue, 
+    green, and red.
+
+    Example usage:
+    bgr_1d(array)
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray or bytearray
+        A 1D array (or buffer) of pixel data in RGB(A) format, with uint8 data type 
+        (values between 0 and 255). The array length should be a multiple of 3 (for RGB) 
+        or 4 (for RGBA). The array contains the pixel color values that will be converted 
+        from RGB(A) to BGR(A) format.
+
+    format_32 : bool, optional
+        A boolean flag indicating the format of the input array. 
+        - `True` indicates the array is in 'RGB' (24-bit, 3 channels).
+        - `False` (default) indicates the array is in 'RGBA' (32-bit, 4 channels).
+
+    Returns
+    -------
+    void
+        The function modifies the input array in place and does not return any value.
+
+    Raises
+    ------
+    TypeError
+        If the input array does not have a `uint8` data type.
+    """
+
+    # Ensure the array is of uint8 data type (values between 0 and 255)
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type, got %s" % rgb_array.dtype)
+
+    # Call the underlying C function to perform the BGR conversion in place
+    bgr_1d_c(rgb_array, format_32)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline np.ndarray[np.uint8_t, ndim=1] bgr_1d_cp(
+        unsigned char [::1] rgb_array, bint format_32=False):
+    """
+    Convert a 1D array from RGB(A) to BGR(A) format and return a new copy.
+
+    This function takes a 1D array (or memoryview slice) that contains pixel data in 
+    RGB(A) order and produces a new 1D array with the color channels reordered to 
+    BGR(A). This conversion is useful when interfacing with libraries or routines 
+    that expect pixels in BGR(A) format instead of the more common RGB(A) order.
+
+    The function assumes that the input array is of type uint8, and its length should 
+    be a multiple of 3 (for RGB data) or 4 (for RGBA data). The `format_32` flag indicates 
+    whether the input contains 32-bit pixels (True for RGBA, False for RGB).
+
+    **Example:**
+    ```python
+    new_bgr_array = bgr_1d_cp(rgb_array)
+    ```
+
+    ### Parameters:
+    - **bgr_array** (*numpy.ndarray* or *memoryview slice*, shape `(w,)`, dtype `uint8`):
+      A 1D array or buffer containing pixel data in RGB(A) order.  
+      (For instance, if the image is RGB, the array length should be 3 * number_of_pixels.)
+
+    - **format_32** (*bool*, optional):
+      A flag indicating the pixel format:
+        - `False` (default): the input is assumed to be 24-bit (RGB, 3 channels).
+        - `True`: the input is assumed to be 32-bit (RGBA, 4 channels).
+
+    ### Returns:
+    - **numpy.ndarray**:  
+      A new 1D array (uint8) with the pixel data converted to BGR(A) order.
+    """
+
+    # Only uint8 data is compatible
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    return bgr_1d_cp_c(rgb_array, format_32)
+
+
+
+
+# ------------ RGB TO BRG
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void brg(object surface_):
+    """
+    Convert a Pygame surface from RGB(A) to BRG(A) format in-place.
+
+    This function modifies the given surface by swapping the red and green color channels,
+    converting an image from RGB(A) order to BRG(A) order. The alpha channel, if present,
+    is preserved but ignored during the conversion process.
+
+    **Example Usage:**
+        brg(surface)
+
+    ### Parameters:
+    - **surface_** (*pygame.Surface*):  
+      A Pygame surface or display surface compatible with 24-bit (RGB) or 32-bit (RGBA) pixel formats.
+      The function operates directly on the provided surface.
+
+    ### Returns:
+    - **None**:  
+      The function modifies the input surface in-place and does not return a new surface.
+      
+    """
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    cdef unsigned char [:, :, :] rgb_array
+    try:
+        '3 returns a (surface-w, surface-h, 3) array of RGB color components. ' \
+        'Each of the red, green, and blue components are unsigned bytes. Only 24-bit' \
+        ' and 32-bit surfaces are supported. The color components must be in either RGB' \
+        ' or BGR order within the pixel.'
+
+        rgb_array = surface_.get_view('3')
+
+    except Exception as e:
+
+        print("Surface is format 32-bit? %s" % get_image_format(surface_))
+        raise ValueError(
+            "\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    # Not needed since the brg_c process ignore the channel alpha
+    # cdef image_format = get_image_format(surface_)
+
+    brg_c(rgb_array)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef brg_copy(object surface_):
+    """
+    Convert an image from RGB(A) to BRG(A) format and return a new copy.
+
+    This function swaps the red and green channels of an image while preserving 
+    the blue channel. It creates and returns a new surface with the modified 
+    color format, leaving the original surface unchanged.
+
+    ### Example Usage:
+        brg_surface = brg_copy(surface)
+
+    ### Parameters:
+    - **surface_** (*pygame.Surface*):  
+      A Pygame surface or display surface in 24-bit (RGB) or 32-bit (RGBA) format.  
+      The alpha channel (if present) will be ignored.
+
+    ### Returns:
+    - **pygame.Surface**:  
+      A new surface with the color channels converted to BRG format.
+    """
+
+    # Ensure the input `surface_` is a valid Pygame Surface
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Declare Cython variables for efficiency
+    cdef:
+        unsigned char [::1] bgr_array  # 1D memoryview slice for pixel data
+        Py_ssize_t w, h, bit_size      # Image dimensions and bit depth
+
+    # Get width and height of the Pygame Surface
+    w, h = surface_.get_size()
+
+    # Get the bit depth (bytes per pixel)
+    bit_size = surface_.get_bytesize()
+
+    try:
+        # Attempt to retrieve the raw pixel buffer of the Pygame Surface
+        bgr_array = surface_.get_buffer()
+
+    except Exception as e:
+        # If getting the buffer fails, check the surface format and raise an error
+        print("Surface is format 32-bit? %s" % get_image_format(surface_))
+        raise ValueError(
+            "\nCannot reference source pixels into a 1D memoryview slice array.\n %s " % e
+        )
+
+    # Convert the processed BGR array back into a Pygame image Surface
+    # - `brg_1d_cp_c()` processes the buffer
+    # - If bit depth is 4 bytes per pixel, assume an "RGBA" format; otherwise, assume "RGB".
+    return pygame.image.frombuffer(
+        brg_1d_cp_c(bgr_array, format_32=True if bit_size == 4 else False),
+        (w, h), 
+        "RGB" if bit_size == 3 else "RGBA"
+)
+
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void brg_3d(unsigned char [:, :, :] rgb_array):
+    """
+    Convert a 3D array from RGB(A) to BRG(A) format (inplace).
+    
+    This function swaps the red and green channels while preserving the blue 
+    and alpha channels (if present). It modifies the input array directly 
+    without creating a copy.
+    
+    ### Example Usage:
+        brg_3d(rgb_array)
+    
+    ### Parameters:
+    - **rgb_array** (*numpy.ndarray*, shape *(w, h, n)*, dtype *uint8*):  
+      A 3D array representing an image, where pixel values range from 0 to 255.  
+      The last dimension *(n)* must be 3 (RGB) or 4 (RGBA).
+    
+    ### Returns:
+    - **None**:  
+      The function operates inplace and does not return a new array.
+    """
+
+    # Declare variables using Cython's cdef for performance optimization
+    cdef:
+        Py_ssize_t w, h            # Width and height of the image array
+        Py_ssize_t bit_size = 0    # Bit size (number of channels, e.g., 3 for RGB, 4 for RGBA)
+
+    try:
+        # Extract the width, height, and bit size (number of channels) from the RGB array's shape
+        w, h, bit_size = rgb_array.shape[:3]
+
+        # Check if the image has either 3 (RGB) or 4 (RGBA) channels, raise error if not
+        if bit_size not in (3, 4):
+            raise ValueError('\nIncorrect bit_size, support only RGB(A)')
+
+    except ValueError as e:
+        # If a ValueError occurs, check whether the array is a memoryview or a numpy array
+        if is_type_memoryview(rgb_array):
+            # For memoryviews, print flags of the numpy array (viewable properties like contiguous in memory)
+            print(numpy.array(rgb_array).flags)
+        else:
+            # For regular numpy arrays, print flags for debugging
+            print(rgb_array.flags)
+
+        # Raise a more descriptive ValueError with the dimensions of the array
+        raise ValueError(
+            "\n%s\nExpecting array shape (w, h, n), "
+            "RGB(A) got (%s, %s, %s)" % (e, w, h, len(rgb_array[:3])))
+
+    # Check if the data type is uint8 (unsigned 8-bit integer), which is required for compatibility
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    # Process the RGB array (likely converting from RGB to BGR or applying GPU operations)
+    brg_c(rgb_array)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef void brg_1d(unsigned char [::1] rgb_array, bint format_32=False):
+    """
+    Converts a 1D array of RGB(A) pixel data to BRG(A) format in-place.
+
+    This function swaps the red and blue channels of an input array or buffer 
+    representing RGB or RGBA pixel data. It works on both 24-bit (RGB) and 
+    32-bit (RGBA) formats.
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray or bytearray
+        A 1D array of shape (w,) containing uint8 pixel data (values 0-255).
+        Can be either a NumPy array or a raw byte buffer.
+
+    format_32 : bool, optional (default: False)
+        - True: Treats the input as an RGB (24-bit) buffer.
+        - False: Treats the input as an RGBA (32-bit) buffer.
+
+    Returns
+    -------
+    None
+        The operation is performed in-place, modifying `rgb_array` directly.
+
+    Example
+    -------
+    ```python
+    brg_1d(rgb_array)  # Converts an RGB(A) buffer to BRG(A)
+    ```
+    """
+
+    # Only uint8 data is compatible
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    brg_1d_c(rgb_array, format_32)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline np.ndarray[np.uint8_t, ndim=1] brg_1d_cp(
+        const unsigned char [::1] bgr_array, bint format_32=False):
+    """
+    Converts a 1D array of uint8 BGR(A) pixel data to BRG(A) format and returns a new array.
+
+    Unlike the in-place version (`brg_1d`), this function creates and returns a 
+    new array with the red and blue channels swapped.
+
+    BRG stands for Blue, Red, Green.
+
+    Example
+    -------
+    ```python
+    bgr_array = brg_1d_cp(bgr_array)  # Converts an BGR(A) buffer to BRG(A)
+    ```
+
+    Parameters
+    ----------
+    bgr_array : numpy.ndarray or bytearray
+        A 1D array of shape (w,) containing uint8 pixel data (values 0-255).
+        Can be either a NumPy array or a raw byte buffer.
+
+    format_32 : bool, optional (default: False)
+        - True: Treats the input as an BGR (24-bit) buffer.
+        - False: Treats the input as an BGRA (32-bit) buffer.
+
+    Returns
+    -------
+    numpy.ndarray
+        A new array of shape (w,) with the BRG(A) pixel format (copied).
+        
+    """
+
+    # Only uint8 data is compatible
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    return brg_1d_cp_c(bgr_array, format_32)
+
+
+# ------------ GRAYSCALE
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void grey(object surface_):
+    """
+    Convert an image to grayscale while preserving luminosity (in-place).
+
+    A grayscale image has a single channel representing pixel intensity or brightness,
+    where pixel values range from 0 (black) to 255 (white). This function computes the
+    grayscale values based on luminosity, preserving perceived brightness from the original color image.
+
+    Example Usage:
+    --------------
+    grey(surface)
+
+    Parameters
+    ----------
+    surface_ : 
+        pygame.Surface
+        A Pygame surface or display surface compatible object, with an image in 
+        24-bit or 32-bit format. The surface may include transparency or an alpha 
+        channel.
+
+    Returns
+    -------
+    None
+        The function modifies the input surface in place and does not return a new surface.
+    """
+
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    cdef unsigned char [:, :, :] rgb_array
+    try:
+        # '3' returns a (surface-w, surface-h, 3) array of RGB color components.
+        # Each of the red, green, and blue components are unsigned bytes.
+        # Only 24-bit and 32-bit surfaces are supported.
+        # The color components must be in either RGB or BGR order within the pixel.
+        rgb_array = surface_.get_view('3')
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    grey_c(rgb_array)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef grey_copy(object surface_):
+    """
+    Convert an image to grayscale while preserving luminosity and return a new surface.
+
+    A grayscale image has a single channel representing pixel intensity or brightness, 
+    with pixel values typically ranging from 0 (black) to 255 (white). This function 
+    converts the original image to grayscale based on luminosity, preserving perceived 
+    brightness from the color image. The alpha channel is preserved in images with 
+    transparency (RGBA format), but it is not altered.
+
+    Example Usage:
+    --------------
+    im = grey_copy(surface)
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface or display surface compatible object, with an image in 
+        24-bit or 32-bit format. The surface may include transparency (alpha channel).
+
+    Returns
+    -------
+    pygame.Surface
+        A new surface object containing the grayscale image. The original surface remains unchanged.
+    """
+
+    # Ensure the input `surface_` is a valid Pygame Surface object
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Declare Cython variables for optimized memory usage
+    cdef:
+        unsigned char [::1] bgr_buffer  # 1D memory view for pixel buffer (BGR format)
+        Py_ssize_t w, h                 # Image dimensions: width (w) and height (h)
+        int bit_size                    # Image bit depth (number of channels)
+
+    # Retrieve the width and height of the Pygame Surface
+    w, h = surface_.get_size()
+
+    # Get the bit size of the surface (bytes per pixel)
+    bit_size = surface_.get_bytesize()
+
+    try:
+        # Try to get the raw pixel buffer from the Pygame Surface (this is the pixel data)
+        bgr_buffer = surface_.get_buffer()
+
+    except Exception as e:
+        # If an error occurs, raise a more descriptive exception
+        raise ValueError("\nCannot reference source pixels into a 1d memoryviewslice array.\n %s " % e)
+
+    # Process the raw buffer using `grey_1d_cp_c` function (likely for a grayscale conversion or format change)
+    # - The function processes the buffer, with `format_32=True` if the bit size is 4 (RGBA), else False for RGB
+    # Convert the processed buffer back into a Pygame image using `pygame.image.frombuffer`
+    # - If bit size is 4, assume it's "RGBA", otherwise "RGB"
+    return pygame.image.frombuffer(
+        grey_1d_cp_c(bgr_buffer, format_32=True if bit_size == 4 else False),
+        (w, h), 
+        "RGBA" if bit_size == 4 else "RGB"
+    )
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef np.ndarray[np.uint8_t, ndim=2] grey_2d(surface_):
+    """
+    Convert an image into a 2D grayscale array.
+
+    A grayscale image has a single channel representing pixel intensity or brightness,
+    with pixel values typically ranging from 0 (black) to 255 (white). This function 
+    converts the input image to grayscale based on luminosity, preserving the intensity 
+    from the original color image. The alpha channel, if present, will be ignored in the 
+    output.
+
+    Example Usage:
+    --------------
+    gray = grey_2d(surface)
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface or display surface-compatible object, with an image in 
+        24-bit or 32-bit format. The surface may include transparency (alpha channel),
+        which will be ignored during the conversion.
+
+    Returns
+    -------
+    numpy.ndarray
+        A 2D NumPy array containing the grayscale image data. The array will have 
+        shape (w, h) and dtype uint8, where each value represents pixel intensity.
+    """
+
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    cdef unsigned char [:, :, :] rgb_array
+    try:
+        # '3' returns a (surface-w, surface-h, 3) array of RGB color components.
+        # Each of the red, green, and blue components are unsigned bytes.
+        # Only 24-bit and 32-bit surfaces are supported.
+        # The color components must be in either RGB or BGR order within the pixel.
+        rgb_array = surface_.get_view('3')
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    return grey_2d_c(rgb_array)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void grey_3d(unsigned char [:, :, :] rgb_array):
+    """
+    Convert a 3D array (w, h, n) in RGB(A) format to grayscale (with alpha) in place.
+
+    This function processes a 3D array directly, converting it to grayscale based on 
+    luminosity while preserving the alpha channel (if present). The pixel values in 
+    the resulting grayscale array represent intensity or brightness, ranging from 
+    0 (black) to 255 (white).
+
+    Example Usage:
+    --------------
+    # For a 24-bit image/surface
+    grey_3d(pixels3d(im))
+
+    # For a 32-bit image with alpha channel
+    grey_3d(numpy.asarray(im.get_view('0'), dtype=uint8).reshape(w, h, 4))
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 3D NumPy array of shape (w, h, n) with dtype uint8, containing pixel data 
+        in RGB(A) format. The values in the array range from 0 to 255. For 32-bit arrays 
+        (RGBA), the alpha channel will be preserved but ignored in the grayscale conversion.
+
+    Returns
+    -------
+    None
+        This function modifies the input array in place and does not return a new array.
+    """
+
+
+    # Declare Cython variables for optimized memory usage
+    cdef:
+        Py_ssize_t w, h             # Width (w) and Height (h) of the image
+        Py_ssize_t bit_size = 0     # Bit depth (number of color channels) of the image, initially set to 0
+
+    try:
+        # Try to unpack the shape of the input `rgb_array` into width, height, and bit size (number of channels)
+        w, h, bit_size = rgb_array.shape[:3]  # Extract first 3 dimensions (w, h, bit_size)
+
+        # Check if the image has valid bit sizes (either 3 for RGB or 4 for RGBA)
+        if bit_size not in (3, 4):
+            raise ValueError('\nIncorrect bit_size, support only RGB(A)')
+
+    except ValueError as e:
+        # If the array doesn't have the expected shape, handle errors:
+        
+        # Check if the input is a memory view (memoryviewslice)
+        if is_type_memoryview(rgb_array):
+            print(numpy.array(rgb_array).flags)  # Print memory flags for memoryview input
+        else:
+            # Print array flags for numpy array input
+            print(rgb_array.flags)
+
+        # Raise an error if the array shape is incorrect (not in the expected (w, h, 3) or (w, h, 4) format)
+        raise ValueError(
+            "\n%s\nExpecting array shape (w, h, n), "
+            "RGB(A) got (%s, %s, %s)" % (e, w, h, len(rgb_array[:3])))
+
+    # Check if the array data type is uint8 (unsigned 8-bit integer), which is compatible
+    # RGB(A) images are expected to be in uint8 format (values 0-255 for each color channel)
+    if not is_uint8(rgb_array):
+        raise TypeError(
+            "\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    # Call the `grey_c` function (likely for grayscale conversion or another image processing function)
+    grey_c(rgb_array)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void grey_1d(unsigned char [:] rgb_array, bint format_32=False):
+    """
+    Convert a 1D array of uint8 data (RGB(A)) to grayscale (with alpha) in place.
+
+    A grayscale image has a single channel representing pixel intensity or brightness, 
+    with pixel values typically ranging from 0 (black) to 255 (white). This function 
+    converts the input RGB(A) array to grayscale while preserving the alpha channel 
+    (if present). The conversion is performed in place, modifying the original array.
+
+    Example Usage:
+    --------------
+    # For a 24-bit buffer (RGB)
+    grey_1d(image.get_buffer(), format_32=True)
+    grey_1d(im.get_view('0'), format_32=True)
+    grey_1d(numpy.frombuffer(im.get_view('1'), dtype=uint8), format_32=True)
+
+    # For a 32-bit buffer (RGBA)
+    import PIL
+    from PIL import Image
+    im = Image.open("../Assets/px.png")
+    w, h = im.size
+    arr = numpy.frombuffer(numpy.asarray(im.getdata(), dtype=uint8), dtype=uint8)
+    grey_1d(arr, format_32=True)
+    image = Image.frombytes('RGBA', (w, h), arr)
+    image.show()
+
+    Set `format_32` to `True` if the array is a 32-bit buffer containing RGBA values.
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray or bytearray
+        A 1D array or buffer containing pixel data in RGB(A) format, with dtype uint8 
+        (unsigned char values ranging from 0 to 255).
+
+    format_32 : bool, optional (default=False)
+        If `True`, the function assumes the input is a 32-bit buffer (RGBA).
+        If `False`, the function assumes a 24-bit buffer (RGB).
+
+    Returns
+    -------
+    None
+        The function modifies the input array in place and does not return a new array.
+    """
+
+    # Only uint8 data is compatible
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    grey_1d_c(rgb_array, format_32)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline np.ndarray[np.uint8_t, ndim=1]\
+        grey_1d_cp(const unsigned char [::1] bgr_array, bint format_32=False):
+
+    """
+    Convert a 1D array of uint8 BGR(A) data to grayscale (with alpha channel) and return a copy.
+
+    This function checks that the input array has the expected uint8 data type, 
+    and then converts the pixel data from BGR or BGRA format to grayscale. The conversion 
+    preserves the alpha channel (if present). It returns a new 1D NumPy array in grayscale format.
+
+    The grayscale conversion is based on the luminosity formula, which calculates the 
+    brightness based on the red, green, and blue channels.
+
+    Parameters
+    ----------
+    bgr_array : numpy.ndarray
+        A 1D array containing pixel data in BGR(A) format, with dtype uint8. The pixel values 
+        should range from 0 to 255. If the array represents a BGRA image, the alpha channel 
+        will be preserved.
+
+    format_32 : bool, optional (default=False)
+        If `True`, the input array is assumed to be in BGRA (32-bit) format. 
+        If `False`, the array is assumed to be in BGR (24-bit) format.
+
+    Returns
+    -------
+    numpy.ndarray
+        A new 1D NumPy array of shape (w,) with dtype uint8, containing the grayscale 
+        pixel data. If the input was in BGRA format, the alpha channel is preserved in the output.
+
+    Raises
+    ------
+    TypeError
+        If the input array does not have dtype uint8, a `TypeError` will be raised.
+    """
+
+    # Only uint8 data is compatible
+    if not is_uint8(bgr_array):
+        raise TypeError(
+            "\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    return grey_1d_cp_c(bgr_array, format_32)
+
+
+# -------------------- SEPIA
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void sepia(object surface_):
     """
-    SHADER SEPIA MODEL (INPLACE)
+    Apply a sepia tone filter to an image, surface, or video game graphics (inplace).
 
-    Transform your video game into an equivalent sepia model
+    Sepia toning is a technique used in photography and imaging where the image is given 
+    a reddish-brown tint, simulating the warm tones of old photographs. It creates a 
+    softer, dreamier aesthetic compared to standard grayscale, adding depth and a vintage look.
 
-    e.g:
+    This function transforms the provided surface into an equivalent sepia-toned model, 
+    adjusting the pixel colors accordingly while preserving the original structure. The 
+    transformation is applied directly to the surface (inplace), and no new surface is returned.
+
+    Example:
+    --------
     sepia(surface)
 
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface or display surface, which can be 24- or 32-bit with or without 
+        per-pixel transparency (alpha channel). The surface will be modified directly.
 
-    :param surface_  : Pygame surface or display surface compatible (image 24-32 bit with 
-                       or without per-pixel transparency / alpha channel)
-    :return:         : void
+    Returns
+    -------
+    None
+        The transformation is applied inplace, and no new object is returned.
     """
+
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
     cdef unsigned char [:, :, :] rgb_array
@@ -505,9 +1516,10 @@ cpdef inline void sepia(object surface_):
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    sepia_inplace_c(rgb_array)
+    sepia_c(rgb_array)
+
 
 
 @cython.binding(False)
@@ -517,55 +1529,396 @@ cpdef inline void sepia(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef sepia_copy(object surface_):
+    """
+    Sepia model (New Surface)
+
+    Transform your video game/ image or surface into an equivalent sepia model
+    
+    While traditional black-and-white photographs use a standard grayscale to create
+    highlights and shadows, sepia-toned photos use a reddish-brown tone to create that spectrum.
+    “Sepia is a softer manipulation of light,”. This gives them a softer, dreamier aesthetic.
+    
+    e.g:
+    im = sepia_copy(surface)
+
+    :param surface_  : 
+        Pygame surface or display surface compatible (image 24-32 bit with 
+        or without per-pixel transparency / alpha channel)
+        
+    :return:         : Return a new surface 
+    """
+
+    # Ensure the surface_ argument is of type pygame.Surface
+    # If it's not a pygame.Surface type, raise an assertion error with the provided type
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Declare Cython variables for optimized memory usage
+    cdef:
+        unsigned char [::1] bgr_array  # Array to hold the pixel data of the surface
+        Py_ssize_t w, h                # Width (w) and Height (h) of the surface
+        Py_ssize_t bit_size            # Bit size (depth) of the surface's pixels
+
+    # Retrieve the dimensions (width and height) of the surface
+    w, h = surface_.get_size()
+
+    # Get the number of bytes per pixel (bit depth), e.g., 3 for RGB, 4 for RGBA
+    bit_size = surface_.get_bytesize()
+
+    # Declare additional Cython variables to create a new array to hold the processed data
+    cdef:
+        Py_ssize_t l = w * h * bit_size  # Calculate the total number of bytes in the surface
+        unsigned char [::1] destination_array = numpy.empty(l, dtype=numpy.uint8)  # Allocate a new array for destination
+
+    # Attempt to get the buffer of the surface (raw pixel data)
+    try:
+        bgr_array = surface_.get_buffer()  # This gives access to the underlying pixel data
+
+    except Exception as e:
+        # If unable to access the buffer, raise a ValueError with a detailed error message
+        raise ValueError("\nCannot reference source pixels into a 1d array.\n %s " % e)
+
+    # Return a new pygame image created from the processed data.
+    # Call sepia_1d_cp_c to apply a sepia filter to the image's buffer (raw pixel data)
+    # `format_32=True` if bit_size is 4 (RGBA), otherwise format is RGB
+    return pygame.image.frombuffer(
+        sepia_1d_cp_c(
+            bgr_array, destination_array, format_32=True if bit_size == 4 else False
+        ),
+        (w, h),  # Provide the width and height of the surface
+        "RGBA" if bit_size == 4 else "RGB"  # Specify color format (RGBA for 4 channels, RGB for 3 channels)
+    )
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void sepia_3d(unsigned char [:, :, : ] rgb_array):
+    """
+    Apply a sepia tone filter to a 3D RGB(A) image array (inplace).
+
+    This function processes a 3D NumPy array representing pixel data in RGB(A) format 
+    and applies a sepia filter. The sepia effect is achieved by adjusting the red, 
+    green, and blue channels according to predefined coefficients, creating a warm-toned, 
+    vintage effect. The function modifies the input array directly and does not return anything.
+
+    Only arrays with shapes (w, h, 3) for RGB or (w, h, 4) for RGBA are supported.
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 3D array with shape (w, h, 3) for RGB or (w, h, 4) for RGBA pixel data, where
+        `w` is the width, `h` is the height, and `3` or `4` corresponds to the RGB or RGBA channels.
+        The array must have dtype uint8 (unsigned char) with pixel values ranging from 0 to 255.
+
+    Raises
+    ------
+    ValueError
+        If the input array does not have the expected shape (w, h, 3) or (w, h, 4).
+
+    TypeError
+        If the input array does not have dtype uint8.
+
+    Notes
+    -----
+    - This function modifies the input `rgb_array` directly (inplace).
+    - If the input is in RGBA format, the alpha channel is preserved.
+    - The sepia effect is applied by adjusting the luminosity of the RGB channels using a set of coefficients.
+
+    Example
+    -------
+    # Assuming rgb_array is a 3D NumPy array with shape (w, h, 3) for RGB or (w, h, 4) for RGBA:
+    sepia_3d(rgb_array)
+    """
+
+    cdef:
+        Py_ssize_t w, h
+        Py_ssize_t bit_size = 0
+
+    try:
+
+        w, h, bit_size = rgb_array.shape[ :3 ]
+
+        # Only RGB(A) array supported (w, h, 3|4)
+        if bit_size not in (3, 4):
+            raise ValueError('\nIncorrect bit_size, support only RGB(A)')
+
+    except ValueError as e:
+        # _memoryviewslice
+        if is_type_memoryview(rgb_array):
+            print(numpy.array(rgb_array).flags)
+        # numpy.array
+        else:
+            print(rgb_array.flags)
+
+        raise ValueError(
+            "\n%s\nExpecting array shape (w, h, n), "
+            "RGB(A) got (%s, %s, %s)" % (e, w, h, len(rgb_array[ :3 ])))
+
+        # Only uint8 data is compatible
+    if not is_uint8(rgb_array):
+        raise TypeError(
+            "\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    sepia_c(rgb_array)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void sepia_1d(unsigned char [:] rgb_array, bint format_32=False):
+    """
+    Convert 1d array uint8 data type, RGB(A) to sepia equivalent (inplace)
+    
+    While traditional black-and-white photographs use a standard grayscale to create
+    highlights and shadows, sepia-toned photos use a reddish-brown tone to create that spectrum.
+    “Sepia is a softer manipulation of light,”. This gives them a softer, dreamier aesthetic.
+    
+    e.g 
+    # image 24-bit  
+    im = pygame.image.load("../Assets/px.png")
+    w, h = im.get_width(), im.get_height()
+    c = numpy.ndarray(shape=(w*h*3), buffer=im.get_view('0'), dtype=uint8)
+    sepia_1d(c, False)   
+
+    
+    # image 32-bit 
+    import pygame
+    im = pygame.image.load("../Assets/px.png")
+    w, h = im.get_width(), im.get_height()
+    sepia_1d(im.get_view('0'), True)
+    
+    or 
+    
+    im = pygame.image.load("../Assets/px.png")
+    w, h = im.get_width(), im.get_height()
+    sepia_1d(numpy.ndarray(shape=(w*h*4), buffer=im.get_view('1'), dtype=uint8), True)
+    
+    
+    Parameters
+    ----------
+    rgb_array : 
+        numpy.ndarray shape(w,) uint8 data type, RGB(A) 
+        (unsigned char 0...255) containing pixels or bytearray buffer
+        
+    format_32: 
+        bool True | for 'RGB' buffer type (24-bit) or False 'RGBA' (32-bit)
+ 
+    Returns
+    -------
+    Void
+    
+    """
+
+        # Only uint8 data is compatible
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    sepia_1d_c(rgb_array, format_32)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef np.ndarray[np.uint8_t, ndim=1, mode='c'] sepia_1d_cp(
+        const unsigned char [::1] bgr_array, bint format_32=False):
+    """
+    Apply sepia tone transformation to a 1D array of BGR (or BGRA) pixels.
+    
+    This function processes a 1D NumPy array containing BGR (or BGRA) pixel data 
+    and applies a sepia tone filter to each pixel. It returns a new 1D array of 
+    the same shape with the sepia-toned pixel values. If the input is in BGRA format, 
+    the alpha channel is preserved.
+    
+    The sepia effect is achieved by transforming the red, green, and blue components 
+    of each pixel using a specific mathematical formula that produces a reddish-brown tone.
+    
+    Parameters
+    ----------
+    bgr_array : numpy.ndarray
+       A 1D NumPy array with dtype uint8, containing pixel data in BGR (or BGRA) format. 
+       The pixel values must be in the range 0 to 255. The array is expected to have 
+       shape (w, 3) for BGR or (w, 4) for BGRA, where `w` is the number of pixels.
+    
+    format_32 : bool, optional (default=False)
+       If `True`, the input array is assumed to be in BGRA (32-bit) format, 
+       where each pixel has 4 channels (Blue, Green, Red, Alpha). 
+       If `False`, the input is assumed to be in BGR (24-bit) format, with 3 channels.
+    
+    Returns
+    -------
+    numpy.ndarray
+       A new 1D NumPy array of the same shape as `bgr_array`, containing the sepia-toned pixel data. 
+       The returned array will have dtype uint8 and will apply the sepia filter while preserving the 
+       alpha channel if the input is in BGRA format.
+    
+    Raises
+    ------
+    TypeError
+       If `bgr_array` does not have dtype uint8, an error is raised indicating the expected data type.
+    
+    ValueError
+       If the length of `bgr_array` is undefined or there is a problem with the array shape.
+    """
+
+    # Declare a variable to store the length of the input array
+    cdef:
+        Py_ssize_t length = 0  
+
+    try:
+        # Attempt to get the length of the input bgr_array
+        length = len(bgr_array)
+
+    except Exception as e:
+        # Raise an error if the length cannot be determined
+        raise ValueError(
+            "\nArray length is 'undefined'.\n%s " % e)
+
+    # Declare the destination array for processing
+    cdef:
+        # Create an empty array of the same length as the input array
+        # This array will store the processed sepia-toned pixel data
+        unsigned char [::1] destination_array = numpy.empty(length, dtype=numpy.uint8)
+
+    # Ensure that the input array contains only uint8 (unsigned 8-bit integer) data
+    if not is_uint8(bgr_array):
+        raise TypeError(
+            "\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    # Apply the sepia filter to the input array and store the result in the destination array
+    return sepia_1d_cp_c(bgr_array, destination_array, format_32)
+
+
+
+
+# ------------------- MEDIAN
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void median(
         object surface_,
         unsigned short int kernel_size_=2,
         bint fast_=True,
         unsigned short int reduce_factor_=1
 ) except *:
-    """
-    SHADER MEDIAN FILTER (INPLACE) 
-    
-    This shader cannot be used for real time display rendering as the performance 
-    of the algorithm is not satisfactory.
-    
 
-    :param surface_      : Pygame surface or display surface compatible (image 24-32 bit with 
-                           or without per-pixel transparency / alpha channel)
-    :param kernel_size_  : integer; Kernel size or neighbourhood pixels to be included default is 2
-                           Increase the effect with kernel size > 2 (effect overall speed is 
-                           degrading quickly with large kernel size e.g > 2)
-    :param fast_         : boolean; Flag for fast calculation (default True). Improve overall speed 
-                           performance by using smaller texture sizes (see reduce_factor_ option)
-    :param reduce_factor_: integer; Int value to reduce the size of the original surface to 
-                           process. A value of 1, divide the original surface by 2 and a value of 2
-                           reduce the surface by 4 (value of 1 and 2 are acceptable, over 2 the 
-                           image quality is too pixelated and blur) default value is 1 (div by 2).
-                           This argument as no effect if flag fast_=False
-    :return:             : void
     """
+    Apply median filter to a surface (inplace).
+
+    The median filter is a non-linear image filtering technique that is often used 
+    to remove noise from an image or signal. It works by replacing each pixel 
+    value with the median of the pixel values in a neighborhood defined by the 
+    kernel size. This technique is widely used for noise reduction in digital 
+    image processing, especially for preserving edges while removing noise.
+
+    The strength of the effect is controlled by the `kernel_size` parameter, 
+    with larger kernel sizes producing stronger filtering effects. However, 
+    larger kernel sizes may also slow down the process significantly. 
+
+    Note: This filter is not suitable for real-time rendering in games or animations 
+    due to its computational cost.
+
+    Example usage:
+    # For 24-bit image
+    im = pygame.image.load("../Assets/background.jpg")
+    im = scale(im, (800, 600))
+    median(im, fast=True)
+    
+    # For 32-bit image
+    im = pygame.image.load("../Assets/px.png").convert_alpha()
+    im = scale(im, (800, 600))
+    median(im, fast=False)
+    
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface object (24-bit or 32-bit) containing the image to be processed.
+        It can have or lack an alpha channel for transparency.
+
+    kernel_size_ : unsigned short int, optional
+        The size of the kernel or neighborhood of pixels used for the median calculation. 
+        Default is 2. Increasing the kernel size improves the filter effect but decreases performance.
+
+    fast_ : bool, optional
+        A flag to enable fast calculation (default is `True`). If `True`, the filter 
+        will use a smaller texture size to improve performance, and may reduce the quality 
+        based on the `reduce_factor_` argument.
+
+    reduce_factor_ : unsigned short int, optional
+        A factor to reduce the size of the surface before processing. A value of 1 divides 
+        the surface by 2, and a value of 2 reduces the surface by 4. Values larger than 2 
+        may degrade the image quality. Has no effect if `fast_` is `False`. Default is 1.
+
+    Returns
+    -------
+    void
+        This function modifies the surface directly (in-place) and does not return a value.
+
+    Raises
+    ------
+    ValueError
+        If `surface_` is not a valid `pygame.Surface` or if the `kernel_size_` 
+        or `reduce_factor_` are out of valid ranges.
+    """
+
+    # Ensure the provided surface is a valid Pygame Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
+    # Ensure the kernel size is greater than 1
     if kernel_size_ <= 1:
         raise ValueError('\nArgument kernel_size_ must be > 1')
 
     cdef unsigned char [:, :, :] rgb_array
+
+    # If 'fast_' flag is set to True, use a faster approach with surface reduction
     if fast_:
+        # Ensure reduce_factor_ is within a valid range (1 < reduce_factor_ < 8)
         if not 0 < reduce_factor_ < 9:
             raise ValueError('\nArgument reduce_factor_ must be > 1 and < 8 ')
+
+        # Apply fast median filter with the given kernel size and reduction factor
         median_fast(surface_, kernel_size_, reduce_factor_)
 
     else:
         try:
+            # Get a reference to the pixel data as a 3D array (RGB values)
             rgb_array = surface_.get_view('3')
 
         except Exception as e:
-            raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+            raise ValueError("\nCannot reference source pixels into a 3D array.\n %s " % e)
 
+        # Apply standard (slower) median filter inplace to the RGB array
         median_inplace_c(rgb_array, kernel_size_)
 
 
+# ------------------- PAINTING
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -574,31 +1927,55 @@ cpdef inline void median(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void painting(
-        object surface_,
-) except *:
+@cython.exceptval(check=False)
+cpdef inline void painting(object surface_) except *:
+    """   
+    Apply a painting effect (in-place) to a Pygame surface.
+
+    This function transforms an image to resemble a hand-painted artistic style.
+    It achieves this by using a fast median filter algorithm (`median_fast`), 
+    which smooths pixel values while maintaining edge details, giving the image
+    a brushstroke-like appearance.
+
+    Note:
+    -----
+    - This method **modifies the input surface in place**.
+    - It **is not optimized for real-time rendering** and is intended for offline 
+      processing of images.
+
+    Example Usage:
+    --------------
+    ```python
+    # Load a 24-bit or 32-bit image
+    im = pygame.image.load("../Assets/background.jpg").convert(24)
+
+    # Scale the image to a preferred size
+    im = scale(im, (800, 600))
+
+    # Apply the painting effect
+    painting(im)
+    ```
+
+    Parameters:
+    -----------
+    surface_ : pygame.Surface
+        A Pygame-compatible surface (24-bit or 32-bit), 
+        with or without per-pixel transparency (alpha channel).
+
+    Returns:
+    --------
+    void
+        The function modifies the input surface directly.
     """
-    PAINTING (INPLACE)
 
-    This algorithm cannot be used for real time rendering, use it offline to modify 
-    images/surface.
-
-
-    :param surface_      : Pygame surface or display surface compatible (image 24-32 bit with 
-                           or without per-pixel transparency / alpha channel)  
-    :return:             : void
-    """
-    cdef:
-        unsigned char kernel_size_ = 8
-        bint fast_ = True
-        unsigned char reduce_factor_ = 1
-
+    # Ensure the input is a valid Pygame surface
     assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+        "\nArgument 'surface_' must be a pygame.Surface type, got %s " % type(surface_)
 
-    median_fast(surface_, kernel_size_, reduce_factor_)
+    # Apply the median fast filter to create the painting effect
+    median_inplace_c(pixels3d(surface_), 8)
 
-
+# ------------------- PIXELATION
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -607,24 +1984,46 @@ cpdef inline void painting(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void pixels(object surface_) except *:
     """
-    PIXELATION (INPLACE)
+    Apply a pixelation effect to an image (INPLACE).
 
-    :param surface_      : Pygame surface or display surface compatible (image 24-32 bit with 
-                           or without per-pixel transparency / alpha channel)  
-    :return:             : void
+    Pixelation is a visual effect where an image is displayed at a low resolution, 
+    making individual pixels (small, single-colored square elements) clearly visible. 
+    This technique is often used in digital graphics to create artistic styles, 
+    censor parts of an image, or simulate retro, low-resolution video game graphics.
+
+    This function modifies the input surface in-place, reducing fine details and 
+    emphasizing blocky pixel structures.
+
+    Example Usage:
+    --------------
+    # Works with both 24-bit and 32-bit images
+    import pygame
+    im = pygame.image.load("../Assets/background.jpg").convert()
+    im = pygame.transform.scale(im, (800, 600))  # Rescale image
+    pixels(im)  # Apply pixelation effect
+
+    Parameters:
+    -----------
+    surface_ : pygame.Surface
+        A Pygame-compatible surface (24-bit or 32-bit image) with or without 
+        per-pixel transparency (alpha channel).
+
+    Returns:
+    --------
+    None
+        The input surface is modified directly (in-place).
     """
-    cdef:
-        unsigned char kernel_size_ = 2
-        bint fast_ = True
-        unsigned char reduce_factor_ = 4
 
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    median_fast(surface_, kernel_size_, reduce_factor_)
+    median_fast(surface_, 2, 4)
 
+
+# -------------------
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -633,55 +2032,112 @@ cpdef inline void pixels(object surface_) except *:
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void median_fast(
         object surface_,
-        unsigned short int kernel_size_=2,
-        unsigned short int reduce_factor_=1
+        unsigned short int kernel_size_   = 2,
+        unsigned short int reduce_factor_ = 1
 ):
     """
-    This function is used by the algorithms median, painting and pixels (cannot be call directly 
-    from python) 
+    Apply a fast median filter effect (INPLACE).
 
-    :param surface_: pygame.surface; Surface compatible 24-32 bit 
-    :param kernel_size_: integer; size of the kernel 
-    :param reduce_factor_: integer; value of 1 divide the image by 2, value of 2 div the image by 4
-    :return: void
+    This function is a lower-level implementation used internally by the `median`, 
+    `painting`, and `pixels` algorithms. It cannot be called directly from 
+    Python's interactive shell (IDLE). Instead, it is optimized for high-performance 
+    image processing in compiled Cython code.
+
+    The **median filter** is a non-linear digital filtering technique commonly 
+    used to remove noise from images while preserving edges. It is widely used 
+    in digital image processing as a pre-processing step for tasks such as edge 
+    detection and segmentation.
+
+    The strength of the median effect is controlled by the `kernel_size_` parameter. 
+    However, this filter is not optimized for real-time display rendering.
+
+    Example Usage:
+    --------------
+    # 24-bit image
+    im = pygame.image.load("../Assets/background.jpg")
+    median_fast(im, kernel_size_=3, reduce_factor_=1)
+
+    # 32-bit image (with alpha channel)
+    im = pygame.image.load("../Assets/px.png").convert_alpha()
+    median_fast(im, kernel_size_=5, reduce_factor_=2)
+
+    Parameters:
+    -----------
+    surface_ : pygame.Surface
+        A 24-bit or 32-bit Pygame-compatible surface.
+
+    kernel_size_ : int, optional (default=2)
+        The size of the kernel (neighborhood of pixels considered for filtering).
+        Increasing the kernel size enhances the filtering effect but significantly 
+        impacts performance.
+
+    reduce_factor_ : int, optional (default=1)
+        Determines the reduction factor applied to the image before processing.
+        - `1` reduces the image size by half.
+        - `2` reduces the image size by a factor of four.
+        Values higher than 2 may result in excessive blurring and pixelation.
+
+    Returns:
+    --------
+    None
+        The function modifies the input surface directly (in-place).
     """
+
     try:
+        # Attempt to retrieve a 3D view (RGB) of the pixel data from the input surface
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Raise an error if the surface pixel data cannot be accessed as a 3D array
+        raise ValueError("\nCannot reference source pixels into a 3D array.\n %s " % e)
 
-
-    # surface_cp = surface_.copy()
+    # Create a copy of the input surface
     surface_cp = surface_.copy()
+
     cdef:
-        int w, h
+        int w, h  # Declare width and height variables
+
+    # Retrieve the dimensions (width and height) of the copied surface
     w, h = surface_cp.get_size()
 
+    # Downscale the copied surface by a factor of 2^reduce_factor_ using smooth scaling
     surface_cp = smoothscale(surface_cp, (w >> reduce_factor_, h >> reduce_factor_))
 
     try:
+        # Retrieve a 3D view of the downscaled surface
         cp_array = surface_cp.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Raise an error if the downscaled surface pixel data cannot be accessed as a 3D array
+        raise ValueError("\nCannot reference source pixels into a 3D array.\n %s " % e)
 
     cdef:
-        int i, j
-        unsigned char[:, :, :] org_surface = rgb_array
-        unsigned char[:, :, :] surface_cp_arr = cp_array
+        int i, j  # Loop variables for iterating through pixels
+        unsigned char[:, :, :] org_surface = rgb_array  # Original surface pixel data
+        unsigned char[:, :, :] surface_cp_arr = cp_array  # Downscaled surface pixel data
 
+    # Apply an in-place median filter to the downscaled surface using a given kernel size
     median_inplace_c(surface_cp_arr, kernel_size_)
-    surface_cp_arr = scale_array24_c(surface_cp_arr, w, h)
 
+    # Resize the filtered array back to the original dimensions of the input surface
+    surface_cp_arr = resize_array_c(surface_cp_arr, w, h)
+
+    # Perform parallel processing (using OpenMP) to update the original surface with the processed pixels
     with nogil:
-        for i in prange(w, schedule=SCHEDULE, num_threads=THREADS):
-            for j in range(h):
-                org_surface[i, j, 0] = surface_cp_arr[i, j, 0]
-                org_surface[i, j, 1] = surface_cp_arr[i, j, 1]
-                org_surface[i, j, 2] = surface_cp_arr[i, j, 2]
+        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):  # Parallel loop over height
+            for i in range(w):  # Loop over width
+                # Copy the processed pixel values back to the original surface
+                org_surface[i, j, 0] = surface_cp_arr[i, j, 0]  # Red channel
+                org_surface[i, j, 1] = surface_cp_arr[i, j, 1]  # Green channel
+                org_surface[i, j, 2] = surface_cp_arr[i, j, 2]  # Blue channel
+
+
+
+
+# ------------------- MEDIAN GRAYSCALE
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -690,36 +2146,76 @@ cdef inline void median_fast(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void median_grayscale(
-        object surface_,
-        int kernel_size_=2
-):
+@cython.exceptval(check=False)
+cpdef inline void median_grayscale(object surface_, int kernel_size_=2):
     """
-    SHADER MEDIAN GRAYSCALE (INPLACE)
-
-    This shader cannot be used for real time rendering as the performance of the algorithm are not
-    satisfactory. 
-
-    The surface is compatible 24 - 32 bit with or without alpha layer
+    Apply a median filter to a grayscale version of the image (INPLACE).
     
-    :param surface_: pygame.Surface; compatible 24 - 32 bit with or without alpha layer
-    :param kernel_size_: integer; Kernel size (must be > 0), default value = 2
-    :return: void 
+    The **median filter** is a non-linear digital filtering technique commonly 
+    used to remove noise from images while preserving edges. It is widely used 
+    in digital image processing as a pre-processing step for tasks such as edge 
+    detection and segmentation.
+    
+    This function converts the input surface to grayscale and applies a median 
+    filter effect. The strength of the filtering effect is controlled by the 
+    `kernel_size_` parameter.
+
+    ⚠ **Note**:  
+    - This method **modifies the surface in place**.
+    - It is **not suitable for real-time rendering**.
+    - Compatible with **24-bit and 32-bit surfaces**, with or without an alpha channel.
+
+    Example Usage:
+    --------------
+    # Apply median filter to a 24-bit image
+    im = pygame.image.load("../Assets/background.jpg")
+    median_grayscale(im)
+
+    # Apply median filter to a 32-bit image (with alpha channel)
+    im = pygame.image.load("../Assets/px.png").convert_alpha()
+    median_grayscale(im)
+
+    Parameters:
+    -----------
+    surface_ : pygame.Surface
+        A Pygame-compatible surface (24-bit or 32-bit, with or without alpha).
+
+    kernel_size_ : int, optional (default=2)
+        The size of the kernel (neighborhood of pixels considered for filtering).
+        Must be greater than 0. Increasing the kernel size enhances the filtering 
+        effect but significantly impacts performance.
+
+    Returns:
+    --------
+    None
+        The function modifies the input surface directly (in-place).
     """
+
+
+    # Ensure that the input surface_ is an instance of pygame.Surface
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Declare a 3D memoryview to store the RGB pixel data
     cdef unsigned char [:, :, :] rgb_array
+
+    # Ensure that the kernel size for the median filter is greater than 1
     assert kernel_size_ > 1, "\nArgument kernel_size_ must be > 1"
+
     try:
+        # Retrieve a 3D view (RGB) of the pixel data from the input surface
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Raise an error if the surface pixel data cannot be accessed as a 3D array
+        raise ValueError("\nCannot reference source pixels into a 3D array.\n %s " % e)
 
-    shader_median_grayscale_filter24_inplace_c(rgb_array, kernel_size_)
+    # Apply an in-place median filter to the grayscale version of the RGB array
+    median_grayscale_inplace_c(rgb_array, kernel_size_)
 
 
 
+# --------------- COLOR REDUCTION
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -728,40 +2224,70 @@ cpdef inline void median_grayscale(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void color_reduction(
+@cython.exceptval(check=False)
+cpdef inline void posterize_surface(
         object surface_,
-        int color_=8
+        int color_ = 8
 ):
     """
-     COLOR REDUCTION SHADER (INPLACE)
+    Reduce the number of colors in an image (INPLACE).
 
-    Decrease the amount of colors in the display or texture.
-    The method of color reduction is very simple: every color of the original picture is replaced
-    by an appropriate color from the limited palette that is accessible.
-    
-    The surface is compatible 24 - 32 bit with or without alpha layer
-      
-    e.g:
+    This function decreases the number of unique colors in the given surface, 
+    effectively creating a posterization effect. Reducing colors can be useful 
+    for artistic effects, image compression, or preprocessing for stylized 
+    graphics.
+
+    ⚠ **Note**:  
+    - **Modifies the surface in place**.  
+    - **Works with 24-bit and 32-bit surfaces**, with or without an alpha channel.  
+    - If the surface has a **32-bit per-pixel alpha channel**, the alpha layer will 
+      be disregarded, meaning the effect is applied only to RGB values.
+
+    Example Usage:
+    --------------
+    # Reduce the number of colors in a Pygame surface to 8
     color_reduction(surface, 8)
 
-    :param surface_: pygame.Surface; compatible 24 - 32 bit 
-    :param color_: integer must be > 0 default 8
-    :return: void 
+    Parameters:
+    -----------
+    surface_ : pygame.Surface
+        A Pygame-compatible surface (24-bit or 32-bit, with or without alpha).
+
+    color_ : int, optional (default=8)
+        The number of colors to reduce the image to.
+        Must be greater than 0. Lower values produce a more dramatic effect.
+
+    Returns:
+    --------
+    None
+        The function modifies the input surface directly (in-place).
     """
+
+
+    # Ensure that the input surface_ is an instance of pygame.Surface
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
+    # Ensure that the color depth (number of colors) is greater than 0
     assert color_ > 0, "Argument color_number must be > 0"
 
+    # Declare a 3D memoryview to store the RGB pixel data
     cdef unsigned char [:, :, :] rgb_array
 
     try:
+        # Retrieve a 3D view (RGB) of the pixel data from the input surface
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Raise an error if the surface pixel data cannot be accessed as a 3D array
+        raise ValueError("\nCannot reference source pixels into a 3D array.\n %s " % e)
 
-    color_reduction_inplace_c(rgb_array, color_)
+    # Apply a posterization effect to the surface using the specified number of colors
+    posterize_surface_c(rgb_array, color_)
+
+
+
+# ----------------------- SOBEL
 
 
 @cython.binding(False)
@@ -771,38 +2297,66 @@ cpdef inline void color_reduction(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void sobel(
         object surface_,
         int threshold_ = 64
 ):
     """
-    SHADER SOBEL (INPLACE) 
-
-    Transform the game display or a pygame surface into a sobel equivalent model
-    (surface edge detection)
-
-    The surface is compatible 24 - 32 bit with or without alpha layer
+    Apply Sobel Edge Detection (Inplace)
     
-
-    e.g:
-    sobel(surface, 64)
-
-    :param surface_: pygame.Surface; compatible 24 - 32 bit 
-    :param threshold_: integer; Value for detecting the edges default 64
+    The Sobel operator, also known as the Sobel-Feldman operator, is commonly used in image processing 
+    for edge detection. It highlights edges in an image by emphasizing areas with high intensity 
+    gradients.
+    
+    This function applies the Sobel edge detection to a Pygame surface, transforming the surface to emphasize 
+    its edges based on the gradient of pixel intensities.
+    
+    The input surface must be in grayscale (24 - 32 bit) for best results. If the surface is not in grayscale, 
+    only the red channel will be used for the edge detection.
+    
+    Example usage:
+        sobel(surface, 64)  # Apply Sobel edge detection with a threshold of 64.
+    
+    :param surface_:
+        A Pygame.Surface object (24 - 32 bit depth), which may or may not have an alpha channel. 
+        The surface should be greyscaled, although non-greyscale images will use the red channel 
+        for edge detection.
+    
+    :param threshold_:
+        An integer (default is 64), representing the threshold for detecting edges. 
+        The threshold determines the sensitivity of edge detection, with higher values requiring 
+        stronger gradients to be considered an edge.
+    
     :return:
+        None. The function modifies the input surface in place, updating it with the Sobel edge detection result.
     """
+
+
+    # Ensure that the input surface_ is an instance of pygame.Surface
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
+    # Ensure that the threshold value is within the valid range [0, 255]
     assert -1 < threshold_ < 256, "\nArgument threshold must be an integer in range [0 ... 255]"
+
+    # Declare a 3D memoryview to store the RGB pixel data
     cdef unsigned char [:, :, :] rgb_array
+
     try:
+        # Retrieve a 3D view (RGB) of the pixel data from the input surface
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Raise an error if the surface pixel data cannot be accessed as a 3D array
+        raise ValueError("\nCannot reference source pixels into a 3D array.\n %s " % e)
 
-    sobel_inplace_c(rgb_array, threshold_)
+    # Apply the Sobel edge detection filter to the RGB image in-place
+    # The threshold_ value determines the edge intensity sensitivity
+    sobel_inplace_c(rgb_array, <float>threshold_)
+
+
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -811,41 +2365,167 @@ cpdef inline void sobel(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void sobel_1d(
+        Py_ssize_t w,
+        Py_ssize_t h,
+        unsigned char [::1] bgr_array,
+        tmp_array = None,
+        int threshold = 64,
+        bint format_32 = False,
+        bint greyscale = False
+        ):
+
+    """
+    Apply 1D Sobel Edge Detection (Inplace)
+
+    This function applies the 1D Sobel operator to a given image (or surface), emphasizing 
+    the edges in the horizontal or vertical direction based on the gradient of pixel intensities. 
+    It modifies the input buffer(s) in place.
+
+    Example usage:
+    # For 24-bit image
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    image = pygame.transform.smoothscale(image, (800, 600))
+    grey(image)
+    image_copy = image.copy()
+    sobel_1d(800, 600, image.get_buffer(), image_copy.get_buffer(), threshold=25)
+
+    # For 32-bit image (with alpha)
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    image = pygame.transform.smoothscale(image, (800, 600))
+    image_copy = image.copy()
+    sobel_1d(800, 600, image.get_buffer(), image_copy.get_buffer(), threshold=25, format_32=True)
+
+    Parameters
+    ----------
+    w : int
+        Width of the Pygame surface that the source array (`bgr_array`) is referencing.
+
+    h : int
+        Height of the Pygame surface that the source array (`bgr_array`) is referencing.
+
+    bgr_array : numpy.ndarray
+        A 1D C-buffer of type uint8 containing pixel data in BGR format. If the image is not 
+        greyscale, the algorithm processes all three RGB channels. If greyscale is enabled, only 
+        the blue channel is used for edge detection.
+
+    tmp_array : numpy.ndarray, optional
+        A 1D C-buffer of type uint8 containing pixel data in BGR format. It is a copy of the 
+        source `bgr_array`. Both `bgr_array` and `tmp_array` must have the same size and 
+        data format. This is used as a temporary buffer during processing.
+
+    threshold : int, optional, default=64
+        The threshold for edge detection. Pixels with gradient values above this threshold will 
+        be considered edges.
+
+    format_32 : bool, optional, default=False
+        If `True`, the input array is assumed to be in 32-bit BGRA format. If `False`, the input 
+        array is assumed to be in 24-bit BGR format.
+
+    greyscale : bool, optional, default=False
+        If `True`, the algorithm processes only the blue channel for edge detection, which can 
+        simplify the computation for greyscale images. If `False`, all three RGB channels are 
+        used in the Sobel operator.
+
+    Returns
+    -------
+    None
+        The function modifies the input buffers (`bgr_array` and `tmp_array`) in place.
+    """
+
+
+    assert PyObject_IsInstance(bgr_array, (numpy.ndarray, cython.view.memoryview)), \
+        "\nArgument bgr_array must be a numpy ndarray type, got %s " % type(bgr_array)
+
+    # Only uint8 data is compatible
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    if tmp_array is not None:
+        assert PyObject_IsInstance(tmp_array, (numpy.ndarray, pygame.bufferproxy.BufferProxy)), \
+            "\nArgument tmp_array must be a numpy ndarray type, got %s " % type(tmp_array)
+
+        # Cannot check data type for BufferProxy yet
+        if not PyObject_IsInstance(tmp_array,  pygame.bufferproxy.BufferProxy):
+            # Only uint8 data is compatible
+            if not is_uint8(tmp_array):
+                raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % tmp_array.dtype)
+
+    assert -1 < threshold < 256, "\nArgument threshold must be an integer in range [0 ... 255]"
+
+    cdef:
+        cdef Py_ssize_t l = bgr_array.shape[ 0 ]
+        # below create a copy False of the array and do not reference the pixels.
+        # The real time transformation of the identical copy of the array will not be functional as all the pixels
+        # undergo constant transformations. It is then necessary to load the pixels from a copy of the source array
+        # to implement the inplace transformation. Such as below
+        unsigned char [::1] bgr_array_cp = numpy.ndarray(shape=l, buffer=bgr_array, dtype=uint8).copy() if\
+            tmp_array is None else tmp_array
+
+    sobel_1d_c(w, l, bgr_array, bgr_array_cp, <float>threshold, format_32)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void sobel_fast(
         object surface_,
         int threshold_ = 64,
         unsigned short factor_ = 1
 ):
     """
-    SHADER FAST SOBEL (INPLACE)
+    Fast sobel (inplace)
+    
+    The Sobel operator, sometimes called the Sobel–Feldman operator or Sobel filter,
+    is used in image processing and computer vision, particularly within edge detection
+    algorithms where it creates an image emphasising edges.
 
     Transform the game display or a pygame surface into a sobel equivalent model
-    (surface edge detection).This version is slightly fastest than sobel_inplace_c as
+    This version is slightly fastest than sobel_inplace_c as
     it down-scale the array containing all the pixels and apply the sobel algorithm to a smaller
     sample. When the processing is done, the array is re-scale to its original dimensions.
     If this method is in theory faster than sobel_inplace_c, down-scaling and up-scaling
     an array does have a side effect of decreasing the overall image definition
     (jagged lines non-antialiasing)
     
-    Compatible 24 - 32 bit with or without alpha layer
+    Compatible 24 - 32 bit with or without alpha layer. 
+    The surface must be greyscale, but non greyscale image will also work. However only
+    the red channel will be used to code the sobel effect
       
     e.g:
-    sobel_fast(surface, 64, factor_=1)
+     sobel_fast(surface, 64, amplitude=1)
 
-    :param surface_: pygame.surface compatible 24-32 bit 
-    :param threshold_: integer; default value is 24 
-    :param factor_: integer; default value is 1 (div by 2)
-    :return:
+    :param surface_: 
+        pygame.surface compatible 24-32 bit
+         
+    :param threshold_: 
+        integer; default value is 24
+         
+    :param factor_: 
+        integer; default value is 1 (div by 2)
+        
+    :return: 
+        void
+        
     """
+
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
     assert -1 < threshold_ < 256, "\nArgument threshold must be an integer in range [0 ... 255]"
-    assert 0 < factor_ < 9, "\nArgument factor_ must be in range [1 ... 8]"
+    assert 0 < factor_ < 9, "\nArgument amplitude must be in range [1 ... 8]"
 
     sobel_fast_inplace_c(surface_, threshold_, factor_)
 
 
+#-------------------- INVERT
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -854,29 +2534,45 @@ cpdef inline void sobel_fast(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void invert(object surface_):
     """
-    SHADER INVERT PIXELS (INPLACE)
+    Invert pixels (inplace)
     
     Invert all pixels of the display or a given texture
     
+    Inverting an image means inverting the pixel values.
+    Images are represented using RGB or Red Green Blue values. 
+    Each can take up an integer value between 0 and 255 (both included). 
+    For example, a red color is represent using (255, 0, 0), white with (255, 255, 255), 
+    black with (0, 0, 0) and so on. Inverting an image means reversing the colors on the image.
+    For example, the inverted color for red color will be (0, 255, 255). Note that 0 
+    became 255 and 255 became 0. This means that inverting an image is essentially subtracting 
+    the old RGB values from 255. 
+    
     Compatible 24 - 32 bit with or without alpha layer
-    
-    
+      
     e.g:
-    invert(surface)
+     invert(surface)
     
-    :param surface_: pygame.surface; compatible 24 - 32 bit surfaces
-    :return: void
+    :param surface_: 
+        pygame.surface; compatible 24 - 32 bit surfaces
+        
+    :return: 
+        void
+        
     """
+
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
     cdef unsigned char [:, :, :] rgb_array
+
     try:
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
     invert_inplace_c(rgb_array)
 
@@ -889,32 +2585,69 @@ cpdef inline void invert(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void hsl_effect(object surface_, float shift_):
+@cython.exceptval(check=False)
+cpdef invert_copy(object surface_):
     """
-    ROTATE THE HUE OF THE GAME DISPLAY OR GIVEN TEXTURE (INPLACE)
+    Invert pixels and return a copy
+
+    Invert all pixels of the display or a given texture
     
+    Inverting an image means inverting the pixel values.
+    Images are represented using RGB or Red Green Blue values. 
+    Each can take up an integer value between 0 and 255 (both included). 
+    For example, a red color is represent using (255, 0, 0), white with (255, 255, 255), 
+    black with (0, 0, 0) and so on. Inverting an image means reversing the colors on the image.
+    For example, the inverted color for red color will be (0, 255, 255). Note that 0 
+    became 255 and 255 became 0. This means that inverting an image is essentially subtracting 
+    the old RGB values from 255. 
+
     Compatible 24 - 32 bit with or without alpha layer
-      
+
+
     e.g:
-    hsl_effect(surface, 0.2)
-    
-    :param surface_: pygame.Surface; Compatible 24 - 32 bit surfaces
-    :param shift_: float; float value in range [-1.0 ... 1.0]
-    :return: void 
+     inv = invert_copy(surface)
+
+    :param surface_: 
+        pygame.surface; compatible 24 - 32 bit surfaces
+        
+    :return: 
+        return a copy with inverted pixels
+        
     """
+
+    # Ensure that the input surface_ is an instance of pygame.Surface
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    assert -1.0 <= shift_ <= 1.0, \
-        "Argument shift must be in range[-1.0 ... 1.0]"
-    cdef unsigned char [:, :, :] rgb_array
+    # Declare necessary variables
+    cdef:
+        Py_ssize_t w, h  # Image width and height
+        int bit_size      # Number of bytes per pixel (3 for RGB, 4 for RGBA)
+        unsigned char [:] rgb_array  # 1D memory view of the image buffer
+
+    # Retrieve the dimensions (width and height) of the input surface
+    w, h = surface_.get_size()
+
+    # Get the bit depth (bytes per pixel) of the surface (3 for RGB, 4 for RGBA)
+    bit_size = surface_.get_bytesize()
+
     try:
-        rgb_array = surface_.get_view('3')
+        # Retrieve a direct buffer view of the surface pixel data
+        rgb_array = surface_.get_buffer()
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Raise an error if the buffer cannot be accessed
+        raise ValueError(
+            "\nCannot reference source pixels into a 1D memoryviewslice array.\n %s " % e)
 
-    hsl_inplace_c(rgb_array, shift_)
+    # Process the image by inverting its colors using the invert1d_cp_c function
+    # The function modifies the pixel values, flipping them to create a negative effect
+    # The format_32 flag is set to True if the image has 4 bytes per pixel (RGBA), otherwise False
+    return pygame.image.frombuffer(
+        invert1d_cp_c(rgb_array, format_32=True if bit_size == 4 else False),
+        (w, h), 
+        "RGB" if bit_size == 3 else "RGBA"
+)
 
 
 
@@ -926,33 +2659,75 @@ cpdef inline void hsl_effect(object surface_, float shift_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void hsv_effect(object surface_, float shift_):
+@cython.exceptval(check=False)
+cpdef inline void invert3d(unsigned char [:, :, :] rgb_array):
+
     """
-    ROTATE THE HUE OF THE GAME DISPLAY OR GIVEN TEXTURE (INPLACE)
+    Invert 3d array pixels (inplace)
+    
+    Invert a 3d array shape (w, h, n) uint8 data type
+    
+    Inverting an image means inverting the pixel values.
+    Images are represented using RGB or Red Green Blue values. 
+    Each can take up an integer value between 0 and 255 (both included). 
+    For example, a red color is represent using (255, 0, 0), white with (255, 255, 255), 
+    black with (0, 0, 0) and so on. Inverting an image means reversing the colors on the image.
+    For example, the inverted color for red color will be (0, 255, 255). Note that 0 
+    became 255 and 255 became 0. This means that inverting an image is essentially subtracting 
+    the old RGB values from 255. 
+    
+    e.g
+    # 24 bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    invert3d(array3d)
+    
+    # 32 bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    invert3d(array3d)
+    
+    Parameters
+    ----------
+    rgb_array : 
+        numpy.ndarray shape (w, h, n) containing RGB(A) pixel format and 
+        works with any other formats such as BGR, BGRA
 
-    Compatible 24 - 32 bit with or without alpha layer
-
-    e.g:
-    hsv_effect(surface, 0.2)
-
-    :param surface_: pygame.Surface; Compatible 24 - 32 bit surfaces
-    :param shift_: float; float value in range [-1.0 ... 1.0]
-    :return: void
+    Returns
+    -------
+    void
+    
     """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    assert -1.0 <= shift_ <= 1.0, \
-        "Argument shift must be in range[0.0 ... 1.0]"
+    cdef:
+        Py_ssize_t w, h
+        Py_ssize_t bit_size = 0
 
-    cdef unsigned char [:, :, :] rgb_array
     try:
-        rgb_array = surface_.get_view('3')
 
-    except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        w, h, bit_size = rgb_array.shape[ :3 ]
 
-    hsv_inplace_c(rgb_array, shift_)
+        # Only RGB(A) array supported (w, h, 3|4)
+        if bit_size not in (3, 4):
+            raise ValueError('\nIncorrect bit_size, support only RGB(A)')
+
+    except ValueError as e:
+        # _memoryviewslice
+        if is_type_memoryview(rgb_array):
+            print(numpy.array(rgb_array).flags)
+        # numpy.array
+        else:
+            print(rgb_array.flags)
+
+        raise ValueError(
+            "\n%s\nExpecting array shape (w, h, n), "
+            "RGB(A) got (%s, %s, %s)" % (e, w, h, len(rgb_array[ :3 ])))
+
+        # Only uint8 data is compatible
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    invert3d_c(rgb_array)
+
+
 
 
 @cython.binding(False)
@@ -962,58 +2737,57 @@ cpdef inline void hsv_effect(object surface_, float shift_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void hsl_fast(
-        object surface_,
-        float shift_,
-        float [:, :, :, ::1] rgb_to_hsl_,
-        unsigned char [:, :, :, ::1] hsl_to_rgb_
-):
-    """    
-    ROTATE THE HUE OF AN IMAGE USING STORED HSL TO 
-    RGB AND RGB TO HSL VALUES (INPLACE)
-    
-    This method is 25% faster than hsl_effect
-    
-    To use this algorithm you would have to pre-cache the converted values of both models 
-    RGB to HSL and HSL to RGB using the functions hsl_to_rgb_model & rgb_to_hsl_model.
-    
-    Compatible 24 - 32 bit with or without alpha layer
-
-    e.g:
-    rgb2hsl_model = hsl_to_rgb_model()
-    hsl2rgb_model = rgb_to_hsl_model()
-
-    while game:
-        hsl_fast(
-            image,
-            hsl_value,
-            rgb_to_hsl_=rgb2hsl_model,
-            hsl_to_rgb_=hsl2rgb_model)
-
-    :param surface_: pygame.Surface; compatible 24 - 32 bit surfaces
-    :param shift_: float; value must be in range [ -1.0 ... + 1.0]
-    :param hsl_to_rgb_: 3d numpy.ndarray shape (256, 256, 256, 3) see hsl_to_rgb_model function
-    :param rgb_to_hsl_: 3d numpy.ndarray shape (256, 256, 256, 3) see rgb_to_hsl_model function
-    :return:
+@cython.exceptval(check=False)
+cpdef void invert1d(unsigned char [:] rgb_array, bint format_32=False):
     """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-    assert -1.0 <= shift_ <= 1.0, \
-        "Argument shift must be in range[-1.0 ... 1.0]"
-    assert PyObject_IsInstance(hsl_to_rgb_, (numpy.ndarray, cython.view.memoryview)), \
-        "\nArgument hsl_to_rgb_ must be a numpy.ndarray or memoryview type, got %s " % type(
-            hsl_to_rgb_)
-    assert PyObject_IsInstance(rgb_to_hsl_, (numpy.ndarray, cython.view.memoryview)), \
-        "\nArgument rgb_to_hsl_ must be a numpy.ndarray or memoryview type, got %s " % type(
-            rgb_to_hsl_)
-    cdef unsigned char [:, :, :] rgb_array
-    try:
-        rgb_array = surface_.get_view('3')
+    Invert directly a C-buffer pixel values 
+    
+    Invert a C-buffer uint8 data types RGB(A) format
+    
+    This method will works with other buffer format such as BGR, BGRA
+    
+    Inverting an image means inverting the pixel values.
+    Images are represented using RGB or Red Green Blue values. 
+    Each can take up an integer value between 0 and 255 (both included). 
+    For example, a red color is represent using (255, 0, 0), white with (255, 255, 255), 
+    black with (0, 0, 0) and so on. Inverting an image means reversing the colors on the image.
+    For example, the inverted color for red color will be (0, 255, 255). Note that 0 
+    became 255 and 255 became 0. This means that inverting an image is essentially subtracting 
+    the old RGB values from 255. 
+    
+    e.g
+    # 24 bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    invert1d(image.get_buffer(), False)
+    
+    # 32 bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    invert1d(image.get_buffer(), True)
+    
+    Parameters
+    ----------
+    rgb_array : 
+        numpy.ndarray 1d array, memoryviewslice uint8 data type containing 
+        RGB(A) pixel format, works also with other format pixel (BGR, BGRA etc)
+         
+    format_32 : 
+        bool; True | 'RGB' for 24-bit array (RGB) or False | 'RGBA' for 32-bit array (RGBA)
+         
 
-    except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+    Returns
+    -------
+    void
+    
+    """
 
-    hsl_fast_inplace_c(rgb_array, shift_, rgb_to_hsl_, hsl_to_rgb_)
+    # Only uint8 data is compatible
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    invert1d_c(rgb_array, format_32)
+
+
+
 
 
 @cython.binding(False)
@@ -1023,89 +2797,725 @@ cpdef inline void hsl_fast(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void blur(object surface_, t_=1):
+@cython.exceptval(check=False)
+cpdef np.ndarray[np.uint8_t, ndim=1] invert1d_cp(const unsigned char [:] rgb_array, bint format_32=False):
     """
-    APPLY A GAUSSIAN BLUR EFFECT TO THE GAME DISPLAY (INPLACE)
+    Invert directly a C-buffer pixel values (return a copy)
+    
+    Invert C buffer uint8 data types RGB(A) format
+    
+    Inverting an image means inverting the pixel values.
+    Images are represented using RGB or Red Green Blue values. 
+    Each can take up an integer value between 0 and 255 (both included). 
+    For example, a red color is represent using (255, 0, 0), white with (255, 255, 255), 
+    black with (0, 0, 0) and so on. Inverting an image means reversing the colors on the image.
+    For example, the inverted color for red color will be (0, 255, 255). Note that 0 
+    became 255 and 255 became 0. This means that inverting an image is essentially subtracting 
+    the old RGB values from 255. 
+    
+    This method will works with other buffer format such as BGR, BGRA
+    
+    e.g:
+    # 24-bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    arr3d = invert1d_cp(image.get_buffer(), False)
+    image = pygame.image.frombuffer(arr3d, (WIDTH, HEIGHT), "BGR")
+    
+    # 32-bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    arr3d = invert1d_cp(image.get_buffer(), True)
+    image = pygame.image.frombuffer(arr3d, (WIDTH, HEIGHT), "BGRA")
+    
+    Parameters
+    ----------
+    rgb_array : 
+        numpy.ndarray 1d array, memoryviewslice uint8 data type containing 
+        RGB(A) pixel format, works also with other format pixel (BGR, BGRA etc)
+         
+    format_32 : 
+        bool; True | 'RGB' for 24-bit array (RGB) or False | 'RGBA' for 32-bit array (RGBA)
+         
 
-    This method is using convolution property and process the image in two passes,
-    first the horizontal convolution and last the vertical convolution
-    pixels convoluted outside image edges will be set to adjacent edge value
-    Apply a 5x5 kernel.
+    Returns
+    -------
+    numpy.ndarray 1d array uint8 data type. Copy of the input buffer
+    
+    """
+
+    # Only uint8 data is compatible
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    return invert1d_cp_c(rgb_array, format_32)
+
+
+
+
+# -------------------- HSL
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void hsl_effect(object surface_, const float shift):
+    """
+    Apply Hue Rotation to an Image (HSL Color Space)
+    
+    This function directly modifies the hue of a Pygame surface using the HSL (Hue, Saturation, Lightness) 
+    color model. Hue rotation shifts the colors of the surface in a way that corresponds to a rotation 
+    on the color wheel, allowing you to alter the overall color tone.
+    
+    The surface must be compatible with 24-bit or 32-bit color depth, with or without an alpha layer. 
+    If the `shift` value is 0.0, the surface remains unchanged.
+    
+    The hue shift value must be within the range [0.0, 1.0], where 0.0 represents no rotation, and 1.0 
+    represents a 360-degree rotation.
+    
+    Example usage:
+        hsl_effect(surface, 0.2)  # Apply a 72-degree hue shift to the surface.
+    
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface, compatible with 24-bit or 32-bit color formats (with or without alpha).
+    
+    shift : float
+        A float value in the range [0.0, 1.0], where 0.0 corresponds to no hue shift, 
+        and 1.0 corresponds to a full 360-degree rotation of the hue.
+    
+    Returns
+    -------
+    None
+        The function modifies the input `surface_` in place, applying the hue shift effect.
+    """
+
+    # Ensure that the input surface_ is an instance of pygame.Surface
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Validate that the shift value is within the allowed range [0.0, 1.0]
+    assert 0.0 <= shift <= 1.0, \
+        "\nArgument shift must be in range [0.0 ... 1.0]"
+
+    # If shift is 0, there is no need to modify the image, so return immediately
+    if shift == 0:
+        return
+
+    # Declare a 3D unsigned char array to hold the pixel data
+    cdef unsigned char [:, :, :] rgb_array
+
+    try:
+        # Attempt to get a direct view of the pixel data in RGB format
+        rgb_array = surface_.get_view('3')
+
+        # Alternative approach (commented out) - converting the pixel data to a NumPy array
+        # bgr_array = numpy.array(surface_.get_view('3'), copy=False, order='F')
+
+    except Exception as e:
+        # Raise an error if unable to retrieve the pixel buffer
+        raise ValueError("\nCannot reference source pixels into a 3D array.\n %s " % e)
+
+    # Apply HSL transformation with the given shift value
+    # This function modifies the image's color properties by shifting the hue
+    hsl_c(rgb_array, shift)
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef void hsl3d(unsigned char [:, :, :] rgb_array, const float shift):
+    """
+    Apply Hue Rotation to a 3D Array (HSL Color Space)
+
+    This function applies hue rotation to a 3D numpy array representing an image in the HSL (Hue, Saturation, 
+    Lightness) color space. The hue shift is applied directly to the array, modifying the color tone of the image.
+
+    The array must be in the shape (w, h, n), where `w` is the width, `h` is the height, and `n` is the number 
+    of color channels (3 for RGB or 4 for RGBA, etc.). The data type should be uint8.
+
+    The `shift` value must be within the range [0.0, 1.0], where 0.0 represents no hue rotation, and 1.0 represents 
+    a full 360-degree hue rotation.
+
+    Example usage:
+        # For 24-bit RGB image
+        image = pygame.image.load('../Assets/px.png').convert(24)
+        array3d = pygame.surfarray.pixels3d(image)
+        hsl3d(array3d, 0.2)  # Apply a 72-degree hue shift
+
+        # For 32-bit RGBA image
+        image = pygame.image.load('../Assets/px.png').convert_alpha()
+        array3d = pygame.surfarray.pixels3d(image)
+        hsl3d(array3d, 0.2)  # Apply a 72-degree hue shift
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 3D numpy array with shape (w, h, n) containing RGB or RGBA pixel data. 
+        The array can also represent other formats such as BGR, BGRA.
+
+    shift : float
+        A float value in the range [0.0, 1.0], representing the hue rotation. 
+        A value of 0.0 means no rotation, while 1.0 corresponds to a full 360-degree hue shift.
+
+    Returns
+    -------
+    None
+        The function modifies the input `rgb_array` in place, applying the hue shift.
+    """
+
+    # If the shift value is 0, no transformation is needed, so return immediately
+    if shift == 0:
+        return
+
+    # Validate that the shift value is within the allowed range [0.0, 1.0]
+    assert 0.0 <= shift <= 1.0, \
+        "\nArgument shift must be in range [0.0 ... 1.0]"
+
+    # Declare variables for image dimensions and bit depth
+    cdef:
+        Py_ssize_t w, h      # Width and height of the image
+        Py_ssize_t bit_size = 0  # Number of color channels (3 for RGB, 4 for RGBA)
+
+    try:
+        # Extract the shape of the rgb_array (should be in the format (w, h, 3) or (w, h, 4))
+        w, h, bit_size = rgb_array.shape[:3]
+
+        # Ensure that the image has either 3 (RGB) or 4 (RGBA) channels
+        if bit_size not in (3, 4):
+            raise ValueError('\nIncorrect bit_size, support only RGB(A)')
+
+    except ValueError as e:
+        # Handle cases where the input is a memoryview or NumPy array
+        if is_type_memoryview(rgb_array):
+            # Print memory layout details for debugging if it's a memoryview
+            print(numpy.array(rgb_array).flags)
+        else:
+            # Print NumPy array flags if it's a NumPy array
+            print(rgb_array.flags)
+
+        # Raise an error with a detailed message about the expected format
+        raise ValueError(
+            "\n%s\nExpecting array shape (w, h, n), "
+            "RGB(A) got (%s, %s, %s)" % (e, w, h, len(rgb_array[:3])))
+
+    # Ensure that the input pixel data is of type uint8 (unsigned char)
+    if not is_uint8(rgb_array):
+        raise TypeError(
+            "\nExpecting uint8 (unsigned char) data type, got %s" % rgb_array.dtype)
+
+    # Apply HSL transformation with the given shift value
+    # This modifies the color properties of the image by shifting the hue
+    hsl_c(rgb_array, shift)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef void hsl1d(unsigned char [::1] bgr_array, const float shift, bint format_32=False):
+
+    """
+    Apply Hue Rotation to a C-buffer (HSL Color Space)
+
+    This function performs hue rotation on a C-buffer (1D array) containing pixel data in RGB(A) format 
+    using the HSL (Hue, Saturation, Lightness) color model. It modifies the array in place.
+
+    The function supports pixel formats like RGB, BGR, RGBA, and BGRA, adjusting the hue of each pixel 
+    according to the specified `shift`. The `shift` value should be in the range [0.0, 1.0], which 
+    corresponds to a rotation of 0.0 to 360.0 degrees on the hue color wheel.
+
+    Example usage:
+        # For 24-bit RGB image
+        image = pygame.image.load('../Assets/px.png').convert(24)
+        hsl1d(image.get_buffer(), 0.2)
+
+        # For 32-bit RGBA image
+        image = pygame.image.load('../Assets/px.png').convert_alpha()
+        hsl1d(image.get_buffer(), 0.2, format_32=True)
+
+    Parameters
+    ----------
+    bgr_array : numpy.ndarray
+        A 1D numpy array (C-buffer) of type uint8 containing pixel data in RGB(A) format. 
+        The array can also represent other formats such as BGR, BGRA.
+
+    shift : float
+        A float value in the range [0.0, 1.0] representing the hue rotation. 
+        A value of 0.0 means no rotation, while 1.0 corresponds to a full 360-degree rotation.
+
+    format_32 : bool, optional, default=False
+        If `True`, the input array is assumed to be in 32-bit RGBA format. 
+        If `False`, the array is assumed to be in 24-bit RGB format.
+
+    Returns
+    -------
+    None
+        The function modifies the input `bgr_array` in place by applying the hue shift.
+    """
+
+    if shift == 0:
+        return
+
+    assert 0.0 <= shift <= 1.0, \
+        "\nArgument shift must be in range[0.0 ... 1.0]"
+
+    # Only uint8 data is compatible
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    hsl1d_c(bgr_array, shift, format_32)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef np.ndarray[np.uint8_t, ndim=1] hsl1d_cp(
+        const unsigned char [::1] bgr_array, const float shift, bint format_32=False):
+    """
+    Rotate hue (HSL) directly to a C-buffer (return a copy)
+
+    HSL (C buffer) uint8 data types RGB(A) format 
+    
+    This method will works with other buffer format such as BGR, BGRA
+    
+    HSL (Hue, Saturation, Lightness) is another color representation 
+    model used in digital imaging and graphics. It defines colors in 
+    terms of their hue, saturation, and lightness, offering an intuitive 
+    way to describe and manipulate colors based on human perception.
+    
+    e.g:
+    # 24-bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    arr = hsl1d_cp(image.get_buffer(), 0.2, format_32 = False)
+    image = pygame.image.frombuffer(arr, (WIDTH, HEIGHT), "BGR")
+    
+    # 32-bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    arr = hsl1d_cp(image.get_buffer(), 0.2, format_32 = True)
+    image = pygame.image.frombuffer(arr, (WIDTH, HEIGHT), "BGRA")
+    
+    Hue value (shift) must be in range [0.0 ...1.0] corresponding to 0.0 - 360.0 degrees rotation
+    
+    Parameters
+    ----------
+    bgr_array : 
+        numpy.ndarray 1d array, memoryviewslice uint8 data type containing 
+       RGB(A) pixel format, works also with other format pixel (BGR, BGRA etc)
+        
+    shift: 
+        float; float value in range [0.0 ... 1.0] corresponding to 0.0 - 360.0 degrees rotation
+        
+    format_32: 
+        bool True | for 'RGB' buffer type (24-bit) or False 'RGBA' (32-bit)
+         
+    
+    Returns
+    -------
+    numpy.ndarray 1d array type uint8 new array containing pixels with rotated hue
+    
+    """
+
+    if shift == 0:
+        return numpy.asarray(bgr_array)
+
+    assert 0.0 <= shift <= 1.0, \
+        "\nArgument shift must be in range[0.0 ... 1.0]"
+
+        # Only uint8 data is compatible
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    return hsl1d_cp_c(bgr_array, shift, format_32)
+
+
+# -------------------- HSV
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void hsv_effect(object surface_, const float shift):
+    """
+    Apply Hue Rotation to a Surface (HSV Color Space)
+
+    This function applies a hue rotation to a Pygame surface using the HSV (Hue, Saturation, Value) color model. 
+    It modifies the surface in place, rotating the hue of the colors on the surface based on the specified shift.
+
+    The surface must be compatible with 24-bit or 32-bit color formats, with or without an alpha channel. 
+    The hue shift is specified as a float value in the range [0.0, 1.0], where 0.0 corresponds to no hue change, 
+    and 1.0 represents a full 360-degree hue rotation.
+
+    Example usage:
+        surface = pygame.image.load('../Assets/px.png').convert_alpha()
+        hsv_effect(surface, 0.2)  # Rotate the hue by 72 degrees (0.2 * 360)
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface, compatible with 24-bit or 32-bit color formats (with or without alpha).
+
+    shift : float
+        A float value in the range [0.0, 1.0], specifying the hue rotation. 
+        A value of 0.0 means no rotation, while 1.0 corresponds to a full 360-degree rotation.
+
+    Returns
+    -------
+    None
+        The function modifies the input surface in place by applying the hue shift.
+    """
+
+    # Ensure that the input argument `surface_` is a valid Pygame Surface object
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # If shift is 0, no transformation is needed, so return early
+    if shift == 0:
+        return
+
+    # Validate that the shift value is within the allowed range (0.0, 1.0]
+    assert 0.0 < shift <= 1.0, \
+        "Argument shift must be in range [0.0 ... 1.0]"
+
+    # Declare a Cython memoryview for the RGB array
+    cdef unsigned char [:, :, :] rgb_array
+
+    try:
+        # Attempt to obtain a 3D pixel view (RGB format) from the surface
+        rgb_array = surface_.get_view('3')
+
+    except Exception as e:
+        # If accessing the pixel data fails, raise an error with details
+        raise ValueError("\nCannot reference source pixels into a 3D array.\n %s " % e)
+
+    # Apply an HSV transformation with the given shift value
+    # This function modifies the pixel colors in HSV space
+    hsv3d_c(rgb_array, shift)
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void hsv3d(unsigned char [:, :, :] rgb_array, const float shift):
+    """
+    Rotate hue 3d array 
+    
+    Rotate the hue (HSV conversion method), directly from a 3d array  
     
     Compatible 24 - 32 bit with or without alpha layer
+    
+    HSV (Hue, Saturation, Value) is a color model similar to HSL (Hue, Saturation, Lightness)
+    but with some differences in how it represents and manipulates colors. 
+    It’s often used in graphics software and computer vision applications for its 
+    simplicity in specifying and adjusting color attributes.
+    
+    New Shift value. Must be between [0.0 ... 1.0] corresponding to 0.0 - 360.0 degrees 
+     (e.g 0.5 = 180 degrees)
      
-    :param surface_: pygame.Surface; compatible 24 - 32 bit surfaces
-    :param t_      : integer; must be >0; number of passes (default 1)
-    :return: void 
-    """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-    assert t_ > 0, \
-        "\nArgument t_ must be > 0, got %s " % t_
-
-    cdef unsigned char [:, :, :] rgb_array
-    try:
-        rgb_array = surface_.get_view('3')
-
-    except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
-
-    blur_array_inplace_c(rgb_array, None, t_)
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef void blur5x5_array24_inplace(rgb_array_, mask_=None, t_=1):
-    """
-    BLUR ARRAY DIRECTLY (INPLACE)
-    HOOK FOR THE METHOD blur_array_inplace_c
-    """
-    blur_array_inplace_c(rgb_array_, mask_, t_)
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline void wave(object surface_, float rad, int size=5):
-    """
-    CREATE A WAVE EFFECT TO THE GAME DISPLAY OR SURFACE (INPLACE)
-
-    The variable rad represent the angle (in radian) changing overtime, 
-    rad cannot be a constant. 
-    
-    Compatible 24 - 32 bit with or without alpha layer
-
     e.g:
-    wave(surface, 8 * math.pi/180.0 + frame_number, 5)
-    wave(surface, x * math.pi/180.0, 5)
+    # Rotate the hue 72 degrees
+    array3d = pygame.surfarray.pixels3d(image)
+    hsv3d(array3d, 0.2)
     
-    :param surface_: pygame.Surface; pygame surface compatible 24 - 32 bit  
-    :param rad     : float; angle in rad to rotate over time, default 0.139 
-    :param size    : int; Number of sub-surfaces, default is 5 
-    :return        : void
+    Parameters
+    ----------
+    rgb_array : 
+        numpy.ndarray shape (w, h, n) containing RGB(A) pixel format and 
+        works with any other formats such as BGR, BGRA
+        
+    shift     : 
+        float; float value in range [0.0 ... 1.0] corresponding to 0 - 360 degrees. New hue value. 
+
+    Returns
+    -------
+    void 
+
     """
+
+    # If shift is 0, no transformation is needed, so return early
+    if shift == 0:
+        return
+
+    # Validate that the shift value is within the allowed range [0.0, 1.0]
+    assert 0.0 <= shift <= 1.0, \
+        "\nArgument shift must be in range [0.0 ... 1.0]"
+
+    # Declare Cython variables for image dimensions and bit depth
+    cdef:
+        Py_ssize_t w, h  # Image width and height
+        Py_ssize_t bit_size = 0  # Number of color channels (3 for RGB, 4 for RGBA)
+
+    try:
+        # Retrieve image dimensions and bit depth from the given RGB array
+        w, h, bit_size = rgb_array.shape[:3]
+
+        # Ensure that the image format is either RGB (3 channels) or RGBA (4 channels)
+        if bit_size not in (3, 4):
+            raise ValueError('\nIncorrect bit_size, only RGB(A) images are supported')
+
+    except ValueError as e:
+        # Check if `rgb_array` is a memoryview slice and print its flags for debugging
+        if is_type_memoryview(rgb_array):
+            print(numpy.array(rgb_array).flags)
+        # If it's a NumPy array, print its memory layout flags
+        else:
+            print(rgb_array.flags)
+
+        # Raise an error indicating an incorrect image shape
+        raise ValueError(
+            "\n%s\nExpecting array shape (w, h, n), "
+            "RGB(A) got (%s, %s, %s)" % (e, w, h, len(rgb_array[:3]))
+        )
+
+    # Ensure that the pixel data type is uint8 (8-bit unsigned integer)
+    if not is_uint8(rgb_array):
+        raise TypeError(
+            "\nExpecting uint8 (unsigned char) data type, got %s" % rgb_array.dtype
+        )
+
+    # Apply an HSV transformation to the image with the given shift value
+    hsv3d_c(rgb_array, shift)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef void hsv1d(unsigned char [::1] bgr_array, const float shift, bint format_32=False):
+    """
+    Rotate hue 1d array
+    
+    Rotate the hue directly from a C-buffer (1d array uint8 data types RGB(A) format)
+     Changes apply inplace
+    
+    This method will works with other buffer format such as BGR, BGRA
+
+    HSV (Hue, Saturation, Value) is a color model similar to HSL (Hue, Saturation, Lightness)
+    but with some differences in how it represents and manipulates colors. 
+    It’s often used in graphics software and computer vision applications for its 
+    simplicity in specifying and adjusting color attributes.
+    
+    e.g 
+    #compatible with 32 bits images 
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    hsv1d(image.get_buffer(), angle/36.0, format_32=True)
+    
+    #compatible with 24 bits images 
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    hsv1d(image.get_buffer(), angle/36.0, format_32=False) 
+    
+    Parameters
+    ----------
+    bgr_array : 
+        numpy.ndarray 1d array, memoryviewslice uint8 data type containing 
+        BGR(A) pixel format, works also with other format pixel (BGR, BGRA etc)
+         
+    shift     : 
+        float; float value in range [0.0 ... 1.0] corresponding to 0 - 360 degrees. New hue value.
+         
+    format_32 : 
+        bool True | for 'BGR' buffer type (24-bit) or False 'BGRA' (32-bit)
+         
+
+    Returns
+    -------
+    void
+
+    """
+
+    if shift == 0:
+        return
+
+    assert 0.0 <= shift <= 1.0, \
+        "\nArgument shift must be in range[0.0 ... 1.0]"
+
+    # Only uint8 data is compatible
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    hsv1d_c(bgr_array, shift, format_32)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef np.ndarray[np.uint8_t, ndim=1] hsv1d_cp(
+        const unsigned char [::1] bgr_array, const float shift, bint format_32=False):
+    """
+    Rotate the hue 1d array (return a copy)
+    
+    HSV 1d array (C buffer) uint8 data types RGB(A) format 
+
+    This method will works with other buffer format such as BGR, BGRA
+    
+    HSV (Hue, Saturation, Value) is a color model similar to HSL (Hue, Saturation, Lightness)
+    but with some differences in how it represents and manipulates colors. 
+    It’s often used in graphics software and computer vision applications for its 
+    simplicity in specifying and adjusting color attributes.
+    
+    e.g:
+    # 32-bit image
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    arr = hsv1d_cp(image.get_buffer(), angle/360.0, format_32=True) 
+    image = pygame.image.frombuffer(arr, (WIDTH, HEIGHT), "BGRA")
+    
+    # 24-bit image 
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    arr = hsv1d_cp(image.get_buffer(), angle/360.0, format_32=False)
+    
+    Parameters
+    ----------
+    bgr_array : 
+        numpy.ndarray 1d array, memoryviewslice uint8 data type containing 
+       RGB(A) pixel format, works also with other format pixel (BGR, BGRA etc)
+        
+    shift     : 
+        float; float value in range [0.0 ... 1.0] corresponding to 0 - 360 degrees. New hue value.
+         
+    format_32 : 
+        bool True | for 'BGR' buffer type (24-bit) or False 'BGRA' (32-bit)
+         
+
+    Returns
+    -------
+    numpy.ndarray 1d array type uint8 new array containing pixels with rotated hue
+
+    """
+
+    if shift == 0:
+        return numpy.array(bgr_array)
+
+    assert 0.0 <= shift <= 1.0, \
+        "\nArgument shift must be in range[0.0 ... 1.0]"
+
+    # Only uint8 data is compatible
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    return hsv1d_cp_c(bgr_array, shift, format_32)
+
+
+
+# --------------- WAVE EFFECT
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void wave(object surface_, const float rad, int size=5):
+    """
+    Apply Wave Effect to a Surface (Inplace)
+
+    This function applies a wave effect to a Pygame surface, modifying it in place. 
+    The effect is applied to the surface based on an angle (in radians) and the 
+    number of sub-surfaces. It is compatible with 24-bit surfaces.
+
+    The wave effect creates a dynamic, wave-like distortion, often used for water 
+    or other fluid-like visual effects in games.
+
+    Example usage:
+        wave(surface, 8 * math.pi / 180.0 + frame_number, 5)  # Animate with a changing angle
+        wave(surface, x * math.pi / 180.0, 5)  # Apply wave with a fixed angle
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface, compatible with 24-bit color depth.
+
+    rad : float
+        The angle in radians for the wave effect. This value controls the wave's 
+        motion over time. 
+
+    size : int, optional, default=5
+        The number of sub-surfaces used to create the wave effect. A higher number 
+        results in a more complex wave.
+
+    Returns
+    -------
+    None
+        The function modifies the input surface in place, applying the wave effect.
+    """
+
+
+    # Ensure the surface is a valid pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Validate that the size parameter is positive
     assert size > 0, "Argument size must be > 0"
+
+    # Declare a Cython memoryview variable for the 3D RGB array (height x width x channels)
     cdef unsigned char [:, :, :] rgb_array
+
     try:
+        # Attempt to retrieve a 3D view of the surface's pixel data
+        # '3' indicates we're working with a 3D array (height, width, 3 channels - RGB)
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Raise an error if the reference to the surface's pixel data fails
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
+    # Apply a wave distortion effect on the image's pixel data in-place
+    # This function modifies the rgb_array based on the given `rad` and `size` parameters
     wave_inplace_c(rgb_array, rad, size)
 
 
+
+
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -1113,80 +3523,69 @@ cpdef inline void wave(object surface_, float rad, int size=5):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void wave_static(object surface_, array_, float rad, int size=5):
+@cython.exceptval(check=False)
+cpdef void wave32(object surface_, const float rad, int size=5):
     """
-    WAVE EFFECT FOR STATIC BACKGROUND (INPLACE)
-    
-    This method is much faster than wave method 
+    Apply Wave Effect to a 32-bit Surface (Inplace)
 
-    The variable rad represent the angle (in radian) changing overtime, 
-    rad cannot be a constant. 
-    Array_ must have the same dimensions and size than the surface
+    This function applies a wave effect to a 32-bit Pygame surface, modifying it in place. 
+    The effect is applied to both the RGB and alpha channels, meaning the wave will 
+    also displace the alpha layer (transparency) of the surface. It is fully compatible 
+    with 32-bit SDL surfaces, including those with an alpha channel.
 
-    Compatible 24 - 32 bit with or without alpha layer
+    The wave effect creates a dynamic distortion that simulates the motion of waves, 
+    often used for effects like water or fluid movement in games.
 
-    e.g:
-    
-    # Outside of your game loop create convert your surface into a numpy array
-    array_cp = pygame.surfarray.pixels3d(BCK_COPY) 
-    
-    # in the game loop   
-    wave_static(surface, 8 * math.pi/180.0 + frame_number, 5)
-    wave_static(surface, x * math.pi/180.0, 5)
+    Example usage:
+        wave32(surface, x * math.pi / 180.0, 5)  # Apply wave effect with a rotating angle
 
-    :param surface_: pygame.Surface; pygame surface compatible 24 - 32 bit  
-    :param array_  : numpy.ndarray (array containing copied pixels of the surface)
-    :param rad     : float; angle in rad to rotate over time, default 0.139 
-    :param size    : int; Number of sub-surfaces, default is 5 
-    :return        : void
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface, compatible with 32-bit color depth and alpha channel (RGBA).
+
+    rad : float
+        The angle in radians for the wave effect, controlling its rotation over time. 
+
+    size : int, optional, default=5
+        The number of sub-surfaces used to create the wave effect. A higher value results 
+        in a more detailed wave.
+
+    Returns
+    -------
+    None
+        The function modifies the input surface in place, applying the wave effect to both 
+        the color and alpha channels.
     """
+
+    # Ensure that the surface_ is a valid pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-    assert PyObject_IsInstance(array_, numpy.ndarray), \
-        "\nArgument surface_ must be a numpy ndarray type, got %s " % type(array_)
+
+    # Validate that the size argument is greater than 0
     assert size > 0, "Argument size must be > 0"
-    cdef unsigned char [:, :, :] rgb_array
-    try:
-        rgb_array = surface_.get_view('3')
 
-    except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+    # Declare variables to hold the width, height, and bit size of the surface
+    cdef:
+        Py_ssize_t w, h  # Width and height of the surface
+        int bit_size     # Number of bytes per pixel (bit size)
 
-    wave_static_inplace_c(rgb_array, array_, rad, size)
+    # Retrieve the width and height of the surface using get_size()
+    w, h = surface_.get_size()
 
+    # Get the number of bytes per pixel (bit size) of the surface
+    bit_size = surface_.get_bytesize()
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline void swirl(object surface_, float degrees):
-    """
-    SWIRL AN IMAGE (INPLACE WITH ANGLE APPROXIMATION)
+    # Convert the surface's pixel data into a contiguous numpy array and reshape it to 3D (height, width, bit_size)
+    # 'get_view('0')' retrieves a raw memory view of the pixel data as a 1D array
+    # We reshape it into a 3D array with dimensions (height, width, bit_size) for easier manipulation
+    cdef unsigned char [:, :, ::1] rgba_array = \
+        numpy.ascontiguousarray(surface_.get_view('0'), dtype = numpy.uint8).reshape(h, w, bit_size)
 
-    This algorithm uses a table of cos and sin.
-    
-    Compatible 24 - 32 bit with or without alpha layer
+    # Apply the wave distortion effect to the RGBA array
+    # 'wave32_c' modifies the image data in place based on the provided `rad` and `size` parameters
+    wave32_c(rgba_array, rad, size)
 
-    e.g:
-    swirl_static(BCK, angle)
-    
-    :param surface_: pygame.Surface, compatible 24 - 32 bit 
-    :param degrees : float; angle in degrees 
-    :return        : void 
-    """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-    cdef unsigned char [:, :, :] rgb_array
-    try:
-        rgb_array = surface_.get_view('3')
-
-    except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
-
-    swirl_inplace_c(rgb_array, degrees)
 
 
 
@@ -1197,43 +3596,67 @@ cpdef inline void swirl(object surface_, float degrees):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void swirl_static(object surface_, array_, float degrees):
+@cython.exceptval(check=False)
+cpdef inline void wave_static(object surface_, array_, const float rad, int size=5):
     """
-    SWIRL STATIC IMAGE/BACKGROUND (INPLACE WITH ANGLE APPROXIMATION)
+    Wave effect for static background (inplace)
+     
+    This function is different to the wave method as a copy of the 
+    static background or game display is passed to the function as an argument `array_` to 
+    improve the overall performances 
 
-    This algorithm uses a table of cos and sin.
-    
-    array_ must have the exact same size/dimension than the image/surface
-
-    Compatible 24 - 32 bit with or without alpha layer
+    Compatible 24-bit
 
     e.g:
-    # outside the main loop
-    array_cp = pygame.surfarray.pixels3d(BCK_COPY)
-    
-    # in the main loop
-    swirl_static(BCK, array_cp, angle)
+    background = pygame.image.load('../Assets/px.png').convert(24)
+    background = pygame.transform.smoothscale(background, (800, 600))
+    background_cp = background.copy()
+    wave_static_c(pixels3d(background), pixels3d(background_cp), FRAME * math.pi/180 , 5)
+    SCREEN.blit(background, (0, 0))
 
-    :param surface_: pygame.Surface, compatible 24 - 32 bit 
-    :param array_  : numpy.ndarray (pixels copy) 
-    :param degrees : float; angle in degrees 
-    :return        : void 
+    :param surface_: 
+        Pygame.Surface compatible 24-bit
+         
+    :param array_: 
+        numpy.ndarray shape (w, h, 3) type uint8 copy of the game display or image 
+        to be modified (copy of the game display)
+         
+    :param rad: 
+        float; angle in rad to rotate over time
+         
+    :param size: 
+        int; Number of sub-surfaces, default is 5
+         
+    :return:
+        void
+        
     """
+
+  # Ensure that the surface_ is a valid pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Ensure that the array_ is a valid numpy ndarray
     assert PyObject_IsInstance(array_, numpy.ndarray), \
         "\nArgument surface_ must be a numpy ndarray type, got %s " % type(array_)
 
+    # Validate that the size argument is greater than 0
+    assert size > 0, "Argument size must be > 0"
 
+    # Declare a variable to hold the RGB pixel data of the surface as a 3D array
     cdef unsigned char [:, :, :] rgb_array
+
+    # Attempt to get a 3D view of the surface pixels (3D: height, width, bit depth)
     try:
-        rgb_array = surface_.get_view('3')
+        rgb_array = surface_.get_view('3')  # '3' represents a 3D memory view (height, width, bit depth)
 
+    # Handle exceptions if surface_.get_view fails to get a 3D array
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    swirl_static_inplace_c(rgb_array, array_, degrees)
-
+    # Apply a static wave effect on the image pixels using the wave_static_c function
+    # It modifies the rgb_array in place based on the data from array_, with parameters rad and size
+    wave_static_c(rgb_array, array_, rad, size)
 
 
 
@@ -1244,29 +3667,79 @@ cpdef inline void swirl_static(object surface_, array_, float degrees):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void swirl_inplace(object surface_, float degrees):
+@cython.exceptval(check=False)
+cpdef inline void swirl(object surface_, rgb_array_cp, float degrees):
     """
-    SWIRL AN IMAGE WITHOUT ANGLE APPROXIMATION (INPLACE)
-
-    Compatible 24 - 32 bit with or without alpha layer
-       
-    e.g:
-    swirl2(surface_, angle)
+    Swirl an image (inplace)
     
-    :param surface_: pygame.Surface, compatible 24 - 32 bit 
-    :param degrees : float; angle in degrees
-    :return        : void 
+    The swirl effect is a visual distortion that creates
+    a spiraling appearance in an image or graphic. 
+    This effect can draw attention to specific areas of a design
+    and add a sense of movement or dynamism. It can be used creatively
+    in various contexts, from social media graphics to advertising
+    and digital art.
+    
+    Works with 24 - 32 bit image format but not compatible 
+    with 32-bit format due to the layer alpha.
+    
+    If the image is 32-bit with alpha channel, the layer alpha will be unchanged
+     during the transformation. This will cause the layer alpha to bleed on the effect.
+    If you do not which to see that undesirable effect, convert the image to 24-bit instead. 
+    
+    For 32-bit image with layer alpha, prefer the method swirl32 (designed for 32-bit).
+     
+    This algorithm uses a table of cos and sin
+    
+    e.g:
+    background = pygame.image.load("../Assets/background.jpg").convert(24)
+    background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+    background_cp = background.copy()
+    
+    # in the game loop
+    swirl(background_cp, pixels3d(background), angle)
+    SCREEN.blit(background_cp, (0, 0))
+    
+    :param surface_: 
+        pygame.Surface, works with 24 - 32 bit but not compatible with 32-bit due 
+        to the alpha channel.
+        
+    :param rgb_array_cp:
+        3d numpy.ndarray shape (w, h, 3) containing RGB pixel format. 
+        Copy of the image to swirl. Both array must have same shapes and types
+           
+    :param degrees: 
+        float; angle in degrees
+         
+    :return:
+        void 
+        
     """
+
+    # Ensure that surface_ is a valid pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Declare a variable to hold the RGB pixel data from the surface as a 3D array (height, width, color channels)
     cdef unsigned char [:, :, :] rgb_array
+
+    # Try to get a 3D view (height, width, color channels) of the surface pixels
     try:
-        rgb_array = surface_.get_view('3')
+        rgb_array = surface_.get_view('3')  # '3' indicates a 3D memory view (height, width, bit-depth)
 
+    # If there is an error accessing the pixel data, raise a ValueError
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    swirl_inplace_c1(rgb_array, degrees)
+    # Declare variables for the width (w) and height (h) of the image
+    cdef Py_ssize_t w, h
+
+    # Get the width and height from the shape of the 3D rgb_array
+    w, h = rgb_array.shape[:2]  # Extract the first two dimensions (height, width)
+
+    # Apply a swirl effect to the image using the 'swirl_c' function, passing the image data and other parameters
+    # 'rgb_array' is the original image, 'rgb_array_cp' is likely a copy for manipulation, and 'degrees' is the swirl angle
+    swirl_c(w, h, rgb_array, rgb_array_cp, degrees)
+
 
 
 
@@ -1278,37 +3751,73 @@ cpdef inline void swirl_inplace(object surface_, float degrees):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void swirl2_static(object surface_, array_, float degrees):
+@cython.exceptval(check=False)
+cpdef inline void swirl32(object surface_, float degrees):
     """
-    SWIRL STATIC IMAGE/BACKGROUND WITHOUT ANGLE APPROXIMATION (INPLACE)
-
-    Compatible 24 - 32 bit with or without alpha layer
+    Swirl an image (inplace)
+    
+    Compatible with both 24, 32-bit format (with or without alpha layer).
+    
+    The swirl effect is a visual distortion that creates
+    a spiraling appearance in an image or graphic. 
+    This effect can draw attention to specific areas of a design
+    and add a sense of movement or dynamism. It can be used creatively
+    in various contexts, from social media graphics to advertising
+    and digital art.
+    
+    This algorithm uses a table of cos and sin for angle approximation
+    
+    Unlike the method `swirl`, this algorithm will take into account the layer alpha 
+    during the transformation if the image is 32-bit with per pixel transparency.  
 
     e.g:
-    # outside the main loop
-    array_cp = pygame.surfarray.pixels3d(image)
-    
-    # in the main loop
-    swirl2_static(BCK, array_cp, angle)
+     swirl32(image, angle)
 
-    :param surface_: pygame.Surface, compatible 24 - 32 bit 
-    :param array_  : numpy.ndarray pixel copy
-    :param degrees : float; angle in degrees
-    :return        : void 
+    :param surface_: 
+        pygame.Surface, compatible 24 - 32 bit
+         
+    :param degrees: 
+        float; angle in degrees
+         
+    :return: 
+        void 
+        
     """
+
+    # Ensure that surface_ is a valid pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-    assert PyObject_IsInstance(array_, numpy.ndarray), \
-        "\nArgument surface_ must be a numpy.ndarray type, got %s " % type(array_)
 
-    cdef unsigned char [:, :, :] rgb_array
+    # Declare variables for image width (w), height (h), and bit depth (bit_size)
+    cdef:
+        Py_ssize_t w, h  # Width and height of the surface
+        unsigned int bit_size  # Bit size of each pixel (for example, 32-bit for RGBA)
+
+    # Get the size (width and height) of the surface and its byte size per pixel
+    w, h = surface_.get_size()  # Get the width and height of the surface
+    bit_size = surface_.get_bytesize()  # Get the number of bytes per pixel
+
+    # Declare a 3D array to hold the RGBA pixel data from the surface
+    cdef unsigned char [:, :, ::1] rgba_array
+
+    # Attempt to create a contiguous array with shape (h, w, bit_size) from the surface pixel data
     try:
-        rgb_array = surface_.get_view('3')
+        # Use numpy to get a contiguous array of uint8 data, reshaped to (height, width, bit_size)
+        rgba_array = numpy.ascontiguousarray(surface_.get_view('0'), dtype=uint8).reshape(h, w, bit_size)
 
+    # If there's an error while trying to reference the pixel data, raise a ValueError with an appropriate message
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    swirl2_static_inplace_c1(rgb_array, array_, degrees)
+    # Create a copy of the RGBA array as a 3D numpy array for further processing (presumably for the swirl effect)
+    cdef const unsigned char[:, :, :] rgb = numpy.array(rgba_array, copy=True)
+
+    # Apply the swirl effect to the image using the 'swirl32_c' function, passing width, height, 
+    # the original RGBA array, the copied RGB array, and the swirl degree parameter.
+    swirl32_c(w, h, rgba_array, rgb, degrees)
+
+
+
 
 
 
@@ -1321,6 +3830,75 @@ cpdef inline void swirl2_static(object surface_, array_, float degrees):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void swirlf(object surface_, float degrees):
+    """
+    Swirl an image (inplace) floating point accuracy 
+    
+    This algorithm DO NOT use COS and SIN tables, it determines the angles with 
+    floating point accuracy instead.
+    
+    compatible with 24-bit image format only
+    
+    The swirl effect is a visual distortion that creates
+    a spiraling appearance in an image or graphic. 
+    This effect can draw attention to specific areas of a design
+    and add a sense of movement or dynamism. It can be used creatively
+    in various contexts, from social media graphics to advertising
+    and digital art.
+      
+    e.g:
+     swirlf(surface_, angle)
+    
+    :param surface_: 
+        pygame.Surface, compatible 24-bit
+         
+    :param degrees : 
+        float; angle in degrees
+        
+    :return        : 
+    void
+     
+    """
+
+    # Ensure that the input surface_ is a valid pygame.Surface object
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Declare a 3D array to hold the RGB pixel data from the surface
+    cdef unsigned char [:, :, :] rgb_array
+
+    # Attempt to retrieve the pixel data of the surface as a 3D array
+    try:
+        rgb_array = surface_.get_view('3')  # '3' indicates accessing the surface as a 3D array (height x width x color channels)
+    except Exception as e:
+        # Raise a ValueError if there is an issue referencing the source pixels
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    # Create a Fortran-contiguous array from the RGB data (Fortran order means column-major)
+    cdef unsigned char [::1, :, :] rgb = numpy.asarray(rgb_array, order='F')
+
+    # Declare variables for the image dimensions (width and height)
+    cdef Py_ssize_t w, h
+    w, h = rgb_array.shape[:2]  # Extract the width and height from the shape of the rgb_array
+
+    # Apply the swirl effect to the image using the 'swirlf_c' function
+    # Pass the width (w), height (h), the original rgb_array, 
+    # array (rgb), and the degrees of swirl
+    swirlf_c(w, h, rgb_array, rgb, degrees)
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void plasma_config(
         object surface_,
         int frame,
@@ -1332,24 +3910,43 @@ cpdef inline void plasma_config(
         float c_=<float>1.0/<float>12.0
 ):
     """
-
+    
+    
     CREATE A BASIC PLASMA EFFECT ON THE TOP OF A PYGAME SURFACE (INPLACE)
 
     Compatible 24 - 32 bit with or without alpha layer
     
     e.g:
-    plasma_config(surface, frame_number)
+     plasma_config(surface, frame_number)
+    
+    :param surface_:
+        pygame.surface; compatible 24 - 32 bit
 
-    :param a_           : float; default value 1.0/255.0 control the plasma equation
-    :param b_           : float; default value 1.0/12.0 control the plasma equation
-    :param c_           : float; default value 1.0/12.0 control the plasma equation
-    :param value_       : float; default value 1.0/8.0 value factor
-    :param sat_         : float; default value 1.0/6.0 saturation value
-    :param hue_         : float; default value 1.0/6.0 hue value factor
-    :param surface_     : pygame.surface; compatible 24 - 32 bit
-    :param frame        : integer; Variable that need to change over time
-    :return             : void
+    :param frame: 
+        integer; Variable that need to change over time
+
+    :param hue_: 
+        float; (Optional), default value 1.0/6.0 hue value factor
+ 
+    :param sat_: 
+        float; (Optional), default value 1.0/6.0 saturation value
+
+    :param value_: 
+        float; (Optional), default value 1.0/8.0 value factor
+
+    :param a_: 
+        float; (Optional), default value 1.0/255.0 control the plasma equation
+
+    :param b_: 
+        float; (Optional), default value 1.0/12.0 control the plasma equation
+
+    :param c_: 
+        float; (Optional), default value 1.0/12.0 control the plasma equation 
+
+    :return: 
+        void
     """
+
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
     cdef unsigned char [:, :, :] rgb_array
@@ -1357,10 +3954,11 @@ cpdef inline void plasma_config(
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
     plasma_inplace_c(rgb_array, frame, hue_, sat_, value_, a_, b_, c_)
 
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -1368,36 +3966,50 @@ cpdef inline void plasma_config(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void plasma(surface_, float frame, unsigned int [::1] palette_):
     """
-    CREATE A PLASMA EFFECT INPLACE
+    Apply Plasma Effect Inplace to a Surface
 
-    e.g:
-    plasma(surface, frame_number, palette_)
-    
-    :param surface_: pygame.Surface; compatible 24 - 32 bit 
-    :param frame   : float; frame number
-    :param palette_: 1d array containing colors
-    :return: void
+    This function generates a dynamic plasma effect on a pygame surface. The effect is created 
+    using a palette of colors and evolves over time based on the `frame` value, producing 
+    a fluid, glowing visual pattern. The plasma effect is applied directly to the surface, 
+    modifying its pixels in place.
+
+    The function works with both 24-bit and 32-bit surfaces (with or without an alpha channel).
+
+    Example usage:
+        plasma(surface, frame_number, palette)
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A pygame surface compatible with 24-bit or 32-bit formats. The plasma effect is 
+        applied directly to this surface, modifying its pixels in place.
+
+    frame : float
+        The current frame number, which drives the evolution of the plasma effect. This value 
+        determines the shifting patterns and animation in the plasma effect.
+
+    palette_ : numpy.ndarray (1D)
+        A 1D array containing a palette of colors (as unsigned integers) used to generate 
+        the plasma effect. The colors are applied cyclically to create the visual effect.
+
+    Returns
+    -------
+    None
+        This function modifies the `surface_` in place, applying the plasma effect to the surface.
     """
+
+
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
     plasma_c(surface_, frame, palette_)
 
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline float [:, :, :, ::1] rgb_to_hsl_model():
-    """
-    Create an HSL model containing all precalculate values
-    :return: Return a cython.view.memoryview shape (256, 256, 256, 3)
-    """
-    return rgb_to_hsl_model_c()
+
+# ---------------------------- BRIGHTNESS
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -1406,56 +4018,57 @@ cpdef inline float [:, :, :, ::1] rgb_to_hsl_model():
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline unsigned char [:, :, :, ::1] hsl_to_rgb_model():
-    """
-    Create an RGB model containing all precalculate values
-    :return: Return a cython.view.memoryview shape (256, 256, 256, 3)
-    """
-    return hsl_to_rgb_model_c()
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void brightness(object surface_, float shift_):
     """
-    SHADER BRIGHTNESS (INPLACE)
+    Brightness (inplace)
 
-    This shader control the pygame display brightness level
-    It uses two external functions coded in C, struct_rgb_to_hsl & struct_hsl_to_rgb
+    This method control the pygame display or SDL surface brightness level
     
-    Parameter shift_ is a float value in range [ -1.0 ... 1.0]. with +1.0 for the 
+    Parameter shift is a float value in range [ -1.0 ... 1.0]. with +1.0 for the 
     maximum brightness. A value of 0.0 will not perform any changes to the original 
     surface
     
-    Compatible 24 - 32 bit with or without alpha layer
+    Compatible 24, 32-bit (with or without alpha layer).
       
     e.g:
-    brightness(surface, 0.2)
+     brightness(surface, 0.2)
     
-    :param surface_ : pygame.surface; 
-    :param shift_   : float must be in range [ -1.0 ... 1.0 ]
-    :return         : void
+    :param surface_: 
+        pygame.surface; Compatible 24 - 32 bit with or without alpha layer
+        
+    :param shift_: 
+        float must be in range [ -1.0 ... 1.0 ]
+        
+    :return: 
+        void
+        
     """
+
+    # Ensure that the input surface_ is a valid pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
+    # If the shift is 0.0, no operation is needed, so return early
     if shift_ == 0.0:
         return
 
-    assert -1.0 <= shift_ <= 1.0, "\nArgument shift_ must be in range [-1.0 ... 1.0]"
+    # Ensure that the shift value is within the valid range [-1.0, 1.0]
+    assert -1.0 <= shift_ <= 1.0, "\nArgument shift must be in range [-1.0 ... 1.0]"
+
+    # Declare a 3D array to hold the RGB pixel data from the surface
     cdef unsigned char [:,:,:] rgb_array
+
+    # Attempt to retrieve the pixel data of the surface as a 3D array
     try:
-        rgb_array = surface_.get_view('3')
-
+        rgb_array = surface_.get_view('3')  # '3' indicates accessing the surface as a 3D array (height x width x color channels)
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Raise a ValueError if there is an issue referencing the source pixels
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    brightness_inplace_c(rgb_array, shift_)
+    # Apply the brightness shift effect to the image using the 'brightness_c' function
+    # Pass the 3D RGB array and the shift value
+    brightness_c(rgb_array, shift_)
 
 
 
@@ -1467,43 +4080,247 @@ cpdef inline void brightness(object surface_, float shift_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline brightness_(object surface_, float shift_):
+@cython.exceptval(check=False)
+cpdef inline void brightness3d(unsigned char [:, :, :] rgb_array, float shift):
     """
-    SHADER BRIGHTNESS
+    Control the brightness of an image given its array shape (w, h, n) uint8 
+    data type, RGB(A) to BGR(A) (inplace)
 
-    Apply the transformation to a new surface
-
-    This shader control the pygame display brightness level
-    It uses two external functions coded in C, struct_rgb_to_hsl & struct_hsl_to_rgb
-
-    Parameter shift_ is a float value in range [ -1.0 ... 1.0]. with +1.0 for the
-    maximum brightness. A value of 0.0 will not perform any changes to the original
-    surface
-
-    Compatible 24 - 32 bit with or without alpha layer
+    Allow to process 3d array directly 
 
     e.g:
-    brightness_(surface, 0.2)
+    brightness3d(rgb_array)
 
-    :param surface_ : pygame.surface;
-    :param shift_   : float must be in range [ -1.0 ... 1.0 ]
-    :return         : pygame surface
+    Parameters
+    ----------
+    :param rgb_array:  
+        numpy.ndarray shape(w, h, n) uint8 data type, RGB(A) 
+        (unsigned char 0...255) containing pixels
+        
+    :param shift:
+        float must be in range [ -1.0 ... 1.0 ]
+
+    Returns
+    -------
+    void
+
     """
+
+    # If shift is 0, no operation is needed, so return early
+    if shift == 0:
+        return
+
+    # Declare variables for width (w), height (h), and bit_size (bit_size)
+    cdef:
+        Py_ssize_t w, h
+        Py_ssize_t bit_size = 0
+
+    # Try to extract the shape of the rgb_array to get width, height, and bit size
+    try:
+        w, h, bit_size = rgb_array.shape[:3]  # Extract the shape dimensions (height, width, and bit_size)
+
+        # Ensure that the bit size is either 3 (RGB) or 4 (RGBA)
+        if bit_size not in (3, 4):
+            raise ValueError('\nIncorrect bit_size, support only RGB(A)')
+
+    # Handle the ValueError exception in case of invalid shape
+    except ValueError as e:
+        # If it's a memory view, print the flags of the numpy array
+        if is_type_memoryview(rgb_array):
+            print(numpy.array(rgb_array).flags)
+        # Otherwise, print the flags of the numpy array directly
+        else:
+            print(rgb_array.flags)
+
+        # Raise a new error with the details about the expected and actual array shapes
+        raise ValueError(
+            "\n%s\nExpecting array shape (w, h, n), "
+            "RGB(A) got (%s, %s, %s)" % (e, w, h, len(rgb_array[:3])))
+
+    # Ensure the data type is uint8 (unsigned char), as it is the expected type for RGB values
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    # Call the brightness function to apply the brightness shift on the RGB array
+    brightness_c(rgb_array, shift)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef void brightness1d(unsigned char [:] bgr_array, const float shift, bint format_32=False):
+    """
+    Control brightness of an image given its C buffer, 1d array shape (w, )
+     BGR(A) or RGB(A) (inplace)
+
+    e.g:
+    # for 24-bit  
+    array_bck = brightness1d_copy(background.get_buffer(), 0.1, False)
+    background = pygame.image.frombuffer(array_bck, (800, 600), 'BGR')
+    
+    # for 32-bit 
+    array_bck = brightness1d_copy(background.get_buffer(), 0.1, True)
+    background = pygame.image.frombuffer(array_bck, (800, 600), 'BGRA')
+
+    :param bgr_array:  
+        numpy.ndarray shape(w,) uint8 data type, (unsigned char 0...255) containing pixels or
+        bytearray buffer
+        
+    :param shift: 
+        float; must be in range [ -1.0 ... 1.0 ]
+        
+    :param format_32: 
+        bool; True for 'BGRA' buffer type (32-bit) or False 'BGR' (24-bit) 
+        
+    :return: void 
+    """
+
+    if shift == 0:
+        return
+
+    # Only uint8 data is compatible
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    brightness1d_c(bgr_array, shift, format_32)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef np.ndarray[np.uint8_t, ndim=1] brightness1d_copy(
+        unsigned char [:] bgr_array,
+        const float shift,
+        bint format_32=False
+):
+    """
+    Brightness control (return a copy)
+    
+    Control brightness of an image given its C buffer, 1d array shape (w, )
+    The bgr_array is a C-buffer with pixel format BGR or BGRA 
+
+    e.g:
+    # for 24-bit
+    array_bck = brightness1d_copy(background.get_buffer(), 0.1, False)
+    background = pygame.image.frombuffer(array_bck, (800, 600), 'BGR')
+    
+    # for 32-bit 
+    array_bck = brightness1d_copy(background.get_buffer(), 0.1, True)
+    background = pygame.image.frombuffer(array_bck, (800, 600), 'BGRA')
+    
+    :param bgr_array:
+        numpy.ndarray shape(w,) uint8 data type, (unsigned char 0...255)
+        containing pixels or bytearray buffer
+        
+    :param shift: 
+        float; must be in range [ -1.0 ... 1.0 ]. 
+        Brightness value.
+        
+    :param format_32: 
+        bool;  True for 'BGRA' buffer type (32-bit) or False 'RGB' (24-bit)
+         
+    :return: 
+        Return a copy of the original SDL surface with adjusted brightness
+         
+    """
+
+    if shift == 0:
+        return numpy.array(bgr_array)
+
+    assert -1.0 <= shift <= 1.0, \
+        "\nArgument shift must be in range[-1.0 ... 1.0]"
+
+    # Only uint8 data is compatible
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    return brightness1d_copy_c(bgr_array, shift, format_32)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline object brightness_copy(object surface_, const float shift):
+    """
+    Brightness (return a copy)
+
+    Apply the transformation to a new SDL surface
+    This method control the pygame display brightness level
+
+    Parameter shift is a float value in range [ -1.0 ... 1.0]. with +1.0 for the
+    maximum brightness. A value of 0.0 will not perform any change to the original
+    SDL surface
+
+    Compatible 24, 32-bit (with or without alpha layer).
+
+    e.g:
+    new_surface = brightness_copy(surface, 0.2)
+
+    :param surface_: 
+        pygame.surface; Compatible 24 - 32 bit with or without alpha layer
+        
+    :param shift: 
+        float must be in range [ -1.0 ... 1.0 ]
+        
+    :return: 
+        pygame surface 24-bit format, without alpha layer
+        
+    """
+
+    # If the shift is 0.0, there's no change needed, so return the surface as is
+    if shift == 0.0:
+        return surface_
+
+    # Declare variables for width (w), height (h), and bit size (bit_size)
+    cdef:
+        Py_ssize_t w, h
+        unsigned int bit_size
+
+    # Get the width and height of the surface and the byte size of the pixel format
+    w, h = surface_.get_size()  # surface_.get_size() returns a tuple (width, height)
+    bit_size = surface_.get_bytesize()  # surface_.get_bytesize() returns the byte size per pixel
+
+    # Check if the argument surface_ is a pygame.Surface type
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    if shift_ == 0.0:
-        return surface_
+    # Ensure that the shift value is between -1.0 and 1.0
+    assert -1.0 <= shift <= 1.0, "\nArgument shift must be in range [-1.0 ... 1.0]"
 
-    assert -1.0 <= shift_ <= 1.0, "\nArgument shift_ must be in range [-1.0 ... 1.0]"
+    # Attempt to reference the pixel data of the surface as a 3D array (RGB format)
     cdef unsigned char [:,:,:] rgb_array
     try:
-        rgb_array = surface_.get_view('3')
+        rgb_array = surface_.get_view('3')  # '3' represents a 3D view (RGB) of the surface's pixel data
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # If an exception occurs (e.g., unable to access the pixel data), raise an error
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    return brightness_c(rgb_array, shift_)
+    # Apply the brightness adjustment by passing the RGB array and shift value to the brightness_copy_c function
+    return brightness_copy_c(rgb_array, shift)
+
+
+
 
 
 @cython.binding(False)
@@ -1513,91 +4330,76 @@ cpdef inline brightness_(object surface_, float shift_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void brightness_exclude(
         object surface_,
-        float shift_,
+        const float shift_,
         color_=(0, 0, 0)
 ):
     """
 
-    INCREASE/DECREASE AN IMAGE BRIGHTNESS (OPTIONAL EXCLUDE COLOR)
+    Brightness adjustment with color exclusion (inplace)
     
-    The optional setting (color_) allow you to select a color that will not 
-    be included in the process. This can be useful if you know the background 
-    color RGB values and do not wish the background to change
+    Exclusion:
+    Set the parameter color to exclude a specific color from the transformation process.
+    parameter shift control the brightness transformation, with +1.0 being the maximum 
+    brightness possible. 
     
-    Parameter shift_ is a float value in range [ -1.0 ... 1.0]. with +1.0 for the 
-    maximum brightness. A value of 0.0 will not perform any changes to the original 
-    surface
-   
-    Parameter color_ is a tuple of RGB colors e.g (1, 1, 1) 
+    Compatible with 24, 32-bit images 
+    
+    e.g
+    # 24-bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    brightness_exclude(image, +0.5, color=(0, 0, 0))
+    
+    # 32-bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    brightness_exclude(image, +0.5, color=(0, 0, 0))
 
-    :param surface_ : pygame.surface; 
-    :param shift_   : float must be in range [ -1.0 ... 1.0 ]
-    :param color_   : tuple RGB to be excluded from the process
-    :return         : void
+    :param surface_: 
+        pygame.surface; 32|24-bit surface compatible
+        
+    :param shift_: 
+        float; must be in range [ -1.0 ... +1.0 ], +1.0 is the maximum 
+        brightness effect, zero will have no effect.
+    
+    :param color_: 
+        tuple; RGB values to be excluded from the process e.g (10, 22, 0), 
+        default is black tuple(0, 0, 0) 
+        
+    :return: 
+        void
+        
     """
+
+   # Ensure the argument surface_ is a pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
+    # If the shift value is 0.0, no change is needed, so return early
     if shift_ == 0.0:
         return
 
-    assert -1.0 <= shift_ <= 1.0, \
-        "Argument shift_ must be in range[-1.0 ... 1.0]"
-    cdef unsigned char [:,:,:] rgb_array
-    try:
-        rgb_array = surface_.get_view('3')
-
-    except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
-
-    brightness_exclude_inplace_c(rgb_array, shift_, color_)
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline void brightness_bpf(
-        object surface_,
-        float shift_,
-        unsigned char bpf_threshold = 64):
-    """
-
-    INCREASE/DECREASE SURFACE BRIGHTNESS 
-
-    bpf_threshold is an integer value in range [0..255] that 
-    determines the pixels threshold for the brightness algorithm. 
-    The sum RGB below this threshold will not be included in the process  
-    R + G + B < Threshold 
-
-
-    :param surface_: Pygame.Surface compatible 24 - 32 bit 
-
-    :param shift_: float, must be in range [-1.00 ... +1.00]
-
-    :param bpf_threshold : integer value in range [0 ... 255].
-    threshold RGB. Values R+G+B < threshold will not be included in the process
-    :return: void 
-
-    """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-
+    # Ensure that the shift value is between -1.0 and 1.0
     assert -1.0 <= shift_ <= 1.0, \
         "Argument shift must be in range[-1.0 ... 1.0]"
+
+    # Declare a variable to hold the RGB array of pixel data from the surface
     cdef unsigned char [:,:,:] rgb_array
+
+    # Try to get a 3D view of the surface's pixel data (RGB format)
     try:
-        rgb_array = surface_.get_view('3')
+        rgb_array = surface_.get_view('3')  # '3' indicates a 3D view (RGB) of the surface
 
+    # If an exception occurs while trying to access the pixel data, raise a ValueError
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    brightness_bpf_c(rgb_array, shift_, bpf_threshold)
+    # Call the function to adjust the brightness of the surface's pixel data, passing the shift and color values
+    brightness_ex_c(rgb_array, shift_, color_)
+
+
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -1606,42 +4408,77 @@ cpdef inline void brightness_bpf(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void brightness_model(
+@cython.exceptval(check=False)
+cpdef inline void brightness_bpf(
         object surface_,
-        float shift_,
-        float [:, :, :, :] rgb_to_hsl_model
-):
+        const float shift_,
+        unsigned char bpf_threshold = 64):
     """
     
-    SHADER BRIGHTNESS (EXCLUDE A SPECIFIC COLOR FROM THE PROCESS, DEFAULT BLACK COLOR)
-
-    This shader control the pygame display brightness level
-    It uses two external functions coded in C, struct_rgb_to_hsl & struct_hsl_to_rgb
-
+    Brightness adjustment with *bpf exclusion (inplace)
+    *bpf stand for bright pass filter
+    
+    Exclusion:
+    bpf_threshold is an integer value in range [0..255] that 
+    determines the pixels threshold for the brightness algorithm. 
+    The RGB sum below this threshold will not be included in the process.  
+    
+    Compatible with 24, 32-bit images
+    
     e.g:
-    brightness_exclude(surface, 0.2)
+     24-bit
+    image = pygame.image.load('../Assets/px.png').convert()
+    brightness_bpf(image, 0.5, bpf_threshold=200)
+
+    # 32-bit 
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    brightness_bpf(image, 0.5, bpf_threshold=200)
     
-    :param surface_ : pygame.surface; compatible 24 - 32 bit 
-    :param shift_   : float in range [-1.0 ... 1.0 ]
-    :param rgb_to_hsl_model : numpy.ndarray shape (256, 256, 256, 3)
-    :return : void 
+    :param surface_: 
+        Pygame.Surface compatible with 24 - 32 bit
+         
+    :param shift_:
+        float; must be in range [-1.00 ... +1.00] this value control the brightness
+         
+    :param bpf_threshold: 
+        integer; value in range [0 ... 255]. Bright pass filter value. 
+        Equivalent to a threshold RGB. e.g sum of pixel values < threshold
+        will not be modified. Default value is 64.
+         
+    :return: 
+        void 
+
     """
+
+    # If the shift_ value is 0, no change is needed, so return early
+    if shift_ == 0:
+        return
+
+    # Ensure the argument surface_ is a pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    warnings.warn("Deprecated version, use shader_brightness_24_inplace (fastest version)",
-                  DeprecationWarning)
-    assert -1.0 <= shift_ <= 1.0, "\nArgument shift_ must be in range [-1.0 ... 1.0]"
+    # Ensure that the shift_ value is between -1.0 and 1.0
+    assert -1.0 <= shift_ <= 1.0, \
+        "Argument shift must be in range[-1.0 ... 1.0]"
+
+    # Declare a variable to hold the RGB array of pixel data from the surface
     cdef unsigned char [:,:,:] rgb_array
+
+    # Try to get a 3D view of the surface's pixel data (RGB format)
     try:
-        rgb_array = surface_.get_view('3')
+        rgb_array = surface_.get_view('3')  # '3' indicates a 3D view (RGB) of the surface
 
+    # If an exception occurs while trying to access the pixel data, raise a ValueError
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    brightness_inplace1_c(rgb_array, shift_, rgb_to_hsl_model)
+    # Call the function to adjust the brightness of the surface's pixel data with the given shift_ and bpf_threshold
+    brightness_bpf_c(rgb_array, shift_, bpf_threshold)
 
 
+
+# ---------------------------- SATURATION
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -1650,38 +4487,57 @@ cpdef inline void brightness_model(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void saturation(object surface_, float shift_):
     """
-    SHADER SATURATION
+    Saturation (inplace)
 
-    This shader control the saturation level of the pygame display or surface/texture
+    This method control the saturation level of the pygame display or surface/texture
 
     e.g:
     saturation(surface, 0.2)
     
     
-    :param surface_: pygame.Surface; compatible 24 - 32 bit
-    :param shift_  : float must be in range [ -1.0 ... 1.0] 
-    :return:
+    :param surface_: 
+        pygame.Surface; compatible 24 - 32 bit
+        
+    :param shift_  : 
+        float must be in range [ -1.0 ... 1.0]
+         
+    :return: 
+        void 
+    
     """
+
+    # If the shift_ value is 0, no change is needed, so return early
+    if shift_ == 0:
+        return
+
+    # Ensure the argument surface_ is a pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
+    # Clamp the shift_ value to be within the range [-1.0, 1.0]
     if shift_ < -1.0:
-        shift_ = -1.0
+        shift_ = -1.0  # If shift_ is less than -1, set it to -1
 
     if shift_ > 1.0:
-        shift_ = 1.0
+        shift_ = 1.0   # If shift_ is greater than 1, set it to 1
 
+    # Declare a variable to hold the RGB array of pixel data from the surface
     cdef unsigned char [:, :, :] rgb_array
 
+    # Try to get a 3D view of the surface's pixel data (RGB format)
     try:
-        rgb_array = surface_.get_view('3')
+        rgb_array = surface_.get_view('3')  # '3' indicates a 3D view (RGB) of the surface
 
+    # If an exception occurs while trying to access the pixel data, raise a ValueError
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    saturation_inplace_c(rgb_array, shift_)
+    # Call the function to adjust the saturation of the surface's pixel data with the given shift_
+    saturation_c(rgb_array, shift_)
+
 
 
 @cython.binding(False)
@@ -1691,45 +4547,80 @@ cpdef inline void saturation(object surface_, float shift_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void heatwave_vertical(
-        object surface_,
-        unsigned char [:, :] mask,
-        float factor_,
-        float center_,
-        float sigma_,
-        float mu_):
+@cython.exceptval(check=False)
+cpdef inline void saturation3d(unsigned char [:, :, :] rgb_array, float shift):
+    """
+    Saturate 3d array directly (inplace)
+
+    Modify the saturation level of an image by referencing
+    the surface/image array data.
+    The array must be type uint8 and shape (w, h, 3) containing RGB format pixel but
+    any other format is also compatible
+    The output image will be 24-bit format without layer alpha
+
+    e.g:
+    saturation3d(surface, 0.2)
+
+
+    :param rgb_array:
+        numpy.ndarray or memoryviewslice shape (w, h, 3) type uint8 containing
+        RGB or any other pixel format and referencing an SDL surface or image.
+
+    :param shift  :
+        float must be in range [ -1.0 ... 1.0]
+
+    :return:
+        void (change apply inplace)
+
     """
 
-    APPLY A GAUSSIAN TRANSFORMATION TO A SURFACE
+    # If the shift value is 0, no change is needed, so return early
+    if shift == 0:
+        return
 
-    This effect can be use to simulate air turbulence or heat flow/convection
+    # Clamp the shift value to be within the range [-1.0, 1.0]
+    if shift < -1.0:
+        shift = -1.0  # If shift is less than -1, set it to -1
 
-    :param surface_  : pygame.Surface; compatible 24 - 32 bit 
-    :param mask      : numpy.ndarray shape (x, y) uint8, (values 255 or 0).
-                       Apply transformation to the original array
-                       if the value @(x, y) is 255 else remain unchanged.
-    :param factor_   : Control the maximum of the gaussian equation.
-                       No transformation if factor_ equal zero
-    :param center_   : Control the center of the gaussian equation (if center_ equal zero,
-                       the Gauss equation is centered
-                       at x=0 and maximum is 0.4 with amplitude_ = 1.0)
-    :param sigma_    : float; sigma value of the gauss equation
-    :param mu_       : float; mu value of the gauss equation
-    """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+    if shift > 1.0:
+        shift = 1.0   # If shift is greater than 1, set it to 1
 
-    assert PyObject_IsInstance(mask, (numpy.ndarray, cython.view.memoryview)), \
-        "\nArgument mask must be a numpy.array or memoryview type, got %s " % type(mask)
+    # Declare variables for the dimensions and bit size of the image array
+    cdef:
+        Py_ssize_t w, h  # Width and height of the image
+        Py_ssize_t bit_size = 0  # The bit size (number of color channels)
 
-    cdef unsigned char [:,:,:] rgb_array
+    # Try to get the dimensions (width, height) and bit size of the RGB array
     try:
-        rgb_array = surface_.get_view('3')
 
-    except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # Get the shape of the RGB array, which should return (height, width, channels)
+        w, h, bit_size = rgb_array.shape[:3]
 
-    heatwave24_vertical_inplace_c(rgb_array, mask, factor_, center_, sigma_, mu_)
+        # Check if the bit size (number of color channels) is either 3 (RGB) or 4 (RGBA)
+        if bit_size not in (3, 4):
+            raise ValueError('\nIncorrect bit_size, support only RGB(A)')  # Raise an error if bit size is invalid
+
+    # If a ValueError occurs while retrieving the shape, print the array flags and raise the error
+    except ValueError as e:
+        # Check if the array is a memoryview slice
+        if is_type_memoryview(rgb_array):
+            print(numpy.array(rgb_array).flags)  # Print flags for memoryview slice
+        # If it's a numpy array, print its flags
+        else:
+            print(rgb_array.flags)
+
+        # Raise a ValueError with the shape of the array and the expected dimensions
+        raise ValueError(
+            "\n%s\nExpecting array shape (w, h, n), "
+            "RGB(A) got (%s, %s, %s)" % (e, w, h, len(rgb_array[:3])))
+
+        # Only uint8 data (unsigned char) is compatible
+    if not is_uint8(rgb_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    # Call the function to adjust the saturation of the RGB array with the given shift value
+    saturation_c(rgb_array, shift)
+
 
 
 @cython.binding(False)
@@ -1739,37 +4630,203 @@ cpdef inline void heatwave_vertical(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void horizontal_glitch(
-        object surface_,
-        float rad1_,
-        float frequency_,
-        float amplitude_
-):
-    """
-    SHADER GLITCH EFFECT (INPLACE)
+@cython.exceptval(check=False)
+cpdef inline void saturation1d(
+    unsigned char [:] buffer,
+    const float shift,
+    bint format_32=False):
 
-    Deform the pygame display to create a glitch effect
+    """
+    Saturate 1d array directly (inplace) 
+    
+    Control saturation level of an image given its C data buffer, 1d array shape (w, )
+    type uint8 RGB(A) to BRG(A) or any other pixel format (inplace)
+    
+    Nevertheless for 32-bit image, the alpha channel must be place at the end of
+    the pixel, such as RGB(A) or BGR(A)
     
     e.g:
-    horizontal_glitch(BCK, rad1_=0.5, frequency_=0.08, amplitude_=FRAME % 20)
-
-    :param surface_  : pygame.Surface; compatible 24 - 32 bit 
-    :param rad1_     : float; Angle in radians, this value control the angle variation over time
-    :param frequency_: float; signal frequency, factor that amplify the angle variation
-    :param amplitude_: float; cos amplitude value
-    :return: void
+    # for 32-bit 
+    image = pygame.image.load("../Assets/px.png").convert_alpha()
+    saturation1d(image.get_buffer(), -0.5, True)
+    saturation1d(im.get_view('0'), 0.5, True)
+    
+    # for 24 
+    image = pygame.image.load("../Assets/px.png").convert(24)
+    saturation1d(image.get_buffer(), 0.3, False)
+    
+    :param buffer:  
+        numpy.ndarray or memoryviewslice shape(w,) uint8 data type, (unsigned char 0...255) 
+        containing RGB(A), BGR(A) or any other pixel format.
+        
+    :param shift: 
+        float must be in range [ -1.0 ... 1.0 ], This value control the saturation level
+    
+    :param format_32:
+        bool True|False. Set to False for 'RGB' buffer type (24-bit) or True for 'RGBA' (32-bit), 
+        this bit enable/disable the layer alpha.
+        
+    :return:
+        void, Inplace transformation. 
+        Final image is same pixel format than input image 
     """
+
+    if shift == 0:
+        return
+
+    assert -1.0 <= shift <= 1.0, \
+        "\nArgument shift (float) must be in range[-1.0 ... 1.0]"
+
+    # Only uint8 data is compatible
+    if not is_uint8(buffer):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % buffer.dtype)
+
+    saturation1d_c(buffer, shift, format_32)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef np.ndarray[np.uint8_t, ndim=1]  saturation1d_cp(
+        const unsigned char [:] buffer,
+        const float shift,
+        bint format_32=False
+):
+    """
+    Saturate am image using a C-buffer (return copy) 
+    
+    Control saturation level of an image given its C data buffer, 1d array shape (w, )
+    type uint8 RGB(A) to BRG(A) or any other pixel format (inplace)
+    
+    Nevertheless for 32-bit image, the alpha layer must be place at the end of 
+    the pixel format such as RGB(A) or BGR(A)
+    
+    e.g:
+    # for buffer 32-bit 
+    image = pygame.image.load("../Assets/px.png").convert_alpha()
+    new_buffer = saturation1d_cp_c(image.get_buffer(), -0.5, True)
+   
+    # for 24-bit
+    image = pygame.image.load("../Assets/px.png").convert(24)
+    new_buffer = saturation1d_cp_c(im.get_view('0'), 0.5, False)
+    
+    Parameters
+    ----------
+    buffer: 
+        numpy.ndarray or memoryviewslice shape(w,) uint8 data type, (unsigned char 0...255) 
+        containing RGB(A)|BGR(A) or any other format pixels.
+        
+    shift: 
+        float must be in range [ -1.0 ... 1.0 ]. 
+        This value control the saturation level.
+    
+    format_32: 
+        bool True | for 'RGB' buffer type (24-bit) or False 'RGBA' (32-bit), 
+        this bit enable/disable the layer alpha it works indifferently of the pixel format.
+
+    Returns
+    ----------
+    numpy.ndarray 1d array shape (w, ) type uint8 containing same pixel format than input array 
+
+    """
+
+    if shift == 0:
+        return numpy.asarray(buffer)
+
+    assert -1.0 <= shift <= 1.0, \
+        "\nArgument shift (float) must be in range[-1.0 ... 1.0]"
+
+        # Only uint8 data is compatible
+    if not is_uint8(buffer):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % buffer.dtype)
+
+    return saturation1d_cp_c(buffer, shift, format_32)
+
+
+
+
+# ------------------------------------ OTHER
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void heatconvection(
+        object surface_,
+        float amplitude,
+        float center = 0.0,
+        float sigma = 2.0,
+        float mu = 0.0):
+    """
+
+    Heat flow convection
+    
+    Convection (or convective heat transfer) is the transfer of heat from one place to another 
+    due to the movement of fluid. Although often discussed as a distinct method of heat transfer, 
+    convective heat transfer involves the combined processes of conduction (heat diffusion).    
+    This effect can be use to simulate air turbulence or heat flow/convection
+    it applies a gaussian transformation at the base of the image (vertical flow)   
+    
+    # for 32-24 bit image format 
+     image = pygame.image.load("../Assets/fire.jpg").convert()
+     b = math.cos(i * 3.14 / 180.0) * random.uniform(0, 2)
+     heatconvection(image, abs(b) * random.uniform(20.0, 80.0),
+         0, sigma = random.uniform(0.8, 4), mu_ = b)
+    # Restore the original image 
+     image = image_copy.copy()
+
+    :param surface_  : 
+        pygame.Surface; compatible 24 - 32 bit
+         
+    :param amplitude   : 
+        Control the maximum amplitude (pixels displacement on the Y-axis,
+        vertical effect) of the gaussian equation. No transformation if 
+        amplitude equal zero. example of an variable amplitude issue from a 
+        periodic function: b = math.cos(i * 3.14 / 180.0) * random.uniform(0, 2)
+        with i linear.
+         
+    :param center   : 
+        Control the center of the gaussian equation (if center equal zero,
+        the Gauss equation is centered (default is 0.0)
+                   
+    :param sigma    : 
+        float; sigma value of the gauss equation, a small value will create 
+        a narrow effect while a stronger value will wider the effect. 
+        Please refers to the gaussian distribution for further analysis on the 
+        sigma values (default is 2.0).
+        
+    :param mu       : 
+        float; mu value of the gauss equation. when mu is periodic such as
+        a cosine trigonometric function, it allows to displace the effect 
+        along the X-axis (default is 0.0).
+        
+    """
+
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    if amplitude == <float>0.0:
+        return
 
     cdef unsigned char [:,:,:] rgb_array
     try:
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    horizontal_glitch_inplace_c(rgb_array, rad1_, frequency_, amplitude_)
+    heatconvection_inplace_c(rgb_array, amplitude, center, sigma, mu)
+
 
 
 
@@ -1780,42 +4837,132 @@ cpdef inline void horizontal_glitch(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void horizontal_static_glitch(
+@cython.exceptval(check=False)
+cpdef inline void horizontal_glitch(
         object surface_,
-        object array_,
-        float rad1_,
-        float frequency_,
-        float amplitude_
+        const float deformation,
+        const float frequency,
+        const float amplitude
 ):
     """
-    SHADER GLITCH EFFECT ON STATIC IMAGE/BACKGROUND (INPLACE)
+    Horizontal glitch (inplace)
+
+    Deform the pygame display horizontally 
+    
+    e.g:
+    # for 24 - 32 bit
+    horizontal_glitch(background, deformation=0.5, frequency=0.08, amplitude=FRAME % 20)
+
+    :param surface_    : 
+        pygame.Surface; compatible 24 - 32 bit
+         
+    :param deformation : 
+        float; Angle in radians, this value control the angle variation over time.
+        
+    :param frequency   : 
+        float; signal frequency, factor that amplify the angle variation
+        
+    :param amplitude   : 
+        float; cos amplitude value
+        
+    :return            : 
+        void
+    
+    """
+
+    # Assert that the surface_ argument is of type pygame.Surface
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Declare a 3D array 'rgb_array' that will hold the image pixel data (in unsigned char format)
+    cdef unsigned char [:,:,:] rgb_array
+
+    # Attempt to reference the pixels of the surface_ as a 3D array
+    try:
+        rgb_array = surface_.get_view('3')  # Get the pixel data as a 3D memory view
+
+    # If an exception occurs during the reference, raise a ValueError with a message
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    # Call the horizontal_glitch_c function to apply a horizontal glitch effect to the image
+    # The function is given the rgb_array and the deformation, frequency, and amplitude parameters
+    horizontal_glitch_c(rgb_array, deformation, frequency, amplitude)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void horizontal_sglitch(
+        object surface_,
+        object array_,
+        const float deformation,
+        const float frequency,
+        const float amplitude
+):
+    """
+    Glitch for static image background (inplace)
 
     Deform the pygame display to create a glitch effect
 
     e.g:
-    horizontal_glitch(BCK, rad1_=0.5, frequency_=0.08, amplitude_=FRAME % 20)
+     # for 24 - 32 bit
+    horizontal_sglitch(background, bgr_array, deformation=0.5, frequency=0.08, amplitude=FRAME % 20)
 
-    :param surface_  : pygame.Surface; compatible 24 - 32 bit 
-    :param array_    : numpy.ndarray pixel copy
-    :param rad1_     : float; Angle in radians, this value control the angle variation over time
-    :param frequency_: float; signal frequency, factor that amplify the angle variation
-    :param amplitude_: float; cos amplitude value
-    :return: void
+    :param surface_    : 
+        pygame.Surface; compatible 24 - 32 bit
+         
+    :param array_      : 
+        numpy.ndarray pixel copy
+        
+    :param deformation : 
+        float; Angle in radians, this value control the angle variation over time
+        
+    :param frequency   : 
+        float; signal frequency, factor that amplify the angle variation
+        
+    :param amplitude   : 
+        float; cos amplitude value
+        
+    :return: 
+        void
+        
     """
+
+    # Assert that the surface_ argument is of type pygame.Surface
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-    assert PyObject_IsInstance(array_, numpy.ndarray), \
-        "\nArgument surface_ must be a numpy.ndarray type, got %s " % type(array_)
 
+    # Assert that the array_ argument is of type numpy.ndarray
+    assert PyObject_IsInstance(array_, numpy.ndarray), \
+        "\nArgument rgb_array must be a numpy.ndarray type, got %s " % type(array_)
+
+    # Declare a 3D array 'rgb_array' to hold the pixel data from the surface_ (in unsigned char format)
     cdef unsigned char [:,:,:] rgb_array
 
+    # Attempt to reference the pixels of the surface_ as a 3D array
     try:
-        rgb_array = surface_.get_view('3')
+        rgb_array = surface_.get_view('3')  # Retrieve the pixel data as a 3D memory view
 
+    # If an exception occurs during the reference, raise a ValueError with a detailed message
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    horizontal_glitch_static_inplace_c(rgb_array, array_, rad1_, frequency_, amplitude_)
+    # Call the horizontal_sglitch_c function to apply a horizontal glitch effect to the image
+    # This function takes the rgb_array (pixel data of the surface), array_ (an additional numpy array),
+    # and parameters: deformation, frequency, and amplitude to control the glitch effect
+    horizontal_sglitch_c(rgb_array, array_, deformation, frequency, amplitude)
+
+
+
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -1824,28 +4971,58 @@ cpdef inline void horizontal_static_glitch(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void bpf(object surface_, int threshold = 128):
     """
     
-    SHADER BRIGHT PASS FILTER (INPLACE)
+    BPF, bright pass filter (inplace)
 
-    Conserve only the brightest pixels in a surface
+    Conserve only the brightest pixels of a surface
+    
+    e.g:
+    # 24 bit 
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    bpf(image, threshold=60)
+    
+    # 32 bit 
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    bpf(image, threshold=60)
 
-    :param surface_ : pygame.Surface; compatible 24 - 32 bit 
-    :param threshold: integer; Bright pass threshold default 128
-    :return: void 
+    :param surface_ : 
+        pygame.Surface; compatible 24 - 32 bit
+         
+    :param threshold: 
+        integer; Bright pass threshold default is 128
+        
+    :return: 
+        void 
+    
     """
+
+    # Assert that the surface_ argument is of type pygame.Surface
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
+    # Declare a 3D array 'rgb_array' to hold the pixel data from the surface_ (in unsigned char format)
     cdef unsigned char [:,:,:] rgb_array
+
+    # Attempt to reference the pixels of the surface_ as a 3D array
     try:
-        rgb_array = surface_.get_view('3')
+        rgb_array = surface_.get_view('3')  # Retrieve the pixel data as a 3D memory view
 
+    # If an exception occurs during the reference, raise a ValueError with a detailed message
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    bpf24_inplace_c(rgb_array, threshold)
+    # Declare variables for width (w) and height (h) of the image
+    cdef int w, h
+    w, h = rgb_array.shape[:2]  # Extract width and height from the shape of the rgb_array
+
+    # Call the bpf_inplace_c function to apply the BPF (brightness-preserving filter) effect
+    # The function takes the rgb_array (pixel data of the surface), width (w), height (h), and threshold
+    # to control the intensity of the effect.
+    bpf_inplace_c(rgb_array, w, h, threshold)
+
 
 
 @cython.binding(False)
@@ -1855,32 +5032,56 @@ cpdef inline void bpf(object surface_, int threshold = 128):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void bloom(object surface_, int threshold_, bint fast_=False,
-                        object mask_=None):
+@cython.exceptval(check=False)
+cpdef inline void bloom(
+        object surface_,
+        int threshold_,
+        bint fast_=False,
+        object mask_=None
+):
     """
+    Create a bloom effect (inplace)
+
+    Compatible 24-32 bit SDL surface / image
+    Optional mask to filter the bloom effect by controlling the transparency (alpha).
+    Optional fast argument to improve the overall performance x10 - x80 improvement but reduce the 
+    effect appearance. 
+
+    e.g
+    # check the demo_bloom_mask.py script in the Demo folder 
+    bloom(SCREEN, threshold = BPF, fast=True, mask = mask)
+
+    Parameters
+    ----------
     
-    CREATE A BLOOM EFFECT
-
-    * Surface must be a pygame Surface 24-32 bit format
-
-    :param surface_     : pygame.Surface; Game display or texture
-    :param threshold_   : integer; Threshold value uint8 in range [0 ... 255].
-                          The threshold value is used by a bright
-                          pass filter to determine the bright pixels above the given threshold.
-                          Below 128 the bloom effect will be more
-                          noticeable and above 128 a bit less.
-    :param fast_        : bool; True | False; If True the bloom effect will be approximated
-                          and only the x16 subsurface
-                          will be processed to maximize the overall processing time, 
-                          default is False).
-    :param mask_        : 
-    :return             : void
+    surface_ : 
+        pygame.Surface; Game display or texture compatible 24, 32-bit format
+    
+    threshold_ : 
+        integer; Threshold value uint8 in range [0 ... 255].
+        Bright pass filter threshold value to detect bright pixels within the texture or image.
+    
+    fast_ : 
+        bool; True | False; If True the bloom effect will be approximated
+        and only the x16 subsurface will be processed to maximize the overall processing time. 
+        Default is False.
+    
+    mask_ : 
+        numpy.ndarray or memoryviewslice shape (w, h) type uint8 containing values in range
+        (0 .. 255) representing the mask alpha. Array (w, h) filled with 255 will render and bloom 
+        the entire image. Array (w, h) filled with zero will disable the bloom effect. Any values
+        in between ]0 and 255[ will filter the pixels and create selective bloom effect.
+    
+    Returns
+    -------
+    void
     
     """
+
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    bloom_array24_c(surface_, threshold_, fast_, mask_)
+    bloom_c(surface_, threshold_, fast_, mask_)
 
 
 
@@ -1891,44 +5092,45 @@ cpdef inline void bloom(object surface_, int threshold_, bint fast_=False,
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef void bloom_array24(surface_, threshold_, fast_, mask_):
-    bloom_array24_c(surface_, threshold_, fast_, mask_)
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline fisheye_footprint(
-        int w, int h,
-        unsigned int centre_x,
-        unsigned int centre_y):
+@cython.exceptval(check=False)
+cpdef inline np.ndarray[np.uint32_t, ndim=2] fisheye_footprint(
+        const int w,
+        const int h,
+        const unsigned int centre_x,
+        const unsigned int centre_y
+):
     """
-    CREATE A FISHEYE MODEL TO HOLD THE PIXEL COORDINATES OF A SURFACE/ GAME DISPLAY
+    Create a fisheye lens model holding pixel coordinates of a surface
 
-    * The surface and the model must have the same dimensions.
-
-    Store the fisheye model into an external array image_fisheye_model shape (width, height, 2)
-
-    IMAGE_FISHEYE_MODEL contains the fisheye transformation coordinate (x2 & y2) that reference
-    the final image pixel position (fisheye model)
-    This method has to be call once before the main loop in order to calculate
-    the projected position for each pixels.
-
-    :param centre_y: centre y coordinate
-    :param centre_x: centre x coordinate
-    :param w: integer; width of the fisheye model
-    :param h: integer; height of the fisheye model
-    :return: Return a numpy.ndarray type (w, h, 2) representing the fisheye model (coordinates
-    of all surface pixels passing through the fisheye lens model)
+    The model variables w & h must have the same dimensions than the projected surface.  
+    
+    e.g 
+     width, height = surface.get_size()
+     f_model = fisheye_footprint(w=width, h=height, centre_x=width >> 1, centre_y=height >> 1)
+     fisheye(surface, f_model)
+    
+    :param w       : 
+        integer; width of the surface to project ino the fisheye model
+         
+    :param h       : 
+        integer; height of the surface to project into the fisheye model
+        
+    :param centre_y: 
+        integer; centre position y of the effect
+        
+    :param centre_x: 
+        integer; centre position x of the effect
+    
+    :return        : 
+        Return a numpy.ndarray type (w, h, 2) of unsigned int representing the
+        fisheye model (coordinates of all pixels passing through the fisheye lens model)
+      
     """
+
     return fisheye_footprint_c(w, h, centre_x, centre_y)
 
 
 
-
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -1936,6 +5138,7 @@ cpdef inline fisheye_footprint(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void fisheye_footprint_param(
         tmp_array_,
         float centre_x,
@@ -1943,22 +5146,45 @@ cpdef inline void fisheye_footprint_param(
         float param1_,
         float focal_length,
         ):
-    """
-    CREATE A FISHEYE MODEL TO HOLD THE PIXEL COORDINATES OF A PYGAME SURFACE/ GAME DISPLAY
 
-    This version contains two additional variables param1_ & focal_length to control
-    the fisheye model aspect.
-
-    :param tmp_array_: numpy.ndarray shape (w, h, 2) of unsigned int
-      e.g: tmp = numpy.ndarray((400, 400, 2), dtype=numpy.uint32, order='C').
-      The tmp_array_ array shape will determine the fisheye model.
-      (Declare the tmp outside the main loop)
-    :param centre_x  : float; fisheye x centre coordinate
-    :param centre_y  : float; fisheye y centre coordinate
-    :param param1_   : float; Control the fisheye aspect. param1_ > 1.0 converge lens effect,
-    :param focal_length : float; Control the fisheye type zoom_ > 1 diverging lens
-      zoom_ < 0 converging lens
     """
+    Create a fisheye model to hold the pixel coordinates.
+
+    This version contains two additional variables param1_ & focal_length 
+    to control the fisheye model aspect.
+    
+    e.g
+    check Demo/demo_magnifier.py for a real time example 
+    
+    tmp = numpy.ndarray((400, 400, 2), dtype=numpy.uint32, order='C')
+    fisheye_footprint_param(tmp, 200, 200, 1., .6)
+    
+    :param tmp_array_: 
+        numpy.ndarray shape (w, h, 2) of unsigned int.
+        tmp_array_ array shape will determine the fisheye model.
+        (Declare tmp_array_ outside the main loop).
+        
+    :param centre_x: 
+        float; fisheye x centre coordinate.
+        correspond to half the length of the fisheye model.
+        
+    :param centre_y: 
+        float; fisheye y centre coordinate.
+        Correspond to half the width of the fisheye model.
+        
+    :param param1_: 
+        float; Control the fisheye aspect. param1_ > 1.0 converge to the centre, 
+        param1_ < 1.0 diverge from the centre
+        
+    :param focal_length: 
+        float; Control the fisheye type focal_length > 1 diverging lens
+        focal_length < 0 converging lens
+        
+    :return: 
+        void
+         
+    """
+
     assert isinstance(tmp_array_, numpy.ndarray), \
         "\nArgument tmp_array_ must be a numpy.ndarray type, got %s " % type(tmp_array_)
 
@@ -1966,6 +5192,8 @@ cpdef inline void fisheye_footprint_param(
         tmp_array_, centre_x, centre_y, param1_, focal_length)
 
 
+
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -1973,6 +5201,7 @@ cpdef inline void fisheye_footprint_param(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void fisheye_footprint_param_c(
         unsigned int [:, :, :] tmp_array_,
         float centre_x,
@@ -1980,42 +5209,97 @@ cdef inline void fisheye_footprint_param_c(
         float param1,
         float focal_length,
 ):
+    """
+    
+    Create a fisheye model to hold the pixel coordinates.
 
+    This version contains two additional variables param1_ & focal_length 
+    to control the fisheye model aspect.
+    
+    e.g
+    check Demo/demo_magnifier.py for a real time example 
+    
+    tmp = numpy.ndarray((400, 400, 2), dtype=numpy.uint32, order='C')
+    fisheye_footprint_param_c(tmp, 200, 200, 1., .6)
+    
+    
+    :param tmp_array_: 
+        numpy.ndarray shape (w, h, 2) of unsigned int.
+        tmp_array_ array shape will determine the fisheye model.
+        (Declare tmp_array_ outside the main loop).
+        
+    :param centre_x: 
+        float; fisheye x centre coordinate.
+        correspond to half the length of the fisheye model.
+        
+    :param centre_y: 
+        float; fisheye y centre coordinate.
+        Correspond to half the width of the fisheye model.
+        
+    :param param1: 
+        float; Control the fisheye aspect. param1_ > 1.0 converge to the centre, 
+        param1_ < 1.0 diverge from the centre
+        
+    :param focal_length: 
+        float; Control the fisheye type focal_length > 1 diverging lens
+        focal_length < 0 converging lens
+        
+    :return: 
+        void
+
+    """
+
+    # Declare variables with appropriate types for width (w), height (h), and other necessary values
     cdef:
+        # Extract the width (w) and height (h) from the shape of tmp_array_
         Py_ssize_t w = <object>tmp_array_.shape[0]
         Py_ssize_t h = <object>tmp_array_.shape[1]
+        
+        # Declare other variables used for calculations, such as coordinates (x, y),
+        # transformed coordinates (nx, ny), radius (r), angle (theta), and others
         int y, x
         float ny, ny2, nx, nx2, r, theta, nr
-        float c1 = <float>2.0/w
-        float c2 = <float>2.0/h
-        float w2 = centre_x
-        float h2 = centre_y
+        
+        # Constants for normalization and the center of the image
+        float c1 = <float>2.0 / w  # Normalization constant for x-coordinates
+        float c2 = <float>2.0 / h  # Normalization constant for y-coordinates
+        float w2 = centre_x  # x-coordinate of the center of the image
+        float h2 = centre_y  # y-coordinate of the center of the image
 
+    # Use 'nogil' to allow for multithreading and parallelization (avoiding the Global Interpreter Lock)
     with nogil:
-
+        
+        # Loop over the x-coordinates (prange allows parallel execution across threads)
         for x in prange(w, schedule=SCHEDULE, num_threads=THREADS):
+            # Normalize the x-coordinate and square it
             nx = x * c1 - <float>1.0
             nx2 = nx * nx
-
+            
+            # Loop over the y-coordinates
             for y in range(h):
+                # Normalize the y-coordinate and square it
                 ny = y * c2 - <float>1.0
                 ny2 = ny * ny
-
+                
+                # Calculate the radial distance from the center
                 r = <float>sqrt(nx2 + ny2)
-
+                
+                # If the distance is greater than 1 (outside of a unit circle), set the pixel value to black (0, 0)
                 if r > 1:
-                    tmp_array_[x, y, 0] = <unsigned int>0
-                    tmp_array_[x, y, 1] = <unsigned int>0
-                    continue
-
-                nr = (r + <float>param1 - <float>sqrt(
-                    <float>1.0 - (nx2 + ny2))) * <float>focal_length
-
+                    tmp_array_[x, y, 0] = <unsigned int>0  # Red channel (0)
+                    tmp_array_[x, y, 1] = <unsigned int>0  # Green channel (0)
+                    continue  # Skip the remaining calculations and move to the next pixel
+                
+                # Calculate the new radius using the given parameters
+                nr = (r + <float>param1 - <float>sqrt(<float>1.0 - (nx2 + ny2))) * <float>focal_length
+                
+                # Calculate the angle (theta) from the center using the arctangent function
                 theta = <float>atan2(ny, nx)
-                tmp_array_[x, y, 0] = <unsigned int> (nr * <float>cos(theta) * w2 + w2)
-                tmp_array_[x, y, 1] = <unsigned int> (nr * <float>sin(theta) * h2 + h2)
-
-
+                
+                # Calculate the transformed coordinates using polar to cartesian conversion
+                # Store the results in the tmp_array_ at the x, y location
+                tmp_array_[x, y, 0] = <unsigned int> (nr * <float>cos(theta) * w2 + w2)  # New x-coordinate
+                tmp_array_[x, y, 1] = <unsigned int> (nr * <float>sin(theta) * h2 + h2)  # New y-coordinate
 
 
 
@@ -2028,49 +5312,85 @@ cdef inline void fisheye_footprint_param_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void fisheye(
-        object surface_, unsigned int [:, :, ::1] fisheye_model):
+        object surface_,
+        unsigned int [:, :, ::1] fisheye_model
+):
     """
-    THIS SHADER CAN BE USE TO DISPLAY THE GAME THROUGH A LENS EFFECT (INPLACE)
+    Display surface or gameplay throughout a lens effect (inplace)
 
-    Display a fisheye effect in real time given a surface referencing the
-    pixels RGB. In order to accomplish a real time calculation, 
-    this algorithm is using a pre-calculated transformation stored
-    in the array fisheye_model.
+    Compatible with 24-bit only 
     
-    The function fisheye_footprint_c has to be called prior
-    fisheye_inplace_c in order to store the transformation values.
-
-    This shader can be applied directly to the pygame display
-
-    :param fisheye_model    : numpy.ndarray shape (width, height, 2) int32, fisheye model
-    containing the pixels
-    coordinates after the fisheye transformation
-    :return                 : void
+    A fisheye lens is an ultra wide-angle lens that produces strong visual
+    distortion intended to create a wide panoramic or hemispherical image
     
-    :param surface_      : pygame.Surface; compatible 24 - 32 bit 
-    :param fisheye_model : numpy.ndarray or cython memoryview shape (width, height, 2) int32, 
-                           fisheye model containing the pixels
-    :return: void 
+    Display a fisheye lens effect in real time.
+    In order to accomplish a real time calculation, this algorithm is using 
+    a pre-calculated lens model transformation stored in a numpy.ndarray, 
+    argument fisheye_model (numpy.ndarray shape (w, h, 2) of type uint).
+    The numpy array contains the pixel's coordinates of a surface after 
+    a lens transformation. All calculation are performed upstream. 
+    
+    Use the function fisheye_footprint_c to create the pre-calculated array.
+    This method needs to be called once only. 
+    
+    The fisheye lens transformation is applied inplace.
+    
+    e.g 
+     width, height = surface.get_size()
+     f_model = fisheye_footprint(w=width, h=height, centre_x=width >> 1, centre_y=height >> 1)
+     fisheye(surface, f_model)
+
+    
+    Parameters
+    ----------
+    
+    surface_ : 
+        pygame.Surface; compatible 24 bit 
+    
+    fisheye_model : 
+        numpy.ndarray shape (w, h, 2) int32, fisheye model containing uint values 
+        x' & y'. x' & y' are the surface pixels coordinates after transformation. Values calculated
+        upstream with the function fisheye_footprint_c 
+        
+    Returns
+    -------
+    void
+    
     """
 
+    # Ensure that 'surface_' is an instance of pygame.Surface
+    # This verifies that the input surface is a valid pygame surface object.
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
+    # Ensure that 'fisheye_model' is either a numpy.ndarray or a cython.memoryview type.
+    # This checks the type of the fisheye model to ensure it is a valid memoryview or numpy array.
     assert PyObject_IsInstance(fisheye_model, (cython.view.memoryview, numpy.ndarray)), \
-        "\nArgument fisheye_model must be a numpy.ndarray or a cython.view.memoryview  type, " \
+        "\nArgument fisheye_model must be a numpy.ndarray or a cython.view.memoryview type, " \
         "got %s " % type(fisheye_model)
 
+    # Declare a memoryview of unsigned char to hold the pixel data of the surface.
+    # This will allow access to the pixel data in an efficient way.
     cdef unsigned char [:,:,:] rgb_array
+
+    # Attempt to reference the surface pixels into a 3D array (RGB data).
+    # If the surface cannot be viewed as a 3D array, an error will be raised.
     try:
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # If an error occurs while referencing the pixels, raise a ValueError with details.
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
+    # Apply the fisheye effect to the surface in-place.
+    # The 'fisheye_inplace_c' function modifies the pixel data in 'rgb_array' based on the fisheye model.
     fisheye_inplace_c(rgb_array, fisheye_model)
 
 
+
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -2078,100 +5398,57 @@ cpdef inline void fisheye(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void tv_scan(surface_, int space=5):
     """
-    
-    SHADER CREATING A TV SCANLINE EFFECT ON PYGAME SURFACE (INPLACE)
+    TV scanline effect on pygame surface (inplace)
 
     The space between each scanline can by adjusted with the space value.
-    The scanline intensity/colors is lower that the original image
 
-    :param surface_     : pygame.Surface compatible 24-32 bit 
-    :param space        : integer; space between the lines
-    :return             : void
-    
+    e.g:
+    tv_scan(image, space=10)
+
+    Parameters
+    ----------
+
+    surface_ :
+        pygame.Surface compatible 24, 32-bit format.
+
+    space :
+        integer; space between each lines.
+        Choose a constant or use a variable for a dynamic effect
+
+    Returns
+    -------
+    void
+
     """
 
+    # Ensure that 'surface_' is an instance of pygame.Surface
+    # This checks that the 'surface_' input is of the correct type (pygame.Surface).
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    assert space > 0, "Argument space cannot be <=0"
+    # Ensure that 'space' is greater than 0
+    # This ensures that the value for 'space' is a positive number, as it is expected to control the space of the effect.
+    assert space > 0, "Argument space must be >0"
+
+    # Declare a memoryview of unsigned char to hold the pixel data of the surface
+    # This memoryview will allow efficient access to the surface's pixel data in a 3D array format.
     cdef unsigned char [:, :, :] rgb_array
+
+    # Attempt to reference the surface's pixel data into a 3D array (RGB data).
+    # If this fails, an exception is raised and caught.
     try:
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # If an error occurs while referencing the pixels, raise a ValueError with the exception message.
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    tv_scanline_inplace_c(rgb_array, space)
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline void rgb_split(object surface_, int offset_=10):
-    """
-    
-    THIS SHADER CREATE AN RGB SPLIT EFFECT (SUPERPOSED CHANNEL R, G, B WITH GIVEN OFFSET)
-    
-    The original surface will be used and used for the subsurface blit operation.
-    Each channels will be blit sequentially in the following order RGB
-    Note that channel green and blue will be blit with an additional flag BLEND_RGB_ADD, to mix
-    the channel with the lower layers.
-
-    * FPS BOOST
-    In order to boost the fps frame rate the original surface to process can be downscale x2
-    and rescale after processing.
-
-
-    :param surface_ : pygame Surface to process (24bit format)
-    :param offset_  : integer; offset for (x, y) to add to each channels RGB
-    :return         : void
-    
-    """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-
-    rgb_split_inplace_c(surface_, offset_)
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef object rgb_split_clean(object surface_, int offset_=10):
-    """
-
-    THIS SHADER CREATE AN RGB SPLIT EFFECT (SUPERPOSED CHANNEL R, G, B WITH GIVEN OFFSET)
-    
-    The final image has a different width and height since the offset value is removed 
-    to keep only the overlapping R, G, B channels 
-    Setting the Offset_ to zero will have no effect to the original image.
-    
-
-    :param surface_ : pygame Surface to process (24bit format)
-    :param offset_  : integer; offset for (x, y) to add to each channels RGB
-    :return         : pygame Surface
-
-    """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-
-    assert isinstance(offset_, int), \
-        "\nArgument offset_ must be an int type, got %s" % type(offset_)
-
-    if offset_==0:
-        return surface_
-
-    return rgb_split_c(surface_, offset_)
+    # Apply the TV scanline effect in-place on the surface's pixel data
+    # The 'tv_scanline_c' function modifies the pixel data to create the TV scanline effect using the 'space' parameter.
+    tv_scanline_c(rgb_array, space)
 
 
 
@@ -2182,111 +5459,207 @@ cpdef object rgb_split_clean(object surface_, int offset_=10):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline tuple ripple(
         int rows_,
         int cols_,
-        float [:, ::1] previous_,
+        const float [:, ::1] previous_,
         float [:, ::1] current_,
         unsigned char [:, :, :] array_,
         float dispersion_ = 0.008
 ):
     """
     
-    THIS SHADER CREATE A WATER EFFECT ON A PYGAME SURFACE
-    This version does not include any background deformation to keep a reasonable FPS rate
+    Ripple effect without background deformation
 
-    Check demo_ripple.py for a demonstration (Demo folder)
+    Check demo_ripple.py, demo_ripple1.py in the Demo folder 
+    e.g:
+    previous, current = ripple(width, height, previous, current, back_array,  dispersion_=0.008)
+       
+    rows_       : 
+        integer; Screen width or surface width
+        
+    cols_       : 
+        integer; Screen height or surface height
+        
+    previous_   : 
+        numpy.ndarray type (w, h) type float; array use for the transformation. 
+        Array holding the previous_ data
+          
+    current_    : 
+        numpy.ndarray type (w, h) type float; array use for the transformation. 
+        Array holding the current_ data
+         
+    rgb_array   : 
+        numpy.ndarray type (w, h, 3) type unsigned char. Array containing the background image RGB pixels.
+        The content of this array is invariant (static background image).
+         
+    dispersion_ :  
+        float; ripple dampening factor, higher values decrease the ripple effect 
+        radius default 0.008
 
-    :param rows_        : integer; Array width
-    :param cols_        : integer; Array height
-    :param previous_    : numpy.ndarray type (w, h) type float; array use for the transformation
-    :param current_     : numpy.ndarray type (w, h) type float; array use for the transformation
-    :param array_       : numpy.ndarray type (w, h, 3) type unsigned char
-    :param dispersion_  : float; ripple dampening factor, higher values decrease the ripple effect radius
-    :return             : tuple
+    Returns
+    -------
+    Return a tuple containing 2 arrays (current_, previous_)
+    see Parameters for each array sizes
+        
     
     """
+
+   # Ensure 'previous_' is a valid numpy.ndarray or cython memoryview
+    # This ensures that 'previous_' is either a numpy ndarray or a cython memoryview. 
+    # If it's not, an error message is shown indicating the incorrect type.
     assert PyObject_IsInstance(previous_, (numpy.ndarray, cython.view.memoryview)), \
-        "\nArgument previous must be a numpy.ndarray type got %s " % type(previous_)
+        "\nArgument previous_ must be a numpy.ndarray type got %s " % type(previous_)
 
+    # Ensure 'current_' is a valid numpy.ndarray or cython memoryview
+    # This ensures that 'current_' is also either a numpy ndarray or a cython memoryview.
     assert PyObject_IsInstance(current_, (numpy.ndarray, cython.view.memoryview)), \
-        "\nArgument current must be a numpy.ndarray type got %s " % type(current_)
+        "\nArgument current_ must be a numpy.ndarray type got %s " % type(current_)
 
+    # Ensure 'array_' is a valid numpy.ndarray or cython memoryview
+    # Similarly, this ensures that 'array_' (rgb_array) is either a numpy ndarray or a cython memoryview.
     assert PyObject_IsInstance(array_, (numpy.ndarray, cython.view.memoryview)), \
-        "\nArgument array must be a numpy.ndarray type got %s " % type(array_)
+        "\nArgument rgb_array must be a numpy.ndarray type got %s " % type(array_)
 
+    # Get dimensions (width and height) of 'previous_' array
+    # Extract the width and height of the 'previous_' image array.
     cdef Py_ssize_t prev_w, prev_h
     prev_w, prev_h = previous_.shape[:2]
 
+    # Get dimensions (width and height) of 'current_' array
+    # Extract the width and height of the 'current_' image array.
     cdef Py_ssize_t curr_w, curr_h
     curr_w, curr_h = current_.shape[:2]
 
+    # Get dimensions (width and height) of 'array_' array
+    # Extract the width and height of the 'array_' image array.
     cdef Py_ssize_t arr_w, arr_h
     arr_w, arr_h = array_.shape[:2]
 
+    # Ensure that all input arrays (previous_, current_, array_) have the same dimensions (width and height)
+    # The widths and heights of 'previous_', 'current_', and 'array_' must match.
+    # If they don't, an assertion error is raised with information about the mismatched dimensions.
     assert prev_w == curr_w and prev_w == arr_w \
-           and prev_h == curr_h and prev_h == arr_h, \
-        "\n Array sizes mismatch (previous w: %s, h: %s; " \
-        "current w: %s, h: %s; array_ w: %s, h: %s " % (prev_w, prev_h, curr_w, curr_h,
+        and prev_h == curr_h and prev_h == arr_h, \
+        "\n Array sizes mismatch (previous_ w: %s, h: %s; " \
+        "current_ w: %s, h: %s; bgr_array w: %s, h: %s " % (prev_w, prev_h, curr_w, curr_h,
         arr_w, arr_h)
 
+    # Call the 'ripple_c' function to apply the ripple effect on the images.
+    # This function takes the image dimensions (rows_, cols_), the previous, current, 
+    # and array image data, and a dispersion factor to generate a ripple effect.
     return ripple_c(rows_, cols_, previous_, current_, array_, dispersion_)
 
 
-@cython.binding(True)
-@cython.boundscheck(True)
-@cython.wraparound(True)
-@cython.nonecheck(True)
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
 @cython.cdivision(True)
-@cython.profile(True)
-@cython.initializedcheck(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline tuple ripple_seabed(
     int cols_, int rows_,
-    float [:, ::1] previous_,                       # type numpy.float32 (w, h)
+    const float [:, ::1] previous_,                 # type numpy.float32 (w, h)
     float [:, ::1] current_,                        # type numpy.float32 (w, h)
-    unsigned char [:, :, ::1] texture_array_,       # type numpy.ndarray (w, h, 3)
-    unsigned char [:, :, :] background_array_,    # type numpy.ndarray (w, h, 3)
+    const unsigned char [:, :, ::1] texture_array_, # type numpy.ndarray (w, h, 3)
+    unsigned char [:, :, :] background_array_,      # type numpy.ndarray (w, h, 3)
     float dispersion_ = 0.008
 ):
     """
+    Ripple effect with background deformation
 
-    WATER SURFACE RIPPLE EFFECT AND SEABED DISTORTION
-
-
-    :param rows_          : integer; Array width
-    :param cols_          : integer; Array height
-    :param previous_      : numpy.ndarray type (w, h) type float; array use for the transformation
-    :param current_       : numpy.ndarray type (w, h) type float; array use for the transformation
-    :param texture_array_ : numpy.ndarray type (w, h, 3) type unsigned char
-    :param background_array_: numpy.ndarray type (w, h, 3) type unsigned char
-    :param dispersion_    : float; ripple dampening factor.
-    :return             : tuple
+    Check demo_ripple_seabed.py in the Demo folder 
+    
+    e.g:
+    previous, current, back_array = ripple_seabed(height, width, previous,\
+      current, texture_array, back_array, dispersion_=0.009)
+    
+    
+    Parameters
+    ----------
+    
+    cols_ : 
+        integer; Screen width or surface width
+        
+    rows_ : 
+        integer; Screen height or surface height
+        
+    previous_ : 
+        numpy.ndarray type (w, h) type float; array use for the transformation. 
+        Array holding the previous_ data
+         
+    current_ : 
+        numpy.ndarray type (w, h) type float; array use for the transformation.
+        Array holding the current_ data 
+        
+    texture_array_ : 
+        numpy.ndarray type (w, h, 3) type unsigned char. 
+        Array containing the background image RGB pixels.
+        The content of this array is invariant (static background image). 
+        
+    background_array_ :
+        numpy.ndarray type (w, h, 3) of type unsigned char containing the background image RGB pixels.
+        The background array is equivalent to the texture array with current_ ripple effect transformation.
+         
+    dispersion_ :
+        float; ripple dampening factor, higher values decrease the ripple effect 
+        radius default 0.008
+ 
+    Returns
+    -------
+    Return a tuple containing 3 arrays (current_, previous_, bck_array)
+    see Parameters for each array sizes
 
     """
+
+
+    # Ensure 'previous_' is a valid numpy.ndarray or cython memoryview
+    # This check ensures that 'previous_' is either a numpy ndarray or a cython memoryview. 
+    # If it is not, an error is raised with an appropriate message indicating the incorrect type.
     assert PyObject_IsInstance(previous_, (numpy.ndarray, cython.view.memoryview)), \
-        "\nArgument previous must be a numpy.ndarray type got %s " % type(previous_)
+        "\nArgument previous_ must be a numpy.ndarray type got %s " % type(previous_)
 
+    # Ensure 'current_' is a valid numpy.ndarray or cython memoryview
+    # Similarly, 'current_' is checked to ensure it is either a numpy ndarray or a cython memoryview.
     assert PyObject_IsInstance(current_, (numpy.ndarray, cython.view.memoryview)), \
-        "\nArgument current must be a numpy.ndarray type got %s " % type(current_)
+        "\nArgument current_ must be a numpy.ndarray type got %s " % type(current_)
 
+    # Ensure 'texture_array_' is a valid numpy.ndarray or cython memoryview
+    # The 'texture_array_' argument is also validated to be either a numpy ndarray or a cython memoryview.
     assert PyObject_IsInstance(texture_array_, (numpy.ndarray, cython.view.memoryview)), \
         "\nArgument array must be a numpy.ndarray type got %s " % type(texture_array_)
 
+    # Get the width and height of the 'previous_' array
+    # The dimensions (width and height) of the 'previous_' array are extracted for later comparison.
     cdef Py_ssize_t prev_w, prev_h
     prev_w, prev_h = previous_.shape[:2]
 
+    # Get the width and height of the 'current_' array
+    # The dimensions (width and height) of the 'current_' array are extracted as well.
     cdef Py_ssize_t curr_w, curr_h
     curr_w, curr_h = current_.shape[:2]
 
+    # Get the width and height of the 'texture_array_' array
+    # The dimensions (width and height) of the 'texture_array_' array are also extracted.
     cdef Py_ssize_t arr_w, arr_h
     arr_w, arr_h = texture_array_.shape[:2]
 
+    # Ensure that all input arrays (previous_, current_, texture_array_) have the same dimensions (width and height)
+    # This 'assert' statement checks if all three arrays have matching width and height. 
+    # If the dimensions don't match, an error message is raised showing the mismatched sizes.
     assert prev_w == curr_w and prev_w == arr_w \
-           and prev_h == curr_h and prev_h == arr_h, \
-        "\n Array sizes mismatch (previous w: %s, h: %s; " \
-        "current w: %s, h: %s; texture_array_ w: %s, h: %s " % (prev_w, prev_h, curr_w, curr_h,
+        and prev_h == curr_h and prev_h == arr_h, \
+        "\n Array sizes mismatch (previous_ w: %s, h: %s; " \
+        "current_ w: %s, h: %s; texture_array_ w: %s, h: %s " % (prev_w, prev_h, curr_w, curr_h,
         arr_w, arr_h)
 
+    # Call the 'ripple_seabed_c' function to apply the ripple effect using all the input arrays.
+    # This function applies the ripple effect on the previous, current, and texture arrays, and it also 
+    # uses a background array and a dispersion factor for the effect. It returns the modified result.
     return ripple_seabed_c(
         rows_, cols_,
         previous_,
@@ -2304,18 +5677,55 @@ cpdef inline tuple ripple_seabed(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void heatmap(object surface_, bint rgb_=True):
     """
-    TRANSFORM AN IMAGE INTO A HEATMAP EQUIVALENT (INPLACE)
+    Transform an image into a heatmap equivalent (in-place).
+    
+    This function modifies the given image surface to apply a heatmap effect. 
+    The transformation is applied directly to the surface, so no new object 
+    is returned. It also allows the user to choose whether the heatmap 
+    should be in RGB or BGR color model.
 
-    :param surface_ : pygame.Surface
-    :param rgb_     : boolean; True transformed the image into a RGB heatmap model of False (BGR)
-    :return         : void
+    Example:
+        # Load an image, convert to an alpha surface, and apply heatmap
+        image = pygame.image.load("../Assets/px.png").convert_alpha()
+        heatmap(image, True)
+    
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A pygame.Surface object, typically in 24-bit or 32-bit image format 
+        (compatible with pygame). The image to which the heatmap effect will 
+        be applied.
+    
+    rgb_ : bool, optional
+        If True, the image will be transformed into an RGB-based heatmap. 
+        If False, the transformation will use the BGR-based heatmap model. 
+        Default is True (RGB).
+
+    Returns
+    -------
+    None
+        This function operates in-place, meaning the input surface is modified 
+        directly without returning a new object.
+    
+    Raises
+    ------
+    TypeError
+        If 'surface_' is not a valid pygame.Surface object.
     """
+    
+    # Ensure 'surface_' is a valid pygame.Surface object
+    # This assertion checks if the provided surface is an instance of 
+    # pygame.Surface. If not, it raises an error with the type information.
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
-    heatmap_convert(surface_, rgb_)
+    # Apply the heatmap transformation on the surface_
+    # The actual transformation is done by the heatmap_c function, 
+    # which processes the surface in-place based on the rgb_ parameter.
+    heatmap_c(surface_, rgb_)
 
 
 
@@ -2327,43 +5737,91 @@ cpdef inline void heatmap(object surface_, bint rgb_=True):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline predator_vision(
         object surface_,
-        unsigned int sobel_threshold=12,
-        unsigned int bpf_threshold=50,
-        unsigned int bloom_threshold=50,
-        bint inv_colormap=False,
-        bint fast=False,
-        int blend=pygame.BLEND_RGB_ADD
+        unsigned int sobel_threshold = 12,
+        unsigned int bpf_threshold   = 50,
+        unsigned int bloom_threshold = 50,
+        bint inv_colormap            = False,
+        bint fast                    = False,
+        int blend                    = pygame.BLEND_RGB_ADD
 ):
     """
-    CONVERT A SURFACE OR DISPLAY TO AN EQUIVALENT PREDATOR MODE 
+    Predator Vision Mode
+    
+    This function simulates the predator's vision using a series of image processing 
+    filters. It applies Sobel edge detection, bright pass filter (BPF), bloom effects, 
+    and a colormap inversion to the given surface. Optionally, it allows for a faster 
+    processing mode and blending effects.
 
-    :param surface_        : pygame.Surface; compatible 24 - 32 bit 
-    :param sobel_threshold : integer; value for sobel edge detection, default is 12 
-    :param bpf_threshold   : integer; value for the bright pass filter pixel detection, 
-                             default is 50
-    :param bloom_threshold : integer; Value for the bloom effect intensity default is 50
-    :param inv_colormap    : boolean True | False inverse the colormap aspect, default is False
-    :param fast            : boolean True | False for a fast process, default is False
-    :param blend           : boolean True | False; final blending mode (New in version 1.0.4)  
-    :return                : Return a pygame surface  
+    Example:
+        surface_ = predator_vision(
+            image.copy(), sobel_threshold=80, bpf_threshold=0,
+            bloom_threshold=0, inv_colormap=True, fast=True)
+    
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A pygame.Surface object, compatible with 24-bit or 32-bit formats. 
+        This is the image to which the predator vision effect will be applied.
+    
+    sobel_threshold : int, optional
+        The threshold for Sobel edge detection, used to detect edges in the image.
+        The default value is 12.
+    
+    bpf_threshold : int, optional
+        The threshold for the Bright Pass Filter (BPF), used to detect and highlight 
+        bright pixels. The default value is 50.
+    
+    bloom_threshold : int, optional
+        The intensity of the bloom effect, which adds a glow around bright pixels. 
+        The default value is 50.
+    
+    inv_colormap : bool, optional
+        If True, the colormap will be inverted, changing the color scheme to resemble 
+        a predator's vision more closely. The default value is False.
+    
+    fast : bool, optional
+        If True, a faster processing mode is used. This will reduce the quality 
+        in exchange for faster processing time. The default value is False.
+    
+    blend : int, optional
+        The blending mode to apply after all effects have been processed. This can 
+        be a value from `pygame.BLEND_*` modes. The default is `pygame.BLEND_RGB_ADD`.
+
+    Returns
+    -------
+    pygame.Surface
+        A new pygame.Surface object with the predator vision effect applied. The 
+        surface is in 24-bit format.
+    
     """
 
-
+    # Create a copy of the input surface to preserve the original
     cp = surface_.copy()
 
+    # Apply Sobel edge detection filter: either fast or normal based on the 'fast' flag
     if fast:
-        sobel_fast(cp, sobel_threshold, factor_=1)
+        sobel_fast(cp, sobel_threshold, factor_=1)  # Use fast Sobel edge detection
     else:
-        sobel(cp, sobel_threshold)
+        sobel(cp, sobel_threshold)  # Use normal Sobel edge detection
 
+    # Apply Bright Pass Filter (BPF) to highlight bright areas
     bpf(surface_, bpf_threshold)
+
+    # Apply a bloom effect to simulate glowing bright pixels
     shader_bloom_fast1(surface_, bloom_threshold)
-    heatmap_convert(surface_, inv_colormap)
+
+    # Apply the heatmap effect with optional colormap inversion
+    heatmap_c(surface_, inv_colormap)
+
+    # Blend the processed surface ('cp') onto the original surface ('surface_')
     surface_.blit(cp, (0, 0), special_flags=blend)
 
-    return surface_.convert()
+    # Return the surface in 24-bit format after all effects are applied
+    return surface_.convert(24)
+
 
 
 
@@ -2374,82 +5832,86 @@ cpdef inline predator_vision(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void blood(object surface_, float [:, :] mask_, float perc_):
+@cython.exceptval(check=False)
+cpdef inline void blood(
+        object surface_,
+        const float [:, :] mask_,
+        float percentage_
+):
     """
-    SHADER 2D GAME "HURT EFFECT" (INPLACE)
-    
-    This effect is used in 2D game when the player is being hurt
-    THE MASK DETERMINE THE CONTOUR USED FOR THE BLOOD EFFECT.
-    
-    e.g
-    # Outside the main loop 
-    blood_surface = pygame.image.load("../Assets/redvignette.png").convert_alpha()
-    blood_surface = pygame.transform.smoothscale(blood_surface, (WIDTH, HEIGHT))
-    BLOOD_MASK = numpy.asarray(
-    pygame.surfarray.pixels_alpha(blood_surface) / 255.0, numpy.float32)
-    
-    # In the main loop (percentage must change overtime)
-    blood(BCK, BLOOD_MASK, percentage)
+    Blood effect (inplace)
 
-    :param surface_ : pygame.Surface; compatible surface 24 - 32 bit
-    :param mask_    : numpy.ndarray shape (w, h) of float values in range [0.0...1.0]
-    :param perc_    : Percentage value in range [0.0 ... 1.0] with 1.0 being 100%
-    :return         : void
-    
+    This function applies a blood effect to a given surface using a mask array 
+    that defines the contour of the blood effect. The surface and mask must have 
+    the same dimensions. The percentage parameter determines the intensity of the 
+    blood effect, with 1.0 representing full intensity.
+
+    Example:
+        background = pygame.image.load("../Assets/Aliens.jpg").convert()
+        background = pygame.transform.smoothscale(background, (800, 600))
+        background.convert(32, RLEACCEL)
+        image = background.copy()
+        
+        blood_surface = pygame.image.load("../Assets/redvignette.png").convert_alpha()
+        blood_surface = pygame.transform.smoothscale(blood_surface, (800, 600))
+        BLOOD_MASK = numpy.asarray(pygame.surfarray.pixels_alpha(blood_surface) / 255.0, numpy.float32)
+        
+        # Then call the method in your main loop (percentage must vary over time)
+        blood(image, BLOOD_MASK, percentage)
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        The surface (e.g., game display) to which the blood effect will be applied.
+        It must be in a compatible 24-bit or 32-bit format.
+
+    mask_ : numpy.ndarray or cython.view.memoryview
+        A normalized array or memoryview (of shape (w, h) with type float) 
+        representing the blood mask. The values must be in the range [0.0, 1.0], 
+        where 1.0 represents full intensity of the effect.
+
+    percentage_ : float
+        A value in the range [0.0, 1.0] that determines the intensity of the blood effect. 
+        A value of 1.0 applies the full effect, while 0.0 applies no effect.
+
+    Returns
+    -------
+    void
+        The function modifies the given surface in place (i.e., it has no return value).
     """
+    
+    # Assert that the surface is a valid pygame.Surface
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
+    # Assert that the mask is either a numpy.ndarray or cython memoryview
     assert PyObject_IsInstance(mask_, (numpy.ndarray, cython.view.memoryview)), \
-        "\nArgument mask_ must be a numpy.ndarray or cython memoryview types got %s " % type(mask_)
+        "\nArgument mask must be a numpy.ndarray or cython memoryview type, got %s " % type(mask_)
 
+    # Get the size (width, height) of the surface
     cdef Py_ssize_t w, h
     w, h = surface_.get_size()
 
+    # Get the dimensions of the mask
     cdef Py_ssize_t mask_w, mask_h
     mask_w, mask_h = mask_.shape[:2]
 
+    # Ensure the dimensions of the surface and mask match
     assert w == mask_w and h == mask_h, "\nSurface size and mask size mismatch"
+
+    # Try to obtain a reference to the surface's RGB array
     cdef unsigned char [:, :, :] rgb_array
     try:
-        rgb_array = surface_.get_view('3')
-
+        rgb_array = surface_.get_view('3')  # '3' denotes a 3D array view for RGB
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    blood_inplace_c(rgb_array, mask_, perc_)
+    # Call the C function that applies the blood effect in place
+    blood_inplace_c(w, h, rgb_array, mask_, percentage_)
 
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline object make_palette(int width, float fh, float fs, float fl):
-    """
-    
-    CREATE A PALETTE OF MAPPED RGB COLORS VALUES
-    
-    
-    h, s, l = color[i] * fh,  min(fs, 255.0), min(color[i] * fl, 255.0)
-    e.g:
-        # below: palette of 256 colors (256 colors).
-        # hue * 6, saturation = 255.0, lightness * 2.0
-        palette, surf = make_palette(256, 6, 255, 2)
-        palette, surf = make_palette(256, 4, 255, 2)
 
-    :param width  : integer, Palette width
-    :param fh     : float, hue factor
-    :param fs     : float, saturation value must be in range (0 ... 255)
-    :param fl     : float, lightness factor
-    :return       : Return a 1D array palette of mapped RGB values
-
-    """
-
-    return numpy.asarray(make_palette_c(width, fh, fs, fl))
-
+# ---------------- MIRRORING
 
 
 @cython.binding(False)
@@ -2459,62 +5921,50 @@ cpdef inline object make_palette(int width, float fh, float fs, float fl):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef object palette_to_surface(unsigned int [::1] palette_c):
+@cython.exceptval(check=False)
+cpdef inline np.ndarray[np.uint8_t, ndim=3] mirroring_array(const unsigned char [:, :, :] rgb_array):
+
     """
-    THIS METHOD RETURNS A PYGAME SURFACE RESEMBLING TO THE
-    GIVEN PALETTE (palette_c IS DEFINE WITH make_palette)
+    Mirroring numpy array (return a copy)
 
-    :param palette_c: numpy.ndarray containing the palette colors type unsigned char
+    This method returns a numpy.ndarray with mirrored pixels
+    
+    e.g
+    rgb_array = mirroring_array(pixels3d(image))
+    surface = make_surface(rgb_array)
+     
+    Parameters
+    ----------
+    
+    rgb_array : 
+        numpy.ndarray; Array shape (w, h, 3) of type uint8 containing RGB or any other pixel format 
+        such as BGR etc. 
 
+    Returns
+    -------
+    returns a numpy ndarray shape (w, h, 3) of type uint8 identical to the input array with 
+    mirrored pixels
+    
     """
 
     cdef:
-        int i= 0
-        int s = len(<object>palette_c)
-        rgb rgb_
-        unsigned char [:, :, :] array_ = numpy.empty((s, 1, 3), dtype=numpy.uint8)
+        Py_ssize_t w, h
+        Py_ssize_t byte_size
 
-    with nogil:
+    w, h, byte_size = rgb_array.shape[:3]
 
-        for i in prange(s, schedule = SCHEDULE, num_threads = THREADS):
-            rgb_ = int_to_rgb_c(palette_c[i])
-            array_[i,0,0] = <unsigned char>rgb_.r
-            array_[i,0,1] = <unsigned char>rgb_.g
-            array_[i,0,2] = <unsigned char>rgb_.b
+    if byte_size not in (3, 4):
+        raise ValueError(
+            '\nArgument array must be shape (w, h, 3 | 4) got (%s, %s, %s)' % (w, h, byte_size))
 
-    return make_surface(numpy.asarray(array_))
+    cdef unsigned char [:, :, :] new_array = empty((w, h, 3), uint8)
 
+    # Transform the memoryviewslice into a numpy.ndarray
+    return numpy.ndarray(
+        shape=(w, h, 3),
+        buffer=mirroring_c(w, h, rgb_array, new_array),
+        dtype=uint8)
 
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline fire_sub(
-        int width,
-        int height,
-        float factor,
-        unsigned int [::1] palette,
-        float [:, ::1] fire
-):
-    """
-
-    CREATE A FIRE EFFECT
-
-    :param width    : integer; max width of the effect
-    :param height   : integer; max height of the effect
-    :param factor   : float; factor to reduce the flame effect
-    :param palette  : ndarray; Color palette 1d numpy array (colors buffer unsigned int values)
-    :param fire     : ndarray; 2d array (x, y) (contiguous) containing float values
-    :return         : Return a numpy array containing the fire effect array shape
-     (w, h, 3) of RGB pixels
-     
-    """
-
-    return fire_surface24_c(width, height, factor, palette, fire)
 
 
 
@@ -2525,547 +5975,61 @@ cpdef inline fire_sub(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline fire_effect(
-        int width_,
-        int height_,
-        float factor_,
-        unsigned int [::1] palette_,
-        float [:, ::1] fire_,
-
-        # OPTIONAL
-        unsigned short int reduce_factor_ = 3,
-        unsigned short int fire_intensity_= 32,
-        bint smooth_                      = True,
-        bint bloom_                       = True,
-        bint fast_bloom_                  = True,
-        unsigned char bpf_threshold_      = 0,
-        unsigned int low_                 = 0,
-        unsigned int high_                = 600,
-        bint brightness_                  = True,
-        float brightness_intensity_       = 0.15,
-        object surface_                   = None,
-        bint adjust_palette_              = False,
-        tuple hsl_                        = (10, 80, 1.8),
-        bint transpose_                   = False,
-        bint border_                      = False,
-        bint blur_                        = True
-        ):
-    """
-    CPU FIRE SHADER EFFECT
-
-    e.g
-    ==================================================================
-    # Create a palette
-    palette = make_palette(256, 0.1, 350, 1.2)
-
-    # To check the palette color
-    surf = palette_to_surface(palette)
-    surf = pygame.transform.smoothscale(surf, (800, 1024))
-
-    # Create the fire array
-    fire_array = numpy.zeros((HEIGHT, WIDTH), dtype=numpy.float32)
-
-    # In the main loop
-    SCREEN.fill((0, 0, 0))
-    surf = fire_effect(
-        width_ = 800,
-        height_ = 1024,
-        factor_ = 3.95,
-        palette_ = palette,
-        fire_ = fire_array,
-        low_ = 30,
-        high_ = WIDTH - 30
-    )
-    SCREEN.blit(surf, (0, 0))
-    ==================================================================
-
-    * FIRE TEXTURE SIZES
-    input width_  : integer (screen width)
-    input height_ : integer (screen height)
-
-
-    * FIRE ASPECT (CONTROL OVER THE WIDTH):
-    inputs low_ : integer (width xmin)
-    input high_ : integer (width xmax)
-
-    * FIRE HEIGHT:
-    
-    input factor_ : float
-    
-    The fire maximum height can be adjust with the variable factor_ (float value)
-    value > 3.95 will squash the effect
-    value < 3.95 will enlarge the effect over the display height  
-    Recommended value is 3.95 with reduce_factor_ = 3 otherwise adjust the value manually
-    to contain the fire effect within the display
-        
-    * SPEED CONSIDERATION
-    
-    input reduce_factor_ : integer
-    
-    The argument reduce_factor_ control the size of the texture to be processed 
-    e.g : a value of 2, divide by 4 the pygame surface define by the values (width_ & height_)
-    Smaller texture improve the overall performances but will slightly degrade the fire aspect, 
-    especially if the blur and smooth option are not enabled.
-    Recommended value for reduce_factor_ is 3 (fast process)   
-    reduce_factor_ values must be an integer in range [ 0 ... 4] 
-    The reduce_factor_ value will have a significant impact on the fire effect maximum height, 
-    adjust the argument factor_ accordingly
-
-    * FIRE INTENSITY AT THE SOURCE
-    
-    input fire_intensity_: integer
-    
-    Set the fire intensity with the variable fire_intensity_, 0 low flame,
-    32 maximum flame effect
-    Values must be an int in range [0 ... 32] 
-
-    * SMOOTHING THE EFFECT
-    
-    input smooth_: True | False
-    
-    When smooth_ is True the algorithm will use the pygame function smoothscale (bi-linear 
-    filtering) or False the final texture will be adjust with the scale function.
-    Set this variable to False if you need the best performance for the effect or if you require
-    a pixelated fire effect. Otherwise set the variable to True for a more realistic effect. 
-
-    
-    * BLOOM EFFECT 
-    
-    input bloom_         : True | False
-    input fast_bloom_    : True | False
-    input bpf_threshold_ : integer
-       
-    Fire effect produce a bright and smooth light effect to the background texture where the fire 
-    intensity is at its maximum.
-    Use the flag fast_bloom_ for a compromise between a realistic effect and the best performances
-    The flag fast_bloom_ define a very fast bloom algo using only the smallest texture 
-    to create a bloom effect (all the intermediate textures will be bypassed). See the bloom effect 
-    project for more details.
-    When fast_bloom is False, all the sub-surfaces will be blit to the final effect and will 
-    produce a more realistic fire effect (this will slightly degrade the overall performances). 
-    If the fire effect is too bright, you can always adjust the bright pass filter value
-    bpf_threshold_(this will adjust the bloom intensity)
-    bpf_threshold_ value must be in range [ 0 ... 255]   
-    Below 128 the bloom effect will be more noticeable and above 128 only the brightest
-    area will be enhanced.
-
-    * LIGHT EFFECT INTENSITY
-
-    input brightness_            : True | False
-    input brightness_intensity_  : float
-
-    When the flag is set to True, the algorithm will use an external function, 
-    <brightness_exclude_inplace_c> to increase the brightness of the effect / texture
-    A custom color can be passed to the function defining the pixels to be ignored during the 
-    process (default is black color).
-    the value must be in range [-1.0 ... 1.0]. Values below zero will decrease the brightness 
-    of the flame effect and positive values will increase the brightness of the effect (causing
-    bright white patches on the fire texture). 
-    Values below -0.4 will cause the fire effect to be translucent and this effect can also be 
-    used for simulating ascending heat convection effects on a background texture.
-    
-    
-    * OPTIONAL SURFACE
-      
-    input surface_ : pygame.Surface
-      
-    This is an optional surface that can be passed to the shader to improve the performances 
-    and to avoid a new surface to be generated every iterations. The surface size must match 
-    exactly the reduce texture dimensions otherwise an exception will be raise. 
-    see reduce_factor_ option to determine the fire texture size that will be processed.
-    
-    * COLOR PALETTE ADJUSTMENT  
-    
-    input adjust_palette_ : True | False
-    input hsl_            : (10, 80, 1.8)
-
-    Set this flag to True to modify the color palette of the fire texture. 
-    This allow the HSL color model to be apply to the palette values
-    You can redefine the palette when the flag is True and by customizing a tuple of 3 float 
-    values, default is (10, 80, 1.8). 
-    The first value control the palette hue value, the second is for the saturation and last, 
-    the palette color lightness. 
-    With the variable hsl_ you can rotate the palette colors and define a new flame
-    aspect/color/intensity
-    If adjust_palette_ is True the original palette define by the argument palette_, will 
-    be disregarded.Instead a new palette will be created with the hsl values
-
-    * FLAME ORIENTATION / DIRECTION & BORDER FLAME EFFECT
-     
-    input transpose_ = True | False,
-    input border_    = True | False,
-    
-    transpose_ = True, this will transpose the final array
-    If the final fire texture is (w, h) after setting the transpose flag, the final 
-    fire texture will become (h, w). As a result the fire effect will be transversal (starting 
-    from the right of the display propagating to the left).
-    You can always transpose / flip the texture to get the right flame orientation
-
-    BORDER FLAME EFFECT 
-    border_ = True to create a flame effect burning the edge of the display. This version is only
-    compatible with symmetrical display or textures (same width & height).
-
-    Transpose and border flame effect cannot be combined
-
-    * FINAL TOUCH
-    
-    input blur_ : True | False
-    
-    This will will blur the fire effect for a more realistic appearance, remove all the jagged 
-    edge when and pixelated effect
-    
-    
-    :param width_           : integer; Size (width) of the surface or display in pixels
-    :param height_          : integer; size (height) of the surface or display in pixels
-    :param factor_          : float; Value controlling the fire height value
-                              must be in range [3.95 ... 4.2].
-                              The value 3.95 gives the highest flame effect
-    :param palette_         : numpy.ndarray, buffer containing mapped RGB colors (uint values)
-    :param fire_            : numpy.ndarray shape (w, h) containing float values (fire intensity).
-                              For better performance it is advised to set the array to the size 
-                              of the texture after applying the reduction_factor_.
-                              For example if the reduction_factor_ is 2, the texture would have 
-                              width >> 1 and height >> 1 and the fire_array should be set to 
-                              numpy.empty((height >> 1, width >> 1), float32)
-    :param reduce_factor_   : unsigned short int ; Can be either 0, 1, 2, 3, 4. 
-                              2 and 3 provide the best performance and the best looking effect.
-    :param fire_intensity_  : Integer; Control the original amount of energy at the
-                              bottom of the fire, must be in range of [0 ... 32]. 
-                              32 being the maximum value and the maximum fire intensity
-    :param smooth_          : boolean; True smoothscale (bi-linear filtering) or
-                              scale algorithm jagged edges (mush faster)
-    :param bloom_           : boolean; True or False, True apply a bloom effect to the fire effect
-    :param fast_bloom_      : boolean; Fastest bloom. This reduce the amount of calculation
-    :param bpf_threshold_   : integer; control the bright pass filter threshold
-                              value, must be in range [0 ... 255].
-                              Maximum brightness amplification with threshold = 0, 
-                              when bpf_threshold_ = 255, no change.
-    :param low_             : integer; Starting position x for the fire effect
-    :param high_            : integer; Ending position x for the fire effect
-    :param brightness_      : boolean; True apply a bright filter shader to the array.
-                              Increase overall brightness of the effect
-    :param brightness_intensity_: float; must be in range [-1.0 ... 1.0] control
-                              the brightness intensity
-                              of the effect
-    :param surface_         : pygame.Surface. Pass a surface to the shader for
-                              better performance, otherwise a new surface will be created each 
-                              calls.
-    :param adjust_palette_  : boolean; True adjust the palette setting HSL
-                              (hue, saturation, luminescence).
-                              Be aware that if adjust_palette is True, the optional palette 
-                              passed to the Shader will be disregarded
-    :param hsl_             : tuple; float values of hue, saturation and luminescence.
-                              Hue in range [0.0 ... 100],  saturation [0...100], 
-                              luminescence [0.0 ... 2.0]
-    :param transpose_       : boolean; Transpose the array (w, h) become (h, w).
-                              The fire effect will start from the left and move to the right
-    :param border_          : boolean; Flame effect affect the border of the texture
-    :param blur_            : boolean; Blur the fire effect
-    :return                 : Return a pygame surface that can be blit directly to the game display
-
-    """
-    # todo reduce_factor=0 and border = True crash
-
-    assert reduce_factor_ in (0, 1, 2, 3, 4), \
-        "Argument reduce factor must be in range 0 ... 4 " \
-        "\n reduce_factor_ = 1 correspond to dividing the image size by 2" \
-        "\n reduce_factor_ = 2 correspond to dividing the image size by 4"
-    assert 0 <= fire_intensity_ < 33, \
-        "Argument fire_intensity_ must be in range [0 ... 32] got %s" % fire_intensity_
-
-    assert width_ > 0 and height_ > 0, "Argument width or height cannot be null or < 0"
-    assert factor_ > 0, "Argument factor_ cannot be null or < 0"
-
-    return fire_effect_c(
-        width_, height_, factor_, palette_, fire_,
-        reduce_factor_, fire_intensity_, smooth_,
-        bloom_, fast_bloom_, bpf_threshold_, low_, high_, brightness_,
-        brightness_intensity_, surface_, adjust_palette_,
-        hsl_, transpose_, border_, blur_
-    )
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline cloud_effect(
-        int width_,
-        int height_,
-        float factor_,
-        unsigned int [::1] palette_,
-        float [:, ::1] cloud_,
-
-        # OPTIONAL
-        unsigned short int reduce_factor_   = 2,
-        unsigned short int cloud_intensity_ = 16,
-        bint smooth_                        = True,
-        bint bloom_                         = False,
-        bint fast_bloom_                    = True,
-        unsigned char bpf_threshold_        = 128,
-        unsigned int low_                   = 0,
-        unsigned int high_                  = 0,
-        bint brightness_                    = False,
-        float brightness_intensity_         = 0.0,
-        object surface_                     = None,
-        bint transpose_                     = False,
-        bint blur_                          = True
-        ):
-    """
-    GENERATE CLOUD /SMOKE ON THE GAME DISPLAY 
-    
-    * CLOUD TEXTURE SIZES 
-    
-    input width_  : integer,  
-    input height_ : integer
-    
-    width_ and height_ values define the size of the texture e.g Surface(width x height)
-
-    * CLOUD ASPECT (CONTROL OVER THE WIDTH): 
-    
-    inputs low_ : integer  
-    input high_ : integer 
-    
-    Optional arguments low_ & high_ (integer values) define the width 's limits of the cloud 
-    effect. low_ for the starting point and high_ for the ending of the effect.
-    e.g low_ = 10 and high_ = 200. The cloud effect will be contain within width = 10 and 200
-    low_ & high_ values must be in range [0 ... width_]  
-        
-    * CLOUD HEIGHT:
-    
-    input factor_ : float
-    
-    The cloud maximum height can be adjust with the variable factor_ (float value)
-    value > 3.95 will contain the effect within the display 
-    value < 3.95 will enlarge the effect over the display height  
-    Recommended value is 3.95 with reduce_factor_ = 3 otherwise adjust the value manually 
-    to contain the cloud effect within the display
-        
-    * SPEED CONSIDERATION
-    
-    input reduce_factor_ : integer
-    
-    The argument reduce_factor_ control the size of the texture to be processed 
-    e.g : a value of 2, divide by 4 the pygame surface define by the values (width_ & height_)
-    Smaller texture improve the overall performances but will slightly degrade the cloud aspect, 
-    especially if the blur and smooth option are not enabled.
-    Recommended value for reduce_factor_ is 3 (fast process)   
-    reduce_factor_ values must be an integer in range [ 0 ... 4] 
-    The reduce_factor_ value will have a significant impact on the cloud effect maximum height, 
-    adjust the argument factor_ accordingly
-
-    * CLOUD INTENSITY AT THE SOURCE
-    
-    input cloud_intensity_: integer
-    
-    Set the cloud intensity with the variable cloud_intensity_, 0 low flame,
-    32 maximum flame effect
-    Values must be an int in range [0 ... 32] 
-
-    * SMOOTHING THE EFFECT
-    
-    input smooth_: True | False
-    
-    When smooth_ is True the algorithm will use the pygame function smoothscale (bi-linear 
-    filtering) or False the final texture will be adjust with the scale function.
-    Set this variable to False if you need the best performance for the effect or if you require
-    a pixelated cloud effect. Otherwise set the variable to True for a more realistic effect. 
-   
-    * BLOOM EFFECT 
-    
-    input bloom_         : True | False
-    input fast_bloom_    : True | False
-    input bpf_threshold_ : integer
-       
-    Bloom effect produce a bright and smooth light effect to the background texture where the cloud 
-    intensity is at its maximum.
-    Use the flag fast_bloom_ for a compromise between a realistic effect and the best performances
-    The flag fast_bloom_ define a very fast bloom algo using only the smallest texture 
-    to create a bloom effect (all the intermediate textures will be bypassed). See the bloom effect 
-    project for more details.
-    When fast_bloom is False, all the sub-surfaces will be blit to the final effect and will 
-    produce a more realistic cloud effect (this will slightly degrade the overall performances). 
-    If the cloud effect is too bright, you can always adjust the bright pass filter value
-    bpf_threshold_(this will adjust the bloom intensity)
-    bpf_threshold_ value must be in range [ 0 ... 255]   
-    Below 128 the bloom effect will be more noticeable and above 128 only the brightest
-    area will be enhanced.
-
-    * LIGHT EFFECT INTENSITY
-
-    input brightness_            : True | False
-    input brightness_intensity_  : float
-
-    When the flag is set to True, the algorithm will use an external function, 
-    <brightness_exclude_inplace_c> to increase the brightness of the effect / texture
-    A custom color can be passed to the function defining the pixels to be ignored during the 
-    process (default is black color).
-    the value must be in range [-1.0 ... 1.0]. Values below zero will decrease the brightness 
-    of the cloud effect and positive values will increase the brightness of the effect (causing
-    bright white patches on the cloud texture). 
-    Values below -0.4 will cause the cloud effect to be translucent 
-    
-    
-    * OPTIONAL SURFACE
-      
-    input surface_ : pygame.Surface
-      
-    This is an optional surface that can be passed to the shader to improve the performances 
-    and to avoid a new surface to be generated every iterations. The surface size must match 
-    exactly the reduce texture dimensions otherwise an exception will be raise. 
-    see reduce_factor_ option to determine the cloud texture size that will be processed.
-    
-
-    * CLOUD ORIENTATION / DIRECTION 
-     
-    input transpose_ = True | False,
-    
-    transpose_ = True, this will transpose the final array 
-    for e.g :  
-    If the final cloud texture is (w, h) after setting the transpose flag, the final 
-    cloud texture will become (h, w). As a result the cloud effect will be transversal (starting 
-    from the right of the display to the left side). 
-    You can always transpose / flip the texture to get the right cloud orientation  
-    
-    * FINAL TOUCH
-    
-    input blur_ : True | False
-    
-    This will will blur the cloud effect for a more realistic appearance, remove all the jagged 
-    edge when and pixelated effect
-    
-    :param width_               : integer; Texture size (width) 
-    :param height_              : integer; Texture size (height)
-    :param factor_              : float; Floating value used to control the size of the cloud
-                                  effect. Value must be in range [3.95 ... 4.2]. Value > 3.95 
-                                  will contain the smoke/ cloud effect within the display. 
-                                  Values < 3.95 will enlarge the smoke effect.                              
-    :param palette_             : numpy.ndarray or cython memoryview containing the color for the 
-                                  cloud effect (buffer containing mapped RGB colors (uint values))
-    :param cloud_               : numpy.ndarray shape (w, h) containing float values 
-                                  (cloud intensity). For better performance it is advised to set the
-                                  array to the size of the texture after applying the 
-                                  reduction_factor_. For example if the reduction_factor_ is 2, 
-                                  the texture would have to be width >> 1 and height >> 1 and the 
-                                  cloud_ array should be equivalent to numpy.empty((height >> 1, 
-                                  width >> 1), float32)
-    :param reduce_factor_       : integer; unsigned short int ; Can be either 0, 1, 2, 3, 4. 
-                                  2 and 3 provide the best performance and the best looking effect.
-    :param cloud_intensity_     : integer; Determine the amount of smoke the cloud
-                                  effect will generate at the base of the effect (value must be in 
-                                  range [0 .. 260]). If you provide zero a random value between 
-                                  0 ... 260 will be assigned. If you provide 250, a random value 
-                                  between 250 and 260 will be set for the amount of smoke. 
-                                  The highest the value, the more dense the cloud effect will be
-    :param smooth_              : boolean; True use a smoothscale (bi-linear filtering) or
-                                  False -> scale algorithm jagged edges (mush faster)
-    :param bloom_               : True | False, Add a bloom effect when the flag is set to True
-                                  The bloom effect will smooth the cloud and create a dense smoke 
-                                  areas where the cloud is the brightest.  
-    :param fast_bloom_          : True | False; This set a fast algorithm for the bloom effect (the 
-                                  bloom effect will use the smallest texture)
-    :param bpf_threshold_       : integer; Bright pass filter value must be in range [ 0 ... 255]
-                                  0 produce the maximum bloom effect
-    :param low_                 : integer; must be in range [ 0 ... width_], left position of the 
-                                  cloud effect 
-    :param high_                : integer; must be in range [ 0 ... height_], right position of the
-                                  cloud effect
-    :param brightness_          : True | False; Increase the brightness of the cloud effect when 
-                                  True
-    :param brightness_intensity_: float; Set the brightness intensity of the cloud. The value must 
-                                  be in range [-1.0 ... +1.0]. Changing the value overtime will 
-                                  generate a realistic cloud effect. Negative value will generate 
-                                  translucent patch of smoke on the background image
-    :param surface_             : Pygame.Surface; Pass a surface to the shader for
-                                  better performance, otherwise a new surface will be created each 
-                                  calls.
-    :param transpose_           : boolean; Transpose the array (w, h) become (h, w).
-                                  The cloud effect will start from the left and move to the right
-    :param blur_                : boolean; Blur the cloud effect
-    :return                     : Return a pygame surface that can be blit directly to the game 
-                                  display
-    """
-
-    assert reduce_factor_ in (0, 1, 2, 3, 4), \
-        "Argument reduce factor must be in range 0 ... 4 " \
-        "\n reduce_factor_ = 1 correspond to dividing the image size by 2" \
-        "\n reduce_factor_ = 2 correspond to dividing the image size by 4"
-
-    assert width_ > 0 and height_ > 0, "Argument width or height cannot be null or < 0"
-    assert factor_ > 0, "Argument factor_ cannot be null or < 0"
-
-    return cloud_effect_c(
-        width_, height_, factor_, palette_, cloud_,
-        reduce_factor_, cloud_intensity_, smooth_,
-        bloom_, fast_bloom_, bpf_threshold_, low_, high_, brightness_,
-        brightness_intensity_, surface_, transpose_, blur_
-    )
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline mirroring_array(object surface_):
-    """
-    
-    MIRRORING
-
-    This method create a mirror image 
-    
-    Compatible 24 - 32 bit image / surface
-    
-    :param surface_ : pygame.Surface; compatible 24 - 32 bit 
-    :return         : returns a numpy ndarray shape (w, h, 3) 
-    
-    """
-    assert PyObject_IsInstance(surface_, pygame.Surface), \
-        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-    cdef unsigned char [:, :, :] rgb_array
-    try:
-        rgb_array = surface_.get_view('3')
-
-    except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
-
-    return mirroring_c(rgb_array)
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void mirroring(object surface_):
     """
-    MIRRORING (INPLACE)
+    Mirroring effect (inplace)
 
-    This method create a mirror image 
+    This method creates a mirrored image of the given surface by reflecting it
+    horizontally. The effect is applied directly to the surface (in-place).
 
-    :param surface_ : pygame.Surface; compatible 24 - 32 bit 
-    :return : void
+    Example:
+        # Load an image, apply the mirroring effect
+        image = pygame.image.load("../Assets/px.png").convert()
+        mirroring(image)
+    
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A pygame surface compatible with 24-bit or 32-bit formats that will 
+        undergo the mirroring effect.
+    
+    Returns
+    -------
+    void
+        The function modifies the given surface in place, meaning it does not 
+        return a new surface, but rather alters the input surface.
     """
+
+    # Assert that the input surface is a valid pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    # Declare variables to hold the width and height of the surface
+    cdef:
+        Py_ssize_t w, h
+
+    # Try to get the RGB data array of the surface
     cdef unsigned char [:, :, :] rgb_array
     try:
-        rgb_array = surface_.get_view('3')
-
+        rgb_array = surface_.get_view('3')  # Access the surface as a 3D array (RGB channels)
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # If an error occurs while referencing the pixels, raise a ValueError
+        raise ValueError(
+            "\nCannot reference source pixels into a 3d array.\n %s " % e)
 
-    mirroring_inplace_c(rgb_array)
+    # Get the width and height of the surface from the RGB array
+    w, h = rgb_array.shape[:2]
+
+    # Create a copy of the RGB array with column-major order (F order)
+    cdef const unsigned char [::1, :, :] rgb_array_copy = numpy.asarray(rgb_array, order='F')
+
+    # Apply the mirroring effect in place by calling the C function
+    mirroring_inplace_c(w, h, rgb_array, rgb_array_copy)
 
 
+
+# ------------------------
 
 
 @cython.binding(False)
@@ -3075,24 +6039,73 @@ cpdef inline void mirroring(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void sharpen(object surface_):
     """
-    
-    SHARPEN IMAGE APPLYING THE BELOW 3 X 3 KERNEL OVER EVERY PIXELS (INPLACE)
+    Sharpen an image (in-place) using a 3x3 kernel.
 
-    :param surface_ : pygame.Surface; compatible 24 - 32 bit 
-    :return         : void 
+    This function applies a sharpening filter to the image on the given surface.
+    The filter uses a 3x3 kernel to enhance the edges and details by increasing contrast
+    around edges, making the image appear sharper.
+
+    Example:
+        # Load an image and apply the sharpen effect
+        image = pygame.image.load("../Assets/px.png").convert()
+        sharpen(image)
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface compatible with 24-bit or 32-bit image formats
+        that will be modified in-place to apply the sharpen effect.
+
+    Returns
+    -------
+    void
+        The function modifies the given surface in place, meaning no new surface is returned.
+        The original surface will be sharpened.
     """
+
+    # Ensure that the input is a valid pygame.Surface object
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
-    cdef unsigned char [:, :, :] rgb_array
+
+    # Declare a variable to hold the buffer of the surface
+    cdef unsigned char[::1] bgr_array
+
     try:
-        rgb_array = surface_.get_view('3')
+        # Try to get a reference to the pixel data in the surface as a buffer
+        bgr_array = surface_.get_buffer()
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # If an error occurs while referencing the pixels, raise a ValueError
+        raise ValueError("\nCannot reference source pixels into a buffer.\n %s " % e)
 
-    sharpen_inplace_c(rgb_array)
+    # Ensure that the data is of type uint8 (8-bit unsigned integer)
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    # Get the width and the total length (size) of the surface
+    cdef:
+        Py_ssize_t w = surface_.get_width()  # Width of the surface
+        Py_ssize_t l = bgr_array.shape[0]  # Total number of elements (length of the buffer)
+
+    # Create a copy of the pixel data to allow in-place manipulation
+    # This avoids modifying the original buffer directly, ensuring the transformation is applied correctly
+    cdef unsigned char [::1] bgr_array_cp = numpy.ndarray(shape=l, buffer=bgr_array, dtype=uint8).copy()
+
+    # Get the bit size of the surface (24-bit or 32-bit)
+    cdef int bitsize = surface_.get_bitsize()
+
+    # Validate that the surface is either 24-bit or 32-bit (common formats for color images)
+    if bitsize not in (24, 32):
+        raise ValueError('\nIncompatible surface format got %s bitsize, compatible 24 or 32-bit only.' % bitsize)
+
+    # Call the C function to apply the sharpening effect using a 1D convolution with a 3x3 kernel
+    sharpen_1d_c(w, l, bgr_array, bgr_array_cp, True if bitsize == 32 else False)
+
+
+
 
 
 @cython.binding(False)
@@ -3102,6 +6115,485 @@ cpdef inline void sharpen(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void sharpen_1d(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        unsigned char [::1] bgr_array,
+        bint format_32=False):
+
+    """
+    Sharpen array (inplace)
+    
+    Compatible with BGR or BGR(A) array types, but works with any other pixel format e.g RGB or RGB(A).
+    The sharpen method can be apply directly to a 1d array using a 3 x 3 kernel described below.
+    Set the variable format_32=True if the array contains alpha transparency (array type BGR(A))
+    otherwise set it to False.
+    
+    pixels convoluted outside image edges will be set to adjacent edge value
+        [0 , -1,  0]
+        [-1,  5, -1]
+        [0 , -1,  0]
+        
+    e.g 
+    # for 32 bit array data BGR(A) 
+    sharpen_1d(w, h, im.get_buffer(), True)
+    
+    # for 24-bit array data BGR type
+    sharpen_1d(w, h, im.get_buffer(), False)
+      
+    Parameters
+    ----------
+    
+    w : 
+        integer; array width 
+    
+    h : 
+        integer; array height
+    
+    bgr_array :  
+        numpy.ndarray shape (w, ) of type uint8 containing RGB pixels
+    
+    format_32 : 
+        bool True | 'BGR' for 24-bit array (BGR) or False | 'BGRA' for 32-bit array (BGRA) 
+
+    Returns
+    -------
+    void
+    
+    """
+
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    cdef:
+
+        Py_ssize_t l = bgr_array.shape[0]
+        # below create a copy False of the array and do not reference the pixels.
+        # The real time transformation of the identical copy of the array will not be functional as all the pixels
+        # undergo constant transformations. It is then necessary to load the pixels from a copy of the source array
+        # to implement the inplace transformation. Such as below
+        unsigned char [::1] bgr_array_cp = numpy.ndarray(shape=l, buffer=bgr_array, dtype=uint8).copy()
+
+    sharpen_1d_c(w, l, bgr_array, bgr_array_cp, format_32)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void sharpen_1d_c(
+        const Py_ssize_t w,
+        const Py_ssize_t l,
+        unsigned char [::1] bgr_array,
+        const unsigned char [::1] bgr_array_cp,
+        bint format_32=False)nogil:
+
+    """
+    
+    Sharpen array (inplace)
+    
+    Compatible with BGR or BGR(A) array type, but works with any other pixel format e.g RGB or RGB(A).
+    
+    The sharpen method can be applied directly to a 1d array using a 3 x 3 kernel described below.
+    Set the variable format_32=True if the array contains alpha transparency; array type RGBA or BGRA
+    otherwise set it to False.
+    
+    pixels convoluted outside image edges will be set to adjacent edge value
+        [0 , -1,  0]
+        [-1,  5, -1]
+        [0 , -1,  0]
+
+    e.g 
+    # for 32 bit array data BGR(A) 
+    sharpen_1d_c(w, l, image.get_buffer(), image_copy.get_buffer(), True)
+    
+    
+    # for 24-bit array data BGR type
+    sharpen_1d_c(w, l, image.get_buffer(), image_copy.get_buffer(), False)
+    
+
+    Parameters
+    ----------
+    
+    w: 
+        integer; array width 
+    
+    l: 
+        integer; array total length such as w * h * byte_size
+    
+    bgr_array : 
+        numpy.ndarray shape(w, ) uint8 BGR(A) 
+        (unsigned char 0...255) containing the image pixels format.
+    
+    bgr_array_cp : 
+        numpy.ndarray shape (w, ) uint8 BGR(A), empty array used during the transformation 
+    
+    format_32 : 
+        bool True | 'BGR' for 24-bit array (BGR) or False | 'BGRA' for 32-bit array (BGRA) 
+
+    Returns
+    -------
+    Void
+
+    """
+
+    cdef short bitsize
+    bitsize = 3 if format_32 == False else 4
+
+    cdef:
+
+        int i, r, g, b
+        unsigned int row = w * bitsize
+        const unsigned char * p1
+        const unsigned char * p2
+        const unsigned char * p3
+        const unsigned char * p4
+        const unsigned char * p5
+
+    for i in prange(0, l, bitsize, schedule=SCHEDULE, num_threads=THREADS):
+
+        p3 = &bgr_array_cp[ i ]
+
+        if row + bitsize < i < l - row - bitsize:
+
+            # 3x3 kernel (sharpen)
+            # [ 0, -1, 0 ]
+            # [ -1, 5, -1 ]
+            # [ 0, -1, 0 ]
+
+            p1 = &bgr_array_cp[ i - row ]
+            p2 = &bgr_array_cp[ i - bitsize ]
+            p4 = &bgr_array_cp[ i + bitsize ]
+            p5 = &bgr_array_cp[ i + row ]
+
+            # blue
+            b = -p1[0] -p2[0] +p3[0] * 5 -p4[0] -p5[0]
+
+            # green
+            g = -(p1 + 1)[0] -(p2 + 1)[0] +(p3 + 1)[0] * 5 -(p4 + 1)[0] -(p5 + 1)[0]
+
+            # red
+            r = -(p1 + 2)[0] -(p2 + 2)[0] +(p3 + 2)[0] * 5 -(p4 + 2)[0] -(p5 + 2)[0]
+
+            if r < 0:
+                r = <unsigned char>0
+
+            if g < 0:
+                g = <unsigned char>0
+
+            if b < 0:
+                b = <unsigned char>0
+
+            if r > 255:
+                r= <unsigned char>255
+
+            if g > 255:
+                g = <unsigned char>255
+
+            if b > 255:
+                b = <unsigned char>255
+
+        else:
+            # set pixels that cannot be convoluted.
+            # pixels located on the edge of the image
+            # mode BGR
+            bgr_array[ i     ] = (p3 + 2)[0]
+            bgr_array[ i + 1 ] = (p3 + 1)[0]
+            bgr_array[ i + 2 ] = p3[0]
+            continue
+
+
+        # Alpha channel is unchanged
+        bgr_array[ i    ] = b
+        bgr_array[ i + 1] = g
+        bgr_array[ i + 2] = r
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline np.ndarray[np.uint8_t, ndim=1] sharpen_1d_cp(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        unsigned char [::1] bgr_array,
+        bint format_32=False
+):
+    """
+    Sharpen array (return a new array)
+    
+    Return a new array instead of applying the changes inplace.
+    Compatible with BGR or BGR(A) array types, but works with any other pixel format e.g RGB or RGB(A).
+    The sharpen method can be apply directly to a 1d array using a 3 x 3 kernel described below.
+    Set the variable format_32=True if the array contains alpha transparency (array type BGR(A))
+    otherwise set it to False.
+    
+
+    pixels convoluted outside image edges will be set to adjacent edge value
+        [0 , -1,  0]
+        [-1,  5, -1]
+        [0 , -1,  0]
+
+    e.g 
+    # for 32 bit array data BGR(A) 
+    arr=sharpen_1d_cp(w, h, im.get_buffer(), True)
+    im = pygame.image.frombuffer(arr, (w, h), "RGBA").convert_alpha()
+
+    # for 24-bit array data BGR type
+    arr=sharpen_1d_cp(w, h, im.get_buffer(), False)
+    im = pygame.image.frombuffer(arr, (w, h), "RGB")
+
+   
+    Parameters
+    ----------
+    w : 
+        integer; array width
+    
+    h : 
+        integer; array height
+    
+    bgr_array : 
+        numpy.ndarray shape (w, ) of type uint8 containing BGR pixels
+    
+    format_32 :  
+        bool True | 'BGR' for 24-bit array (BGR) or False | 'BGRA' for 32-bit array (BGRA) 
+
+    Returns
+    -------
+    1d numpy.ndarray shape (w, ) uint8 similar to the input array with sharpen pixels. 
+     
+    """
+
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+    cdef:
+        Py_ssize_t l = bgr_array.shape[0]
+        unsigned char[ ::1 ] tmp_array = numpy.empty(l, uint8)
+
+    return numpy.ndarray(
+        shape=l,
+        buffer=sharpen_1d_cp_c(w, l, bgr_array, tmp_array, format_32),
+        dtype=uint8)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline unsigned char [::1] sharpen_1d_cp_c(
+        const Py_ssize_t w,
+        const Py_ssize_t l,
+        unsigned char [::1] bgr_array,
+        unsigned char [::1] bgr_array_cp,
+        bint format_32=False)nogil:
+    
+    """
+    Sharpen array (return a copy)
+    
+    Return a copy of the array instead of applying the changes inplace
+    Compatible with BGR or BGR(A) array type, but works with any other pixel format e.g RGB or RGBA(A).
+    The sharpen method can be applied directly to a 1d array using a 3 x 3 kernel described below.
+    Set the variable format_32=True if the array contains alpha transparency; array type BGRA
+    otherwise set it to False.
+
+    pixels convoluted outside image edges will be set to adjacent edge value
+        [0 , -1,  0]
+        [-1,  5, -1]
+        [0 , -1,  0]
+
+    e.g 
+    # for 32 bit array data BGR(A) 
+    arr=sharpen_1d_cp_c(w, l, im.get_buffer(), True)
+
+    # for 24-bit array data BGR type
+    arr = sharpen_1d_cp(w, l, bytearray(pygame.image.tobytes(im, "RGB")), False)
+    im = pygame.image.frombuffer(arr, (w, h), "RGB")
+
+
+    Parameters
+    ----------
+    w : 
+        integer; array width
+    
+    l : 
+        integer; array length (width * height * bitsize)
+    
+    bgr_array : 
+        numpy.ndarray shape (w, ) of type uint8 containing BGR pixels
+    
+    bgr_array_cp : 
+        numpy.ndarray shape (w, ) uint8 BGR(A), empty array used during the transformation 
+         
+    format_32 :  
+        bool True | 'BGR' for 24-bit array (BGR) or False | 'BGRA' for 32-bit array (BGRA) 
+
+    Returns
+    -------
+    memoryviewslice shape (w, ) uint8 similar to the input array with sharpen pixels. 
+     
+
+    """
+    cdef short bitsize
+    bitsize = 3 if format_32 == False else 4
+
+    cdef:
+
+        int i, r, g, b
+        unsigned int row = w * bitsize
+        const unsigned char * p1
+        const unsigned char * p2
+        const unsigned char * p3
+        const unsigned char * p4
+        const unsigned char * p5
+
+    for i in prange(0, l, bitsize, schedule = SCHEDULE, num_threads = THREADS):
+
+        p3 = &bgr_array[ i ]
+
+        if format_32:
+            if (p3 + 3)[0] == 0:
+                bgr_array_cp[ i     ] = p3[0]
+                bgr_array_cp[ i + 1 ] = (p3 + 1)[0]
+                bgr_array_cp[ i + 2 ] = (p3 + 2)[0]
+                bgr_array_cp[ i + 3 ] = (p3 + 3)[ 0 ]
+                continue
+
+        if row + bitsize < i < l - row - bitsize:
+
+            # 3x3 kernel (sharpen)
+            # [ 0, -1, 0 ]
+            # [ -1, 5, -1 ]
+            # [ 0, -1, 0 ]
+
+            p1 = &bgr_array[ i - row ]
+            p2 = &bgr_array[ i - bitsize ]
+            p4 = &bgr_array[ i + bitsize ]
+            p5 = &bgr_array[ i + row ]
+
+            # blue
+            b = -p1[ 0 ] - p2[ 0 ] + p3[ 0 ] * 5 - p4[ 0 ] - p5[ 0 ]
+
+            # green
+            g = -(p1 + 1)[ 0 ] - (p2 + 1)[ 0 ] + (p3 + 1)[ 0 ] * 5 - (p4 + 1)[ 0 ] - (p5 + 1)[ 0 ]
+
+            # red
+            r = -(p1 + 2)[ 0 ] - (p2 + 2)[ 0 ] + (p3 + 2)[ 0 ] * 5 - (p4 + 2)[ 0 ] - (p5 + 2)[ 0 ]
+
+            if r < 0:
+                r = <unsigned char> 0
+
+            if g < 0:
+                g = <unsigned char> 0
+
+            if b < 0:
+                b = <unsigned char> 0
+
+            if r > 255:
+                r = <unsigned char> 255
+
+            if g > 255:
+                g = <unsigned char> 255
+
+            if b > 255:
+                b = <unsigned char> 255
+
+        else:
+            # set pixels that cannot be convoluted.
+            # pixels located on the edge of the image
+            # mode RGB
+            bgr_array_cp[ i     ] = (p3 + 2)[ 0 ]
+            bgr_array_cp[ i + 1 ] = (p3 + 1)[ 0 ]
+            bgr_array_cp[ i + 2 ] = p3[ 0 ]
+
+            if format_32:
+                bgr_array_cp[ i + 3 ] = (p3 + 3)[ 0 ]
+
+            continue
+
+        # Set RGB
+        bgr_array_cp[ i     ] = r
+        bgr_array_cp[ i + 1 ] = g
+        bgr_array_cp[ i + 2 ] = b
+
+        # Alpha channel is unchanged
+        if format_32:
+            bgr_array_cp[ i + 3 ] = (p3 + 3)[0]
+
+    return bgr_array_cp
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void sharpen32(object surface_):
+    """
+
+    Sharpen image using 3 x 3 kernel (inplace)
+    
+    Compatible with 24, 32-bit images 
+    
+    e.g:
+    # for 32-bit 
+    sharpen32(image)
+    
+    :param surface_: 
+        pygame.Surface; compatible 24, 32-bit
+         
+    :return: 
+        void
+         
+    """
+
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    cdef:
+        Py_ssize_t w, h
+
+    w, h = surface_.get_size()
+
+    # create a 3d array BGR or BGRA format depends on the input surface
+    cdef unsigned char [:, :, ::1] bgra_array = \
+        numpy.ascontiguousarray(surface_.get_buffer(), dtype = numpy.uint8).reshape(h, w, surface_.get_bytesize())
+
+    sharpen_inplace_c(bgra_array)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void dirt_lens(
         object surface_,
         object lens_model_,
@@ -3109,59 +6601,63 @@ cpdef inline void dirt_lens(
         float light_ = 0.0
 ):
     """
-    DIRT LENS EFFECT (INPLACE)
+    Dirt lens effect (inplace)
     
     This function display a dirt lens texture on the top of your game display to 
     simulate a camera artefact or realistic camera effect when the light from the
     scene is oriented directly toward the camera. 
     
     Choose a lens texture from the Assets directory (free textures provided in Assets directory 
-    of this project). All textures are sizes 5184x3456 and would have to be re-sized to  
-    your game display and used by function `dirt_lens`. 
-    The function dirt_lens will not resize the texture for you.
+    of this project). All textures are sizes 5184x3456 and would have to be re-sized beforehand.
     
-    The setting light_ is a float values cap between -1.0 to 0.2 and allow you to increase the 
+    The setting `light_` is a float values cap between -1.0 to 0.2 and allow you to increase the 
     light source oriented toward the camera. Values <0.0 will decrease the lens dirt 
     effect and values >0.0 will increase the brightness of the display and increase the 
     amount of dirt on the camera lens (your display).
     
-    Optionally the setting flag_ can be changed from BLEND_RGB_ADD to any other pygame optional 
+    Optionally the setting flag can be changed from BLEND_RGB_ADD to any other pygame optional 
     flags value. BLEND_RGB_ADD is the default setting and allow the pixels from the dirt lens 
-    texture to be blended (added) to the display and provide the brightest and better looking 
-    effect. 
+    texture to be blended (added) to the display.
     
-    This effect can be used for real time rendering for surfaces resolution 1024x768  
+    e.g:
+    dirt_lens(image, flag_=BLEND_RGB_ADD, lens_model_=lens, light_=VALUE)
     
-    Assets/Bokeh__Lens_Dirt_9.jpg
-    Assets/Bokeh__Lens_Dirt_38.jpg
-    Assets/Bokeh__Lens_Dirt_46.jpg
-    Assets/Bokeh__Lens_Dirt_50.jpg
-    Assets/Bokeh__Lens_Dirt_54.jpg
-    Assets/Bokeh__Lens_Dirt_67.jpg
+    :param surface_: 
+        Surface 24 - 32 bit represent the surface or the display 
     
-    :param surface_   : Surface 24 - 32 bit represent the surface or the display 
-    
-    :param lens_model_: Surface The Lens model is a pygame Surface. PygameShader provide a 6 
-     different surfaces that can be used as a layer to generate a dirt lens effect on your game 
-     display. See above for the name of the free dirt lens textures. 
-     The texture has to be loaded prior calling this effect and passed as an argument. By default 
-     the textures sizes are 5184x3456 (width & height). The texture would have also to be re-scale 
-     once to the game display dimensions (e.g 1027x768) or to the size of your texture.
+    :param lens_model_: 
+        Surface The Lens model is a pygame Surface. PygameShader provide 6 
+        different surfaces that can be used as a layer to generate a dirt lens effect on your game 
+        display. See below for the name of the free dirt lens textures. 
      
-    :param flag_      : integer; pygame flags such as BLEND_RGB_ADD, BLEND_RGB_MAX etc. These flags 
-     will change the overall appearance of the effect blending the dirt lens
-     image with a different mathematical expression. BLEND_RGB_ADD is the 
-     default flag and blend together the dirt_lens and the game display 
-     providing a very bright aspect and vivid effect.
-    
-    :param light_     : float; Float value cap between [-1.0 ... 0.2] to increase or decrease 
-     the overall brightness of the dirt lens texture. Tis setting can be used to simulate a 
-     texture transition when sweeping the values from -1.0 toward 0.2 by a small increment.
-     Values < 0 will tend to diminish the effect and values > 0 will increase the brightness 
-     and the dirt lens effect. 
+        Assets/Bokeh__Lens_Dirt_9.jpg
+        Assets/Bokeh__Lens_Dirt_38.jpg
+        Assets/Bokeh__Lens_Dirt_46.jpg
+        Assets/Bokeh__Lens_Dirt_50.jpg
+        Assets/Bokeh__Lens_Dirt_54.jpg
+        Assets/Bokeh__Lens_Dirt_67.jpg
      
-    :return: void 
+        The texture has to be loaded prior calling this effect and passed as an argument. By default 
+        the textures sizes are 5184x3456 (w & h). The texture(s) have to be re-scale once to the game 
+        display dimensions (e.g 1027x768)
+     
+    :param flag_: 
+        integer; pygame flags such as BLEND_RGB_ADD, BLEND_RGB_MAX etc. These flags 
+        will change the overall appearance of the effect. BLEND_RGB_ADD is the default flag and blend 
+        together the dirt_lens image and the game display.
+    
+    :param light_: 
+        float; Float value cap between [-1.0 ... 0.2] to increase or decrease 
+        the overall brightness of the dirt lens texture. This setting can be used to simulate a 
+        texture transition when sweeping the values from -1.0 toward 0.2 by a small increment.
+        Values < 0 will tend to diminish the effect and values > 0 will increase the brightness 
+        and the dirt lens effect. 
+     
+    :return: 
+        void; Inplace transformation.
+    
     """
+
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
@@ -3173,6 +6669,7 @@ cpdef inline void dirt_lens(
 
     if light_ > 0.2:
         light_ = 0.2
+
     elif light_ < -1.0:
         light_ = -1.0
 
@@ -3191,6 +6688,7 @@ cpdef inline void dirt_lens(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void end_game(object surface):
     """
     
@@ -3206,6 +6704,7 @@ cpdef inline void end_game(object surface):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void level_clear(object surface):
     """
     
@@ -3214,6 +6713,8 @@ cpdef inline void level_clear(object surface):
     """
     raise NotImplementedError
 
+
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -3221,38 +6722,59 @@ cpdef inline void level_clear(object surface):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef object dithering(object surface_):
 
     """
+    Dithering Floyd Steinberg (copy)
+    
     Dithering is used in computer graphics to create the illusion of "color depth" in images with
     a limited color palette - a technique also known as color quantization. In a dithered image,
     colors that are not available in the palette are approximated by a diffusion of colored pixels
     from within the available palette. The human eye perceives the diffusion as a mixture of 
     the colors within it (see color vision). Dithered images, particularly those with relatively
-     few colors, can often be distinguished by a characteristic graininess or speckled appearance
+    few colors, can often be distinguished by a characteristic graininess or speckled appearance
     
     Take a pygame surface as argument format 24-32 bit and convert it to a 3d array format 
     (w, h, 3) type float (float32, single precision). 
     As the image is converted to a different data type format (uint8 to float32), 
     the transformation cannot be applied inplace. The image returned by the method dithering 
-    is a copy of the original image.   
+    is a copy of the original image without the alpha channel   
+    
+    Compatible with 24 - 32 bit surface. 
+    The output image is 24-bit without the alpha channel 
+    
+    e.g:
+    # for 24 - 32 bit 
+    image = dithering(image)
     
     :param surface_: Pygame surface format 24-32 bit 
-    :return        : Surface; 
+    :return        : 24-bit surface without the alpha channel  
     
     """
+
     assert PyObject_IsInstance(surface_, Surface), \
-        'Argument surface_ must be a pygame.Surface got %s ' % type(surface_)
+        '\nArgument surface_ must be a pygame.Surface got %s ' % type(surface_)
+
+    cdef:
+        # np.ndarray[np.float32_t, ndim=3] bgr_array
+        np.ndarray[ np.uint8_t, ndim=3 ] rgb_array
 
     try:
         rgb_array = pixels3d(surface_)
+        # Create a 3d array shape (w, h, 4)
+        # bgr_array = numpy.asarray(
+        #    surface_.get_view('0'), dtype = numpy.float32).reshape(surface_.get_width(), surface_.get_height(), 4)
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
+    # return dithering_c(bgr_array/<float>255.0)
     return dithering_c(numpy.asarray(rgb_array/<float>255.0, dtype=numpy.float32))
 
 
+
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -3260,36 +6782,58 @@ cpdef object dithering(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void dithering_inplace(object surface_):
     """
+    Dithering Floyd Steinberg (inplace)
+     
     Dithering is used in computer graphics to create the illusion of "color depth" in images with
     a limited color palette - a technique also known as color quantization. In a dithered image,
     colors that are not available in the palette are approximated by a diffusion of colored pixels
     from within the available palette. The human eye perceives the diffusion as a mixture of 
     the colors within it (see color vision). Dithered images, particularly those with relatively
-     few colors, can often be distinguished by a characteristic graininess or speckled appearance
+    few colors, can often be distinguished by a characteristic graininess or speckled appearance
 
     Take a pygame surface as argument format 24-32 bit and convert it to a 3d array format 
     (w, h, 3) type float (float32, single precision). 
     As the image is converted to a different data type format (uint8 to float32), 
     the transformation cannot be applied inplace. The image returned by the method dithering 
     is a copy of the original image.   
+    
+    e.g:
+    # for 24 - 32 bit 
+    dithering_inplace(image)
 
-    :param surface_: Pygame surface format 24-32 bit 
-    :return        : Surface; 
+    :param surface_: 
+        Pygame surface format 24-32 bit
+         
+    :return        : 
+        Output surface is the same format than input 24 or 32 bit
+         
 
     """
+
+    # Ensure that the input argument surface_ is a valid pygame.Surface object
     assert PyObject_IsInstance(surface_, Surface), \
         'Argument surface_ must be a pygame.Surface got %s ' % type(surface_)
 
+    # Declare the variable rgb_array to reference the pixel data of the surface
     cdef unsigned char [:, :, :] rgb_array
+
     try:
+        # Try to get a reference to the pixel data of the surface as a 3D array
         rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # If an error occurs while referencing the pixels, raise a ValueError
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
+    # Convert the rgb_array data to a numpy float32 array (scaled between 0 and 1),
+    # then call the dithering function to apply dithering to the image in-place
     dithering_inplace_c(numpy.asarray(rgb_array, dtype=numpy.float32)/<float>255.0, rgb_array)
+
+
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -3298,32 +6842,557 @@ cpdef inline void dithering_inplace(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void dithering1d(
+        Py_ssize_t w,
+        Py_ssize_t h,
+        unsigned char [::1] bgr_array,
+        bint format_32=False
+):
+    """
+    Dithering Floyd Steinberg (inplace)
+    
+    Dithering is used in computer graphics to create the illusion of "color depth" in images with
+    a limited color palette - a technique also known as color quantization. In a dithered image,
+    colors that are not available in the palette are approximated by a diffusion of colored pixels
+    from within the available palette. The human eye perceives the diffusion as a mixture of 
+    the colors within it (see color vision). Dithered images, particularly those with relatively
+    few colors, can often be distinguished by a characteristic graininess or speckled appearance.
+    
+    Compatible with 24-32 bit image. If the dithering process is not applied to the image, 
+    check the flag format_32. 
+    format_32 should be set to True for image containing per pixel transparency or 
+    equivalent array shape (w, h, 4). 
+    For 24-bit image, set format_32 to False (array shape (w, h, 3))
+    
+    # for 32 bit image
+    dithering1d(w, h, im.get_buffer(), True)
+    
+    # for 24 bit image
+    dithering1d(w, h, im.get_buffer(), False)
+    
+    
+    Parameters
+    ----------
+    w : 
+        integer; width of the array
+          
+    h : 
+        integer; height of the array
+         
+    bgr_array : 
+        numpy.ndarray shape (w, h, 3|4) containing BGR pixels or any other pixel format
+        
+    format_32 : 
+        bool True | 'BGR' for 24-bit array (BGR) or False | 'BGRA' for 32-bit array (BGRA)
+         
+
+    Returns
+    -------
+    void
+    
+    """
+
+    # Declare the variable 'l' as the length of the first dimension of the bgr_array
+    # This represents the width or number of pixels in a single row of the image
+    cdef:
+        Py_ssize_t l = bgr_array.shape[0]
+
+        # Create a temporary array 'tmp_array' that holds the normalized pixel values (0.0 to 1.0)
+        # We convert the original 'bgr_array' to a numpy ndarray, divide each pixel value by 255,
+        # and then cast the resulting values into a numpy float32 array.
+        float [::1] tmp_array = numpy.asarray(numpy.ndarray(
+            shape=l, buffer=bgr_array, dtype=uint8)/<float>255.0, dtype=numpy.float32)
+
+    # Call the dithering function with the width (w), height (h), row length (l), 
+    # the original bgr_array, the temporary normalized tmp_array, and the format_32 flag
+    dithering1d_c(w, h, l, bgr_array, tmp_array, format_32)
+
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void dithering1d_c(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        const Py_ssize_t l,
+        unsigned char [::1] bgr_array,
+        float [::1] tmp_array,
+        bint format_32=False
+)nogil:
+    """
+    Dithering Floyd Steinberg (inplace)
+    
+    Dithering is used in computer graphics to create the illusion of "color depth" in images with
+    a limited color palette - a technique also known as color quantization. In a dithered image,
+    colors that are not available in the palette are approximated by a diffusion of colored pixels
+    from within the available palette. The human eye perceives the diffusion as a mixture of 
+    the colors within it (see color vision). Dithered images, particularly those with relatively
+    few colors, can often be distinguished by a characteristic graininess or speckled appearance.
+    
+    Compatible with 24-32 bit image. If the dithering process is not applied to the image, 
+    check the flag format_32. 
+    format_32 should be set to True for image containing per pixel transparency or 
+    equivalent array shape (w, h, 4). 
+    For 24-bit image, set format_32 to False (array shape (w, h, 3))
+    
+    # for 32 bit image
+    dithering1d_c(w, h, im.get_buffer(), tmp_array, True)
+    
+    # for 24 bit image
+    dithering1d_c(w, h, im.get_buffer(), tmp_array, False)
+    
+    Parameters
+    ----------
+    w : 
+        integer; width of the array
+          
+    h : 
+        integer; height of the array
+         
+    l : 
+        integer; length of the array equivalent to w * h * bytesize
+        
+    bgr_array :
+        numpy.ndarray shape (w, h, 3|4) of type uint8 containing BGR pixels or any other pixel format
+        
+    tmp_array :  
+        numpy.ndarray shape (w, h, 3|4) type float32 containing normalized RGB pixels, 
+        copy of the input array `bgr_array`
+        
+    format_32 : 
+        bool True | 'BGR' for 24-bit array (BGR) or False | 'BGRA' for 32-bit array (BGRA)
+         
+    Returns
+    -------
+    void
+    
+    """
+
+
+    if w * h == 0:
+        raise ValueError('\nExpecting w and h non null! got w:%s h:%s' % (w, h))
+
+    cdef int byte_size = l / (w * h)
+
+    if format_32:
+        if byte_size != 4:
+            raise ValueError(
+                "\nIs format_32 set correctly?\n"
+                " bytesize value is %s and format_32 should be set to %s"
+                % (byte_size, True if byte_size==4 else False))
+
+    cdef:
+        float new_red, new_green, new_blue
+        float quantization_error_red, quantization_error_green, quantization_error_blue
+        float oldr, oldg, oldb
+        float * r1
+        float * g1
+        float * b1
+
+    cdef:
+        int i = 0
+        unsigned int wb = w * byte_size
+
+    # cannot use range(0, l, byte_size) as byte_size is not accepted as a cython value
+    # The only way is to force the num_threads to be equal to 1 (1 active thread only), equivalent
+    # to range.
+    for i in prange(0, l, byte_size, schedule=SCHEDULE, num_threads=1):
+
+        # note: skip transparent pixel
+        if format_32 and byte_size==4:
+            if bgr_array[ i + 3 ] == 0:
+                continue
+
+        oldr = tmp_array[ i ]
+        oldg = tmp_array[ i + 1]
+        oldb = tmp_array[ i + 2]
+
+        new_red   = round_c(oldr)
+        new_green = round_c(oldg)
+        new_blue  = round_c(oldb)
+
+        tmp_array[ i  ] = new_red
+        tmp_array[ i + 1] = new_green
+        tmp_array[ i + 2] = new_blue
+
+        quantization_error_red   = <float>(oldr - new_red)
+        quantization_error_green = <float>(oldg - new_green)
+        quantization_error_blue  = <float>(oldb - new_blue)
+
+        if i + 2 + byte_size < l:
+            r1 = &tmp_array[i + byte_size]
+            r1[0] += quantization_error_red * C1
+            g1 = &tmp_array[i + 1 + byte_size]
+            g1[0] +=quantization_error_green * C1
+            b1 = &tmp_array[i + 2 + byte_size]
+            b1[0] += quantization_error_blue * C1
+
+        if i - byte_size + wb + 2 < l:
+            r1 = &tmp_array[i - byte_size + wb]
+            r1[0] += quantization_error_red * C2
+            g1 = &tmp_array[i - byte_size + wb + 1]
+            g1[0] += quantization_error_green * C2
+            b1 = &tmp_array[i - byte_size + wb + 2]
+            b1[0] += quantization_error_blue * C2
+
+        if i + 2 + wb < l:
+            r1 = &tmp_array[i + wb]
+            r1[0] +=  quantization_error_red * C3
+            g1 = &tmp_array[i + 1 + wb]
+            g1[0] +=  quantization_error_green * C3
+            b1 = &tmp_array[i + 2 + wb]
+            b1[0] +=  quantization_error_blue * C3
+
+        if i + byte_size + wb + 2 < l:
+            r1 = &tmp_array[i + byte_size + wb]
+            r1[0] += quantization_error_red * C4
+            g1 = &tmp_array[i + byte_size + wb + 1]
+            g1[0] += quantization_error_green * C4
+            b1 = &tmp_array[i + byte_size + wb + 2]
+            b1[0] += quantization_error_blue * C4
+
+    # OK to run prange here
+    for i in prange(0, l, byte_size, schedule=SCHEDULE, num_threads=THREADS):
+        # no need to set alpha as the change is applied inplace
+        bgr_array[i    ] = <unsigned char>(tmp_array[ i ] * <float>255.0)
+        bgr_array[i + 1] = <unsigned char>(tmp_array[ i + 1] * <float>255.0)
+        bgr_array[i + 2] = <unsigned char>(tmp_array[ i + 2] * <float>255.0)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline dithering1d_cp(
+        Py_ssize_t w,
+        Py_ssize_t h,
+        rgb_array,
+        bint format_32 = False
+):
+    """
+    
+    Dithering Floyd Steinberg (copy)
+    
+    Dithering is used in computer graphics to create the illusion of "color depth" in images with
+    a limited color palette - a technique also known as color quantization. In a dithered image,
+    colors that are not available in the palette are approximated by a diffusion of colored pixels
+    from within the available palette. The human eye perceives the diffusion as a mixture of 
+    the colors within it (see color vision). Dithered images, particularly those with relatively
+    few colors, can often be distinguished by a characteristic graininess or speckled appearance.
+    
+    Compatible with 24-32 bit image. If the dithering process is not applied to the image, 
+    check the flag format_32. 
+    format_32 should be set to True for image containing per pixel transparency or 
+    equivalent array shape (w, h, 4). 
+    For 24-bit image, set format_32 to False (array shape (w, h, 3))
+    
+    
+    # for 24-bit image
+    buff = pygame.image.tobytes(im, "RGB")
+    arr = dithering1d_cp(w, h, buff, False)
+    im = pygame.image.frombuffer(arr, (w, h), "RGB")
+
+    # for 32-bit image
+    buff = pygame.image.tobytes(im, "RGBA")
+    arr = dithering1d_cp(w, h, buff, True)
+    im = pygame.image.frombuffer(arr, (w, h), "RGBA")
+    
+    Parameters
+    ----------
+    w : 
+        integer; width of the array
+        
+    h : 
+        integer; height of the array
+        
+    rgb_array : 
+        numpy.ndarray shape (w, h, 3|4) containing RGB pixels or any other pixel format
+        
+    format_32 : 
+        bool True | 'RGB' for 24-bit array (RGB) or False | 'RGBA' for 32-bit array (RGBA)
+
+    Returns
+    -------
+    copy of the input array with dithering effect applied to the array
+    
+    """
+
+    # Declare the variable 'l' to represent the length of the 'rgb_array'
+    # This is used to determine the number of pixels in the array (in one dimension)
+    cdef:
+        Py_ssize_t l = len(rgb_array)
+
+        # Create a temporary array 'tmp_array' of type unsigned char and size 'l'.
+        # This array is initialized using numpy.empty to hold the modified pixel values during the dithering process.
+        unsigned char[::1] tmp_array = numpy.empty(l, uint8)
+
+    # Call the dithering function 'dithering1d_cp_c' with the necessary parameters:
+    # - 'w' (width) and 'h' (height) for the image dimensions
+    # - 'l' for the length (number of pixels in one row)
+    # - The normalized pixel values from 'rgb_array' (converted to float32 and divided by 255)
+    # - The temporary array 'tmp_array' that will hold the processed pixel values
+    # - 'format_32' to specify the format of the output (likely related to bit depth or processing)
+    return dithering1d_cp_c(
+        w, h, l,
+        numpy.asarray(numpy.frombuffer(rgb_array, dtype=numpy.uint8)/float(255.0),
+            dtype=numpy.float32), tmp_array, format_32)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef dithering1d_cp_c(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        const Py_ssize_t l,
+        float [::1] bgr_array,
+        unsigned char [::1] tmp_array,
+        bint format_32=False):
+    """
+    
+    Dithering Floyd Steinberg (copy)
+    
+    Dithering is used in computer graphics to create the illusion of "color depth" in images with
+    a limited color palette - a technique also known as color quantization. In a dithered image,
+    colors that are not available in the palette are approximated by a diffusion of colored pixels
+    from within the available palette. The human eye perceives the diffusion as a mixture of 
+    the colors within it (see color vision). Dithered images, particularly those with relatively
+    few colors, can often be distinguished by a characteristic graininess or speckled appearance.
+    
+    Compatible with 24-32 bit image. If the dithering process is not applied to the image, 
+    check the flag format_32. 
+    format_32 should be set to True for image containing per pixel transparency or 
+    equivalent array shape (w, h, 4). 
+    For 24-bit image, set format_32 to False (array shape (w, h, 3))
+    
+    
+    # for 24-bit image
+    buff = pygame.image.tobytes(im, "RGB")
+    arr = dithering1d_cp(w, h, buff, tmp_array, False)
+    im = pygame.image.frombuffer(arr, (w, h), "RGB")
+
+    # for 32-bit image
+    buff = pygame.image.tobytes(im, "RGBA")
+    arr = dithering1d_cp(w, h, buff, tmp_array, True)
+    im = pygame.image.frombuffer(arr, (w, h), "RGBA")
+    
+    Parameters
+    ----------
+    w : 
+        integer; width of the array
+        
+    h : 
+        integer; height of the array
+        
+    l : 
+        integer; length of the array
+        
+    bgr_array : 
+        numpy.ndarray shape (w, h, 3|4) type float32, containing normalized BGR pixels range [0.0 ... 1.0] 
+        or any other pixel format
+        
+    tmp_array :  
+        numpy.ndarray shape (w, h, 3|4) type uint8 containing BGR pixels, 
+        copy of the input array `bgr_array`
+        
+    format_32 : 
+        bool True | 'BGR' for 24-bit array (BGR) or False | 'BGRA' for 32-bit array (BGRA)
+
+    Returns
+    -------
+    memoryviewslice shape (w, ) type uint8 RGB or RGBA format (depends on the input array)
+    copy of the input array with dithering effect applied to the array
+    
+    """
+
+    if w * h == 0:
+        raise ValueError('\nExpecting w and h non null! got w:%s h:%s' % (w, h))
+
+    cdef int byte_size = l / (w * h)
+
+    if format_32:
+        if byte_size != 4:
+            raise ValueError(
+                "\nIs format_32 set correctly?\n"
+                " bytesize value is %s and format_32 should be set to %s"
+                % (byte_size, True if byte_size == 4 else False))
+
+    cdef:
+        float new_red, new_green, new_blue
+        float quantization_error_red, quantization_error_green, quantization_error_blue
+        float oldr, oldg, oldb
+        float * r1
+        float * g1
+        float * b1
+
+    cdef:
+        int i = 0
+        unsigned int wb = w * byte_size
+
+
+    with nogil:
+
+        for i in prange(0, l, byte_size, schedule=SCHEDULE, num_threads=1):
+
+            # note: skip transparent pixel
+            if format_32:
+                if bgr_array[ i + 3] == 0:
+                    continue
+
+            oldr = bgr_array[ i ]
+            oldg = bgr_array[ i + 1]
+            oldb = bgr_array[ i + 2]
+
+            new_red   = round_c(oldr)
+            new_green = round_c(oldg)
+            new_blue  = round_c(oldb)
+
+            bgr_array[ i  ] = new_red
+            bgr_array[ i + 1] = new_green
+            bgr_array[ i + 2] = new_blue
+
+            quantization_error_red   = <float>(oldr - new_red)
+            quantization_error_green = <float>(oldg - new_green)
+            quantization_error_blue  = <float>(oldb - new_blue)
+
+
+            if i + 2 + byte_size < l:
+                r1 = &bgr_array[i + byte_size]
+                r1[0] = r1[0] + quantization_error_red * C1
+                g1 = &bgr_array[i + 1 + byte_size]
+                g1[0] = g1[0] + quantization_error_green * C1
+                b1 = &bgr_array[i + 2 + byte_size]
+                b1[0] = b1[0] + quantization_error_blue * C1
+
+
+            if i - byte_size + wb + 2 < l:
+                r1 = &bgr_array[i - byte_size + wb]
+                r1[0] = r1[0] + quantization_error_red * C2
+                g1 = &bgr_array[i - byte_size + wb + 1]
+                g1[0] = g1[0] + quantization_error_green * C2
+                b1 = &bgr_array[i - byte_size + wb + 2]
+                b1[0] = b1[0] + quantization_error_blue * C2
+
+
+            if i + 2 + wb < l:
+                r1 = &bgr_array[i + wb]
+                r1[0] = r1[0] + quantization_error_red * C3
+                g1 = &bgr_array[i + 1 + wb]
+                g1[0] = g1[0] + quantization_error_green * C3
+                b1 = &bgr_array[i + 2 + wb]
+                b1[0] = b1[0] + quantization_error_blue * C3
+
+
+            if i + byte_size + wb + 2 < l:
+                r1 = &bgr_array[i + byte_size + wb]
+                r1[0] = r1[0] + quantization_error_red * C4
+                g1 = &bgr_array[i + byte_size + wb + 1]
+                g1[0] = g1[0] + quantization_error_green * C4
+                b1 = &bgr_array[i + byte_size + wb + 2]
+                b1[0] = b1[0] + quantization_error_blue * C4
+
+        for i in prange(0, l, byte_size, schedule=SCHEDULE, num_threads=THREADS):
+            tmp_array[i    ] = <unsigned char>(bgr_array[ i ] * <float>255.0)
+            tmp_array[i + 1] = <unsigned char>(bgr_array[ i + 1] * <float>255.0)
+            tmp_array[i + 2] = <unsigned char>(bgr_array[ i + 2] * <float>255.0)
+            if format_32:
+                tmp_array[ i + 3 ] = <unsigned char> (bgr_array[ i + 3 ] * <float> 255.0)
+
+    return tmp_array
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef object dithering_atkinson(object surface_):
     """
-    Dithering atkinson
-
+    
+    Dithering atkinson (copy)
+    
+    Atkinson dithering is a variant of Floyd–Steinberg dithering designed by 
+    Bill Atkinson at Apple Computer, and used in the original Macintosh computer. 
+    
+    Dithering is used in computer graphics to create the illusion of "color depth" in images with
+    a limited color palette - a technique also known as color quantization. In a dithered image,
+    colors that are not available in the palette are approximated by a diffusion of colored pixels
+    from within the available palette. The human eye perceives the diffusion as a mixture of 
+    the colors within it (see color vision). Dithered images, particularly those with relatively
+    few colors, can often be distinguished by a characteristic graininess or speckled appearance.
+    
     Take a pygame surface as argument format 24-32 bit and convert it to a 3d array format 
     (w, h, 3) type float (float32, single precision). 
-    As the image is converted to a different data type format (uint8 to float32), 
-    the transformation cannot be applied inplace. The image returned by the method dithering 
-    is a copy of the original image.   
+    
+    As the image is converted to a different data type format (conversion from uint8 to float32), 
+    the transformation cannot be applied inplace. 
+    
+    The image returned is a copy of the original image.   
+    
+    e.g:
+    # for 24, 32-bit image format 
+     image = dithering_atkinson(image)
 
-    :param surface_: Pygame surface format 24-32 bit 
-    :return        : Surface; 
+    :param surface_:
+        Pygame surface format 24, 32-bit
+         
+    :return:
+        pygame surface format 24-bit 
 
     """
+
+    # Ensure that the 'surface_' object is an instance of pygame.Surface
+    # If the surface is not of the correct type, an error is raised with an informative message
     assert PyObject_IsInstance(surface_, Surface), \
-        'Argument surface_ must be a pygame.Surface got %s ' % type(surface_)
+        'Argument surface_ must be a pygame.Surface, got %s ' % type(surface_)
 
     try:
+        # Attempt to extract the pixel data as a 3D array from the 'surface_' using the function 'pixels3d'.
+        # This function assumes the surface contains the image data in 3D (e.g., RGB or RGBA format).
         rgb_array = pixels3d(surface_)
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        # If the extraction of pixel data fails, raise an error indicating the failure
+        # and provide details about the exception that caused the issue.
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    # Normalize the pixel values (dividing by 255) to bring them into the range [0, 1],
+    # then cast the array to a float32 type.
+    # The resulting normalized array is passed to the 'dithering_atkinson_c' function
+    # to apply the Atkinson dithering algorithm.
 
     return dithering_atkinson_c(numpy.asarray(rgb_array / <float> 255.0, dtype=numpy.float32))
 
 
+
+
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -3331,30 +7400,314 @@ cpdef object dithering_atkinson(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void dithering_atkinson1d(
+    Py_ssize_t w,
+    Py_ssize_t h,
+    unsigned char [::1] c_buffer,
+    bint format_32=False
+):
+
+    """
+    
+    Atkinson dithering for 1d array (inplace)
+    
+    Atkinson dithering is a variant of Floyd–Steinberg dithering designed by 
+    Bill Atkinson at Apple Computer, and used in the original Macintosh computer. 
+    
+    Dithering is used in computer graphics to create the illusion of "color depth" in images with
+    a limited color palette - a technique also known as color quantization. In a dithered image,
+    colors that are not available in the palette are approximated by a diffusion of colored pixels
+    from within the available palette. The human eye perceives the diffusion as a mixture of 
+    the colors within it (see color vision). Dithered images, particularly those with relatively
+    few colors, can often be distinguished by a characteristic graininess or speckled appearance.
+    
+    Compatible with 24-32 bit image. If the dithering process is not applied to the image, 
+    check the flag format_32. 
+    format_32 should be set to True for image containing per pixel transparency or 
+    equivalent array shape (w, h, 4). 
+    For 24-bit image, set format_32 to False (array shape (w, h, 3))
+    
+    # for 32 bit image
+    dithering_atkinson1d(w, h, im.get_buffer(), True)
+    
+    # for 24 bit image
+    dithering_atkinson1d(w, h, im.get_buffer(), False)
+    
+    Parameters
+    ----------
+    w : 
+        integer; width of the array
+          
+    h : 
+        integer; height of the array
+         
+    c_buffer : 
+        C-Buffer or memoryviewslice or 1d numpy.ndarray containing BGR pixels or any other pixel format. 
+        datatype uint8.
+        
+        
+    format_32 : 
+        bool; True for 'RGB' 24-bit array (BGR) or False for 32-bit array (BGRA)
+         
+    Returns
+    -------
+    void
+
+    """
+
+    # Define local variables within the 'cdef' block:
+    cdef:
+        # 'l' is the length of the 'c_buffer', representing the number of elements in the buffer.
+        Py_ssize_t l = len(c_buffer)
+
+        # 'tmp_buffer' is an array created by converting the 'c_buffer' into a 1D NumPy array of 'uint8' type.
+        # Then, it's normalized by dividing by 255.0 to scale the pixel values to the range [0, 1].
+        # The resulting array is cast to 'float32' type for further processing.
+        float [ ::1 ] tmp_buffer = \
+            numpy.asarray(
+                numpy.ndarray(shape=l, buffer=c_buffer, dtype=uint8)/<float>255.0,  # Normalize to [0,1] by dividing by 255
+                dtype=numpy.float32  # Convert the result to float32 for further processing
+            )
+
+    # Apply the Atkinson dithering algorithm to the image data using the 'dithering_atkinson1d_c' function.
+    # Parameters passed include width ('w'), height ('h'), length ('l') of the buffer, the 'c_buffer' itself,
+    # the temporary 'tmp_buffer' used for processing, and a format flag ('format_32').
+    dithering_atkinson1d_c(w, h, l, c_buffer, tmp_buffer, format_32)
+
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void dithering_atkinson1d_c(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        const Py_ssize_t l,
+        unsigned char [::1] c_buffer,
+        float [::1] tmp_buffer,
+        bint format_32=False
+)nogil:
+
+    """
+    
+    Atkinson dithering for 1d array (inplace)
+    
+    Atkinson dithering is a variant of Floyd–Steinberg dithering designed by 
+    Bill Atkinson at Apple Computer, and used in the original Macintosh computer. 
+    
+    Dithering is used in computer graphics to create the illusion of "color depth" in images with
+    a limited color palette - a technique also known as color quantization. In a dithered image,
+    colors that are not available in the palette are approximated by a diffusion of colored pixels
+    from within the available palette. The human eye perceives the diffusion as a mixture of 
+    the colors within it (see color vision). Dithered images, particularly those with relatively
+    few colors, can often be distinguished by a characteristic graininess or speckled appearance.
+    
+    
+    # for 32 bit image
+    dithering_atkinson1d_c(w, h, im.get_buffer(), tmp_buffer, True)
+    
+    # for 24 bit image
+    dithering_atkinson1d_c(w, h, im.get_buffer(), tmp_buffer, False)
+    
+    Parameters
+    ----------
+    w : 
+        integer; width of the array
+          
+    h : 
+        integer; height of the array
+         
+    l : 
+        integer; length of the array equivalent to w * h * bytesize
+        
+    c_buffer : 
+        C buffer, memoryviewslice or 1d numpy.ndarray of type uint8 
+        containing BGR pixels or any other pixel format
+        
+    tmp_buffer : 
+        C buffer, memoryviewslice or 1d numpy.ndarray of type float32 
+        containing BGR pixels or any other pixel format, copy of the input array with 
+        normalized pixels.
+        
+    format_32 : 
+        bool; True for 24-bit array (BGR) or False for 32-bit array (BGRA)
+         
+    Returns
+    -------
+    void
+
+    """
+
+
+    if w * h == 0:
+        with gil:
+            raise ValueError('\nExpecting w and h non null! got w:%s h:%s' % (w, h))
+
+    cdef int byte_size = l / (w * h)
+
+    if format_32:
+        if byte_size != 4:
+            with gil:
+                raise ValueError(
+                    "\nIs format_32 set correctly?\n"
+                    " bytesize value is %s and format_32 should be set to %s"
+                    % (byte_size, True if byte_size==4 else False))
+
+    cdef:
+        float new_red, new_green, new_blue
+        float quantization_error_red, quantization_error_green, quantization_error_blue
+        float oldr, oldg, oldb
+
+        float * ptr
+
+
+    cdef:
+        int i = 0
+        unsigned int wb = w * byte_size
+
+    # cannot use range(0, l, byte_size) as byte_size is not accepted as a cython value
+    # The only way is to force the num_threads to be equal to 1 (1 active thread only), equivalent
+    # to range.
+    for i in prange(0, l, byte_size, schedule=SCHEDULE, num_threads=1):
+
+        # ptr = &tmp_buffer[ i ]
+
+        # note: skip transparent pixel
+        if format_32 and byte_size==4:
+            if c_buffer[ i + 3 ] == 0:
+                continue
+
+        oldr = tmp_buffer[ i ]
+        oldg = tmp_buffer[ i + 1 ]
+        oldb = tmp_buffer[ i + 2 ]
+
+        new_red   = round_c(oldr)
+        new_green = round_c(oldg)
+        new_blue  = round_c(oldb)
+
+        tmp_buffer[ i ] = new_red
+        tmp_buffer[ i + 1 ] = new_green
+        tmp_buffer[ i + 2 ] = new_blue
+
+        quantization_error_red   = <float>(oldr - new_red) * <float>0.125
+        quantization_error_green = <float>(oldg - new_green) * <float>0.125
+        quantization_error_blue  = <float>(oldb - new_blue) * <float>0.125
+
+        ptr = &tmp_buffer[ i ]
+
+        if i + 2 + byte_size < l:
+
+            (ptr + byte_size)[0] += quantization_error_red
+            (ptr + 1 + byte_size)[ 0 ] += quantization_error_green
+            (ptr + 2 + byte_size)[ 0 ] += quantization_error_blue
+
+
+        if i + 2 + 2 * byte_size < l:
+
+            (ptr + 2 * byte_size)[ 0 ] += quantization_error_red
+            (ptr + 1 + 2 * byte_size)[ 0 ] += quantization_error_green
+            (ptr + 2 + 2 * byte_size)[ 0 ] += quantization_error_blue
+
+        if i - byte_size + wb + 2 < l:
+
+            (ptr - byte_size + wb)[ 0 ] += quantization_error_red
+            (ptr - byte_size + wb + 1)[ 0 ] += quantization_error_green
+            (ptr + byte_size + wb + 2)[ 0 ] += quantization_error_blue
+
+        if i + 2 + wb < l:
+
+            (ptr + wb)[ 0 ] += quantization_error_red
+            (ptr + wb + 1)[ 0 ] += quantization_error_green
+            (ptr + wb + 2)[ 0 ] += quantization_error_blue
+
+        if i + byte_size + wb + 2 < l:
+
+            (ptr + byte_size + wb)[ 0 ] += quantization_error_red
+            (ptr + byte_size + wb + 1)[ 0 ] += quantization_error_green
+            (ptr + byte_size + wb + 2)[ 0 ] += quantization_error_blue
+
+        if i + 2 * wb + 2 < l:
+
+            (ptr + 2 * wb)[ 0 ] += quantization_error_red
+            (ptr + 2 * wb + 1)[ 0 ] += quantization_error_green
+            (ptr + 2 * wb + 2)[ 0 ] += quantization_error_blue
+
+    # OK to run prange here
+    for i in prange(0, l, byte_size, schedule=SCHEDULE, num_threads=THREADS):
+        # no need to set alpha as the change is applied inplace
+        c_buffer[i    ] = <unsigned char>(tmp_buffer[ i ] * <float>255.0)
+        c_buffer[i + 1] = <unsigned char>(tmp_buffer[ i + 1] * <float>255.0)
+        c_buffer[i + 2] = <unsigned char>(tmp_buffer[ i + 2] * <float>255.0)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef object pixelation(object surface_, unsigned int blocksize_=64):
     """
+    
     Pixelate a pygame.Surface 
+    
+    In computer graphics, pixelation (also spelled pixellation in British English) 
+    is caused by displaying a bitmap or a section of a bitmap at such a large size 
+    that individual pixels, small single-colored square display elements that comprise
+    the bitmap, are visible. Such an image is said to be pixelated (pixellated in the UK). 
     
     Return a new pixelated surface
     Blocksize represent the square pixel size (default is 64, 64x64 pixel block).
     
-    :param surface_: pygame.Surface; 
-    :param blocksize_: unsigned int; block size used for the pixelation process, default is 64
-    :return: pixelated surface
+    e.g:
+    # Compatible with 24, 32-bit images
+    pix_image = pixelation(image)
+    
+    :param surface_: 
+        pygame.Surface;
+         
+    :param blocksize_: 
+        unsigned int; block size used for the pixelation process, default is 64
+        
+    :return: 
+        pixelated surface
     """
 
+    # Ensure that the 'surface_' is a valid pygame.Surface object.
+    # If it's not, raise an error with a message that includes the type of the provided object.
     assert PyObject_IsInstance(surface_, Surface), \
         'Argument surface_ must be a pygame.Surface got %s ' % type(surface_)
 
+    # Check if the 'blocksize_' is greater than 4.
+    # If it's not, raise an error, as block size must be > 4.
     assert blocksize_ > 4, 'Invalid block size, blocksize must be > 4  got %s ' % blocksize_
 
+    # Define local variables for the width ('w') and height ('h') of the surface.
     cdef Py_ssize_t w, h
-    w, h = surface_.get_size()
+    w, h = surface_.get_size()  # Get the dimensions of the surface (width, height).
+
+    # Create a smaller version of the surface by scaling it down to the specified block size.
+    # The 'smoothscale' function smoothly resizes the surface to the given dimensions.
     cdef object small = smoothscale(surface_, (blocksize_, blocksize_))
+
+    # Scale the resized image back to the original surface dimensions ('w', 'h').
+    # This effectively applies the block-based scaling.
     return scale(small, (w, h))
 
 
 
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -3362,42 +7715,82 @@ cpdef object pixelation(object surface_, unsigned int blocksize_=64):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef object blend(object source_, object destination_, float percentage_):
+@cython.exceptval(check=False)
+cpdef object blend(object source, object destination, float percentage):
     """
-    BLEND A SOURCE TEXTURE TOWARD A DESTINATION TEXTURE 
+    Alpha Blending 
     
-    The shader create a new image from both source_ and destination_
-
-    * Video system must be initialised 
-    * source_ & destination_ Textures must be same sizes
-    * Compatible with 24 - 32 bit surface
-    * Output create a new surface
-
-
-    :param source_     : pygame.Surface (Source)
-    :param destination_: pygame.Surface (Destination)
-    :param percentage_ : float; Percentage value between [0.0 ... 100.0]
-    :return: return    : Return a 24 bit pygame.Surface and blended with a percentage
-                         of the destination texture.
+    Blend two images together.
+    
+    e.g:
+    # compatible 24, 32-bit
+    transition = blend(source=image1, destination=image2, percentage =60)
+    
+    :param source: 
+        pygame.Surface (Source), compatible 24, 32-bit 
+        
+    :param destination: 
+        pygame.Surface (Destination), compatible 24, 32-bit
+        
+    :param percentage: 
+        float; Percentage value between [0.0 ... 100.0]
+        
+    :return: return: 
+        Return a new surface (24-bit) blend of both input images.
+        
     """
-    assert PyObject_IsInstance(source_, Surface), \
-        'Argument source_ must be a pygame.Surface got %s ' % type(source_)
 
-    assert PyObject_IsInstance(destination_, numpy.ndarray), \
-        'Argument destination_ must be a numpy.ndarray got %s ' % type(destination_)
+    # Ensure that the 'source' is a valid pygame.Surface object.
+    # If not, raise an error with a message that includes the type of the provided object.
+    assert PyObject_IsInstance(source, Surface), \
+        'Argument source must be a pygame.Surface got %s ' % type(source)
 
-    assert 0.0 <= percentage_ <= 100.0, \
-        "\nIncorrect value for argument percentage should be [0.0 ... 100.0] got %s " % percentage_
+    # Ensure that 'destination' is also a valid pygame.Surface object.
+    # If 'destination' is not a Surface, raise an error with a message.
+    assert PyObject_IsInstance(destination, Surface), \
+        'Argument destination must be a pygame.Surface got %s ' % type(destination)
 
-    if percentage_ == 0.0:
-        return source_
+    # Validate that the 'percentage' argument is within the valid range [0.0, 100.0].
+    # If it’s not, raise an error with the out-of-range value.
+    assert 0.0 <= percentage <= 100.0, \
+        "\nIncorrect value for argument percentage should be [0.0 ... 100.0] got %s " % percentage
 
-    assert source_.get_size() == destination_.shape[:2], \
+    # If percentage is 0.0, simply return the original source image (no blending needed).
+    if percentage == 0.0:
+        return source
+
+    # Ensure that both the 'source' and 'destination' surfaces have the same dimensions.
+    # If they don't match, raise an error with the dimensions of both surfaces.
+    assert source.get_size() == destination.get_size(), \
         'Source and Destination surfaces must have same dimensions: ' \
         'Source (w:%s, h:%s), destination (w:%s, h:%s).' % \
-        (*source_.get_size(), *destination_.shape[:2])
+        (*source.get_size(), *destination.get_size())
 
-    return blending(source_, destination_, percentage_)
+    # Define local variables for the 3D pixel arrays of the 'source' and 'destination' surfaces.
+    cdef:
+        unsigned char [:, :, :] source_array
+        unsigned char[:, :, :] destination_array
+
+    # Attempt to reference the pixel data of the source surface as a 3D array.
+    # If an error occurs, raise a ValueError indicating the failure.
+    try:
+        source_array = source.get_view('3')
+    except Exception as e:
+        raise ValueError(
+            "\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    # Attempt to reference the pixel data of the destination surface as a 3D array.
+    # If an error occurs, raise a ValueError indicating the failure.
+    try:
+        destination_array = destination.get_view('3')
+    except Exception as e:
+        raise ValueError(
+            "\nCannot reference destination pixels into a 3d array.\n %s " % e)
+
+    # Call the 'blend_c' function to perform the blending operation between the source and destination arrays.
+    # The blending operation uses the specified 'percentage' value.
+    return blend_c(source_array, destination_array, percentage)
+
 
 
 
@@ -3408,109 +7801,261 @@ cpdef object blend(object source_, object destination_, float percentage_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef void blend_inplace(
-        object source_,
-        object destination_,
-        float percentage_
-        ):
-    """
-    BLEND A SOURCE TEXTURE TOWARD A DESTINATION TEXTURE 
-
-    The shader create a new image from both source_ and destination_
-
-    * Video system must be initialised 
-    * source_ & destination_ Textures must be same sizes
-    * Compatible with 24 - 32 bit surface
-    * Output create a new surface
-
-    :param source_     : pygame.Surface (Source)
-    :param destination_: 3d array (Destination)
-    :param percentage_ : float; Percentage value between [0.0 ... 100.0]
-    :return: return    : Return a 24 bit pygame.Surface and blended with a percentage
-                         of the destination texture.
-    """
-    assert PyObject_IsInstance(source_, Surface), \
-        'Argument source_ must be a pygame.Surface got %s ' % type(source_)
-
-    assert PyObject_IsInstance(destination_, numpy.ndarray), \
-        'Argument destination_ must be a numpy.ndarray got %s ' % type(destination_)
-
-    assert 0.0 <= percentage_ <= 100.0, \
-        "\nIncorrect value for argument percentage should be [0.0 ... 100.0] got %s " % percentage_
-
-    assert source_.get_size() == destination_.shape[ :2 ], \
-        'Source and Destination surfaces must have same dimensions: ' \
-        'Source (w:%s, h:%s), destination (w:%s, h:%s).' % \
-        (*source_.get_size(), *destination_.shape[ :2 ])
-
-    blend_inplace_c(source_, destination_, percentage_)
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef cartoon(
-        object surface_,
-        unsigned int sobel_threshold_ = 128,
-        unsigned int median_kernel_ = 2,
-        unsigned int color_  = 8,
-        unsigned int flag_  = BLEND_RGB_ADD
+@cython.exceptval(check=False)
+cpdef blend1d(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        const unsigned char [::1] source,
+        const unsigned char [::1] destination,
+        float percentage,
+        modes,
+        bint format_32 = False
 ):
     """
-    CREATE A CARTOON EFFECT FROM A GIVEN PYGAME SURFACE/IMAGE
+    Alpha blending 
     
-    * Compatible with 24 - 32 bit image 
+    Blend 2 buffers together (1d array)
+
+    Use this method to blend two surfaces together by providing 2 images buffers as source
+    and destination. 
     
-    :param surface_: pygame.Surface compatible 24 - 32 bit 
-    :param sobel_threshold_: integer sobel threshold
-    :param median_kernel_  : integer median kernel  
-    :param color_          : integer; color reduction value (max color)
-    :param flag_           : integer; Blend flag e.g (BLEND_RGB_ADD, BLEND_RGB_SUB, 
-                             BLEND_RGB_MULT, BLEND_RGB_MAX, BLEND_RGB_MIN  
-    :return                : Return a pygame Surface with the cartoon effect 
+    With the argument `percentage`, you can control the % of both images
+    for example, if percentage is set to 25%, the source image will be drawn at 25% while the
+    destination image will be drawn at 75%.
+    
+    Argument `modes` can be RGB(X) for buffer format RGB(X) or BGR(X) for buffer pixel type BGR(X).
+    
+    Set `format_32` to True if the source and destination arrays contains per-pixel transparency (alpha values)
+
+    NOTE:
+    Both source & destination buffers must have the same length, 
+    same data type (uint8) and same pixel format.
+    Percentage must be in range [0...100]
+    modes must be RGB(X) or BGR(X)
+
+    # for 32 bit images.
+    im = blend1d(w, h, im.get_buffer(), BCK.get_buffer(), 25, 'BGR(X)', True)
+
+    # for 24 bit images
+    im = blend1d(w, h, im.get_buffer(), BCK.get_buffer(), 25, 'BGR(X)', False)
+
+
+    Parameters
+    ----------
+    w: 
+        integer; with of the source array
+        
+    h: 
+        integer; height of the source array
+        
+    source: 
+        numpy.ndarray; shape (w, ) of type uint8 containing 
+        RGB(A) or BGR(A) pixel format
+        
+    destination: 
+        numpy.ndarray; numpy.ndarray; shape (w, ) of type uint8 
+        containing pixels with format identical to the source array
+        
+    percentage: 
+        float; blending value 0 to 100%
+        
+    modes: 
+        str; can be RGB(X) or BGR(X). Use RGB(X) if the source array pixel
+        format is equivalent to RGB or RGBA, otherwise select BGR(X)
+    
+    format_32: 
+        bool; default is False. Select True if the source array 
+        contains alpha transparency.
+
+    Returns
+    -------
+    Returns a pygame.Surface with the blending effect.
+    The final output image can be 24-32 bit format and depends on 
+    the source & destination buffers shapes
+
+
     """
-    if median_kernel_ < 2:
-        raise ValueError("\nKernel size median_kernel_ must be >=2")
-    if not (0 <= sobel_threshold_<=255):
-        raise ValueError("\nSobel threshold sobel_threshold_ must be in range 0...255")
 
-    return cartoon_c(surface_, sobel_threshold_, median_kernel_, color_, flag_)
+    # Validate that the 'percentage' argument is within the valid range [0.0, 100.0].
+    # If it's not, raise an error with the out-of-range value.
+    assert 0.0 <= percentage <= 100.0, \
+        "\nIncorrect value for argument percentage should be [0.0 ... 100.0] got %s " % percentage
+
+    # Define local variables for the length of 'source' and calculate the byte size for the image data.
+    # The byte size is determined by dividing the length of the source by the product of image width (w) and height (h).
+    cdef:
+        Py_ssize_t l = len(source)   # Length of the source array (number of elements).
+        int byte_size = l / (w * h)  # Determine the byte size (channels per pixel).
+
+    # If the percentage is 0.0, simply return the destination as it is, using the appropriate color format.
+    # 'RGBA' is used if the byte size is 4 (meaning the source has alpha), otherwise 'RGB' is used.
+    if percentage == 0.0:
+        return frombuffer(destination, (w, h), 'RGBA' if byte_size == 4 else 'RGB')
+
+    # Ensure that the 'source' and 'destination' arrays have the same length.
+    # If they don't, raise an error with the mismatched lengths.
+    assert l == len(destination), \
+        'Source and Destination arrays must have same dimensions: ' \
+        'Source (w,) %s, destination (w, ) %s).' % (l, len(destination))
+
+    # Call the 'blend1d_c' function to perform the blending operation.
+    # The blending operation uses the specified 'percentage' value, image width (w), height (h),
+    # and the byte size format (RGBA or RGB), as well as additional blending modes.
+    return blend1d_c(w, h, l, source, destination, percentage, modes, format_32)
 
 
 
-@cython.profile(False)
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.profile(False)
 @cython.initializedcheck(False)
-cpdef object spectrum(int width, int height, float gamma=1.0):
-    """
-
-    CREATE A PYGAME SURFACE DISPLAYING THE LIGHT SPECTRUM 380-750 nm
-
-    Color   Wavelength(nm) Frequency(THz)
-    Red     620-750        484-400
-    Orange  590-620        508-484
-    Yellow  570-590        526-508
-    Green   495-570        606-526
-    Blue    450-495        668-606
-    Violet  380-450        789-668
-
-    :param width: integer; width of the image
-    :param height: integer; height of the image
-    :param gamma: float; gamma value 
-    :return: Return a pygame surface 24-bit (width, height) converted for fast 
-    blit 
+@cython.exceptval(check=False)
+cdef blend1d_c(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        const Py_ssize_t l,
+        const unsigned char[::1] source_array,
+        const unsigned char[::1] destination_array,
+        float percentage,
+        modes,
+        bint format_32 = False):
 
     """
+    Alpha blending 
+    
+    Blend 2 arrays together (1d array)
 
-    return spectrum_c(width, height, gamma)
+    Use this method to blend two arrays together by providing 2 buffers as source
+    and destination. 
+    
+    With the argument `percentage`, you can control the % of both images
+    for example, if percentage is set to 25%, the source image will be drawn at 25% while the
+    destination image will be drawn at 75%.
+    
+    Argument `modes` can be RGB(X) for buffer format RGB(X) or BGR(X) for buffer pixel type BGR(X).
+    
+    Set `format_32` to True if the source and destination arrays contains per-pixel transparency (alpha values)
+
+    NOTE:
+    Both source & destination buffers must have the same length, 
+    same data type (uint8) and same pixel format.
+    Percentage must be in range [0...100]
+    modes must be RGB(X) or BGR(X)
+
+    # for 32 bit images.
+    im = blend1d_c(w, h, im.get_buffer(), BCK.get_buffer(), 25, 'BGR(X)', True)
+
+    # for 24 bit images
+    im = blend1d_c(w, h, im.get_buffer(), BCK.get_buffer(), 25, 'BGR(X)', False)
+
+
+    Parameters
+    ----------
+    w : 
+        integer; with of the source array
+        
+    h : 
+        integer; height of the source array
+        
+    l : 
+        integer; length of the array
+        
+    source_array :
+        numpy.ndarray; shape (w, ) of type uint8 containing RGB(A) or BGR(A) pixel format
+        
+    destination_array : 
+        numpy.ndarray; numpy.ndarray; shape (w, ) of type uint8 containing pixels with format identical to
+        the source array
+        
+    percentage : 
+        float; blending value 0 to 100%
+        
+    modes : 
+        str; can be RGB(X) or BGR(X). Use RGB(X) if the source array pixel format is equivalent to RGB or RGBA,
+        otherwise select BGR(X)
+        
+    format_32 :
+        bool; default is False. Select True if the source array contains alpha transparency.
+
+    Returns
+    -------
+    Returns a pygame.Surface with the blending effect.
+    The final output image can be 24-32 bit format and depends 
+    on the source & destination buffers.
+
+
+    """
+
+    if w * h == 0:
+        raise ValueError('\nExpecting w and h non null! got w:%s h:%s' % (w, h))
+
+    cdef int byte_size = l / (w * h)
+
+    if format_32:
+        if byte_size != 4:
+            raise ValueError(
+                "\nIs format_32 set correctly?\n"
+                " bytesize value is %s and format_32 should be set to %s"
+                % (byte_size, True if byte_size==4 else False))
+
+    cdef:
+        unsigned char[ ::1 ] tmp_array = empty(l, dtype = uint8)
+        int j=0
+        float c4 = percentage * <float>0.01
+        float tmp = <float> 1.0 - c4
+        unsigned char * f_array
+        const unsigned char * dst_array
+        const unsigned char * src_array
+
+
+    with nogil:
+        for j in prange(0, l, byte_size, schedule=SCHEDULE, num_threads=THREADS):
+
+                dst_array = &destination_array[ j ]
+                src_array = &source_array[ j ]
+                f_array = &tmp_array[ j ]
+
+                if modes == 'BGR(X)':
+
+                    # using pointer address instead of array indexing.
+                    # In a contiguous buffer memory array the next element is the pointer address + 1
+                    f_array[ 0 ] = min(<unsigned char> (<float> (src_array + 2)[0] * c4 + (dst_array + 2)[ 0 ] * tmp),
+                                       <unsigned char> 255)
+
+                    (f_array + 1)[ 0 ] = min(
+                        <unsigned char> (<float> (src_array + 1)[ 0 ] * c4 + (dst_array + 1)[ 0 ] * tmp),
+                        <unsigned char> 255)
+
+                    (f_array + 2)[ 0 ] = min(
+                        <unsigned char> (<float> src_array[ 0 ] * c4 + dst_array[ 0 ] * tmp),
+                        <unsigned char> 255)
+
+                    # force the alpha value to 255
+                    if byte_size == 4:
+                        (f_array + 3)[ 0 ] = <unsigned char>255
+
+                # modes RGB(X)
+                else:
+                    f_array[ 0 ] = min(<unsigned char> (<float> src_array[ 0 ] * c4 + dst_array[ 0 ] * tmp),
+                                       <unsigned char> 255)
+
+                    (f_array + 1)[ 0 ] = min(
+                        <unsigned char> (<float> (src_array + 1)[ 0 ] * c4 + (dst_array + 1)[ 0 ] * tmp),
+                        <unsigned char> 255)
+
+                    (f_array + 2)[ 0 ] = min(
+                        <unsigned char> (<float> (src_array + 2)[ 0 ] * c4 + (dst_array + 2)[ 0 ] * tmp),
+                        <unsigned char> 255)
+
+                    # force the alpha value to 255
+                    if byte_size == 4:
+                        (f_array + 3)[ 0 ] = <unsigned char> 255
+
+    return frombuffer(tmp_array, (w, h), 'RGBA' if byte_size == 4 else 'RGB')
+
 
 
 @cython.binding(False)
@@ -3520,24 +8065,198 @@ cpdef object spectrum(int width, int height, float gamma=1.0):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void convert_27colors(object surface_):
-
+@cython.exceptval(check=False)
+cpdef void blend_inplace(
+        object destination,
+        object source,
+        float percentage
+        ):
     """
-    THIS ALGORITHM CONVERT AN IMAGE USING 27 COLORS ONLY
-
-    :param surface_: numpy.ndarray; containing the pixels RGB. Array shape (w, h, 3)  
-    :return: void 
+    
+    Blend the source image into the destination (inplace) 
+    
+    source & destination Textures must be same sizes
+    Compatible with 24 - 32 bit surface
+    
+    e.g:
+    blend_inplace(destination, source, percentage = VALUE)
+    
+    :param destination     : 
+        pygame.Surface, compatible 24, 32-bit 
+    
+    :param source: 
+        pygame.Surface, compatible 24, 32-bit
+    
+    :param percentage : 
+        float; Percentage value between [0.0 ... 100.0]
+    
+    :return:  
+        void
+        
     """
+
+    # Ensure that 'source' is a valid Pygame Surface object.
+    # If it's not, raise an error with the type of the argument.
+    assert PyObject_IsInstance(source, Surface), \
+        'Argument source must be a pygame.Surface got %s ' % type(source)
+
+    # Ensure that 'destination' is also a valid Pygame Surface object.
+    # If it's not, raise an error with the type of the argument.
+    assert PyObject_IsInstance(destination, Surface), \
+        'Argument destination must be a pygame.Surface got %s ' % type(destination)
+
+    # Validate that the 'percentage' argument is within the valid range [0.0, 100.0].
+    # If it's outside this range, raise an error with the provided percentage value.
+    assert 0.0 <= percentage <= 100.0, \
+        "\nIncorrect value for argument percentage should be [0.0 ... 100.0] got %s " % percentage
+
+    # Check that the 'source' and 'destination' surfaces have the same size.
+    # If the dimensions don't match, raise an error with the respective sizes.
+    assert source.get_size() == destination.get_size(), \
+        'Source and Destination surfaces must have same dimensions: ' \
+        'Source (w:%s, h:%s), destination (w:%s, h:%s).' % \
+        (*source.get_size(), *destination.get_size())
+
+    # Attempt to get the pixel data of the source surface as a 3D array.
+    # If this fails, raise a ValueError with the exception message.
+    try:
+        source_array = source.get_view('3')  # '3' refers to a 3D array (height, width, channels)
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    # Attempt to get the pixel data of the destination surface as a 3D array.
+    # If this fails, raise a ValueError with the exception message.
+    try:
+        destination_array = destination.get_view('3')
+    except Exception as e:
+        raise ValueError("\nCannot reference destination pixels into a 3d array.\n %s " % e)
+
+    # Call the 'blend_inplace_c' function to perform the blending operation between the source and destination arrays.
+    # The blending operation is done in-place based on the specified 'percentage' value.
+    blend_inplace_c(destination_array, source_array, percentage)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef cartoon(
+        object surface_,
+        unsigned int sobel_threshold = 128,
+        unsigned int median_kernel   = 2,
+        unsigned int color           = 8,
+        unsigned int flag            = BLEND_RGB_ADD
+):
+    """
+    Create a cartoon effect
+    
+    Compatible with 24 - 32 bit image 
+    
+    e.g:
+    cartoon_image = cartoon(image)
+    
+    Parameters
+    ----------
+    surface_ : 
+        pygame.Surface compatible 24 - 32 bit 
+    
+    sobel_threshold : 
+        integer sobel threshold
+    
+    median_kernel : 
+        integer median kernel 
+    
+    color : 
+        integer; color reduction value (max color)
+    
+    flag : 
+        integer; Blend flag e.g (BLEND_RGB_ADD, BLEND_RGB_SUB, 
+        BLEND_RGB_MULT, BLEND_RGB_MAX, BLEND_RGB_MIN  
+
+    Returns
+    -------
+    Return a pygame Surface with the cartoon effect 
+    
+    """
+
+    # Check if the 'median_kernel' is less than 2.
+    # If it is, raise a ValueError because the kernel size must be at least 2.
+    if median_kernel < 2:
+        raise ValueError("\nKernel size median_kernel must be >=2")
+
+    # Check if the 'sobel_threshold' is within the valid range of 0 to 255.
+    # If it's not, raise a ValueError because the threshold must be within this range.
+    if not (0 <= sobel_threshold <= 255):
+        raise ValueError("\nSobel threshold sobel_threshold must be in range 0...255")
+
+    # Call the 'cartoon_c' function to apply a cartoon effect on the 'surface_'.
+    # Pass the 'sobel_threshold', 'median_kernel', 'color', and 'flag' as parameters.
+    # This function will perform the cartooning effect using these parameters.
+    return cartoon_c(surface_, sobel_threshold, median_kernel, color, flag)
+
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void convert_27(object surface_):
+    """
+    Convert an image to a reduced color palette of 27 colors (inplace).
+
+    This function applies an algorithm that converts a surface (image) to only 27 distinct colors,
+    reducing the color depth of the image. It modifies the surface directly, so the result is
+    stored back in the same surface.
+
+    The algorithm is compatible with both 24-bit and 32-bit surface formats.
+
+    Example:
+    --------
+    # Convert an image to 27 colors.
+    convert_27(image)
+
+    Parameters:
+    -----------
+    surface_ : pygame.Surface
+        A Pygame surface (image) that is compatible with either 24-bit or 32-bit formats.
+
+    Returns:
+    --------
+    void
+        This function modifies the surface in place and does not return a new surface.
+    """
+    
+    # Ensure that the provided surface is a valid Pygame surface.
     assert isinstance(surface_, Surface), \
-        'Argument surface_ must be a valid Surface, got %s ' % type(surface_)
+        'Argument surface_ must be a valid Pygame.Surface, got %s ' % type(surface_)
+
+    # Try to retrieve the 3D array view of the surface for manipulation.
     cdef unsigned char [:, :, :] array_
+    
     try:
         array_ = surface_.get_view('3')
-
     except (pygame.error, ValueError):
-        raise ValueError('\nTexture/image is not compatible.')
+        raise ValueError('\nCannot convert the surface into a 3D array.')
 
-    convert_27colors_c(array_)
+    # Get the dimensions of the surface (width and height).
+    cdef Py_ssize_t w, h
+    w, h = surface_.get_size()
+
+    # Apply the conversion to 27 colors using the C function 'convert_27_c'.
+    convert_27_c(w, h, array_)
+
 
 
 
@@ -3548,55 +8267,80 @@ cpdef inline void convert_27colors(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef object bilateral(object image, float sigma_s, float sigma_i, unsigned int kernel_size = 3):
+@cython.exceptval(check=False)
+cpdef object bilateral(object image, const float sigma_s, const float sigma_i, unsigned int kernel_size = 3):
     """
-    BILATERAL FILTERING (CREATE A NEW SURFACE)
+    Apply bilateral filtering to an image and return a filtered copy.
 
-    A bilateral filter is a non-linear, edge-preserving, and noise-reducing
-    smoothing filter for images. It replaces the intensity of each pixel with a
-    weighted average of intensity values from nearby pixels. This weight can be
-    based on a Gaussian distribution.
+    Bilateral filtering is a non-linear, edge-preserving, and noise-reducing 
+    smoothing filter. It replaces the intensity of each pixel with a weighted 
+    average of intensities from nearby pixels, with weights based on both 
+    spatial proximity and intensity similarity. This allows the filter to blur 
+    smooth regions while preserving sharp edges.
 
-    Here, the normalization factor and the range weight are new terms added to 
-    the previous equation. sigma_s  denotes the spatial extent of the kernel, i.e. 
-    the size of the neighborhood, and sigma_r  denotes the minimum amplitude of an edge.
-    It ensures that only those pixels with intensity values similar to that of the
-    central pixel are considered for blurring, while sharp intensity changes are maintained.
-    The smaller the value of sigma_i ( or sigma_r), the sharper the edge. As sigma_r  tends to 
-    infinity, the equation tends to a Gaussian blur.
-       
-    e.g:
-    
-    surface = bilateral(surface, sigma_s = 16, sigma_i = 18)
-    
-    :param kernel_size  : integer; kernel size, default is 3
-    :param image: Surface, Pygame Surface format 24-32 bit format (alpha channel will be ignored)
-    
-    :param sigma_s: float sigma_s : Spatial extent of the kernel, size of the 
-    considered neighborhood
-    
-    :param sigma_i: float sigma_i (also call sigma_r) range kernel, minimum amplitude of an edge.
-    
-    :return: return a filtered Surface
+    The filter relies on two key parameters:
+    - **sigma_s**: Spatial extent of the kernel. It defines the size of the 
+      neighborhood around each pixel that influences the filter's operation.
+    - **sigma_i**: Intensity range kernel. This controls how sensitive the 
+      filter is to intensity differences. A smaller value of `sigma_i` preserves 
+      edges more effectively, while a larger value allows for more uniform blurring.
+
+    As `sigma_i` increases, the filter approaches a Gaussian blur (which is 
+    applied uniformly across the image). A smaller value of `sigma_i` retains 
+    more local detail by reducing the contribution of pixels with different intensities.
+
+    **Example usage**:
+        surface = bilateral(surface, 16.0, 18.0, 3)
+
+    :param image: 
+        Pygame Surface object (24-32 bit format). The alpha channel is ignored. 
+        The image must be in the RGB format, and a view of it will be converted 
+        to a 3D array for processing.
+
+    :param sigma_s: 
+        float; Spatial extent of the kernel. This value controls the size of 
+        the neighborhood used to calculate the weighted average.
+
+    :param sigma_i: 
+        float; Intensity sensitivity. Defines the maximum intensity difference 
+        that contributes to the blurring process. Smaller values preserve edges.
+
+    :param kernel_size: 
+        integer (default is 3); The size of the kernel. It defines how far 
+        the filter will reach from each pixel, affecting the size of the 
+        local neighborhood considered.
+
+    :return: 
+        Pygame Surface; A new surface with the bilateral filter applied.
     """
 
+    # Ensure that the 'image' argument is a valid Pygame surface.
     assert isinstance(image, Surface), \
         'Argument image must be a valid Surface, got %s ' % type(image)
 
+    # Ensure that 'sigma_s' is a valid float value for the spatial sigma in the bilateral filter.
     assert isinstance(sigma_s, float), \
-        'Argument sigma_s must be a valid Surface, got %s ' % type(sigma_s)
+        'Argument sigma_s must be a valid float, got %s ' % type(sigma_s)
 
+    # Ensure that 'sigma_i' is a valid float value for the intensity sigma in the bilateral filter.
     assert isinstance(sigma_i, float), \
-        'Argument sigma_i must be a valid Surface, got %s ' % type(sigma_i)
+        'Argument sigma_i must be a valid float, got %s ' % type(sigma_i)
+
+    # Try to retrieve a 3D array view of the 'image' surface for pixel manipulation.
     cdef unsigned char [:, :, :] array_
+
     try:
+        # Get the 3D view of the image (for color channels).
         array_ = image.get_view('3')
 
     except (pygame.error, ValueError):
-        raise ValueError('\nTexture/image is not compatible.')
+        # Raise an error if the surface cannot be converted into a 3D array.
+        raise ValueError('\nCannot convert the surface into a 3D array.')
 
-
+    # Apply the bilateral filter using the 'bilateral_c' C function with the image data and parameters.
     return bilateral_c(array_, sigma_s, sigma_i, kernel_size)
+
+
 
 
 @cython.binding(False)
@@ -3606,33 +8350,59 @@ cpdef object bilateral(object image, float sigma_s, float sigma_i, unsigned int 
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef object emboss(object surface_, unsigned short int flag_=0):
     """
-    EMBOSS A PYGAME SURFACE 
+    Apply an emboss filter to an image or surface, producing an embossed effect.
     
-    :param surface_: pygame.Surface; compatible 24-32 bit
-    :param flag_    : integer; special pygame flag such as BLEND_RGB_ADD, BLEND_RGB_MULT etc
-    :return        : pygame.Surface; Emboss effect 
+    The embossing filter creates a visual effect that makes the image appear raised, similar to a paper
+    or metal embossing of the original image, which can be used to highlight edges or create artistic effects.
+    
+    e.g:
+    # Apply the emboss effect and return a 24-bit image format.
+    image = emboss(image)
+    
+    # Apply the emboss effect and return a 32-bit image format with blending.
+    image = emboss(image, 1)
+    
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface compatible with 24-bit or 32-bit image formats.
+    
+    flag_ : int, optional, default=0
+        A special Pygame blend flag such as BLEND_RGB_ADD, BLEND_RGB_MULT, etc.
+        This flag modifies the image blending behavior and will affect the final output.
+
+    Returns
+    -------
+    pygame.Surface
+        A surface containing the embossed image. The output is a 24-bit format if flag is set to 0,
+        otherwise, a 32-bit format is returned.
     """
 
+    # Ensure the 'surface_' argument is a valid Pygame Surface object.
     assert isinstance(surface_, Surface), \
         'Argument surface_ must be a valid Surface, got %s ' % type(surface_)
 
+    # Try to extract a 3D array view of the surface (for manipulation of color channels).
     cdef unsigned char [:, :, :] array_
-
     try:
         array_ = surface_.get_view('3')
-
     except (pygame.error, ValueError):
-        raise ValueError('\nTexture/image is not compatible.')
+        # Raise an error if the surface cannot be converted to a 3D array.
+        raise ValueError('\nCannot convert the surface into a 3D array.')
 
-    cdef object emb = emboss5x5_c(array_)
+    # Apply the emboss effect by passing the 3D array to the C function.
+    cdef object emb = emboss3d_c(array_)
 
+    # If a blending flag is provided (non-zero), apply the blend mode and return the surface.
     if flag_ != 0:
         del array_
         surface_.blit(emb, (0, 0), special_flags=flag_)
         return surface_
 
+    # Return the embossed image as a 24-bit surface when no blending is applied.
     return emb
 
 
@@ -3645,67 +8415,59 @@ cpdef object emboss(object surface_, unsigned short int flag_=0):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef void palette_change(
-        object surface_,
-        object palette_,
-        object tmp_v_
-):
+@cython.exceptval(check=False)
+cpdef void emboss_inplace(object surface_, copy=None):
+
     """
-    CHANGE AN IMAGE BY CHANGING THE COLOR PALETTE (INPLACE)
+    Emboss a surface (inplace)
     
-    LIST_PALETTES contains all the palettes available
-    in PygameShader project.
+    Applying an embossing filter to an image often results in an image resembling a paper
+    or metal embossing of the original image, hence the name. 
     
-    e.g: 
-    from PygameShader.Palette import LIST_PALETTES
-    print(LIST_PALETTES.keys())
-   
-    Temporary array to declare 
-    tmp_v = numpy.ascontiguousarray(numpy.ndarray(
-        (SURFACE.get_width()*SURFACE.get_height(),
-        IRIDESCENTCRYSTAL.shape[0]), dtype=float32
-    ))
+    e.g:
+    # 24-bit 
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    pixel_copy = numpy.ascontiguousarray(array3d(image_copy).transpose(1, 0, 2))
+    emboss_inplace(image, copy=pixel_copy)
     
-    :param surface_: pygame.Surface; 
+    # 32-bit 
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    pixel_copy = numpy.ascontiguousarray(array3d(image_copy).transpose(1, 0, 2))
+    emboss_inplace(image, copy=pixel_copy)
+    
+    Parameters
+    ----------
+    surface_ : 
+        Pygame.Surface to emboss 
+        Changes apply inplace - meaning the surface will be directly modified once the process 
+        is complete
         
-    :param palette_: numpy.ndarray containing the palette colors to use for
-        substituting the image colors, array format (w, 3) of type float range (0.0 ... 255.0)
-        e.g 
-        from PygameShader import IRIDESCENTCRYSTAL
-        
-    :param tmp_v_ : numpy.ndarray (contiguous array) shape 
-        (rgb_array_.shape[0] * rgb_array_.shape[1], len(palette_.shape[0])) of type float32
-        Temporary array to increase performance (the array does not have to be redeclared every
-        frames. 
-        e.g 
-        tmp_v = numpy.ascontiguousarray(numpy.ndarray(
-            (SURFACE.get_width()*SURFACE.get_height(),
-            IRIDESCENTCRYSTAL.shape[0]), dtype=float32
-        ))
-    :return: void
+    copy      : 
+        numpy.ndarray shape (w, h, 3) type uint8 containing RGB pixels and must be the same sizes than 
+        the input surface.Copy of the source array pixels (improve slightly the performance). 
+
+    Returns
+    -------
+    void 
+    
     """
 
+    # Ensure the 'surface_' argument is a valid Pygame Surface object.
     assert isinstance(surface_, Surface), \
-        'Argument surface_ must be a valid pygame Surface, got %s ' % type(surface_)
+        'Argument surface_ must be a valid Surface, got %s ' % type(surface_)
 
-    assert isinstance(palette_, numpy.ndarray), \
-        'Argument palette_ must be a numpy.ndarray, got %s ' % type(palette_)
+    # Declare a 3D unsigned char array to hold pixel data for manipulation.
+    cdef unsigned char [:, :, :] rgb_array
 
-    assert isinstance(tmp_v_, numpy.ndarray), \
-        'Argument tmp_v must be a numpy.ndarray, got %s ' % type(tmp_v_)
-
-    cdef:
-        unsigned char [:, :, :] array_
-        float [:, :] palette = palette_
-        float[ :, ::1 ] tmp_v = tmp_v_
-
+    # Try to get a 3D array view of the surface's pixels (for accessing color channels).
     try:
-        array_ = surface_.get_view('3')
-
+        rgb_array = surface_.get_view('3')
     except (pygame.error, ValueError):
-        raise ValueError('\nTexture/image is not compatible.')
+        # Raise an error if the surface cannot be converted to a 3D array.
+        raise ValueError('\nCannot convert the surface into a 3D array.')
 
-    palette_change_c(array_, palette, tmp_v)
+    # Apply the embossing effect in-place by passing the 3D array and a copy flag.
+    emboss3d_inplace_c(rgb_array, copy)
 
 
 
@@ -3717,39 +8479,199 @@ cpdef void palette_change(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef inline void emboss1d(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        unsigned char [:] bgr_array,
+        tmp_array = None,
+        bint format_32 = False
+):
+    """
+    Emboss directly a C-buffer type (inplace) 
+    
+    Applying an embossing filter to an image often results in an image resembling a paper
+    or metal embossing of the original image, hence the name. 
+    
+    If you are using tmp_array to improve the performances, make sure to have the same 
+    array size and shape than the source array bgr_array 
+     
+    e.g
+    # 24 - bit 
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    image = pygame.transform.smoothscale(image, (800, 600))
+    image_copy = image.copy()
+     
+    emboss1d(800, 600, image.get_view('0'), image_copy.get_buffer(), False)
+    
+    # 32 - bit 
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    image = pygame.transform.smoothscale(image, (800, 600))
+    image_copy = image.copy()
+     
+    emboss1d(800, 600, image.get_view('0'), image_copy.get_buffer(), True)
+    
+     
+    Parameters
+    ----------
+    w : 
+        int; width of the surface 
+        
+    h : 
+        int; height of the surface 
+        
+    bgr_array :
+        numpy.ndarray or memoryviewslice shape (l, ) type uint8 containing BGR pixels or any other format 
+        bgr_array represent the source data that will be modify. The changes are applied inplace - meaning 
+        that the surface will be automatically changed after updating the source array data. 
+        
+    tmp_array : 
+        numpy.ndarray or memoryviewslice shape (l, ) type uint8 containing BGR pixels or any other format 
+        This array is a copy of the source array 
+        
+    format_32 :
+        bool; default is False. Select True if the source array contains alpha transparency (32 - bit format).
+
+    Returns
+    -------
+    void
+
+    """
+
+    cdef:
+        Py_ssize_t l = bgr_array.shape[0]
+        # below create a copy False of the array and do not reference the pixels.
+        # The real time transformation of the identical copy of the array will not be functional as all the pixels
+        # undergo constant transformations. It is then necessary to load the pixels from a copy of the source array
+        # to implement the inplace transformation. Such as below
+        const unsigned char [:] bgr_array_cp = numpy.ndarray(shape=l, buffer=bgr_array, dtype=uint8).copy() if\
+            tmp_array is None else tmp_array
+
+    # Only uint8 data is compatible
+    if not is_uint8(bgr_array):
+        raise TypeError("\nExpecting uint8 (unsigned char) data type got %s" % bgr_array.dtype)
+
+
+    emboss1d_c(w, l, bgr_array, bgr_array_cp, format_32)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef object emboss_gray(object surface_):
+    """
+    Apply a gray-scale embossing filter to an image or surface and return a modified copy.
+    
+    Embossing creates a raised effect on the image, often making it appear like it has been embossed
+    onto paper or metal. This version applies the embossing effect in grayscale, making it ideal for 
+    artistic or stylistic transformations. 
+
+    Example usage:
+        image = emboss_gray(image)
+    
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface compatible with 24-32 bit formats. The surface to which the emboss effect will be applied.
+    
+    Returns
+    -------
+    pygame.Surface
+        A new surface with the gray-scale embossed image. The resulting image is always in 24-bit format.
+    
+    """
+
+    # Ensure the 'surface_' argument is a valid Pygame Surface object.
+    assert isinstance(surface_, Surface), \
+        'Argument surface_ must be a valid Surface, got %s ' % type(surface_)
+
+    # Declare a 3D unsigned char array to hold pixel data for manipulation (this will store the RGB channels).
+    cdef unsigned char [:, :, :] array_
+
+    # Attempt to get a 3D array view of the surface's pixels (RGB channels).
+    try:
+        array_ = surface_.get_view('3')
+    except (pygame.error, ValueError):
+        # Raise an error if the surface cannot be converted to a 3D array (e.g., invalid format).
+        raise ValueError('\nCannot convert the surface into a 3D array.')
+
+    # Apply the gray-scale embossing effect to the array and return the modified surface.
+    return emboss3d_gray_c(array_)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef object bilinear(
     object surface_,
     tuple size_,
     fx=None,
     fy=None
     ):
-
     """
-    BILINEAR FILTER (RESIZE IMAGE)
+    Resize an image using the bilinear filter algorithm (returns a copy).
 
-    Return a resized image using the bilinear filter algorithm
-    This algorithm is 10 times faster than smoothscale when reducing surfaces but 7 times slower when 
-    increasing surface sizes 
+    This function applies the bilinear filter to resize an image. Bilinear filtering 
+    smooths the image and is commonly used in image resizing tasks. The function 
+    supports 32-bit input images, but the result is always returned in 24-bit format 
+    (without the alpha channel).
+
+    Example usage:
+        image = bilinear(image, (600, 600))  # Resize image to 600x600
+        image = bilinear(image, (600, 600), 2, 2)  # Resize with specific scaling factors
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface, compatible with 24 or 32-bit formats, representing the image to be resized.
     
-    :param surface_: pygame Surface
-    :param size_ : tuple; (new_width, new_height)
-    :param fx: float; new width (factor), the new width will be, current image width * fx
-    :param fy:float; new height (factor), the new width will be, current image height * fy
+    size_ : tuple
+        A tuple (width, height) specifying the new dimensions of the surface.
+    
+    fx : float, optional
+        A scaling factor for the x-axis (width). If provided, it will override the width specified in `size_`.
+        Default is None.
+    
+    fy : float, optional
+        A scaling factor for the y-axis (height). If provided, it will override the height specified in `size_`.
+        Default is None.
+    
+    Returns
+    -------
+    pygame.Surface
+        A new Pygame surface of type 24-bit (without alpha channel), resized based on the input parameters.
 
     """
-
+    
+    # Ensure that the 'surface_' argument is a valid Pygame Surface object.
     assert isinstance(surface_, Surface), \
         'Argument surface_ must be a valid Surface, got %s ' % type(surface_)
 
+    # Declare a 3D unsigned char array to hold pixel data for the surface (for RGB channels).
     cdef unsigned char [:,:,:] rgb_array
 
+    # Try to obtain a 3D array view of the surface's pixels (RGB channels).
     try:
         rgb_array = surface_.get_view('3')
-
     except (pygame.error, ValueError):
+        # Raise an error if the surface is not compatible for conversion to a 3D array.
         raise ValueError('\nTexture/image is not compatible.')
 
-    return bilinear_c(rgb_array, size_)
+    # Call the C function 'bilinear_c' to perform the resizing and return the resized surface.
+    return bilinear_c(rgb_array, size_, fx, fy)
+
 
 
 
@@ -3760,7 +8682,45 @@ cpdef object bilinear(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef tunnel_modeling24(int screen_width, int screen_height, object surface_):
+@cython.exceptval(check=False)
+cpdef tuple tunnel_modeling24(
+        const int screen_width,
+        const int screen_height,
+        object surface_
+):
+
+    """
+    24-bit Tunnel modeling  
+    This method will produce 24-bit rendering data 
+    
+    This algorithm uses a 256x256 texture but reshape it to 512x512 pixels for a
+    better rendering
+    
+    e.g
+    WIDTH = 800
+    HEIGHT = 800
+    BCK1 =  pygame.image.load("../Assets/space2.jpg").convert(24)
+    BCK1 = pygame.transform.smoothscale(BCK1, (WIDTH, HEIGHT))
+    BACKGROUND = pygame.image.load("../Assets/space1.jpg")
+    BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
+    distances, angles, shades, scr_data = tunnel_modeling24(WIDTH, HEIGHT, BACKGROUND)
+    
+    Parameters
+    ----------
+    screen_width : 
+        int; display's width or width of the tunnel effect
+        
+    screen_height : 
+        int; display's height or height of the tunnel effect
+        
+    surface_ : 
+        pygame.Surface; Tunnel texture effect compatible 24, 32-bit
+
+    Returns
+    -------
+    python tuple containing 4 buffers (distances, angles, shades and scr_data)
+
+    """
 
     assert screen_width > 0, "Argument screen_width must be > 0"
     assert screen_height > 0, "Argument screen_height must be > 0"
@@ -3770,33 +8730,48 @@ cpdef tunnel_modeling24(int screen_width, int screen_height, object surface_):
         int [:] distances = numpy.empty(length, int32)
         int [:] angles    = numpy.empty(length, int32)
         int [:] shades    = numpy.empty(length, int32)
+        unsigned int [:, :] indexes = \
+            numpy.empty((screen_height * 2, screen_width * 2), dtype=numpy.uint32)
+        int ii, jj, n
 
     cdef:
         int s_width  = 512
         int s_height = 512
 
-    surface = surface_.convert_alpha()
+    surface = surface_.convert()
     surface = smoothscale(surface, (s_width, s_height))
 
     cdef:
         unsigned char [::1] scr_data = surface.get_buffer()
         float sqy, sqx
-        int x, y, i = 0
+        int x, y
 
-    for y in range(0, screen_height * <unsigned short int>2):
-        sqy = <float>pow(y - screen_height, <unsigned short int>2)
-        for x in range(0, screen_width * <unsigned short int>2):
-            sqx = <float>pow(x - screen_width, <unsigned short int>2)
-            if (sqx + sqy) == 0:
-                distances[i] = <unsigned short int>1
-            else:
-                distances[i] = <int>(<float>floor(
-                    <float>32.0 * <float>s_height / <float>sqrt(sqx + sqy))) % s_height
-            angles[i]    = <int>round_c(<float>s_width *
-                                        <float>atan2(<float>y - <float>screen_height,
-                                        <float>x - <float>screen_width) / (<float>M_PI))
-            shades[i]    = <int>min(<float>sqrt(sqx + sqy)* <float>10.0, <unsigned char>255)
-            i = i + <unsigned short int>1
+    with nogil:
+
+        n = 0
+
+        for ii in range(0, screen_height * 2):
+            for jj in range(0, screen_width * 2):
+                indexes[ ii, jj ] = n
+                n = n + 1
+
+        for y in prange(0, screen_height * <unsigned short int>2):
+            sqy = <float>pow(y - screen_height, <unsigned short int>2)
+
+            for x in range(0, screen_width * <unsigned short int>2):
+
+                sqx = <float>pow(x - screen_width, <unsigned short int>2)
+
+
+                if (sqx + sqy) == 0:
+                    distances[indexes[y, x]] = <unsigned short int>1
+                else:
+                    distances[indexes[y, x]] = \
+                        <int>(<float>floor(<float>32.0 * <float>s_height / <float>sqrt(sqx + sqy))) % s_height
+
+                angles[indexes[y, x]]    = <int>round_c(<float>s_width * <float>atan2(<float>y - <float>screen_height,
+                                            <float>x - <float>screen_width) / (<float>M_PI))
+                shades[indexes[y, x]]    = <int>min(<float>sqrt(sqx + sqy)* <float>10.0, <unsigned char>255)
 
     return distances, angles, shades, scr_data
 
@@ -3810,16 +8785,73 @@ cpdef tunnel_modeling24(int screen_width, int screen_height, object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef tunnel_render24(int t,
-                    int screen_width,
-                    int screen_height,
-                    int screen_w2,
-                    int screen_h2,
-                    int [::1] distances,
-                    int [::1] angles,
-                    int [::1] shades,
-                    unsigned char [::1] scr_data,
-                    unsigned char [::1] dest_array):
+@cython.exceptval(check=False)
+cpdef tunnel_render24(
+        int t,
+        const int screen_width,
+        const int screen_height,
+        const int screen_w2,
+        const int screen_h2,
+        const int [::1] distances,
+        const int [::1] angles,
+        const int [::1] shades,
+        unsigned char [::1] scr_data,
+        unsigned char [::1] dest_array):
+
+    """
+    Tunnel effect rendering 
+    
+    The output surface is 24-bit
+    
+    e.g
+    surface_ = tunnel_render24(FRAME*5,WIDTH,HEIGHT,
+        WIDTH >> 1,HEIGHT >> 1,distances,angles,shades,scr_data,dest_array) 
+    SCREEN.blit(surface_, (0, 0), special_flags=pygame.BLEND_RGB_ADD)
+        
+    Parameters
+    ----------
+    t : 
+        int; Timer or frame count. Control the speed of the effect 
+        
+    screen_width : 
+        int; Display width or width of the tunnel effect 
+        
+    screen_height : 
+        int; Display height or height of the tunnel effect 
+        
+    screen_w2 : 
+        int; This is the screen_width divided by 2
+        
+    screen_h2 :
+        int; This is the screen_height value divided by 2
+        
+    distances : 
+        numpy.ndarray shape (l, ) C-buffer containing the distances.
+        You need to get this data buffer from tunnel_modeling24 
+        
+    angles : 
+        numpy.ndarray shape (l, ) C-buffer containing all the angles.
+        You need to get this data buffer from tunnel_modeling24
+        
+    shades : 
+        numpy.ndarray shape (l, ) C-buffer containing all the shades.
+        You need to get this data buffer from tunnel_modeling24
+        
+    scr_data : 
+        numpy.ndarray shape (l, ) C-buffer containing all the background pixels
+        You need to get this data buffer from tunnel_modeling24
+        
+    dest_array : 
+        numpy.ndarray shape (l, ) C-buffer empty. This is typically an empty buffer with 
+        length equal to width * height * 4 (RGBA empty buffer)  
+        This buffer will be used to build the final texture effect (image)
+
+    Returns
+    -------
+    pygame.Surface; image compatible 24-bit 
+
+    """
+
     cdef:
         unsigned int s_width  = 512
         unsigned int s_height = 512
@@ -3870,68 +8902,110 @@ cpdef tunnel_render24(int t,
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef tunnel_modeling32(Py_ssize_t screen_width, Py_ssize_t screen_height, object surface_):
+@cython.exceptval(check=False)
+cpdef tuple tunnel_modeling32(
+        const Py_ssize_t screen_width,
+        const Py_ssize_t screen_height,
+        object surface_
+):
     """
-    THIS METHOD CREATE A TUNNEL MODEL
+    Generate 32-bit Tunnel Modeling Effect.
 
-    * This method must be called before rendering the tunnel in order to create
-      all the necessary buffers that will be called during the rendering of the tunnel effect.
-      tunnel_modeling32 must be call once only before the main loop of your game.
+    This method simulates a tunnel effect and produces 32-bit rendering data based on 
+    the provided surface texture. It uses a 256x256 texture but reshapes it to a 
+    512x512 resolution for better rendering quality. The algorithm calculates various 
+    parameters such as distances, angles, shades, and rendering data, which can be 
+    used to visualize the tunnel effect.
 
-    * Cython cpdef function, this function can be called directly and do not require a
-      hook function.
+    Example usage:
+        WIDTH = 800
+        HEIGHT = 800
+        BCK1 = pygame.image.load("../Assets/space2.jpg").convert(24)
+        BCK1 = pygame.transform.smoothscale(BCK1, (WIDTH, HEIGHT))
+        BACKGROUND = pygame.image.load("../Assets/space1.jpg")
+        BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
+        distances, angles, shades, scr_data = tunnel_modeling32(WIDTH, HEIGHT, BACKGROUND)
 
-    * This algorithm uses a 256x256 texture but reshape it to 512x512 pixels for a
-    better effect definition
+    Parameters
+    ----------
+    screen_width : int
+        The width of the display or the width of the tunnel effect.
 
-    :param surface_: Pygame Surface to pass for the tunnel effect (surface 256x256)
-    :param screen_width     : integer; Game display size (width in pixels)
-    :param screen_height    : integer; Game display size (height in pixels)
-    :return                 : return a tuple containing the following (distances, angles,
-    shades, scr_data)
-    distances is a numpy.ndarray buffer containing float values representing the distance
-    of each pixels
-    angles is a numpy.ndarray buffer containing float values representing the angle of each pixels
-    shades is a numpy.ndarray buffer containing float values representing the shade of each pixels
-    scr_data is a numpy.ndarray buffer containing uint8 values representing the BGR (not RGB)
-    values of each pixels
+    screen_height : int
+        The height of the display or the height of the tunnel effect.
 
+    surface_ : pygame.Surface
+        The texture surface used for the tunnel effect. The surface should be compatible 
+        with 24 or 32-bit formats.
+
+    Returns
+    -------
+    tuple
+        A tuple containing four buffers:
+        - distances: A buffer representing the calculated distances for the effect.
+        - angles: A buffer representing the calculated angles for the effect.
+        - shades: A buffer representing the calculated shades (brightness) for the effect.
+        - scr_data: A buffer containing the texture data of the surface.
     """
 
+    # Validate screen dimensions to ensure they are positive integers
     assert screen_width > 0, "Argument screen_width must be > 0"
     assert screen_height > 0, "Argument screen_height must be > 0"
 
-    cdef int [:] distances = numpy.empty((screen_width * screen_height * 4), int32)
-    cdef int [:] angles    = numpy.empty((screen_width * screen_height * 4), int32)
-    cdef int [:] shades    = numpy.empty((screen_width * screen_height * 4), int32)
+    # Declare buffers for storing distances, angles, shades, and indexes (for pixel mapping)
+    cdef:
+        ssh4 = screen_width * screen_height * 4
+        int [:] distances = numpy.empty(ssh4, int32)  # Buffer for distances
+        int [:] angles    = numpy.empty(ssh4, int32)  # Buffer for angles
+        int [:] shades    = numpy.empty(ssh4, int32)  # Buffer for shades (brightness)
+        unsigned int[ :, : ] indexes = numpy.empty(
+            (screen_height * 2, screen_width * 2), dtype = numpy.uint32)  # Pixel indexes for mapping
 
+    # Convert the surface to 32-bit with alpha channel for processing
     surface = surface_.convert_alpha()
 
-    cdef int s_width  = 512
-    cdef int s_height = 512
-    surface = smoothscale(surface, (s_width, s_height))
-    cdef unsigned char [::1] scr_data = surface.get_buffer()
-    cdef float sqy, sqx
-    cdef int x, y, i = 0
+    # Resize the surface to 512x512 for better rendering
+    cdef:
+        int s_width  = 512
+        int s_height = 512
 
+    surface = smoothscale(surface, (s_width, s_height))  # Smooth scaling for texture resolution
 
-    for y in range(0, screen_height * <unsigned short int>2):
-        sqy = <float>pow(y - screen_height, <unsigned short int>2)
-        for x in range(0, screen_width * <unsigned short int>2):
-            sqx = <float>pow(x - screen_width, <unsigned short int>2)
-            if (sqx + sqy) == 0:
-                distances[i] = <unsigned short int>1
-            else:
-                distances[i] = <int>(<float>floor(
-                    <float>32.0 * <float>s_height / <float>sqrt(sqx + sqy))) % s_height
-            angles[i]    = <int>round_c(<float>s_width *
-                                        <float>atan2(<float>y - <float>screen_height,
-                                        <float>x - <float>screen_width) / (<float>M_PI))
-            shades[i]    = <int>min(<float>sqrt(sqx + sqy)* <float>10.0, <unsigned char>255)
-            i = i + <unsigned short int>1
+    # Create a buffer for accessing the surface pixel data (RGBA)
+    cdef:
+        unsigned char [::1] scr_data = surface.get_buffer()  # Pixel data buffer
+        float sqy, sqx  # Temporary variables for distance calculations
+        int x, y        # Pixel coordinates
+        int n, ii, jj   # Loop counters
 
+    # Initialize pixel index counter for mapping
+    n = 0
+    with nogil:  # Release the Global Interpreter Lock for optimized loop performance
+        # Create a grid of pixel indexes for the 2x scaled screen
+        for ii in range(0, screen_height * 2):
+            for jj in range(0, screen_width * 2):
+                indexes[ii, jj] = n
+                n = n + 1  # Increment pixel index
+
+        # Loop through each pixel in the 2x scaled screen area
+        for y in prange(0, screen_height * 2):  # Parallelize the outer loop for better performance
+            sqy = <float>pow(y - screen_height, <unsigned short int>2)  # Calculate the squared Y distance from the center
+
+            for x in range(0, screen_width * 2):
+                sqx = <float>pow(x - screen_width, <unsigned short int>2)  # Calculate the squared X distance from the center
+
+                # Calculate distances, angles, and shades based on pixel positions
+                if (sqx + sqy) == 0:
+                    distances[indexes[y, x]] = <unsigned short int>1  # Prevent division by zero
+                else:
+                    distances[indexes[y, x]] = <int>(<float>floor(
+                        <float>32.0 * <float>s_height / <float>sqrt(sqx + sqy))) % s_height  # Calculate distance
+                angles[indexes[y, x]] = <int>round_c(<float>s_width *
+                    <float>atan2(<float>y - <float>screen_height, <float>x - <float>screen_width) / (<float>M_PI))  # Calculate angle
+                shades[indexes[y, x]] = <int>min(<float>sqrt(sqx + sqy)* <float>10.0, <unsigned char>255)  # Calculate shade (brightness)
+
+    # Return the calculated data as a tuple
     return distances, angles, shades, scr_data
-
 
 
 
@@ -3942,50 +9016,72 @@ cpdef tunnel_modeling32(Py_ssize_t screen_width, Py_ssize_t screen_height, objec
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef tunnel_render32(
         int t,
-        Py_ssize_t screen_width,
-        Py_ssize_t screen_height,
-        int screen_w2,
-        int screen_h2,
-        int [::1] distances,
-        int [::1] angles,
-        int [::1] shades,
+        const Py_ssize_t screen_width,
+        const Py_ssize_t screen_height,
+        const int screen_w2,
+        const int screen_h2,
+        const int [::1] distances,
+        const int [::1] angles,
+        const int [::1] shades,
         unsigned char [::1] scr_data,
         unsigned char [::1] dest_array):
+    """
+    Tunnel effect rendering 
+    
+    The output surface is 32-bit
+    
+    e.g
+    surface_ = tunnel_render32(FRAME*5,WIDTH,HEIGHT,
+        WIDTH >> 1,HEIGHT >> 1,distances,angles,shades,scr_data,dest_array) 
+    SCREEN.blit(surface_, (0, 0), special_flags=pygame.BLEND_RGB_ADD)
+    
+    Parameters
+    ----------
+    t : 
+       int; Timer or frame count. Control the speed of the effect 
+       
+    screen_width : 
+       int; Display width or width of the tunnel effect 
+       
+    screen_height : 
+       int; Display height or height of the tunnel effect 
+       
+    screen_w2 : 
+       int; This is the screen_width divided by 2
+       
+    screen_h2 :
+       int; This is the screen_height value divided by 2
+       
+    distances : 
+       numpy.ndarray shape (l, ) C-buffer containing the distances.
+       You need to get this data buffer from tunnel_modeling32 
+       
+    angles : 
+       numpy.ndarray shape (l, ) C-buffer containing all the angles.
+       You need to get this data buffer from tunnel_modeling32
+       
+    shades : 
+       numpy.ndarray shape (l, ) C-buffer containing all the shades.
+       You need to get this data buffer from tunnel_modeling32
+       
+    scr_data : 
+       numpy.ndarray shape (l, ) C-buffer containing all the background pixels
+       You need to get this data buffer from tunnel_modeling32
+       
+    dest_array : 
+       numpy.ndarray shape (l, ) C-buffer empty. This is typically an empty buffer with 
+       length equal to width * height * 4 (RGBA empty buffer)  
+       This buffer will be used to build the final texture effect (image)
+    
+    Returns
+    -------
+    pygame.Surface; image compatible 32-bit 
 
     """
-    TUNNEL EFFECT RENDERING METHOD
 
-    * Always call the method tunnel_modeling32 outside of your game main loop
-    before calling this method (from
-      the main loop)
-
-    * Return a pygame surface containing the tunnel rendering effect, the image
-    is 32 bit (with per-pixel information)
-
-    * Cython cpdef function, this function can be called directly and do not
-    require a hook function.
-
-    * The parameter t must change overtime
-
-    :param t            : integer; linear value (frame number)
-    :param screen_width : integer; Game display size (width in pixels)
-    :param screen_height: integer; Game display size (height in pixels)
-    :param screen_w2    : integer; Game display width / 2.0
-    :param screen_h2    : integer; game display height / 2.0
-    :param distances    : numpy.ndarray buffer containing float values
-    representing the distance of each pixels
-    :param angles       : numpy.ndarray buffer containing float values
-    representing the angle of each pixels
-    :param shades       : numpy.ndarray buffer containing float values
-    representing the shade of each pixels
-    :param scr_data     : numpy.ndarray buffer containing float values
-    representing the BGR values  of each pixels
-    :param dest_array   : numpy.ndarray buffer containing float values
-    representing the RGB values of each pixels
-    :return             : Return a pygame.Surface (w, h) 32 bit with per-pixel information
-    """
 
     assert screen_width > 0, "Argument screen_width must be > 0"
     assert screen_height > 0, "Argument screen_height must be > 0"
@@ -4032,14 +9128,9 @@ cpdef tunnel_render32(
                     scr_data[pix_ofs + <unsigned short int>0] * shade
                 dest_array[dest_ofs + <unsigned short int>3] = <unsigned char>255
 
-    return pygame.image.frombuffer(dest_array,
-                                   (screen_width, screen_height), "RGBA").convert_alpha()
+    return pygame.image.frombuffer(dest_array, (screen_width, screen_height), "RGBA").convert_alpha()
 
-
-
-
-
-# ******************************************************************
+# ----------------
 
 
 
@@ -4050,16 +9141,37 @@ cpdef tunnel_render32(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline float damped_oscillation(float t)nogil:
+@cython.exceptval(check=False)
+cdef inline float damped_oscillation(float t) nogil:
     """
+    Compute the value of a damped oscillation at a given time.
+
+    This function calculates a damped oscillation value based on the input time `t`.
+    It combines an exponential decay function and a cosine function to model the oscillation.
+    The decay rate is controlled by the factor `0.1` in the exponential term, and the frequency 
+    of the oscillation is determined by the cosine function with a frequency of `π`.
+
+    Example:
+        y = damped_oscillation(2.0)
     
-    :param t: float (variable x use for the oscillation
-    :return: float (value y = f(x))
+    Parameters
+    ----------
+    t : float
+        The time variable (x) at which the damped oscillation is to be evaluated.
+    
+    Returns
+    -------
+    float
+        The resulting value (y) of the damped oscillation function, where y = f(x).
+        The oscillation value that decays over time while oscillating with a cosine wave.
     """
-    return <float>(exp(-t * <float>0.1) * <float>cos(M_PI * t))
 
+    # Calculate the damped oscillation value using exponential decay and cosine
+    # The exponential decay is modeled with exp(-t * 0.1), which decays over time
+    # The cosine oscillation is modeled with cos(M_PI * t), which oscillates between -1 and 1
+    return <float>(<float>exp(-t * <float>0.1) * <float>cos(M_PI * t))
+    
 
-cdef float C1_ = <float>1.0 / <float>sqrt(M_2PI)
 
 
 @cython.binding(False)
@@ -4069,22 +9181,108 @@ cdef float C1_ = <float>1.0 / <float>sqrt(M_2PI)
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline float gauss(float x, float c, float sigma=1.0, float mu=0.0)nogil:
+cdef inline float gauss(float x, float c, float sigma=1.0, float mu=0.0) nogil:
     """
-    Gauss function
+    Compute the value of a Gaussian function at a given point.
 
-    check https://en.wikipedia.org/wiki/Gaussian_function for more details
+    This function evaluates the Gaussian (normal distribution) function based on the input value `x`.
+    It calculates the probability density function (PDF) of a Gaussian distribution, with a mean (`mu`) 
+    and standard deviation (`sigma`). The function can be shifted by a constant `c`.
 
-    :param x: 
-    :param c: 
-    :param sigma: 
-    :param mu: 
-    :return: 
+    For more details on the mathematical formulation, refer to:
+    https://en.wikipedia.org/wiki/Gaussian_function
+
+    Example:
+        y = gauss(2.0, 0.0, sigma=1.0, mu=0.0)
+    
+    Parameters
+    ----------
+    x : float
+        The input variable at which to evaluate the Gaussian function.
+    
+    c : float
+        A constant that shifts the input `x`. This effectively shifts the Gaussian curve along the x-axis.
+
+    sigma : float, optional, default=1.0
+        The standard deviation of the Gaussian distribution. It controls the width of the bell curve.
+    
+    mu : float, optional, default=0.0
+        The mean (or center) of the Gaussian distribution. It controls the peak position of the bell curve.
+
+    Returns
+    -------
+    float
+        The value of the Gaussian function at the point `x`, shifted by `c`, with the specified `sigma` and `mu`.
+        The result represents the probability density at that point in the Gaussian distribution.
     """
+
+    # Shift the input `x` by the constant `c` to modify the position
     x -= c
-    return <float>((<float>1.0 / sigma * C1_) * exp(-<float>0.5 *
-    ((x - mu) * (x - mu)) / (sigma * sigma)))
+    
+    # Compute the Gaussian function using the formula:
+    # exp(-0.5 * ((x - mu)^2) / sigma^2) scaled by 1 / (sigma * sqrt(2 * pi))
+    # In this case, we use a constant `C1_` which is precomputed to represent 1 / sqrt(2 * pi)
+    
+    # return <float>((<float>1.0 / sigma * C1_) * exp(-<float>0.5 * ((x - mu) * (x - mu)) / (sigma * sigma)))
+    return 0.0
 
+
+
+# @cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void bgr_c(unsigned char [:, :, :] rgb_array) nogil:
+    """
+    Convert an array of shape (w, h, n) from RGB(A) to BGR(A) format (in-place).
+
+    This function performs an in-place conversion of the color channels in an image
+    represented by a numpy array. The image is assumed to be in RGB(A) format (where 
+    'n' is either 3 for RGB or 4 for RGBA) and the function converts it to BGR(A) format
+    by swapping the red and blue channels.
+
+    **Note**: The function operates in-place, meaning it modifies the original array.
+
+    **Example usage**:
+        bgr_c(bgr_array)
+
+    :param rgb_array: 
+        A numpy array of shape (w, h, n), where `w` is the image width, 
+        `h` is the image height, and `n` is 3 (for RGB) or 4 (for RGBA). The array 
+        contains 8-bit unsigned integer values (0-255) representing the pixel color 
+        values in RGB(A) format.
+
+    :return: 
+        void; modifies the array in-place.
+    """
+    # Get the width (w) and height (h) of the image (array shape)
+    w, h = rgb_array.shape[ :2 ]
+
+    # Declare variables for the loop, temporary storage, and pointers for red and blue components
+    cdef:
+        int i = 0, j = 0  # Loop counters for x and y coordinates (pixels)
+        unsigned char tmp  # Temporary variable for swapping colors
+        unsigned char *r  # Pointer to the red channel of the current pixel
+        unsigned char *b  # Pointer to the blue channel of the current pixel
+
+    # Iterate over each row (y-coordinate) of the image, parallelizing the outer loop for performance
+    for j in prange(h, schedule = SCHEDULE, num_threads = THREADS):
+        # Iterate over each column (x-coordinate) of the image
+        for i in range(w):
+            # Set the pointer to the blue component of the current pixel
+            b = &rgb_array[ i, j, 0 ]
+
+            # Set the pointer to the red component of the current pixel (which is 2 indices ahead of the blue component)
+            r = b + 2  # Equivalent to: &rgb_array[i, j, 2]
+
+            # Swap the red and blue values in the pixel by using the temporary variable
+            tmp = <unsigned char> b[ 0 ]  # Store the current blue value in tmp
+            b[ 0 ] = <unsigned char> r[ 0 ]  # Assign the red value to the blue channel
+            r[ 0 ] = tmp  # Assign the stored blue value to the red channel
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -4093,40 +9291,58 @@ cdef inline float gauss(float x, float c, float sigma=1.0, float mu=0.0)nogil:
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void rgb_to_bgr_inplace_c(unsigned char [:, :, :] rgb_array):
+@cython.exceptval(check=False)
+cdef inline void bgr_1d_c(unsigned char [::1] rgb_array, bint format_32=False)nogil:
     """
-    SHADER RGB to BGR
+    Convert a 1D array from RGB(A) to BGR(A) format in-place.
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a
-    3d array (library surfarray)
+    This function rearranges the color channels of a 1D array containing pixel data,
+    switching the red and blue channels to convert an image from RGB(A) order to 
+    BGR(A) order. The operation is performed in-place, meaning the original array is modified.
 
-    Convert your game display from RGB to BGR format
-    This algorithm can also be used to transform pygame texture in the equivalent bgr format
+    **Example:**
+        bgr_1d_c(rgb_array)
 
-    e.g:
-    rgb_to_bgr(surface)
+    ### Parameters:
+    
+    - **rgb_array** (*numpy.ndarray* or memoryview slice, shape (w,), dtype uint8):  
+      A 1D array containing pixel data in RGB(A) order. For an RGB image, the array length 
+      should be a multiple of 3, and for an RGBA image, it should be a multiple of 4.
+      
+    - **format_32** (*bool*, default False):  
+      Indicates the pixel format of the input array:
+        - `True` for 32-bit (RGBA).
+        - `False` for 24-bit (RGB).
 
-    :param rgb_array    : numpy.ndarray shape(w, h, 3) uint8 (unsigned char 0...255) containing the
-    pygame display pixels format RGB. Apply the transformation inplace by swapping the channel
-    Red to channel blue and vice versa
-    :return             : void
+    ### Returns:
+    - **None**:  
+      The function modifies the input array in-place and does not return a new array.
     """
 
-    cdef Py_ssize_t w, h
-    w, h = rgb_array.shape[:2]
+    cdef unsigned int l = rgb_array.shape[0]
 
     cdef:
-        int i=0, j=0
+        int i=0
         unsigned char tmp
+        unsigned char * r
+        unsigned char * b
+        unsigned short int bit = 3
 
-    with nogil:
+    if format_32:
+        bit = 4
 
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
-            for i in range(w):
-                tmp = rgb_array[i, j, <unsigned short int>0]  # keep the blue color
-                rgb_array[i, j, <unsigned short int>0]  = rgb_array[i, j, <unsigned short int>2]
-                rgb_array[i, j, <unsigned short int>2]  = tmp
+    # noinspection SpellCheckingInspection
+    for i in prange(0, l, bit, schedule=SCHEDULE, num_threads=THREADS):
+
+        # BGR
+        r = &rgb_array[ i     ]
+        b = r + 2 # &rgb_array[ i + 2 ]
+
+        tmp = r[0]
+        r[0] = <unsigned char> b[0]
+        b[0] = <unsigned char> tmp
+
+
 
 
 @cython.binding(False)
@@ -4136,24 +9352,108 @@ cdef inline void rgb_to_bgr_inplace_c(unsigned char [:, :, :] rgb_array):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void rgb_to_brg_inplace_c(unsigned char [:, :, :] rgb_array):
+@cython.exceptval(check=False)
+cdef inline np.ndarray[np.uint8_t, ndim=1] bgr_1d_cp_c(
+        unsigned char [::1] rgb_array, bint format_32=False):
+
     """
+    Convert a 1D uint8 array from RGB(A) format to BGR(A) format and return a new array.
+    
+    This function takes a 1D array (or memoryview slice) representing image pixel data in 
+    RGB or RGBA order and returns a new 1D numpy.ndarray with the red and blue channels swapped, 
+    resulting in a BGR or BGRA order. This is useful when interfacing with libraries or systems 
+    that require BGR(A) formatted data.
+    
+    **Example:**
+        bgr_array = bgr_1d_cp_c(rgb_array)
+    
+    ### Parameters:
+    - **rgb_array**:
+        - *Type:* numpy.ndarray or memoryview slice
+        - *Shape:* (w,), where w is the total number of elements. For an RGB image, w should be a 
+          multiple of 3, and for an RGBA image, a multiple of 4.
+        - *Description:* Contains pixel data in RGB(A) order (with values ranging from 0 to 255).
+    
+    - **format_32**:
+        - *Type:* bool
+        - *Description:* 
+            - `True` if the input array is in 32-bit format (RGBA), 
+            - `False` if in 24-bit format (RGB).
+    
+    ### Returns:
+    - A new 1D numpy.ndarray of type uint8 with the same shape as the input, but with the color channels 
+      converted to BGR(A) order.
+    """
+    cdef:
+        unsigned int l = rgb_array.shape[0]
 
-    SHADER RGB TO BRG
+    cdef:
+        int i=0
+        unsigned char [::1] destination_array = numpy.empty(l, dtype=uint8)
+        unsigned short int bit = 3
+        unsigned char * index
+        unsigned char * array_index
 
-    Convert your game display from RGB to BRG format.
-    This algorithm can also be used to transform pygame texture in the equivalent BRG format
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a 3d array
-    (library surfarray)
+    if format_32: bit = 4
 
-    e.g:
-    rgb_to_brg(surface)
+    # noinspection SpellCheckingInspection
+    with nogil:
 
-    :param rgb_array    : numpy.ndarray shape(w, h, 3) uint8 (unsigned char 0...255) containing the
-    pygame display pixels format RGB
-    :return             : void
+        if format_32:
+            for i in prange(0, l, bit, schedule=SCHEDULE, num_threads=THREADS):
+                # BGR
+                index = &destination_array[ i ]
+                array_index = &rgb_array[ i ]
+                index[0] = <unsigned char> (array_index + 2)[0]
+                (index + 1)[0] = <unsigned char> (array_index + 1)[0]
+                (index + 2)[0] = <unsigned char> array_index[0]
+                (index + 3)[0] = <unsigned char> (array_index + 3)[0]
+        else:
+            for i in prange(0, l, bit, schedule=SCHEDULE, num_threads=THREADS):
+                # BGR
+                index = &destination_array[ i ]
+                array_index = &rgb_array[ i ]
+                index[ 0 ] = <unsigned char> (array_index + 2)[ 0 ]
+                (index + 1)[ 0 ] = <unsigned char> (array_index + 1)[ 0 ]
+                (index + 2)[ 0 ] = <unsigned char> array_index[ 0 ]
+
+    return numpy.ndarray(shape=l, buffer=destination_array, dtype=uint8)
+
+
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void brg_c(unsigned char [:, :, :] rgb_array):
+    """
+    Convert an image from RGB(A) to BRG(A) format in-place.
+
+    This function swaps the red and green channels of an image while preserving 
+    the blue channel and alpha channel (if present). It is useful for converting 
+    game displays, textures, or Pygame surfaces to the equivalent BRG format.
+
+    ### Example Usage:
+        brg_c(rgb_array)
+
+    ### Parameters:
+    - **rgb_array** (*numpy.ndarray, shape (w, h, n), dtype=uint8*):  
+      A 3D NumPy array containing image pixel data in RGB(A) format.  
+      Each pixel is represented by unsigned 8-bit values (0–255).  
+      The function supports both 24-bit (RGB) and 32-bit (RGBA) formats.
+
+    ### Returns:
+    - **None**:  
+      The function modifies the input array in-place and does not return a new array.
     """
 
     cdef Py_ssize_t w, h
@@ -4166,11 +9466,12 @@ cdef inline void rgb_to_brg_inplace_c(unsigned char [:, :, :] rgb_array):
     with nogil:
 
         for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+
             for i in range(w):
+
                 tmp_r = rgb_array[i, j, 0]  # keep the red color
                 tmp_g = rgb_array[i, j, 1]  # keep the green color
-                rgb_array[i, j, <unsigned short int>0] = \
-                    rgb_array[i, j, <unsigned short int>2] # r-->b
+                rgb_array[i, j, <unsigned short int>0] = rgb_array[i, j, <unsigned short int>2] # r-->b
                 rgb_array[i, j, <unsigned short int>1] = tmp_r  # g --> r
                 rgb_array[i, j, <unsigned short int>2] = tmp_g
 
@@ -4183,25 +9484,167 @@ cdef inline void rgb_to_brg_inplace_c(unsigned char [:, :, :] rgb_array):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void greyscale_luminosity24_inplace_c(unsigned char [:, :, :] rgb_array):
+@cython.exceptval(check=False)
+cdef inline void brg_1d_c(
+        unsigned char [::1] rgb_array, bint format_32=False):
+
     """
-    SHADER GRAYSCALE (CONSERVE LUMINOSITY)
+    Convert a 1D NumPy array of type uint8 from RGB(A) to BGR(A) in place.
 
-    This shader transform the game display on a grayscale video game effect
-    This shader can also be applied to pygame textures/surface to transform them into
-    an equivalent grayscale model
+    This function modifies the input array directly, swapping the red and blue channels.
+    It supports both 24-bit (RGB) and 32-bit (RGBA) image buffers.
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a 3d array
-    (library surfarray)
+    Set `format_32` to `True` if the array contains 32-bit (RGBA) values.
 
-    e.g:
-    greyscale(surface)
+    Example Usage:
+    --------------
+    # Convert a 24-bit RGB image
+    brg_1d_c(rgb_array)
 
-    :param rgb_array    : numpy.ndarray shape(w, h, 3) uint8 (unsigned char 0...255) containing the
-    pygame display pixels format RGB
-    :return             : void
+    # Convert a 32-bit RGBA image
+    brg_1d_c(rgb_array, format_32=True)
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 1D NumPy array of shape (w,) and dtype uint8, containing image pixel data 
+        in RGB(A) format.
+
+    format_32 : bool, optional (default=False)
+        If `False`, the function assumes an RGB (24-bit) buffer.
+        If `True`, it assumes an RGBA (32-bit) buffer.
+
+    Returns
+    -------
+    None
+        The function modifies the input array in place.
     """
+
+    cdef unsigned int l = rgb_array.shape[ 0 ]
+
+    cdef:
+        int i = 0
+        unsigned char tmp_r
+        unsigned char tmp_g
+        unsigned short int bit = 3
+
+    if format_32:
+        bit = 4
+
+    with nogil:
+
+        # noinspection SpellCheckingInspection
+        for i in prange(0, l, bit, schedule = SCHEDULE, num_threads = THREADS):
+            tmp_r = rgb_array[ i     ]
+            tmp_g = rgb_array[ i + 1 ]
+            rgb_array[ i     ] = <unsigned char>rgb_array[ i + 2 ]
+            rgb_array[ i + 1 ] = <unsigned char>tmp_r
+            rgb_array[ i + 2 ] = <unsigned char>tmp_g
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline np.ndarray[np.uint8_t, ndim=1] brg_1d_cp_c(
+        const unsigned char [::1] bgr_array, bint format_32=False):
+
+    """
+    Convert a 1D uint8 array from BGR(A) to BRG(A) format and return a new array.
+    
+    This function swaps the red and green channels while preserving the blue 
+    and alpha channels (if present). It processes a 1D array representation 
+    of an image and returns a new array with the modified pixel format.
+    
+    ### Example Usage:
+        brg_array = brg_1d_cp_c(bgr_array)
+    
+    ### Parameters:
+    - **bgr_array** (*numpy.ndarray*, shape *(w,)*, dtype *uint8*):  
+      A 1D array containing image pixel data in BGR(A) format, where values 
+      range from 0 to 255.
+    
+    - **format_32** (*bool*):  
+      - `True`: Input is a 24-bit (BGR) format.  
+      - `False`: Input is a 32-bit (BGRA) format.  
+    
+    ### Returns:
+    - **numpy.ndarray** (*shape (w,), dtype uint8*):  
+      A new 1D array with pixel data converted to BRG(A) format.
+    """
+
+    cdef:
+        unsigned int l = bgr_array.shape[0]
+
+    cdef:
+        int i=0
+        unsigned char [::1] destination_array = numpy.empty(l, dtype=uint8)
+        unsigned short int bit = 3
+        unsigned char * index
+
+    if format_32:
+        bit = 4
+
+
+    with nogil:
+        if format_32:
+            # noinspection SpellCheckingInspection
+            for i in prange(0, l, bit, schedule=SCHEDULE, num_threads=THREADS):
+                # BRG
+                index = &destination_array[ i ]
+                index[0] = <unsigned char> bgr_array[ i + 2 ]
+                (index+1)[0] = <unsigned char> bgr_array[ i     ]
+                (index+2)[0] = <unsigned char> bgr_array[ i + 1 ]
+                (index+3)[0] = <unsigned char> bgr_array[ i + 3 ]
+        else:
+            for i in prange(0, l, bit, schedule = SCHEDULE, num_threads = THREADS):
+                # BRG
+                index = &destination_array[ i ]
+                index[ 0 ] = <unsigned char> bgr_array[ i + 2 ]
+                (index + 1)[ 0 ] = <unsigned char> bgr_array[ i ]
+                (index + 2)[ 0 ] = <unsigned char> bgr_array[ i + 1 ]
+
+    return numpy.ndarray(shape=l, buffer=destination_array, dtype=uint8)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void grey_c(unsigned char [:, :, :] rgb_array):
+    """
+    Convert an image to grayscale while preserving luminosity (in-place).
+
+    This function converts a 3-channel (RGB) or 4-channel (RGBA) image to grayscale by 
+    calculating the luminosity of each pixel, which preserves the perceived brightness. 
+    The alpha (transparency) channel will be ignored in 32-bit (RGBA) images.
+
+    Example Usage:
+    --------------
+    grey_c(rgb_array)
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 3D NumPy array of shape (w, h, 3) for RGB images, or (w, h, 4) for RGBA images. 
+        The array should be of type uint8, with pixel values ranging from 0 to 255. 
+        For RGBA images, the alpha channel will be ignored.
+
+    Returns
+    -------
+    None
+        The function modifies the input array in place and does not return a new array.
+    """
+
 
     cdef Py_ssize_t w, h
     w, h = rgb_array.shape[:2]
@@ -4216,9 +9659,9 @@ cdef inline void greyscale_luminosity24_inplace_c(unsigned char [:, :, :] rgb_ar
     with nogil:
         for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(w):
-                r = &rgb_array[i, j, <unsigned short int>0]
-                g = &rgb_array[i, j, <unsigned short int>1]
-                b = &rgb_array[i, j, <unsigned short int>2]
+                r = &rgb_array[i, j, 0]
+                g = &rgb_array[i, j, 1]
+                b = &rgb_array[i, j, 2]
                 luminosity = <unsigned char>(r[0] * <float>0.2126 + g[0] * <float>0.7152 + b[0] * <float>0.072)
                 r[0] = luminosity
                 g[0] = luminosity
@@ -4232,22 +9675,243 @@ cdef inline void greyscale_luminosity24_inplace_c(unsigned char [:, :, :] rgb_ar
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void sepia_inplace_c(unsigned char [:, :, :] rgb_array):
+@cython.exceptval(check=False)
+cdef np.ndarray[np.uint8_t, ndim=2] grey_2d_c(unsigned char [:, :, :] rgb_array):
+    """
+    Convert a 3D RGB(A) array into a 2D grayscale array.
+
+    This function converts an input RGB or RGBA array to a 2D grayscale array based 
+    on the luminosity of each pixel. The resulting 2D array contains pixel intensities 
+    that range from 0 (black) to 255 (white). The alpha (transparency) channel is 
+    ignored for 32-bit images with transparency.
+
+    Example Usage:
+    --------------
+    grey_array = grey_2d_c(rgb_array)
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 3D NumPy array of shape (w, h, 3) for RGB images, or (w, h, 4) for RGBA images.
+        The array should have dtype uint8, with pixel values ranging from 0 to 255. 
+        The alpha channel will be ignored in RGBA images.
+
+    Returns
+    -------
+    numpy.ndarray
+        A 2D NumPy array of shape (w, h) with dtype uint8, containing the grayscale 
+        image data. Each pixel represents intensity, ranging from 0 (black) to 255 (white).
+    """
+
+
+    cdef Py_ssize_t w, h
+    w, h = rgb_array.shape[:2]
+
+    cdef:
+        int i, j
+        unsigned char luminosity
+        unsigned char [:, :] grayscale = numpy.empty((w, h), dtype=uint8)
+
+    with nogil:
+        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+            for i in range(w):
+                luminosity = <unsigned char>(rgb_array[i, j, 0] * <float>0.2126 +
+                                             rgb_array[i, j, 1] * <float>0.7152 +
+                                             rgb_array[i, j, 2] * <float>0.072)
+                grayscale[i, j] = luminosity
+    return numpy.ndarray(shape=(w, h), buffer=grayscale, dtype=uint8)
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void grey_1d_c(
+        unsigned char [:] rgb_array, bint format_32=False):
+    """
+    Convert a 1D array of uint8 data (RGB(A)) to grayscale (with alpha) in place.
+
+    A grayscale image has a single channel representing pixel intensity or brightness, 
+    with pixel values typically ranging from 0 (black) to 255 (white). This function 
+    converts the input RGB(A) array to grayscale while preserving the alpha channel 
+    (if present). The conversion is performed in place, modifying the original array.
+
+    Set `format_32` to `True` if the array is a 32-bit buffer containing RGBA values.
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray or bytearray
+        A 1D array or buffer containing pixel data in RGB(A) format, with dtype uint8 
+        (unsigned char values ranging from 0 to 255).
+
+    format_32 : bool, optional (default=False)
+        If `True`, the function assumes the input is a 32-bit buffer (RGBA).
+        If `False`, the function assumes a 24-bit buffer (RGB).
+
+    Returns
+    -------
+    None
+        The function modifies the input array in place and does not return a new array.
+    """
+
+    cdef unsigned int l = rgb_array.shape[ 0 ]
+
+    cdef:
+        int i = 0
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
+        unsigned char luminosity = 0
+        unsigned short int bit = 3
+
+    if format_32:
+        bit = 4
+
+
+    with nogil:
+
+        # noinspection SpellCheckingInspection
+        for i in prange(0, l, bit, schedule = SCHEDULE, num_threads = THREADS):
+            # Assuming an RGB array
+            r = &rgb_array[ i     ]
+            g = &rgb_array[ i + 1 ]
+            b = &rgb_array[ i + 2 ]
+            luminosity = <unsigned char> (   r[ 0 ] * <float> 0.2126
+                                           + g[ 0 ] * <float> 0.7152
+                                           + b[ 0 ] * <float> 0.072)
+            r[ 0 ] = luminosity
+            g[ 0 ] = luminosity
+            b[ 0 ] = luminosity
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline np.ndarray[np.uint8_t, ndim=1] grey_1d_cp_c(
+    const unsigned char [::1] bgr_array,
+    bint format_32=False):
 
     """
-    SHADER SEPIA MODEL
+    Convert a 1D array of type uint8 from BGR(A) to grayscale (with alpha channel) and return a copy.
 
-    Transform your video game into an equivalent sepia model
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a 3d array
-    (library surfarray)
+    This function converts the input BGR or BGRA array to grayscale based on the luminosity 
+    formula, preserving the alpha channel (if present). The conversion generates a new 1D 
+    NumPy array in grayscale format, where the pixel values represent intensity.
 
-    e.g:
+    Parameters
+    ----------
+    bgr_array : numpy.ndarray
+        A 1D NumPy array of shape (w,) with dtype uint8, containing pixel data in 
+        BGR(A) format. The pixel values should range from 0 to 255. 
+        If the array represents a BGRA image, the alpha channel will be preserved.
+
+    format_32 : bool, optional (default=False)
+        If `True`, the input array is assumed to be in BGRA (32-bit) format. 
+        If `False`, the array is assumed to be in BGR (24-bit) format.
+
+    Returns
+    -------
+    numpy.ndarray
+        A new 1D NumPy array of shape (w,) with dtype uint8, containing the grayscale 
+        pixel data in grayscale format. If the input was in BGRA format, the alpha channel
+        is preserved in the output.
+    """
+
+    cdef:
+        Py_ssize_t l = bgr_array.shape[0]
+
+    cdef:
+        int i=0
+        unsigned char [::1] destination_array = numpy.empty(l, dtype=uint8)
+        unsigned short int channels = 3
+        unsigned char luminosity = 0
+        unsigned char * index
+        const unsigned char * bgr_index
+
+    if format_32:
+        channels = 4
+
+
+    with nogil:
+
+        # noinspection SpellCheckingInspection
+        for i in prange(0, l, channels, schedule=SCHEDULE, num_threads=THREADS):
+
+            index = &destination_array[ i ]
+            bgr_index = &bgr_array[ i ]
+            luminosity = <unsigned char> ( (bgr_index + 2)[0] * <float> 0.2126
+                                         + (bgr_index + 1)[0] * <float> 0.7152
+                                         + bgr_index[0] * <float> 0.072)
+
+            index[0] = luminosity
+            (index + 1)[0] = luminosity
+            (index + 2)[0] = luminosity
+            if format_32:
+                (index + 3)[0] = <unsigned char> (bgr_index + 3)[0]
+
+    return numpy.ndarray(shape=l, buffer=destination_array, dtype=uint8)
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void sepia_c(unsigned char [:, :, :] rgb_array):
+
+    """
+    Apply a sepia tone filter to a 3D RGB image array (inplace).
+
+    This function transforms an image (or video game surface) into a sepia-toned version by applying
+    a filter that shifts the colors of the RGB channels toward a reddish-brown hue. The result gives
+    the image a warm, vintage look, often associated with old photographs.
+
+    The input array (`rgb_array`) must be a 3D NumPy array with shape (w, h, 3), where `w` is the width,
+    `h` is the height, and `3` corresponds to the RGB channels. If you're working with a Pygame surface,
+    you can use functions like `pixels3d` or `array3d` from the `surfarray` module to convert it into a 3D array.
+
+    In sepia-toned images, unlike traditional black-and-white photographs that use standard grayscale,
+    the color spectrum is adjusted to a warmer, reddish-brown tone, resulting in a softer, dreamier aesthetic.
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 3D NumPy array of shape (w, h, 3) with dtype uint8 (unsigned char 0...255), containing RGB pixel data.
+        The array should represent an image in RGB format, typically from Pygame display or surface data.
+
+    Returns
+    -------
+    void
+        This function modifies the input array (`rgb_array`) directly and does not return a new array.
+
+    Example
+    -------
+    # For a Pygame surface:
     sepia(surface)
 
-    :param rgb_array    : numpy.ndarray shape(w, h, 3) uint8 (unsigned char 0...255) containing the
-    pygame display pixels format RGB
-    :return             : void
+    Notes
+    -----
+    - The input array should have dtype uint8, representing pixel values ranging from 0 to 255.
+    - If working with Pygame surfaces, consider using `pixels3d` or `array3d` from `surfarray` 
+        to convert the surface to a 3D array.
+    - This function modifies the input array in place.
     """
     cdef Py_ssize_t w, h
     w, h = rgb_array.shape[:2]
@@ -4263,6 +9927,7 @@ cdef inline void sepia_inplace_c(unsigned char [:, :, :] rgb_array):
         for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(w):
 
+                # RGB
                 r = &rgb_array[i, j, <unsigned short int>0]
                 g = &rgb_array[i, j, <unsigned short int>1]
                 b = &rgb_array[i, j, <unsigned short int>2]
@@ -4271,11 +9936,13 @@ cdef inline void sepia_inplace_c(unsigned char [:, :, :] rgb_array):
                 gg = r[0] * <float>0.349 + g[0] * <float>0.686 + b[0] * <float>0.168
                 bb = r[0] * <float>0.272 + g[0] * <float>0.534 + b[0] * <float>0.131
 
-                r[0] = <unsigned char> rr if rr<255 else 255
-                g[0] = <unsigned char> gg if gg<255 else 255
-                b[0] = <unsigned char> bb if bb<255 else 255
+                r[0] = <unsigned char> rr if rr<255 else <unsigned char>255
+                g[0] = <unsigned char> gg if gg<255 else <unsigned char>255
+                b[0] = <unsigned char> bb if bb<255 else <unsigned char>255
 
-# ************* SORTING ALGORITHM FOR MEDIAN FILTER
+
+
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -4283,261 +9950,74 @@ cdef inline void sepia_inplace_c(unsigned char [:, :, :] rgb_array):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void bubble_sort(unsigned char [::1] nums, int size)nogil:
+@cython.exceptval(check=False)
+cdef void sepia_1d_c(unsigned char [:] rgb_array, bint format_32=False):
     """
+    Convert 1d array BGR(A) (uint8) into sepia equivalent model. 
     
-    :param nums: 
-    :param size: 
-    :return: 
-    """
-    # We set swapped to True so the loop looks runs at least once
-    cdef:
-        int i, j
-        unsigned char *p
-        unsigned char *p1
-        bint swapped
-
-    swapped = True
-    while swapped:
-        swapped = False
-        for i in range(size - 1):
-            p  = &nums[i]
-            p1 = &nums[i+1]
-            if p[0] > p1[0]:
-                p[0], p1[0] = p1[0], p[0]
-                swapped = True
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void insertion_sort(unsigned char [::1] nums, int size)nogil:
-    """
+    While traditional black-and-white photographs use a standard grayscale to create
+    highlights and shadows, sepia-toned photos use a reddish-brown tone to create that spectrum.
+    “Sepia is a softer manipulation of light,”. This gives them a softer, dreamier aesthetic.
     
-    :param nums: 
-    :param size: 
-    :return: 
-    """
+    e.g 
+    # image 24-bit  
+    im = pygame.image.load("../Assets/px.png")
+    w, h = im.get_width(), im.get_height()
+    c = numpy.ndarray(shape=(w*h*3), buffer=im.get_view('0'), dtype=uint8)
+    sepia_1d(c, False)   
 
-    cdef:
-        int i, j
-        unsigned char item_to_insert
-
-    for i in prange(1, size, schedule=SCHEDULE, num_threads=THREADS):
-        item_to_insert = nums[i]
-
-        j = i - 1
-        while j >= 0 and nums[j] > item_to_insert:
-            nums[j + 1] = nums[j]
-            j = j - 1
-        # Insert the item
-        nums[j + 1] = item_to_insert
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-# There are different ways to do a Quick Sort partition, this implements the
-# Hoare partition scheme. Tony Hoare also created the Quick Sort algorithm.
-cdef inline int partition_cython(unsigned char [::1] nums, int low, int high)nogil:
-    """
     
-    :param nums: 
-    :param low: 
-    :param high: 
-    :return: 
-    """
-    cdef:
-        int pivot
-        int i, j
-    pivot = nums[(low + high) >> 1]
-    i = low - 1
-    j = high + 1
-    while True:
-        i += 1
-        while nums[i] < pivot:
-            i += 1
-
-        j -= 1
-        while nums[j] > pivot:
-            j -= 1
-
-        if i >= j:
-            return j
-
-        nums[i], nums[j] = nums[j], nums[i]
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void _quick_sort(unsigned char [::1] items, int low, int high)nogil:
-    """
+    # image 32-bit 
+    import pygame
+    im = pygame.image.load("../Assets/px.png")
+    w, h = im.get_width(), im.get_height()
+    sepia_1d(im.get_view('0'), True)
     
-    :param items: 
-    :param low: 
-    :param high: 
-    :return: 
-    """
-    cdef int split_index
-    if low < high:
-        split_index = partition_cython(items, low, high)
-        _quick_sort(items, low, split_index)
-        _quick_sort(items, split_index + 1, high)
+    Parameters
+    ----------
+    
+    rgb_array : 
+        numpy.ndarray; memoryviewslice; 1d array of uint8 data type containing BGR(A) pixels
+        or any other pixel format.
+        
+    format_32 : 
+        bool True | for 'BGR' buffer type (24-bit) or False 'BGRA' (32-bit)
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void heapify(unsigned char [::1] nums, int heap_size, int root_index)nogil:
+    Returns
+    -------
+    void
+    
     """
 
-    :param nums:
-    :param heap_size:
-    :param root_index:
-    :return:
-    """
-    # Assume the index of the largest element is the root index
-    cdef int largest = root_index
-    cdef int left_child = (2 * root_index) + 1
-    cdef int right_child = (2 * root_index) + 2
-
-    if left_child < heap_size and nums[left_child] < nums[left_child]:
-        largest = left_child
-
-    if right_child < heap_size and nums[largest] < nums[right_child]:
-        largest = right_child
-
-    if largest != root_index:
-        nums[root_index], nums[largest] = nums[largest], nums[root_index]
-        heapify(nums, heap_size, largest)
-
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void heap_sort(unsigned char [::1] nums, int n)nogil:
-    """
-
-    :param nums:
-    :param n:
-    :return:
-    """
-    cdef int i
-
-    for i in range(n>>1, -1, -1):
-        heapify(nums, n, i)
-
-    for i in range(n - 1, 0, -1):
-        nums[i], nums[0] = nums[0], nums[i]
-        heapify(nums, i, 0)
-
-
-
-
-
-# *********** END OF SORTING ALGORITHM
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void median_inplace_heapsort_c(
-        unsigned char [:, :, :] rgb_array_, int kernel_size_=2):
-
-    cdef Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
-
-    cdef int k = kernel_size_ >> 1
-    cdef int v = 0, kx, ky
-
-
-    for kx in range(-k, k):
-       for ky in range(-k, k):
-           v += 1
+    cdef Py_ssize_t l = rgb_array.shape[ 0 ]
 
     cdef:
-        # todo change to unsigned char [::1, :, :] rgb_array_copy = numpy.array(rgb_array_,
-        #  copy=False, order='F')
-        unsigned char [:, :, ::1] rgb_array_copy = \
-           ascontiguousarray(numpy.array(rgb_array_, copy=False))
+        int i = 0
+        int bit = 3
+        float rr, gg, bb
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
 
-        int i=0, j=0
-        Py_ssize_t ii=0, jj=0
-
-        unsigned char [::1] tmp_red   = empty(v, numpy.uint8, order='C')
-        unsigned char [::1] tmp_green = empty(v, numpy.uint8, order='C')
-        unsigned char [::1] tmp_blue  = empty(v, numpy.uint8, order='C')
-
-
-        int index = 0, val
-        Py_ssize_t w_1 = w - 1, h_1 = h - 1
+    if format_32:
+        bit = 4
 
 
     with nogil:
-       for j in prange(h, schedule=SCHEDULE, num_threads=THREADS, chunksize=2048):
-           for i in range(w):
+        for i in prange(0, l, bit, schedule = SCHEDULE, num_threads = THREADS):
 
-               index = 0
+                # BGR format
+                r = &rgb_array[ i + 2 ]
+                g = &rgb_array[ i + 1 ]
+                b = &rgb_array[ i     ]
 
-               for kx in range(-k, k):
-                   for ky in range(-k, k):
+                rr = r[ 0 ] * <float> 0.393 + g[ 0 ] * <float> 0.769 + b[ 0 ] * <float> 0.189
+                gg = r[ 0 ] * <float> 0.349 + g[ 0 ] * <float> 0.686 + b[ 0 ] * <float> 0.168
+                bb = r[ 0 ] * <float> 0.272 + g[ 0 ] * <float> 0.534 + b[ 0 ] * <float> 0.131
 
-                       ii = i + kx
-                       jj = j + ky
-
-                       if ii < 0:
-                           ii = 0
-                       elif ii >= w_1:
-                           ii = <int>w_1
-
-                       if jj < 0:
-                           jj = 0
-                       elif jj >= h_1:
-                           jj = <int>h_1
-
-
-                       tmp_red[index]   = rgb_array_copy[ii, jj, 0]
-                       tmp_green[index] = rgb_array_copy[ii, jj, 1]
-                       tmp_blue[index]  = rgb_array_copy[ii, jj, 2]
-
-                       index = index + 1
-
-               # External C quicksort
-               heap_sort(tmp_red, v)
-               heap_sort(tmp_green,v)
-               heap_sort(tmp_blue, v)
-
-               val = (index - 1) >> 1
-               rgb_array_[i, j, 0] = tmp_red[val]
-               rgb_array_[i, j, 1] = tmp_green[val]
-               rgb_array_[i, j, 2] = tmp_blue[val]
-
+                r[ 0 ] = <unsigned char>rr if rr < 255 else <unsigned char>255
+                g[ 0 ] = <unsigned char>gg if gg < 255 else <unsigned char>255
+                b[ 0 ] = <unsigned char>bb if bb < 255 else <unsigned char>255
 
 
 
@@ -4548,45 +10028,146 @@ cdef inline void median_inplace_heapsort_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef unsigned char [::1]  sepia_1d_cp_c(
+    const unsigned char [::1] bgr_array,
+    unsigned char [::1] destination_array,
+    bint format_32=False)nogil:
+    """
+    Apply a sepia tone filter to a 1D array of image data (inplace).
+    
+    This function processes a 1D array representing pixel data in BGR(A) format and 
+    applies a sepia filter. The sepia effect is achieved by adjusting the red, green, 
+    and blue channels according to a set of predefined coefficients, creating a vintage, 
+    warm-toned effect. The result is stored in the provided destination array.
+    
+    Parameters
+    ----------
+    bgr_array : numpy.ndarray
+        A 1D array containing pixel data in BGR(A) format, with dtype uint8. Each pixel 
+        is represented by 3 (for BGR) or 4 (for BGRA) values corresponding to the blue, green, 
+        red, and optionally alpha channels. The pixel values should range from 0 to 255.
+    
+    destination_array : numpy.ndarray
+        A 1D array of the same length as `bgr_array`, where the sepia-filtered pixel data will 
+        be stored. This array is modified directly (inplace).
+    
+    format_32 : bool, optional (default=False)
+        If `True`, the input array is assumed to be in BGRA format (32-bit), meaning each 
+        pixel contains four channels. If `False`, the input is assumed to be in BGR format 
+        (24-bit), meaning each pixel contains three channels (blue, green, red).
+    
+    Returns
+    -------
+    numpy.ndarray
+        The `destination_array` with the sepia-toned pixel data. The array is modified 
+        directly (inplace) and is returned for convenience.
+    """
+
+    cdef unsigned int l = bgr_array.shape[ 0 ]  # Get the length of the input array
+
+    # Initialize variables
+    cdef:
+        int i = 0, channels = 3  # Initialize iteration index and number of channels
+        float rr, gg, bb  # Variables to store the new red, green, and blue values
+        const unsigned char * r  # Pointer to the red channel
+        const unsigned char * g  # Pointer to the green channel
+        const unsigned char * b  # Pointer to the blue channel
+
+    if format_32:  # Check if input is in BGRA format
+        channels = 4  # Update channel count for BGRA format
+
+    with nogil:  # Release the Global Interpreter Lock for parallel execution
+
+        # Iterate through the image data in steps of 'channels' (3 for BGR, 4 for BGRA)
+        for i in prange(0, l, channels, schedule = SCHEDULE, num_threads = THREADS):
+
+            # Get pointers to individual color channels (BGR)
+            r = &bgr_array[ i + 2 ]  # Pointer to the red channel
+            g = &bgr_array[ i + 1 ]  # Pointer to the green channel
+            b = &bgr_array[ i ]  # Pointer to the blue channel
+
+            # Apply sepia filter using the luminosity coefficients for each channel
+            rr = r[ 0 ] * <float> 0.393 + g[ 0 ] * <float> 0.769 + b[ 0 ] * <float> 0.189
+            gg = r[ 0 ] * <float> 0.349 + g[ 0 ] * <float> 0.686 + b[ 0 ] * <float> 0.168
+            bb = r[ 0 ] * <float> 0.272 + g[ 0 ] * <float> 0.534 + b[ 0 ] * <float> 0.131
+
+            # Ensure the resulting pixel values are capped at 255
+            destination_array[ i ] = <unsigned char> rr if rr < 255 else <unsigned char> 255
+            destination_array[ i + 1 ] = <unsigned char> gg if gg < 255 else <unsigned char> 255
+            destination_array[ i + 2 ] = <unsigned char> bb if bb < 255 else <unsigned char> 255
+
+            # If in BGRA format, preserve the alpha channel
+            if format_32:
+                destination_array[ i + 3 ] = bgr_array[ i + 3 ]
+
+    return destination_array  # Return the modified destination array
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void median_inplace_c(
         unsigned char [:, :, :] rgb_array_, int kernel_size_=2):
 
     """
-    SHADER MEDIAN FILTER
+    Median filter (inplace)
+    
+    The median filter is a non-linear digital filtering technique, 
+    often used to remove noise from an image or signal. 
+    Such noise reduction is a typical pre-processing step to improve 
+    the results of later processing (for example, edge detection on an image).
+    Median filtering is very widely used in digital image processing because, 
+    under certain conditions, it preserves edges while removing noise 
+    
+    The output median effect strength is controlled by the kernel size variable.
+    This method cannot be used for real time rendering
 
-    This shader cannot be used for real time rendering as the performance of the algorithm are not
-    satisfactory. The code would have to be changed and improved with C or assembler in order to
-    be adapted for a real time application. Another version can also be written with a surface
-    downscale prior processing /rescale method that would boost the fps performance.
+    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB(A) pixels,
+     
+    e.g
+    # 24-bit 
+    im = pygame.image.load("../Assets/background.jpg")
+    im = scale(im, (800, 600))
+    w, h = im.get_width(), im.get_height()
+    median_inplace_c(pixels3d(im), fast=True)
+    
+    # 32-bit 
+    im = pygame.image.load("../Assets/px.png").convert_alpha()
+    im = scale(im, (800, 600))
+    w, h = im.get_width(), im.get_height()
+    median_inplace_c(pixels3d(im), fast=False)
 
-    In the state, this shader can be used for texture/surface transformation offline
+    
+    Parameters
+    ----------
+    rgb_array_ : 
+        numpy.ndarray shape(w, h, 3) uint8 (unsigned char 0...255) containing the
+        pygame display pixels format RGB
+        
+    kernel_size_ : 
+        integer; size of the kernel
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a 3d array
-    (library surfarray)
-
-    :param rgb_array_   : numpy.ndarray shape(w, h, 3) uint8 (unsigned char 0...255) containing the
-    pygame display pixels format RGB
-    :param kernel_size_ : integer; size of the kernel
-    :return             : void
+    Returns
+    -------
+    void
     """
 
     cdef Py_ssize_t w, h
     w, h = rgb_array_.shape[:2]
 
     cdef int k = kernel_size_ >> 1
-    cdef int v = 0, kx, ky
-
-
-    for kx in range(-k, k):
-        for ky in range(-k, k):
-            v += 1
+    cdef int v = k * k * 3, kx, ky
 
     cdef:
-        # unsigned char [:, :, ::1] rgb_array_copy = \
-        #     ascontiguousarray(numpy.array(rgb_array_, copy=False))
         unsigned char [::1, :, :] rgb_array_copy = \
-                    numpy.array(rgb_array_, copy=False, order='F')
+                    numpy.asarray(rgb_array_, order='F')
 
         int i=0, j=0
         Py_ssize_t ii=0, jj=0
@@ -4608,22 +10189,28 @@ cdef inline void median_inplace_c(
 
 
     with nogil:
-        for i in prange(w, schedule=SCHEDULE, num_threads=THREADS, chunksize=2048):
-            for j in range(h):
+        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS, chunksize=2048):
+            for i in range(w):
 
                 index = 0
 
                 for kx in range(-k, k):
+
                     ii = i + kx
+
                     if ii < 0:
                         ii = 0
+
                     elif ii >= w_1:
                         ii = <int> w_1
 
                     for ky in range(-k, k):
+
                         jj = j + ky
+
                         if jj < 0:
                             jj = 0
+
                         elif jj >= h_1:
                             jj = <int>h_1
 
@@ -4633,15 +10220,22 @@ cdef inline void median_inplace_c(
 
                         index = index + 1
 
+
                 # External C quicksort
                 tmpr = new_quickSort(&tmp_red_[0], 0, v)
                 tmpg = new_quickSort(&tmp_green_[0], 0, v)
                 tmpb = new_quickSort(&tmp_blue_[0], 0, v)
 
                 val = (index - 1) >> 1
+
                 rgb_array_[i, j, 0] = tmpr[val]
                 rgb_array_[i, j, 1] = tmpg[val]
                 rgb_array_[i, j, 2] = tmpb[val]
+
+    free(tmp_red)
+    free(tmp_green)
+    free(tmp_blue)
+
 
 
 @cython.binding(False)
@@ -4651,69 +10245,91 @@ cdef inline void median_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void shader_median_grayscale_filter24_inplace_c(
+@cython.exceptval(check=False)
+cdef inline void median_grayscale_inplace_c(
         unsigned char [:, :, :] rgb_array_, int kernel_size_=2):
 
     """
-    SHADER MEDIAN FILTER
+    Median grayscale (inplace)
+    
+    The median filter is a non-linear digital filtering technique, 
+    often used to remove noise from an image or signal. 
+    Such noise reduction is a typical pre-processing step to improve 
+    the results of later processing (for example, edge detection on an image).
+    Median filtering is very widely used in digital image processing because, 
+    under certain conditions, it preserves edges while removing noise 
 
-    This shader cannot be used for real time rendering as the performance of the algorithm are not
-    satisfactory. The code would have to be changed and improved with C or assembler in order to
-    be adapted for a real time application. Another version can also be written with a surface
-    downscale prior processing /rescale method that would boost the fps performance.
+    The output image is a greyscale image with a median filter effect. 
+    The output median effect strength is controlled by the kernel size variable.  
+    
+    This method cannot be used for real time rendering. 
 
-    In the state, this shader can be used for texture/surface transformation offline
+    The surface is compatible 24 - 32 bit with or without alpha layer
+    
+    e.g
+    # 24-bit 
+    im = pygame.image.load("../Assets/background.jpg")
+    median_grayscale_inplace_c(im)
+    
+    # 32-bit 
+    im = pygame.image.load("../Assets/px.png").convert_alpha()
+    median_grayscale_inplace_c(im)
+    
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a 3d
-    array (library surfarray)
-
-    :param rgb_array_   : numpy.ndarray shape(w, h, 3) uint8 (unsigned char 0...255) containing the
-    pygame display pixels format RGB
-    :param kernel_size_ : integer; size of the kernel
-    :return             : void
+    :param rgb_array_: 
+        numpy.ndarray shape(w, h, n) uint8 (unsigned char 0...255) containing the
+        pygame display or surface pixels format RGB(A)
+        
+    :param kernel_size_: 
+        integer; size of the kernel, default kernel_size_=2
+        
+    :return: 
+        void
+        
     """
 
-    cdef Py_ssize_t w, h
+    cdef:
+        Py_ssize_t w, h
+        int k = kernel_size_ >> 1, ky, kx
+        unsigned char v = k * k * 4
+
     w, h = rgb_array_.shape[:2]
 
-    cdef int k = kernel_size_ >> 1, ky, kx
-    cdef unsigned char v
-
-    v = 0
-    for kx in range(-k, k):
-        for ky in range(-k, k):
-            v += 1
-
     cdef:
-        unsigned char [:, :, ::1] rgb_array_copy = \
-            ascontiguousarray(numpy.array(rgb_array_, copy=False))
+
+        unsigned char [::1, :, :] rgb_array_copy = \
+            numpy.asarray(rgb_array_, order='F')
 
         int i=0, j=0
         Py_ssize_t ii=0, jj=0
 
         unsigned char *tmp_   = <unsigned char *> malloc(v * sizeof(unsigned char))
         unsigned char *tmp
+
         int index = 0
         unsigned char val
 
-
+    # multiprocessing is not used here.
+    # tmp_ share memory view cannot be shared across all the instances and
+    # using multiprocess with chunks will be slower
     with nogil:
-        for i in prange(0, w, schedule=SCHEDULE, num_threads=THREADS, chunksize=2048):
-            for j in range(0, h):
+        for j in range(0, h):
+            for i in range(0, w):
 
                 index = 0
 
                 for kx in range(-k, k):
+
+                    ii = i + kx
+
+                    if ii < 0:
+                        ii = 0
+                    elif ii > w - 1:
+                        ii = w - 1
+
                     for ky in range(-k, k):
 
-                        ii = i + kx
                         jj = j + ky
-
-                        if ii < 0:
-                            ii = 0
-                        elif ii > w - 1:
-                            ii = w - 1
 
                         if jj < 0:
                             jj = 0
@@ -4726,14 +10342,18 @@ cdef inline void shader_median_grayscale_filter24_inplace_c(
 
                 tmp = new_quickSort(tmp_, 0, v)
 
-                val = (v >> 1) - 1
-                rgb_array_[i, j, 0] = tmp[val]
-                rgb_array_[i, j, 1] = tmp[val]
-                rgb_array_[i, j, 2] = tmp[val]
+                val = tmp[(v >> 1) - 1]
+
+                rgb_array_[i, j, 0] = val
+                rgb_array_[i, j, 1] = val
+                rgb_array_[i, j, 2] = val
+
+    free(tmp_)
 
 
 
 cdef float ONE_255 = <float>1.0 / <float>255.0
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -4742,28 +10362,31 @@ cdef float ONE_255 = <float>1.0 / <float>255.0
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void color_reduction_inplace_c(
+@cython.exceptval(check=False)
+cdef inline void posterize_surface_c(
         unsigned char [:, :, :] rgb_array, int color_number):
     """
-    COLOR REDUCTION SHADER
+    Apply color reduction (posterization) to an image.
 
-    Decrease the amount of colors in the display or texture.
-    The method of color reduction is very simple: every color of the original picture is replaced
-    by an appropriate color from the limited palette that is accessible.
+    Reduces the number of distinct colors in the given image or texture, creating a posterized effect.
+    The function maps the RGB values of the image to a limited set of colors, effectively reducing the 
+    color depth.
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a 3d array
-     (library surfarray)
+    Example usage:
+    posterize_surface_c(surface, 8)  # Reduce the color depth of the surface to 8 colors.
 
-    e.g:
-    color_reduction(surface, 8)
+    :param rgb_array: 
+        A 3D numpy.ndarray with shape (width, height, 3), containing RGB values in the range [0, 255].
+        This array represents the image or texture to be posterized. Modifying this array will directly 
+        alter the underlying image or display surface.
 
-    :param rgb_array    : numpy.ndarray shape(w, h, 3) uint8 (unsigned char 0...255) containing the
-    pygame display pixels format RGB
-    :param color_number : integer; color number color_number^2
-    :return             : void
+    :param color_number: 
+        An integer specifying the target number of colors to reduce the image to.
+        A higher number retains more colors, while a lower number results in a more heavily posterized image.
+
+    :return: 
+        None. The function modifies the input `rgb_array` in place.
     """
-
 
     cdef Py_ssize_t w, h
     w, h = rgb_array.shape[:2]
@@ -4784,10 +10407,12 @@ cdef inline void color_reduction_inplace_c(
                 r = &rgb_array[x, y, 0]
                 g = &rgb_array[x, y, 1]
                 b = &rgb_array[x, y, 2]
-
-                r[0] = <unsigned char>(<int>(round_c(c1 * r[0]) * f))
-                g[0] = <unsigned char>(<int>(round_c(c1 * g[0]) * f))
-                b[0] = <unsigned char>(<int>(round_c(c1 * b[0]) * f))
+                if r[0]!=0:
+                    r[0] = <unsigned char>(<int>(round_c(c1 * r[0]) * f))
+                if g[0]!=0:
+                    g[0] = <unsigned char>(<int>(round_c(c1 * g[0]) * f))
+                if b[0]!=0:
+                    b[0] = <unsigned char>(<int>(round_c(c1 * b[0]) * f))
 
 
 
@@ -4804,6 +10429,8 @@ cdef:
 
     unsigned short int KERNEL_HALF = 1
 
+
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -4811,34 +10438,49 @@ cdef:
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void sobel_inplace_c(unsigned char [:, :, :] rgb_array, float threshold=20.0):
+@cython.exceptval(check=False)
+cdef inline void sobel_inplace_c(
+        unsigned char [:, :, :] rgb_array,
+        float threshold=20.0
+):
     """
-    SHADER SOBEL (EDGE DETECTION)
+    Sobel (edge detection)
 
     Transform the game display or a pygame surface into a sobel equivalent model
-    (surface edge detection)
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a 3d
-    array (library surfarray)
+    The array must be greyscaled but non greyscale array will also work, 
+    only the red channel will be used to code the sobel filter 
 
     e.g:
     sobel(surface, 64)
 
-    :param rgb_array    : numpy.ndarray shape (w, h, 3) containing RGB values
-    :param threshold    : float; Threshold value (Default value = 20.0)
-    :return             : void
+    :param rgb_array: 
+        numpy.ndarray shape (w, h, 3) type uint8 referencing the game display or SDL surface
+        containing RGB values. Any change to this array will modify the SDL surface directly
+        
+    :param threshold: 
+        float; Threshold value (Default value = 20.0)
+        
+    :return: 
+        void
+        
     """
 
     cdef Py_ssize_t w, h
     w, h = rgb_array.shape[:2]
 
+    cdef unsigned char [::1, :, :] source_array
+
+    try:
+        source_array = numpy.asarray(rgb_array, order='F')
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+
     cdef:
         Py_ssize_t w_1 = w - 1
         Py_ssize_t h_1 = h - 1
         int kernel_offset_x, kernel_offset_y
-        # unsigned char [:, :, :] source_array = numpy.array(rgb_array, copy=True)
-        unsigned char [::1, :, :] source_array = numpy.array(rgb_array, copy=False, order='F')
         int x, y
         Py_ssize_t xx, yy
         float r_gx, r_gy
@@ -4870,6 +10512,8 @@ cdef inline void sobel_inplace_c(unsigned char [:, :, :] rgb_array, float thresh
 
                         # grayscale image red = green = blue
                         gray = &source_array[xx, yy, 0]
+
+                        # if gray[0]!=0:
 
                         # if kernel_offset_x != 0:
 
@@ -4904,58 +10548,166 @@ cdef inline void sobel_inplace_c(unsigned char [:, :, :] rgb_array, float thresh
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef unsigned char [:, :, ::1] scale_array24_c(
-        unsigned char [:, :, :]
-        rgb_array,
-        int w2,
-        int h2
-):
+@cython.exceptval(check=False)
+cdef inline void sobel_1d_c(
+        const Py_ssize_t w,
+        const Py_ssize_t l,
+        unsigned char [::1] bgr_array,
+        const unsigned char [::1] bgr_array_cp,
+        float threshold=20.0,
+        bint format_32=False,
+        bint greyscale=False) nogil:
     """
-    ARRAY RE-SCALING ; ARRAY SHAPE (W, H, 3)
+    Applies a 1D Sobel edge detection filter to a C-style buffer (in-place).
 
-    This is an internal tool that cannot be access outside of this library (cpdef hook missing)
-    Re-scale an array (rgb_array) of size (w, h, 3) into an equivalent array size (w2, h2, 3).
-    This function is identical to a surface rescaling but uses the array instead
+    This function computes the Sobel gradient of an image to detect edges. 
+    It operates on a raw C-buffer, modifying it in place. While the input 
+    array should ideally be greyscale, the function can process non-greyscale 
+    images as well. If `greyscale=True`, the computation is simplified by 
+    processing only a single channel (typically the blue channel in BGR format). 
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame function pixels3d or array3d to convert an image into a 3d
-      array (library surfarray)
+    For improved performance, a copy of the source array (`bgr_array_cp`) can be 
+    provided, ensuring both arrays have the same dimensions.
 
-    e.g:
-    memview_array = scale_array24_c(my_array, 300, 300)
+    Example Usage:
+    --------------
+    # 24-bit Image
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    image = pygame.transform.smoothscale(image, (800, 600))
+    grey(image)  # Convert to greyscale before applying Sobel
+    image_copy = image.copy()
+    sobel_1d_c(800, 600, image.get_buffer(), image_copy.get_buffer(), threshold=25.0)
 
-    :param rgb_array    : RGB numpy.ndarray, format (w, h, 3) numpy.uint8
-    :param w2           : new width
-    :param h2           : new height
-    :return             : Return a MemoryViewSlice 3d numpy.ndarray format (w, h, 3) uint8
+    # 32-bit Image
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    image = pygame.transform.smoothscale(image, (800, 600))
+    image_copy = image.copy()
+    sobel_1d_c(800, 600, image.get_buffer(), image_copy.get_buffer(), threshold=25.0, format_32=True)
+
+    Parameters:
+    -----------
+    w : int
+        Width of the image or array.
+
+    l : int
+        Total length of the array (width * height * bytes per pixel).
+
+    bgr_array : numpy.ndarray (1D C-buffer), dtype=uint8
+        A contiguous C-buffer representing the image pixels in BGR or BGRA format.
+        This buffer is modified in place.
+
+    bgr_array_cp : numpy.ndarray (1D C-buffer), dtype=uint8
+        A copy of `bgr_array` used to improve performance. It must have the same 
+        dimensions as `bgr_array`.
+
+    threshold : float, default=20.0
+        The Sobel gradient threshold for edge detection.
+
+    format_32 : bool, default=False
+        - `True`: Input buffer is in 32-bit BGRA format.
+        - `False`: Input buffer is in 24-bit BGR format.
+
+    greyscale : bool, default=False
+        - `True`: Performs the Sobel operation on a single channel (blue) for 
+          improved efficiency when working with greyscale images.
+        - `False`: Applies the filter to all three RGB channels.
+
+    Returns:
+    --------
+    None
+        The function modifies `bgr_array` in place.
     """
-    assert w2 > 0, "Argument w2 cannot be <=0"
-    assert h2 > 0, "Argument h2 cannot be <=0"
 
-    cdef Py_ssize_t w1, h1, s
 
-    try:
-        w1, h1, s = rgb_array.shape[:3]
 
-    except (ValueError, pygame.error) as e:
-        raise ValueError('\nArray shape not understood.')
+    cdef short bitsize
+    bitsize = 3 if format_32 == False else 4
 
     cdef:
-        unsigned char [:, :, ::1] new_array = numpy.empty((w2, h2, 3), numpy.uint8)
-        float fx = <float>w1 / <float>w2
-        float fy = <float>h1 / <float>h2
-        int x, y
-        Py_ssize_t xx, yy
-    with nogil:
-        for x in prange(w2, schedule=SCHEDULE, num_threads=THREADS):
-            xx = <int>(x * fx)
-            for y in range(h2):
-                yy = <int>(y * fy)
-                new_array[x, y, 0] = rgb_array[xx, yy, 0]
-                new_array[x, y, 1] = rgb_array[xx, yy, 1]
-                new_array[x, y, 2] = rgb_array[xx, yy, 2]
 
-    return new_array
+        int i, cx, cy
+        unsigned int row = w * bitsize
+        float magnitude
+        unsigned char m
+        const unsigned char * p1
+        const unsigned char * p2
+        const unsigned char * p3
+        const unsigned char * p4
+
+
+
+    for i in prange(0, l, bitsize, schedule=SCHEDULE, num_threads=THREADS):
+
+        if row + bitsize < i < l - row - bitsize:
+
+            p1 = &bgr_array_cp[ i - row - bitsize ]
+            p2 = &bgr_array_cp[ i - row + bitsize ]
+            p3 = &bgr_array_cp[ i + row - bitsize ]
+            p4 = &bgr_array_cp[ i + row + bitsize ]
+
+            # blue
+            cy =  \
+                - p1[0] \
+                + p2[0] \
+                - bgr_array_cp[ i - bitsize ] * <int>2 \
+                + bgr_array_cp[ i + bitsize ] * <int>2 \
+                - p3[0] \
+                + p4[0]
+
+            cx = \
+                - p1[0] \
+                - bgr_array_cp[ i - row ] * <int>2 \
+                - p2[0] \
+                + p3[0] \
+                + bgr_array_cp[ i + row ] * <int>2 \
+                + p4[0]
+
+            if not greyscale:
+                # green
+                cy = cy \
+                    - (p1+1)[ 0 ] \
+                    + (p2+1)[ 0 ] \
+                    - bgr_array_cp[ i - bitsize +1 ] * <int> 2 \
+                    + bgr_array_cp[ i + bitsize +1] * <int> 2 \
+                    - (p3+1)[ 0 ] \
+                    + (p4+1)[ 0 ]
+
+                cx = cx \
+                    - (p1+1)[ 0 ] \
+                    - bgr_array_cp[ i - row +1] * <int> 2 \
+                    - (p2+1)[ 0 ] \
+                    + (p3+1)[ 0 ] \
+                    + bgr_array_cp[ i + row +1] * <int> 2 \
+                    + (p4+1)[ 0 ]
+
+                # red
+                cy = cy \
+                     - (p1 + 2)[ 0 ] \
+                     + (p2 + 2)[ 0 ] \
+                     - bgr_array_cp[ i - bitsize + 2 ] * <int> 2 \
+                     + bgr_array_cp[ i + bitsize + 2 ] * <int> 2 \
+                     - (p3 + 2)[ 0 ] \
+                     + (p4 + 2)[ 0 ]
+
+                cx = cx \
+                     - (p1 + 2)[ 0 ] \
+                     - bgr_array_cp[ i - row + 2 ] * <int> 2 \
+                     - (p2 + 2)[ 0 ] \
+                     + (p3 + 2)[ 0 ] \
+                     + bgr_array_cp[ i + row + 2 ] * <int> 2 \
+                     + (p4 + 2)[ 0 ]
+
+
+        magnitude = min(<float> sqrt(cx * cx + cy * cy), <float> 255.0)
+        m = <unsigned char> magnitude if magnitude > threshold else 0
+        # update the pixel if the magnitude is above threshold else black pixel
+
+        # Alpha channel is unchanged
+        bgr_array[ i    ] = m
+        bgr_array[ i + 1] = m
+        bgr_array[ i + 2] = m
+
+
 
 
 @cython.binding(False)
@@ -4965,27 +10717,39 @@ cdef unsigned char [:, :, ::1] scale_array24_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void sobel_fast_inplace_c(
         surface_, int threshold_=20, unsigned short factor_=1):
     """
-    SHADER FAST SOBEL (EDGE DETECTION)
+    Fast sobel (inplace)
 
     Transform the game display or a pygame surface into a sobel equivalent model
-    (surface edge detection).This version is slightly fastest than sobel_inplace_c as
+    This version is slightly fastest than sobel_inplace_c as
     it down-scale the array containing all the pixels and apply the sobel algorithm to a smaller
     sample. When the processing is done, the array is re-scale to its original dimensions.
     If this method is in theory faster than sobel_inplace_c, down-scaling and up-scaling
     an array does have a side effect such as decreasing the overall image definition
     (jagged lines non-antialiasing)
+    
+    The surface/array must be greyscaled but non greyscale surface/array will also work, 
+    only the red channel will be used to code the sobel filter 
 
     e.g:
-    sobel_fast(surface, 64, factor_=1)
+    sobel_fast_inplace_c(surface, 64, amplitude=1)
 
-    :param surface_     :  pygame.Surface
-    :param threshold_   : integer; threshold value for the sobel filter
-    :param factor_      : unsigned short (default value =1). Define the
-    reduction factor of an image. 1 divide by 2, 2 divide by 4 etc
-    :return             : void
+    :param surface_: 
+        pygame.Surface
+        
+    :param threshold_: 
+        integer; threshold value for the sobel filter
+        
+    :param factor_: 
+        unsigned short (default value =1). Define the
+        reduction factor of an image. 1 divide by 2, 2 divide by 4 etc
+        
+    :return: 
+        void
+        
     """
 
     cdef:
@@ -5003,7 +10767,7 @@ cdef inline void sobel_fast_inplace_c(
 
         unsigned char [:, :, :] source_array = surface_.get_view('3')
         unsigned char [:, :, :] rescale_array = \
-            numpy.array(pixels3d(scale(surface_, (w >> factor_, h >> factor_))))
+            numpy.asarray(pixels3d(scale(surface_, (w >> factor_, h >> factor_))))
         unsigned char [:, :, :] new_array = empty((w >> factor_, h >> factor_, 3), uint8)
 
     h = h >> factor_
@@ -5064,7 +10828,7 @@ cdef inline void sobel_fast_inplace_c(
     w = w << factor_
     h = h << factor_
 
-    cdef unsigned char [:, :, :] new_ = scale_array24_c(new_array, w, h)
+    cdef unsigned char [:, :, :] new_ = resize_array_c(new_array, w, h)
 
     with nogil:
 
@@ -5083,23 +10847,39 @@ cdef inline void sobel_fast_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void invert_inplace_c(
         unsigned char [:, :, :] rgb_array):
 
     """
-    SHADER INVERT PIXELS
+    Invert the color values of all pixels in a given image or texture (in-place).
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame function pixels3d or array3d to convert an image into a 3d
-     array (library surfarray)
+    This function performs an in-place inversion of all the pixel values in the provided image or texture,
+    effectively creating a negative of the image. Each pixel's color components (Red, Green, Blue, and optionally 
+    Alpha) are inverted by subtracting their current value from the maximum value (255 for 8-bit color channels).
 
-    Invert all pixels of the display or a given texture
-    e.g:
-    invert(surface)
+    The function operates directly on the provided `rgb_array`, modifying the pixel values in place.
 
-    :param rgb_array    : numpy.ndarray containing all the RGB color values. Array shape (w, h, 3)
-    :return             : void
+    Example:
+        invert(surface)
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 3D NumPy array representing the image or texture, with shape (width, height, channels).
+        The array should contain pixel values in the RGB or RGBA format, with each component being 
+        an unsigned 8-bit integer (uint8), where each color channel ranges from 0 to 255.
+
+    Returns
+    -------
+    void
+        This function modifies the provided `rgb_array` in place and does not return any value.
+        
+    Notes
+    -----
+    The function modifies the input array directly, so there is no need to assign the result to a new variable.
     """
+
 
     cdef Py_ssize_t w, h
     w, h = rgb_array.shape[:2]
@@ -5116,14 +10896,11 @@ cdef inline void invert_inplace_c(
                 r = &rgb_array[i, j, 0]
                 g = &rgb_array[i, j, 1]
                 b = &rgb_array[i, j, 2]
-                r[0] = 255 - r[0]
-                g[0] = 255 - g[0]
-                b[0] = 255 - b[0]
+                r[0] = <unsigned char>255 - r[0]
+                g[0] = <unsigned char>255 - g[0]
+                b[0] = <unsigned char>255 - b[0]
 
 
-cdef float[::1] GAUSS_KERNEL = numpy.array(
-    [<float>(1.0/16.0), <float>(4.0/16.0),
-     <float>(6.0/16.0), <float>(4.0/16.0), <float>(1.0/16.0)], dtype=numpy.float32)
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -5132,114 +10909,63 @@ cdef float[::1] GAUSS_KERNEL = numpy.array(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void blur_array_inplace_c(
-        unsigned char [:, :, :] rgb_array_, mask=None, t=1):
+@cython.exceptval(check=False)
+cdef void invert3d_c(unsigned char [:, :, :] rgb_array):
     """
-    APPLY A GAUSSIAN BLUR EFFECT TO THE GAME DISPLAY OR SURFACE (KERNEL 5x5)
+    
+    Invert 3d array pixels (inplace)
+    
+    Invert a 3d array shape (w, h, n) uint8 data type
+    
+    Inverting an image means inverting the pixel values.
+    Images are represented using RGB or Red Green Blue values. 
+    Each can take up an integer value between 0 and 255 (both included). 
+    For example, a red color is represent using (255, 0, 0), white with (255, 255, 255), 
+    black with (0, 0, 0) and so on. Inverting an image means reversing the colors on the image.
+    For example, the inverted color for red color will be (0, 255, 255). Note that 0 
+    became 255 and 255 became 0. This means that inverting an image is essentially subtracting 
+    the old RGB values from 255. 
+    
+    e.g
+    # 24 bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    invert3d_c(array3d)
+    
+    # 32 bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    invert3d_c(array3d)
+    
+    Parameters
+    ----------
+    rgb_array: 
+        numpy.ndarray shape (w, h, n) containing RGB(A) pixel format and 
+        works with any other formats such as BGR, BGRA
 
-    # Gaussian kernel 5x5
-        # |1   4   6   4  1|
-        # |4  16  24  16  4|
-        # |6  24  36  24  6|  x 1/256
-        # |4  16  24  16  4|
-        # |1  4    6   4  1|
-    This method is using convolution property and process the image in two passes,
-    first the horizontal convolution and last the vertical convolution
-    pixels convoluted outside image edges will be set to adjacent edge value
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a 3d array (
-    library surfarray)
-
-    :param rgb_array_   : numpy.ndarray type (w, h, 3) uint8
-    :param mask         : numpy.ndarray default None
-    :param t            : integer; number of times
-    :return             : Return 24-bit a numpy.ndarray type (w, h, 3) uint8
+    Returns
+    -------
+    void
+    
     """
-
     cdef Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
+    w, h = rgb_array.shape[ :2 ]
 
-    # kernel 5x5 separable
     cdef:
+        int i = 0, j = 0
+        unsigned char *r
+        unsigned char *g
+        unsigned char *b
 
-        short int kernel_half = 2
-        unsigned char [:, :, ::1] convolve = \
-            numpy.empty((w, h, 3), dtype=uint8)
-        int x, y, xx, yy
-        float r, g, b, s
-        char kernel_offset
-        unsigned char red, green, blue
-        float *k
-
-    for r in range(t):
-        with nogil:
-
-            # horizontal convolution
-            for x in prange(0, w, schedule=SCHEDULE, num_threads=THREADS):
+    with nogil:
+        for j in prange(h, schedule = SCHEDULE, num_threads = THREADS):
+            for i in range(w):
+                r = &rgb_array[ i, j, 0 ]
+                g = &rgb_array[ i, j, 1 ]
+                b = &rgb_array[ i, j, 2 ]
+                r[ 0 ] = <unsigned char>255 - r[ 0 ]
+                g[ 0 ] = <unsigned char>255 - g[ 0 ]
+                b[ 0 ] = <unsigned char>255 - b[ 0 ]
 
 
-                for y in prange(0, h):  # range [0..w-1]
-
-                    r, g, b = <unsigned char> 0, <unsigned char> 0, <unsigned char> 0
-
-                    for kernel_offset in range(-kernel_half, kernel_half + 1):
-
-                        k = &GAUSS_KERNEL[kernel_offset + kernel_half]
-
-                        xx = x + kernel_offset
-
-                        # check boundaries.
-                        # Fetch the edge pixel for the convolution
-                        if xx < 0:
-                            continue
-
-                        if xx > w - 1:
-                            continue
-
-                        red, green, blue = rgb_array_[xx, y, 0],\
-                            rgb_array_[xx, y, 1], rgb_array_[xx, y, 2]
-                        if red + green + blue == <unsigned short int>0:
-                            continue
-
-                        r = r + red * k[0]
-                        g = g + green * k[0]
-                        b = b + blue * k[0]
-
-                    convolve[x, y, 0] = <unsigned char>r
-                    convolve[x, y, 1] = <unsigned char>g
-                    convolve[x, y, 2] = <unsigned char>b
-
-            # Vertical convolution
-            for x in prange(0,  w, schedule=SCHEDULE, num_threads=THREADS):
-
-                for y in prange(0, h):
-
-                    r, g, b = <unsigned char> 0, <unsigned char> 0, <unsigned char> 0
-                    for kernel_offset in range(-kernel_half, kernel_half + 1):
-
-                        k = &GAUSS_KERNEL[kernel_offset + kernel_half]
-                        yy = y + kernel_offset
-
-                        if yy < 0:
-                            continue
-
-                        if yy > h-1:
-                            continue
-
-                        red, green, blue = convolve[x, yy, 0],\
-                            convolve[x, yy, 1], convolve[x, yy, 2]
-                        if red + green + blue == <unsigned short int>0:
-                            continue
-
-                        r = r + red * k[0]
-                        g = g + green * k[0]
-                        b = b + blue * k[0]
-
-                    rgb_array_[x, y, 0], \
-                    rgb_array_[x, y, 1],\
-                    rgb_array_[x, y, 2] = \
-                        <unsigned char>r, <unsigned char>g, <unsigned char>b
 
 
 @cython.binding(False)
@@ -5249,34 +10975,215 @@ cdef inline void blur_array_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef void invert1d_c(unsigned char [:] rgb_array, bint format_32=False):
+    """
+    Invert directly a C-buffer pixel values 
+    
+    Invert a C-buffer uint8 data types RGB(A) format
+    
+    This method will works with other buffer format such as BGR, BGRA
+    
+    Inverting an image means inverting the pixel values.
+    Images are represented using RGB or Red Green Blue values. 
+    Each can take up an integer value between 0 and 255 (both included). 
+    For example, a red color is represent using (255, 0, 0), white with (255, 255, 255), 
+    black with (0, 0, 0) and so on. Inverting an image means reversing the colors on the image.
+    For example, the inverted color for red color will be (0, 255, 255). Note that 0 
+    became 255 and 255 became 0. This means that inverting an image is essentially subtracting 
+    the old RGB values from 255. 
+    
+    e.g
+    # 24 bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    invert1d_c(image.get_buffer(), False)
+    
+    # 32 bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    invert1d_c(image.get_buffer(), True)
+    
+    Parameters
+    ----------
+    rgb_array: 
+        numpy.ndarray; memoryviewslice; 1d array of uint8 data type 
+        containing RGB(A) pixels or any other pixel format such as BGR or BGRA etc
+        
+    format_32: 
+        bool True | for 'RGB' buffer type (24-bit) or False 'RGBA' (32-bit)
+
+    Returns
+    -------
+    void
+
+    """
+    cdef Py_ssize_t l = rgb_array.shape[ 0 ]
+
+    cdef:
+        int i = 0
+        int bit = 3
+        unsigned char *r
+        unsigned char *g
+        unsigned char *b
+
+
+    if format_32:
+        bit = 4
+
+
+    with nogil:
+        # noinspection SpellCheckingInspection
+        for i in prange(0, l, bit, schedule = SCHEDULE, num_threads = THREADS):
+                r = &rgb_array[ i     ]
+                g = &rgb_array[ i + 1 ]
+                b = &rgb_array[ i + 2 ]
+                r[ 0 ] = <unsigned char>255 - r[ 0 ]
+                g[ 0 ] = <unsigned char>255 - g[ 0 ]
+                b[ 0 ] = <unsigned char>255 - b[ 0 ]
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef np.ndarray[np.uint8_t, ndim=1] invert1d_cp_c(
+        const unsigned char [:] rgb_array,
+        bint format_32=False):
+    """
+    
+    Invert directly a C-buffer pixel values (return a copy)
+    
+    Invert C buffer uint8 data types RGB(A) format
+    
+    Inverting an image means inverting the pixel values.
+    Images are represented using RGB or Red Green Blue values. 
+    Each can take up an integer value between 0 and 255 (both included). 
+    For example, a red color is represent using (255, 0, 0), white with (255, 255, 255), 
+    black with (0, 0, 0) and so on. Inverting an image means reversing the colors on the image.
+    For example, the inverted color for red color will be (0, 255, 255). Note that 0 
+    became 255 and 255 became 0. This means that inverting an image is essentially subtracting 
+    the old RGB values from 255. 
+    
+    This method will works with other buffer format such as BGR, BGRA
+    
+    e.g:
+    # 24-bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    arr3d = invert1d_cp(image.get_buffer(), False)
+    image = pygame.image.frombuffer(arr3d, (WIDTH, HEIGHT), "BGR")
+    
+    # 32-bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    arr3d = invert1d_cp(image.get_buffer(), True)
+    image = pygame.image.frombuffer(arr3d, (WIDTH, HEIGHT), "BGRA")
+
+    Parameters
+    ----------
+    rgb_array: 
+        numpy.ndarray; memoryviewslice; 1d array of uint8 data type 
+        containing RGB(A) pixels or any other pixel format such as BGR or BGRA etc
+        
+    format_32: 
+        bool True | for 'RGB' buffer type (24-bit) or False 'RGBA' (32-bit)
+
+    Returns
+    -------
+    Return a copy of the input array inverted.
+    numpy.ndarray 1d array uint8 data type with pixel format equivalent to the input format
+
+    """
+    cdef Py_ssize_t l = rgb_array.shape[ 0 ]
+
+    cdef:
+        int i = 0
+        const unsigned char *r
+        const unsigned char *g
+        const unsigned char *b
+        unsigned char [::1] destination = empty(l, dtype=uint8)
+
+    with nogil:
+
+        if format_32:
+            # noinspection SpellCheckingInspection
+            for i in prange(0, l, 4, schedule = SCHEDULE, num_threads = THREADS):
+                r = &rgb_array[ i ]
+                g = &rgb_array[ i + 1 ]
+                b = &rgb_array[ i + 2 ]
+                destination[ i ] = <unsigned char> 255 - r[ 0 ]
+                destination[ i + 1 ] = <unsigned char> 255 - g[ 0 ]
+                destination[ i + 2 ] = <unsigned char> 255 - b[ 0 ]
+                destination[ i + 3 ] = rgb_array[ i + 3 ]
+
+        else:
+            # noinspection SpellCheckingInspection
+            for i in prange(0, l, 3, schedule = SCHEDULE, num_threads = THREADS):
+                    r = &rgb_array[ i     ]
+                    g = &rgb_array[ i + 1 ]
+                    b = &rgb_array[ i + 2 ]
+                    destination[ i    ] = <unsigned char>255 - r[ 0 ]
+                    destination[ i + 1] = <unsigned char>255 - g[ 0 ]
+                    destination[ i + 2] = <unsigned char>255 - b[ 0 ]
+
+
+    return numpy.ndarray(shape=l, buffer=destination, dtype=uint8)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void wave_inplace_c(
-        unsigned char [:, :, :] rgb_array_,
+        unsigned char [:, :, :] rgb_array,
         float rad,
-        int size):
+        int size = 5):
     """
-    CREATE A WAVE EFFECT TO THE GAME DISPLAY OR TO A GIVEN SURFACE
+    Wave effect (inplace)
+    
+    Create a wave effect to the game display or surface (inplace)
+    Compatible with 24-bit surface 
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame function pixels3d or array3d to convert an image into a
-     3d array (library surfarray)
+    e.g:
+    wave_inplace_c(pixels3d(surface), 8 * math.pi/180.0 + frame_number, 5)
+    wave_inplace_c(pixels3d(surface), x * math.pi/180.0, 5)
 
-
-    :param rgb_array_   : numpy.ndarray shape (w, h, 3) containing all the RGB values
-    :param rad          : float; angle in rad to rotate over time
-    :param size         : int; Number of sub-surfaces
-    :return             : void
+    Parameters
+    ----------
+    
+    rgb_array : 
+        numpy.ndarray 3d array shape (w, h, 3) type uint8 of RGB format pixels
+        referencing the game display or surface containing all the pixel values.
+        Any change to this array will modify the game display or given surface directly
+       
+    rad : 
+        float; angle in rad to rotate over time, default 0.139 
+        
+    size : 
+        int; Number of sub-surfaces, default is 5 
+        
+    Returns
+    -------
+    void
     """
 
     cdef Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
+    w, h = rgb_array.shape[:2]
 
     cdef:
-        # unsigned char [:, :, ::1] rgb = \
-        # numpy.ascontiguousarray(numpy.array(rgb_array_, copy=False, order='C'))
         unsigned char [::1, :, :] rgb = \
-                numpy.array(rgb_array_, copy=False, order='F')
+                numpy.asarray(rgb_array, order='F')
         int x, y, x_pos, y_pos, xx, yy
-        unsigned int i=0, j=0
+        int i=0, j=0
         float c1 = <float>1.0 / <float>(size * size)
         unsigned int w_1 = <unsigned int>w - 1
         unsigned int h_1 = <unsigned int>h - 1
@@ -5309,9 +11216,112 @@ cdef inline void wave_inplace_c(
                             # xx = 0
                             continue
 
-                        rgb_array_[xx, yy, 0] = rgb[x + i, y + j, 0]
-                        rgb_array_[xx, yy, 1] = rgb[x + i, y + j, 1]
-                        rgb_array_[xx, yy, 2] = rgb[x + i, y + j, 2]
+                        rgb_array[xx, yy, 0] = rgb[x + i, y + j, 0]
+                        rgb_array[xx, yy, 1] = rgb[x + i, y + j, 1]
+                        rgb_array[xx, yy, 2] = rgb[x + i, y + j, 2]
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void wave32_c(
+        unsigned char [:, :, ::1] rgba_array,
+        float rad,
+        int size):
+
+    """
+    Create a wave effect (inplace)
+        
+    Method fully compatible with 32-bit SDL surface with layer alpha.
+    The layer alpha pixels will also be displace by the wave effect.    
+    The Array (rgba_array) must be a numpy array shape (w, h, 4) type uint8 
+    containing RGB pixels   
+    
+    e.g:
+    image = pygame.image.load("../Assets/px.png").convert_alpha()
+    wave32(image, angle * math.pi / 180, 10)
+    
+    Parameters
+    ----------
+    rgba_array : 
+        numpy.ndarray shape (w, h, 4) of type uint8 containing all the RGBA 
+        values and represent the image pixels of the game display surface. This array is referencing 
+        the game display and any changes to the array will affect the surface directly. 
+        
+    rad : 
+        float; angle in radian to rotate the wave over time
+        
+    size : 
+        int; Number of sub-surfaces
+
+    Returns
+    -------
+    void
+
+    """
+
+    cdef:
+        Py_ssize_t w, h
+        Py_ssize_t bit_size
+
+    w, h, bit_size = rgba_array.shape[:3]
+
+
+    cdef:
+        unsigned char [::1, :, :] rgb = \
+                numpy.asarray(rgba_array, order='F')
+
+        int x, y, x_pos, y_pos, xx, yy
+        unsigned int i=0, j=0
+        float c1 = <float>1.0 / <float>(size * size)
+        unsigned int w_1 = <unsigned int>w - 1
+        unsigned int h_1 = <unsigned int>h - 1
+        unsigned int yj, xi
+
+
+    with nogil:
+
+        for x in prange(0, w_1 - size, size, schedule = SCHEDULE, num_threads = THREADS):
+            x_pos = x + size + <int> (<float>sin(rad + <float> x * c1) * <float> size)
+
+
+            for y in prange(0, h_1 - size, size, schedule=SCHEDULE, num_threads=THREADS):
+                y_pos = y + size + <int>(<float>sin(rad + <float>y * c1) * <float>size)
+
+                for i in range(0, size + 1):
+
+                    xx = x_pos + i
+                    if xx > w_1:
+                        # xx = w_1
+                        continue
+                    if xx < 0:
+                        # xx = 0
+                        continue
+                    xi = x + i
+
+                    for j in range(0, size + 1):
+                        yy = y_pos + j
+                        if yy > h_1:
+                            # yy = h_1
+                            continue
+                        if yy < 0:
+                            # yy = 0
+                            continue
+                        yj = y + j
+
+                        # if rgb[ xi, yj, 3 ] > 0:
+
+                        rgba_array[xx, yy, 0] = rgb[xi, yj, 0]
+                        rgba_array[xx, yy, 1] = rgb[xi, yj, 1]
+                        rgba_array[xx, yy, 2] = rgb[xi, yj, 2]
+                        rgba_array[ xx, yy, 3 ] = rgb[xi, yj, 3 ]
+                        # else:
+                        #     rgba_array[ xx, yy, 3 ] = 0
 
 
 
@@ -5322,33 +11332,58 @@ cdef inline void wave_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void wave_static_inplace_c(
-        unsigned char [:, :, :] rgb_array_,
-        unsigned char [:, :, :] array_,
-        float rad,
-        int size):
+@cython.exceptval(check=False)
+cdef inline void wave_static_c(
+        unsigned char [:, :, :] rgb_array,
+        const unsigned char [:, :, :] rgb_array_cp,
+        const float rad,
+        const int size):
+
     """
-    CREATE A WAVE EFFECT TO THE GAME DISPLAY OR TO A GIVEN SURFACE
+    Create a wave effect to a static game display or image
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame function pixels3d or array3d to convert an image into a
-     3d array (library surfarray)
+    This function is different to the wave method as a copy of the 
+    static background is passed to the function as an argument `rgb_array` to 
+    improve the overall performances.
+    
+    The arguments rgb_array and rgb_array_cp are numpy arrays or a memoryviewslice, shape (w, h, 3) 
+    type uint8 containing RGB pixels. 
+   
+    e.g:
+    background = pygame.image.load('../Assets/px.png').convert(24)
+    background = pygame.transform.smoothscale(background, (800, 600))
+    background_cp = background.copy()
+    wave_static_c(pixels3d(background), pixels3d(background_cp), FRAME * math.pi/180 , 5)
+    SCREEN.blit(background, (0, 0))
 
-
-    :param rgb_array_   : numpy.ndarray shape (w, h, 3) containing all the RGB values
-    :param array_       : numpy.ndarray shape (w, h, 3) copy
-    :param rad          : float; angle in rad to rotate over time
-    :param size         : int; Number of sub-surfaces
-    :return             : void
+    :param rgb_array: 
+        numpy.ndarray shape (w, h, 3) of type uint8 containing all the 
+        RGB pixels values and represent the image pixels of the game display surface.
+        This array is referencing the game display and any changes to the array will
+        alter the surface directly. 
+    
+    :param rgb_array_cp: 
+        numpy.ndarray shape (w, h, 3) type uint8 copy of rgb_array
+    
+    :param rad: 
+        float; angle in rad to rotate over time.
+        
+    :param size: 
+        int; Number of sub-surfaces.
+        
+    :return: 
+        void
     """
 
+    cdef:
+        Py_ssize_t w, h, ww, hh
 
+    w, h = rgb_array.shape[:2]
+    ww, hh = rgb_array_cp.shape[:2]
 
-    cdef Py_ssize_t w, h, ww, hh
-    w, h = rgb_array_.shape[:2]
-    ww, hh = array_.shape[:2]
     if w!=ww or h!=hh:
-        raise ValueError("\nBoth the surface and the array must have the same sizes/dimensions")
+        raise ValueError(
+            "\nBoth the surface and the array must have the same sizes/dimensions")
 
     cdef:
         int x, y, x_pos, y_pos, xx, yy
@@ -5385,9 +11420,10 @@ cdef inline void wave_static_inplace_c(
                             # xx = 0
                             continue
 
-                        rgb_array_[xx, yy, 0] = array_[x + i, y + j, 0]
-                        rgb_array_[xx, yy, 1] = array_[x + i, y + j, 1]
-                        rgb_array_[xx, yy, 2] = array_[x + i, y + j, 2]
+                        rgb_array[xx, yy, 0] = rgb_array_cp[x + i, y + j, 0]
+                        rgb_array[xx, yy, 1] = rgb_array_cp[x + i, y + j, 1]
+                        rgb_array[xx, yy, 2] = rgb_array_cp[x + i, y + j, 2]
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -5396,26 +11432,71 @@ cdef inline void wave_static_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void swirl_inplace_c(
-        unsigned char [:, :, :] rgb_array_,
+@cython.exceptval(check=False)
+cdef inline void swirl_c(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        unsigned char [:, :, :] rgb_array,
+        const unsigned char [:, :, :] rgb_array_cp,
         float degrees
-):
+) nogil:
+
     """
-    SWIRL AN IMAGE (ANGLE APPROXIMATION METHOD)
+    Apply Swirl Effect to an Image (Inplace)
 
-    This algorithm uses a table of cos and sin.
+    The swirl effect distorts an image, creating a spiraling or twisting appearance 
+    that draws attention and adds movement or dynamism to the design. It can be used 
+    creatively in various contexts, such as digital art, social media graphics, or advertising.
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame function pixels3d or array3d to convert an image into a
-     3d array (library surfarray)
+    This effect works with 24-bit image formats but is not compatible with 32-bit formats 
+    due to the presence of an alpha channel. For 32-bit images with alpha channels, the 
+    alpha layer will remain unchanged during the transformation, causing the alpha to 
+    "bleed" into the effect. If this is undesirable, convert the image to a 24-bit format 
+    before applying the effect.
 
-    :param rgb_array_   : numpy.ndarray shape (w, h, 3) containing all the RGB color values
-    :param degrees      : float; swirl angle in degrees
-    :return             : void
+    For 32-bit images with an alpha channel, consider using the `swirl32` method instead, 
+    which is specifically designed for such images.
+
+    This algorithm uses a lookup table of cosine and sine values to apply the swirl effect.
+
+    Both the `rgb_array` and `rgb_array_cp` must be numpy arrays of shape (w, h, 3) 
+    containing RGB pixel values.
+
+    Example usage:
+        background = pygame.image.load("../Assets/background.jpg").convert(24)
+        background = pygame.transform.smoothscale(background, (WIDTH, HEIGHT))
+        background_cp = background.copy()
+
+        # In the game loop:
+        swirl_c(WIDTH, HEIGHT, pixels3d(background_cp), pixels3d(background), angle)
+        SCREEN.blit(background_cp, (0, 0))
+
+    Parameters
+    ----------
+    w : int
+        The width of the source image array (in pixels).
+
+    h : int
+        The height of the source image array (in pixels).
+
+    rgb_array : numpy.ndarray
+        A numpy array with shape (w, h, 3) of type uint8, referencing the game 
+        display or surface containing the RGB color values. Any modifications to this array 
+        will directly affect the game display or surface.
+
+    rgb_array_cp : numpy.ndarray
+        A copy of `rgb_array` used to perform the in-place transformation. This copy is 
+        modified by the swirl effect while the original array remains unchanged.
+
+    degrees : float
+        The swirl angle in degrees. This value controls the degree of rotation for the effect.
+
+    Returns
+    -------
+    None
+        This function modifies the `rgb_array_cp` in place to apply the swirl effect.
     """
 
-    cdef Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
 
     cdef:
         int i, j, angle
@@ -5423,39 +11504,40 @@ cdef inline void swirl_inplace_c(
         float columns, rows, r, di, dj
         float * c1
         float * c2
-        # unsigned char [:, :, ::1] rgb = numpy.array(rgb_array_, copy=False, order='C')
-        unsigned char [::1, :, :] rgb = numpy.array(rgb_array_, copy=False, order='F')
         float r_max
-
 
     columns = <float>0.5 * (<float>w - <float>1.0)
     rows    = <float>0.5 * (<float>h - <float>1.0)
 
-    r_max = <float>sqrt(columns * columns + rows * rows)
+    r_max = <float>1.0/<float>sqrt(columns * columns + rows * rows)
 
-    with nogil:
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
-            dj = <float> j - rows
-            for i in range(w):
-                di = <float>i - columns
+    for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+        dj = <float> j - rows
 
-                r = <float>sqrt(di * di + dj * dj) / <float>r_max
-                angle = <int>(degrees * r % 360)
+        for i in range(w):
+            di = <float>i - columns
 
-                c1 = &COS_TABLE[angle]
-                c2 = &SIN_TABLE[angle]
-                diffx = <int>(di * c1[0] - dj * c2[0] + columns)
-                diffy = <int>(di * c2[0] + dj * c1[0] + rows)
+            r = <float>sqrt(di * di + dj * dj) * r_max
+            angle = <int>(degrees * r % 360)
 
-                if (diffx >-1) and (diffx < w) and \
-                   (diffy >-1) and (diffy < h):
-                    rgb_array_[i, j, 0], rgb_array_[i, j, 1],\
-                        rgb_array_[i, j, 2] = rgb[diffx, diffy, 0], \
-                                              rgb[diffx, diffy, 1], rgb[diffx, diffy, 2]
-                else:
-                    rgb_array_[ i, j, 0 ] = 0
-                    rgb_array_[ i, j, 1 ] = 0
-                    rgb_array_[ i, j, 2 ] = 0
+            c1 = &COS_TABLE[angle]
+            c2 = &SIN_TABLE[angle]
+
+            diffx = <int>(di * c1[0] - dj * c2[0] + columns)
+            diffy = <int>(di * c2[0] + dj * c1[0] + rows)
+
+            if (diffx >-1) and (diffx < w) and \
+               (diffy >-1) and (diffy < h):
+                rgb_array[i, j, 0] = rgb_array_cp[diffx, diffy, 0]
+                rgb_array[i, j, 1] = rgb_array_cp[diffx, diffy, 1]
+                rgb_array[i, j, 2] = rgb_array_cp[diffx, diffy, 2]
+
+            else:
+                rgb_array[ i, j, 0 ] = 0
+                rgb_array[ i, j, 1 ] = 0
+                rgb_array[ i, j, 2 ] = 0
+
+
 
 
 @cython.binding(False)
@@ -5465,70 +11547,110 @@ cdef inline void swirl_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void swirl_static_inplace_c(
-        unsigned char [:, :, :] rgb_array_,
-        unsigned char [:, :, :] array_,
-        float degrees
+@cython.exceptval(check=False)
+cdef inline void swirl32_c(
+        Py_ssize_t w,
+        Py_ssize_t h,
+        unsigned char [:, :, ::1] rgb_array_,
+        const unsigned char [:, :, :] rgb,
+        const float degrees
 ):
     """
-    SWIRL A STATIC BACKGROUND (ANGLE APPROXIMATION METHOD)
-
-    This algorithm uses a table of cos and sin.
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame function pixels3d or array3d to convert an image into a
-     3d array (library surfarray)
-    array_ must have the exact same size/dimension
-
-
-    :param rgb_array_   : numpy.ndarray shape (w, h, 3) containing all the RGB color values
-    :param array_       : numpy.ndarray shape (w, h, 3) copy
-    :param degrees      : float; swirl angle in degrees
-    :return             : void
+    Swirl an image (inplace)
+    
+    Compatible with 32-bit images.
+    
+    The swirl effect is a visual distortion that creates
+    a spiraling appearance in an image or graphic. 
+    This effect can draw attention to specific areas of a design
+    and add a sense of movement or dynamism. It can be used creatively
+    in various contexts, from social media graphics to advertising
+    and digital art.
+    
+    both arrays (rgb_array, rgb) must be numpy arrays shape (w, h, 4) containing RGBA pixels.
+    
+    e.g:
+    swirl32_c(w, h, rgb_array_, rgb, 30)
+    
+    :param w:
+        array (rgb_array) width 
+        
+    :param h:
+        array (rgb_array) height 
+        
+    :param rgb_array_: 
+        numpy.ndarray shape (h, w, 4) type uint8 referencing the game display 
+        or surface containing all the RGBA color values.Any change to this array will modify the game 
+        display or given surface directly
+        
+    :param rgb:
+        numpy.ndarray shape (h, w, 4) type uint8 copy of rgb_array_
+         
+    :param degrees: 
+        float; swirl angle in degrees
+    
+    :return: 
+        void
+        
     """
 
-    cdef Py_ssize_t w, h, ww, hh
-    w, h = rgb_array_.shape[:2]
-    ww, hh = array_.shape[:2]
-
-    if w!=ww or h!=hh:
-        raise ValueError("\nBoth surface and array_ must have the same sizes/dimensions.")
-
     cdef:
-        int i, j, diffx, diffy, angle
+        int i, j, angle
+        int diffx, diffy
         float columns, rows, r, di, dj
         float * c1
         float * c2
         float r_max
+        unsigned char * p1
 
     columns = <float>0.5 * (<float>w - <float>1.0)
     rows    = <float>0.5 * (<float>h - <float>1.0)
 
-    r_max = <float>sqrt(columns * columns + rows * rows)
+    r_max = <float>1.0/<float>sqrt(columns * columns + rows * rows)
+
+    # inversion of w, h
+    # The surface size returns w,h and the rgb_array_ returns h,w
+    w, h = h, w
 
     with nogil:
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
-            dj = <float> j - rows
-            for i in range(w):
-                di = <float>i - columns
+        for i in prange(w, schedule=SCHEDULE, num_threads=THREADS):
+            di = <float>i - columns
 
-                r = <float>sqrt(di * di + dj * dj) / <float>r_max
+            for j in range(h):
+
+                dj = <float> j - rows
+
+                r = <float>sqrt(di * di + dj * dj) * r_max
                 angle = <int>(degrees * r % 360)
+
+                # angle = <int>fmodf(degrees * r, 360.0)
 
                 c1 = &COS_TABLE[angle]
                 c2 = &SIN_TABLE[angle]
+                # c2 = <float>sqrt(1- c1[0] ** 2)
+                # diffx = <int> (di * c1[ 0 ] - dj * c2 + columns)
+                # diffy = <int> (di * c2 + dj * c1[ 0 ] + rows)
+
                 diffx = <int>(di * c1[0] - dj * c2[0] + columns)
                 diffy = <int>(di * c2[0] + dj * c1[0] + rows)
 
-                if (diffx >-1) and (diffx < w) and \
-                   (diffy >-1) and (diffy < h):
-                    rgb_array_[i, j, 0], rgb_array_[i, j, 1],\
-                        rgb_array_[i, j, 2] = array_[diffx, diffy, 0], \
-                                              array_[diffx, diffy, 1], array_[diffx, diffy, 2]
+                p1 = &rgb_array_[ i, j, 0 ]
+
+                if (diffx > -1) and (diffx < w) and \
+                        (diffy > -1) and (diffy < h):
+
+                    p1[ 0 ] = rgb[ diffx, diffy, 0 ]
+                    (p1 + 1)[ 0 ] = rgb[ diffx, diffy, 1 ]
+                    (p1 + 2)[ 0 ] = rgb[ diffx, diffy, 2 ]
+                    (p1 + 3)[ 0 ] = rgb[ diffx, diffy, 3 ]
+
                 else:
-                    rgb_array_[ i, j, 0 ] = 0
-                    rgb_array_[ i, j, 1 ] = 0
-                    rgb_array_[ i, j, 2 ] = 0
+                    p1[ 0 ] = <unsigned char>0
+                    (p1 + 1)[ 0 ] = <unsigned char>0
+                    (p1 + 2)[ 0 ] = <unsigned char>0
+                    (p1 + 3)[ 0 ] = <unsigned char>0
+
+
 
 
 
@@ -5539,62 +11661,97 @@ cdef inline void swirl_static_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void swirl_inplace_c1(unsigned char [:, :, :] rgb_array_, float degrees):
+@cython.exceptval(check=False)
+cdef inline void swirlf_c(
+    const Py_ssize_t w,
+    const Py_ssize_t h,
+    unsigned char [:, :, :] rgb_array,
+    const unsigned char [::1, :, :] rgb,
+    const float degrees
+)nogil:
+
     """
-    SWIRL AN IMAGE WITHOUT ANGLE APPROXIMATION
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame function pixels3d or array3d to convert an image into a 3d
-     array (library surfarray)
-
-
-    :param rgb_array_   : numpy.ndarray shape (w, h, 3) containing all the RGB color values
-    :param degrees      : float; swirl angle in degrees
-    :return             : void
+    
+    Swirl an image (inplace) floating point accuracy 
+    
+    This algorithm DO NOT use COS and SIN tables, it determines the angles with 
+    floating point accuracy instead.
+    
+    compatible with 24-bit image format only
+    
+    The swirl effect is a visual distortion that creates
+    a spiraling appearance in an image or graphic. 
+    This effect can draw attention to specific areas of a design
+    and add a sense of movement or dynamism. It can be used creatively
+    in various contexts, from social media graphics to advertising
+    and digital art.
+    
+    The Array (rgb_array_) must be a numpy array shape (w, h, 3) containing RGB pixels
+    
+    e.g:
+     swirlf_c(surface_, rgb,, angle)
+    
+    :param w:
+        integer; rgb_array_ width in pixels 
+        
+    :param h:
+        integer; rgb_array_ height in pixels 
+        
+    :param rgb_array: 
+        numpy.ndarray shape (w, h, 3) type uint8 referencing the game display or 
+        surface containing all the RGB color values. Any changes to this array will modify directly the 
+        game display or surface.
+    
+    :param rgb:
+        numpy.ndarray copy of rgb_array_ (fortran)  
+        
+    :param degrees: 
+        float; swirl angle in degrees
+        
+    :return: 
+        void
+        
     """
 
-    cdef Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
 
     cdef:
         int i, j, diffx, diffy
         float columns, rows, r, di, dj, c1, c2, angle
-        # unsigned char [:, :, :] rgb = numpy.array(rgb_array_, copy=True)
-        unsigned char [::1, :, :] rgb = numpy.array(rgb_array_, copy=False, order='F')
+
         float rad = degrees * DEG_TO_RAD
         float r_max
 
-
     columns = <float>0.5 * (w - <float>1.0)
     rows    = <float>0.5 * (h - <float>1.0)
-    r_max   = <float>sqrt(columns * columns + rows * rows)
+    r_max   = <float>1.0/<float>sqrt(columns * columns + rows * rows)
 
-    with nogil:
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
-            dj = <float> j - rows
-            for i in range(w):
-                di = <float>i - columns
+    for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+        dj = <float> j - rows
+        for i in range(w):
+            di = <float>i - columns
 
-                r = <float>sqrt(di * di + dj * dj)
-                angle = <float>(rad * r/r_max)
+            r = <float>sqrt(di * di + dj * dj)
+            angle = <float>(rad * r * r_max)
 
-                c1 = <float>cos(angle)
-                c2 = <float>sin(angle)
-                diffx = <int>(di * c1 - dj * c2 + columns)
-                diffy = <int>(di * c2 + dj * c1 + rows)
+            c1 = <float>cos(angle)
+            c2 = <float>sin(angle)
+            diffx = <int>(di * c1 - dj * c2 + columns)
+            diffy = <int>(di * c2 + dj * c1 + rows)
 
-                if (diffx >-1) and (diffx < w) and \
-                   (diffy >-1) and (diffy < h):
-                    rgb_array_[i, j, 0], rgb_array_[i, j, 1],\
-                        rgb_array_[i, j, 2] = rgb[diffx, diffy, 0], \
-                                              rgb[diffx, diffy, 1], rgb[diffx, diffy, 2]
+            if (diffx >-1) and (diffx < w) and \
+               (diffy >-1) and (diffy < h):
+                rgb_array[i, j, 0], rgb_array[i, j, 1],\
+                    rgb_array[i, j, 2] = rgb[diffx, diffy, 0], \
+                                          rgb[diffx, diffy, 1], rgb[diffx, diffy, 2]
 
-                else:
-                    rgb_array_[ i, j, 0 ] = 0
-                    rgb_array_[ i, j, 1 ] = 0
-                    rgb_array_[ i, j, 2 ] = 0
+            else:
+                rgb_array[ i, j, 0 ] = 0
+                rgb_array[ i, j, 1 ] = 0
+                rgb_array[ i, j, 2 ] = 0
 
 
+
+# Todo show examples and method name is incorrect in the example
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -5602,73 +11759,7 @@ cdef inline void swirl_inplace_c1(unsigned char [:, :, :] rgb_array_, float degr
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void swirl2_static_inplace_c1(
-        unsigned char [:, :, :] rgb_array_,
-        unsigned char [:, :, :] array_,
-        float degrees):
-
-    """
-    SWIRL STATIC IMAGE/BACKGROUND WITHOUT ANGLE APPROXIMATION (INPLACE)
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame function pixels3d or array3d to convert an image into a 3d
-     array (library surfarray)
-    array_ must have the exact same size/dimension than rgb_array_
-
-    :param rgb_array_   : numpy.ndarray shape (w, h, 3) containing all the RGB color values
-    :param array_       : numpy.ndarray shape (w, h, 3) copy
-    :param degrees      : float; swirl angle in degrees
-    :return             : void
-    """
-
-    cdef Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
-
-    cdef:
-        int i, j, diffx, diffy
-        float columns, rows, r, di, dj, c1, c2, angle
-        float rad = degrees * DEG_TO_RAD
-        float r_max
-
-
-    columns = <float>0.5 * (w - <float>1.0)
-    rows    = <float>0.5 * (h - <float>1.0)
-    r_max   = <float>sqrt(columns * columns + rows * rows)
-
-    with nogil:
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
-            dj = <float> j - rows
-            for i in range(w):
-                di = <float>i - columns
-
-                r = <float>sqrt(di * di + dj * dj)
-                angle = <float>(rad * r/r_max)
-
-                c1 = <float>cos(angle)
-                c2 = <float>sin(angle)
-                diffx = <int>(di * c1 - dj * c2 + columns)
-                diffy = <int>(di * c2 + dj * c1 + rows)
-
-                if (diffx >-1) and (diffx < w) and \
-                   (diffy >-1) and (diffy < h):
-                    rgb_array_[i, j, 0], rgb_array_[i, j, 1],\
-                        rgb_array_[i, j, 2] = array_[diffx, diffy, 0], \
-                                              array_[diffx, diffy, 1], array_[diffx, diffy, 2]
-
-                else:
-                    rgb_array_[ i, j, 0 ] = 0
-                    rgb_array_[ i, j, 1 ] = 0
-                    rgb_array_[ i, j, 2 ] = 0
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void plasma_inplace_c(
         unsigned char [:, :, :] rgb_array_,
         int frame,
@@ -5688,15 +11779,33 @@ cdef inline void plasma_inplace_c(
     e.g:
     plasma_config(surface, frame_number)
 
-    :param a_           : float; default value 1.0/255.0 control the plasma equation
-    :param b_           : float; default value 1.0/12.0 control the plasma equation
-    :param c_           : float; default value 1.0/12.0 control the plasma equation
-    :param value_       : float; default value 1.0/8.0 value factor
-    :param sat_         : float; default value 1.0/6.0 saturation value
-    :param hue_         : float; default value 1.0/6.0 hue value factor
-    :param rgb_array_   : numpy.ndarray shape( w, h, 3) containing all the RGB color values
-    :param frame        : integer; Variable that need to change over time
-    :return             : void
+    :param a_: 
+        float; default value 1.0/255.0 control the plasma equation
+        
+    :param b_: 
+        float; default value 1.0/12.0 control the plasma equation
+        
+    :param c_: 
+        float; default value 1.0/12.0 control the plasma equation
+        
+    :param value_: 
+        float; default value 1.0/8.0 value factor
+        
+    :param sat_: 
+        float; default value 1.0/6.0 saturation value
+        
+    :param hue_: 
+        float; default value 1.0/6.0 hue value factor
+        
+    :param rgb_array_: 
+        numpy.ndarray shape( w, h, 3) containing all the RGB color values
+        
+    :param frame: 
+        integer; Variable that need to change over time
+        
+    :return: 
+        void
+        
     """
 
     cdef Py_ssize_t width, height
@@ -5762,6 +11871,7 @@ cdef inline void plasma_inplace_c(
                     bb[0] = <unsigned char>(min(bb[0] + b * <float>128.0, <float>255.0))
 
 
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -5769,35 +11879,55 @@ cdef inline void plasma_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void plasma_c(surface_, float frame, unsigned int [::1] palette_):
 
     """
-    CREATE A PLASMA EFFECT INPLACE
+    Apply Plasma Effect to a Surface (Inplace)
 
-    e.g:
-    plasma(surface, frame_number)
+    This function creates a dynamic plasma effect on a pygame surface. The effect is generated 
+    using a palette of colors, and it evolves over time based on the `frame` value. The plasma 
+    effect gives a fluid, flowing appearance, which can be used creatively for backgrounds or 
+    visual effects in games or applications.
 
-    :param surface_: pygame Surface
-    :param frame   : float; frame number
-    :param palette_: color palette
-    :return        : void
+    The effect is applied directly to the surface, modifying it in place. The surface can be either 
+    24-bit or 32-bit, with or without an alpha channel.
+
+    Example usage:
+        plasma_c(surface, frame_number, palette)
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A pygame surface compatible with 24-bit or 32-bit formats. The plasma effect is applied 
+        directly to this surface, modifying its pixels in place.
+
+    frame : float
+        The current frame number, which drives the evolution of the plasma effect. This value 
+        controls the shifting patterns in the plasma animation.
+
+    palette_ : numpy.ndarray (1D)
+        A 1D array containing the color palette (as integers). This array represents the colors 
+        used to create the plasma effect. The colors are applied cyclically to the plasma pattern.
+
+    Returns
+    -------
+    None
+        This function modifies the `surface_` in place by applying the plasma effect to it.
     """
+
     cdef Py_ssize_t width, height
     width, height = surface_.get_size()
 
-    cdef unsigned char [:, :, :] rgb_array_
+    cdef unsigned char [:, :, :] rgb_array
     try:
-        rgb_array_ = surface_.get_view('3')
+        rgb_array = surface_.get_view('3')
 
     except Exception as e:
-        raise ValueError("Cannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
     cdef:
-        int x, y, ii,c
-
-        unsigned char *rr
-        unsigned char *gg
-        unsigned char *bb
+        int x, y, ii
         float color_
         float w2 = <float>width * <float>HALF
         float h2 = <float>height * <float>HALF
@@ -5807,10 +11937,6 @@ cdef inline void plasma_c(surface_, float frame, unsigned int [::1] palette_):
 
         for y in prange(height, schedule=SCHEDULE, num_threads=THREADS):
             for x in range(width):
-
-                rr = &rgb_array_[x, y, 0]
-                gg = &rgb_array_[x, y, 1]
-                bb = &rgb_array_[x, y, 2]
 
                 color_ = \
                     <float>128.0 + \
@@ -5823,45 +11949,15 @@ cdef inline void plasma_c(surface_, float frame, unsigned int [::1] palette_):
                     + <float>128.0 + <float>128.0 * <float>sin(
                     <float>sqrt(x * x + y * y + frame) * <float>ONE_64)
 
-                c = min(<int>(color_ / <float>8.0), <int>length)
+                ii = palette_[<int>fmin(color_ / <float>8.0, length)]
 
-                ii = palette_[c]
-
-                rr[0] = (ii >> 16) & 255
-                gg[0] = (ii >> 8) & 255
-                bb[0] = ii & 255
+                rgb_array[x, y, 0] = (ii >> 16) & <unsigned char>255
+                rgb_array[x, y, 1] = (ii >> 8) & <unsigned char>255
+                rgb_array[x, y, 2]= ii & <unsigned char>255
 
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline float [:, :, :, ::1] rgb_to_hsl_model_c():
-    """
-    CONVERT RGB INTO HSL MODEL
 
-    The array can be used when the rgb to hsl is extensively used
 
-    All the values will be stored into an array shape (r, g, b, 3) type float
-    :return: Numpy.ndarray shape (r, g, b, 3) type float
-    """
-    cdef float [:, :, :, ::1] rgb_to_hsl = numpy.empty((256, 256, 256, 3), float32)
-    cdef hsl hsl_
-    cdef int r, g, b
-    with nogil:
-        for r in prange(0, 256, schedule=SCHEDULE, num_threads=THREADS):
-            for g in range(0, 256):
-                for b in range(0, 256):
-                    hsl_ = struct_rgb_to_hsl(
-                        r * <float>ONE_255, g * <float>ONE_255, b * <float>ONE_255)
-                    rgb_to_hsl[r, g, b, 0] = min(<float>(hsl_.h * <float>255.0), <float>255.0)
-                    rgb_to_hsl[r, g, b, 1] = min(<float>(hsl_.s * <float>255.0), <float>255.0)
-                    rgb_to_hsl[r, g, b, 2] = min(<float>(hsl_.l * <float>255.0), <float>255.0)
-
-    return asarray(rgb_to_hsl, dtype=float32)
 
 
 @cython.binding(False)
@@ -5871,59 +11967,45 @@ cdef inline float [:, :, :, ::1] rgb_to_hsl_model_c():
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline unsigned char [:, :, :, ::1] hsl_to_rgb_model_c():
-    """
-    CONVERT HSL INTO RGB MODEL
-
-    The array can be used when the hsl to rgb is extensively used
-
-    All the values will be stored into an array shape (r, g, b, 3) type float
-    :return: Numpy.ndarray shape (r, g, b, 3) type float
-    """
-    cdef unsigned char [:, :, :, ::1] hsl_to_rgb = numpy.empty((256, 256, 256, 3), uint8)
-    cdef rgb rgb_
-    cdef int r, g, b
-    cdef int h, s, l
-
-    with nogil:
-        for h in prange(0, 256, schedule=SCHEDULE, num_threads=THREADS):
-            for s in range(0, 256):
-                for l in range(0, 256):
-                    rgb_ = struct_hsl_to_rgb(h * <float>ONE_255, s *
-                                             <float>ONE_255, l * <float>ONE_255)
-                    hsl_to_rgb[h, s, l, 0] =\
-                        min(<unsigned char> (rgb_.r * <float>255.0), <unsigned char>255)
-                    hsl_to_rgb[h, s, l, 1] = \
-                        min(<unsigned char> (rgb_.g * <float>255.0), <unsigned char>255)
-                    hsl_to_rgb[h, s, l, 2] = \
-                        min(<unsigned char> (rgb_.b * <float>255.0), <unsigned char>255)
-
-    return asarray(hsl_to_rgb, dtype=uint8)
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void hsl_inplace_c(unsigned char [:, :, :] rgb_array, float shift_):
+@cython.exceptval(check=False)
+cdef void hsl_c(unsigned char [:, :, :] rgb_array, const float shift):
 
     """
-    ROTATE THE HUE OF THE GAME DISPLAY OR GIVEN TEXTURE
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a
-    3d array (library surfarray)
-
-    e.g:
-    hsl(surface, 0.2)
-
-    :param rgb_array    : numpy.ndarray of shape(w, h, 3) of unsigned char, rgb values
-    :param shift_       : float; Hue value in range [-1.0 ... 1.0]
-    :return             : void
+    Rotate the Hue of a 3D Array (HSL Transformation)
+    
+    This function applies a hue rotation directly to a 3D array of pixel data. 
+    The hue rotation is based on the HSL (Hue, Saturation, Lightness) color model, 
+    which provides an intuitive way to describe and manipulate colors according to human perception. 
+    
+    The hue value (`shift`) controls the rotation of the colors, where `shift`
+     corresponds to a value between 0.0 and 1.0, mapping to a 0° to 360° hue shift in the color space.
+    
+    Example usage:
+        # For 24-bit image
+        image = pygame.image.load('../Assets/px.png').convert(24)
+        hsl_c(bgr_array, 0.2)
+        
+        # For 32-bit image with alpha
+        image = pygame.image.load('../Assets/px.png').convert_alpha()
+        hsl_c(bgr_array, 0.2)
+    
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 3D array (shape: w, h, n) of uint8 type containing RGB(A) pixel values.
+        This function supports any pixel format (e.g., RGB, BGR, BGRA, etc.), 
+        and modifies the input array in place.
+    
+    shift : float
+        A value in the range [0.0, 1.0], representing the amount to shift the hue. 
+        A value of 0.0 corresponds to no shift (0°), and a value of 1.0 corresponds to a full 360° hue rotation.
+    
+    Returns
+    -------
+    None
+        This function modifies the input `rgb_array` in place by rotating the hue of each pixel.
     """
+
 
     cdef Py_ssize_t w, h
     w, h = rgb_array.shape[:2]
@@ -5936,26 +12018,33 @@ cdef inline void hsl_inplace_c(unsigned char [:, :, :] rgb_array, float shift_):
         unsigned char *r
         unsigned char *g
         unsigned char *b
+        unsigned int sum_rgb
 
 
     with nogil:
         for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(w):
+
                 r = &rgb_array[i, j, 0]
                 g = &rgb_array[i, j, 1]
                 b = &rgb_array[i, j, 2]
+
+                sum_rgb = r[ 0 ] + g[ 0 ] + b[ 0 ]
+                # hsl transform of null RGB (solid black) or solid white remain unchanged
+                if sum_rgb == 0 or sum_rgb == 765:
+                    continue
+
                 hsl_ = struct_rgb_to_hsl(
                     r[0] * <float>ONE_255, g[0] *
                     <float>ONE_255, b[0] * <float>ONE_255)
 
-                #h_ = min((hsl_.h + shift_), <float>1.0)
-                #h_ = max(h_, <float>0.0)
-                h_ = hsl_.h + shift_
+                h_ = hsl_.h + shift
                 rgb_ = struct_hsl_to_rgb(h_, hsl_.s, hsl_.l)
 
                 r[0] = <unsigned char>(rgb_.r * <float>255.0)
                 g[0] = <unsigned char>(rgb_.g * <float>255.0)
                 b[0] = <unsigned char>(rgb_.b * <float>255.0)
+
 
 
 @cython.binding(False)
@@ -5965,21 +12054,238 @@ cdef inline void hsl_inplace_c(unsigned char [:, :, :] rgb_array, float shift_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void hsv_inplace_c(unsigned char [:, :, :] rgb_array, float shift_):
+@cython.exceptval(check=False)
+cdef inline void hsl1d_c(unsigned char [::1] bgr_array, const float shift, bint format_32=False):
+    """
+    HSL (C buffer) uint8 data types RGB(A) format (inplace)
+    
+    HSL (Hue, Saturation, Lightness) is another color representation 
+    model used in digital imaging and graphics. It defines colors in 
+    terms of their hue, saturation, and lightness, offering an intuitive 
+    way to describe and manipulate colors based on human perception.
+    
+    This method will works with other buffer format such as BGR, BGRA
+    
+    Hue value (shift) must be in range [0.0 ...1.0] corresponding to 0.0 - 360.0 degrees rotation
+    
+    e.g:
+    # 24-bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    hsl1d_c(array3d, 0.2)
+    
+    # 32-bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    hsl1d_c(array3d, 0.2, format_32=True)
+    
+    Parameters
+    ----------
+    bgr_array: 
+        numpy.ndarray 1d array, memoryviewslice uint8 data type containing 
+        BGR(A) pixel format, works also with other format pixel (BGR, BGRA etc)
+         
+    shift: 
+        float; Hue value in range [0.0 ... 1.0] corresponding to 0.0 - 360.0 degrees rotation
+        
+    format_32: 
+        bool True | for 'BGR' buffer type (24-bit) or False 'BGRA' (32-bit) 
+
+    Returns
+    -------
+    void
 
     """
-    ROTATE THE HUE OF THE GAME DISPLAY OR GIVEN TEXTURE
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a
-    3d array (library surfarray)
+    cdef unsigned int l = bgr_array.shape[0]
 
+    cdef:
+        int i=0
+        unsigned char tmp
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
+        unsigned short int bit = 3
+        unsigned int sum_rgb
+        hsl hsl_
+        rgb rgb_
+        float h_
+
+    if format_32:
+        bit = 4
+
+
+    with nogil:
+        # noinspection SpellCheckingInspection
+        for i in prange(0, l, bit, schedule=SCHEDULE, num_threads=THREADS):
+
+            r = &bgr_array[ i ]
+            g = &bgr_array[ i + 1 ]
+            b = &bgr_array[ i + 2 ]
+
+            sum_rgb = r[ 0 ] + g[ 0 ] + b[ 0 ]
+            # hsl transform of null RGB (solid black) or solid white remain unchanged
+            if sum_rgb == 0 or sum_rgb == 765:
+                continue
+
+            hsl_ = struct_rgb_to_hsl(
+                r[ 0 ] * <float> ONE_255, g[ 0 ] *
+                <float> ONE_255, b[ 0 ] * <float> ONE_255)
+
+            h_ = hsl_.h + shift
+            rgb_ = struct_hsl_to_rgb(h_, hsl_.s, hsl_.l)
+
+            r[ 0 ] = <unsigned char> (rgb_.r * <float> 255.0)
+            g[ 0 ] = <unsigned char> (rgb_.g * <float> 255.0)
+            b[ 0 ] = <unsigned char> (rgb_.b * <float> 255.0)
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef np.ndarray[np.uint8_t, ndim=1] hsl1d_cp_c(
+        const unsigned char [::1] bgr_array,
+        const float shift,
+        bint format_32=False
+):
+    """
+    Rotate hue (HSL) directly to a C-buffer (return a copy)
+
+    HSL (C buffer) uint8 data types RGB(A) format 
+    
+    This method will works with other buffer format such as BGR, BGRA
+    
+    HSL (Hue, Saturation, Lightness) is another color representation 
+    model used in digital imaging and graphics. It defines colors in 
+    terms of their hue, saturation, and lightness, offering an intuitive 
+    way to describe and manipulate colors based on human perception.
+    
     e.g:
-    hsv_effect(surface, 0.2)
+    # 24-bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    hsl1d_cp_c(array3d, 0.2)
+    
+    # 32-bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    hsl1d_cp_c(array3d, 0.2, format_32=True)
+    
+    Hue value (shift) must be in range [0.0 ...1.0] corresponding to 0.0 - 360.0 degrees rotation
+    
+    Parameters
+    ----------
+    bgr_array: 
+        numpy.ndarray 1d array, memoryviewslice uint8 data type containing 
+        BGR(A) pixel format, works also with other format pixel (BGR, BGRA etc)
+        
+    shift:
+        float; float value in range [0.0 ... 1.0] corresponding to 0.0 - 360.0 degrees rotation
+        
+    format_32: 
+        bool True | for 'BGR' buffer type (24-bit) or False 'BGRA' (32-bit) 
+    
+    Returns
+    -------
+    numpy.ndarray 1d array type uint8 new array containing pixels with rotated hue
 
-    :param rgb_array    : numpy.ndarray of shape(w, h, 3) of unsigned char, rgb values
-    :param shift_       : float; Hue value in range [-1.0 ... 1.0]
-    :return             : void
+    """
+
+    cdef unsigned int l = bgr_array.shape[0]
+
+    cdef:
+        int i=0
+        unsigned char tmp
+        unsigned char [::1] destination = numpy.empty(l, dtype=uint8)
+        const unsigned char * r
+        const unsigned char * g
+        const unsigned char * b
+        unsigned short int bit = 3
+        unsigned int sum_rgb
+        hsl hsl_
+        rgb rgb_
+        float h_
+
+    if format_32:
+        bit = 4
+
+
+    with nogil:
+        # noinspection SpellCheckingInspection
+        for i in prange(0, l, bit, schedule=SCHEDULE, num_threads=THREADS):
+
+            r = &bgr_array[ i ]
+            g = &bgr_array[ i + 1 ]
+            b = &bgr_array[ i + 2 ]
+
+            sum_rgb = r[ 0 ] + g[ 0 ] + b[ 0 ]
+            # hsl transform of null RGB (solid black) or solid white remain unchanged
+            if sum_rgb == 0 or sum_rgb == 765:
+                destination[ i ] = r[ 0 ]
+                destination[ i + 1 ] = g[ 0 ]
+                destination[ i + 2 ] = b[ 0 ]
+                if format_32:
+                    destination[ i + 3 ] = bgr_array[ i + 3 ]
+                continue
+
+            hsl_ = struct_rgb_to_hsl(
+                r[ 0 ] * <float> ONE_255, g[ 0 ] *
+                <float> ONE_255, b[ 0 ] * <float> ONE_255)
+
+            h_ = hsl_.h + shift
+            rgb_ = struct_hsl_to_rgb(h_, hsl_.s, hsl_.l)
+
+            destination[ i     ] = <unsigned char> (rgb_.r * <float> 255.0)
+            destination[ i + 1 ] = <unsigned char> (rgb_.g * <float> 255.0)
+            destination[ i + 2 ] = <unsigned char> (rgb_.b * <float> 255.0)
+
+            if format_32:
+                destination[ i + 3 ] = bgr_array[ i + 3 ]
+
+    return numpy.ndarray(shape=l, buffer=destination, dtype=uint8)
+
+
+
+# ----------------------- HSV
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void hsv3d_c(unsigned char [:, :, :] rgb_array, const float shift_):
+
+    """
+    Rotate the hue directly from a 3d array (HSV conversion method)
+
+    HSV (Hue, Saturation, Value) is a color model similar to HSL (Hue, Saturation, Lightness)
+    but with some differences in how it represents and manipulates colors. 
+    It’s often used in graphics software and computer vision applications for its 
+    simplicity in specifying and adjusting color attributes.
+    
+    New hue value. Must be between [0.0 ... 1.0] corresponding to 0.0 - 360.0 degrees 
+     (e.g 0.5 = 180 degrees)
+    
+    e.g:
+    #Rotate the hue 72 degrees
+    hsv3d_c(bgr_array, 0.2)
+
+    :param rgb_array: 
+        numpy.ndarray of shape(w, h, 3) of unsigned char, rgb values
+        
+    :param shift_: 
+        float; Hue value in range [0.0 ... 1.0] corresponding to 0.0 - 360.0 degrees rotation. 
+        New hue value
+         
+    :return: 
+        void
+        
     """
 
     cdef Py_ssize_t w, h
@@ -5993,33 +12299,39 @@ cdef inline void hsv_inplace_c(unsigned char [:, :, :] rgb_array, float shift_):
         unsigned char *r
         unsigned char *g
         unsigned char *b
+        unsigned int sum_rgb
 
     with nogil:
         for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(w):
 
+                # Get the pixel color
                 r = &rgb_array[i, j, 0]
                 g = &rgb_array[i, j, 1]
                 b = &rgb_array[i, j, 2]
 
+                sum_rgb = r[ 0 ] + g[ 0 ] + b[ 0 ]
+                # hsl transform of null RGB (solid black) or solid white remain unchanged
+                if sum_rgb == 0 or sum_rgb == 765:
+                    continue
+
+                # Get the current hue values
                 hsv_ = struct_rgb_to_hsv(
                     r[0] * <float>ONE_255, g[0] *
                     <float>ONE_255, b[0] * <float>ONE_255)
 
-                # h_ = min((hsv_.h + shift_), <float>1.0)
-                # h_ = max(h_, <float>0.0)
+                # Rotate the hue
                 h_ = hsv_.h + shift_
 
+                # Conversion HSV to RGB
                 rgb_ = struct_hsv_to_rgb(h_, hsv_.s, hsv_.v)
 
+                # Change the pixel with new hue value.
                 r[0] = <unsigned char>(rgb_.r * <float>255.0)
                 g[0] = <unsigned char>(rgb_.g * <float>255.0)
                 b[0] = <unsigned char>(rgb_.b * <float>255.0)
 
 
-
-# todo check the method below
-
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -6027,65 +12339,96 @@ cdef inline void hsv_inplace_c(unsigned char [:, :, :] rgb_array, float shift_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void hsl_fast_inplace_c(
-        unsigned char [:, :, :] rgb_array,
-        float shift_,
-        float [:, :, :, ::1] rgb_to_hsl_,
-        unsigned char [:, :, :, ::1] hsl_to_rgb_):
+@cython.exceptval(check=False)
+cdef inline void hsv1d_c(
+        unsigned char [::1] bgr_array, const float shift, bint format_32=False):
+    """
+     Rotate hue 1d array
+    
+    Rotate the hue directly from a C-buffer (1d array uint8 data types RGB(A) format)
+     Changes apply inplace
+    
+    This method will works with other buffer format such as BGR, BGRA
+
+    HSV (Hue, Saturation, Value) is a color model similar to HSL (Hue, Saturation, Lightness)
+    but with some differences in how it represents and manipulates colors. 
+    It’s often used in graphics software and computer vision applications for its 
+    simplicity in specifying and adjusting color attributes.
+    
+    e.g 
+    #compatible with 32 bits images 
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    hsv1d_c(image.get_buffer(), angle/36.0, True)
+    
+    #compatible with 24 bits images 
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    hsv1d_c(image.get_buffer(), angle/36.0, False) 
+
+    Parameters
+    ----------
+    bgr_array: 
+        numpy.ndarray 1d array, memoryviewslice uint8 data type containing 
+        BGR(A) pixel format, works also with other format pixel (BGR, BGRA etc)
+         
+    shift:
+        float; Hue value in range [0.0 ... 1.0]
+        
+    format_32:
+        bool True | for 'BGR' buffer type (24-bit) or False 'BGRA' (32-bit) 
+
+    Returns
+    -------
+    void
 
     """
-    ROTATE THE HUE OF AN IMAGE USING STORED HSL TO RGB AND RGB TO HSL VALUES
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a
-    3d array (library surfarray)
-
-    e.g:
-    hsl(surface, 0.2, hsl_model, rgb_model)
-
-    :param rgb_array    : numpy.ndarray of shape(w, h, 3) of unsigned char, rgb values
-    :param shift_       : float; Hue value in range [-1.0 ... 1.0]
-    :param hsl_model_   : numpy.ndarray shape (r, g, b, 3) of hsl values r, g & b
-    in range [0 ... 255]
-    :param rgb_model_   : numpy.ndarray shape (h, s, l, 3) of hsl values h, s & l
-    in range [0.0 ... 1.0]
-    :return: void
-    """
-
-
-    cdef Py_ssize_t w, h
-    w, h = rgb_array.shape[:2]
+    cdef unsigned int l = bgr_array.shape[0]
 
     cdef:
-        int i=0, j=0
-
+        int i=0
+        unsigned char tmp
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
+        unsigned short int bit = 3
+        hsv hsv_
+        rgb rgb_
         float h_
-        unsigned char h__, s__, l__
+        unsigned int sum_rgb
 
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
+    if format_32:
+        bit = 4
 
 
     with nogil:
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+        # noinspection SpellCheckingInspection
+        for i in prange(0, l, bit, schedule=SCHEDULE, num_threads=THREADS):
 
-            for i in range(w):
+            # get the pixel color
+            r = &bgr_array[ i ]
+            g = &bgr_array[ i + 1 ]
+            b = &bgr_array[ i + 2 ]
 
-                r = &rgb_array[i, j, 0]
-                g = &rgb_array[i, j, 1]
-                b = &rgb_array[i, j, 2]
+            sum_rgb = r[ 0 ] + g[ 0 ] + b[ 0 ]
+            # hsl transform of null RGB (solid black) or solid white remain unchanged
+            if sum_rgb == 0 or sum_rgb == 765:
+                continue
 
-                h_ = rgb_to_hsl_[r[0], g[0], b[0], 0]
+            # Get the HSV value
+            hsv_ = struct_rgb_to_hsv(
+                r[ 0 ] * <float> ONE_255, g[ 0 ] *
+                <float> ONE_255, b[ 0 ] * <float> ONE_255)
 
-                h__ = <unsigned char> (<float>min((h_ * ONE_255 + shift_), <float>1.0) * <float>255.0)
+            # Rotate the hue
+            h_ = hsv_.h + shift
 
-                s__ = <unsigned char> rgb_to_hsl_[r[0], g[0], b[0], 1]
-                l__ = <unsigned char> rgb_to_hsl_[r[0], g[0], b[0], 2]
+            # Convert HSV to RGB
+            rgb_ = struct_hsv_to_rgb(h_, hsv_.s, hsv_.v)
 
-                r[0] = (&hsl_to_rgb_[h__, s__, l__, 0])[0]
-                g[0] = (&hsl_to_rgb_[h__, s__, l__, 1])[0]
-                b[0] = (&hsl_to_rgb_[h__, s__, l__, 2])[0]
+            # Set the pixel with new RGB values
+            r[ 0 ] = <unsigned char> (rgb_.r * <float> 255.0)
+            g[ 0 ] = <unsigned char> (rgb_.g * <float> 255.0)
+            b[ 0 ] = <unsigned char> (rgb_.b * <float> 255.0)
 
 
 
@@ -6096,29 +12439,164 @@ cdef inline void hsl_fast_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void brightness_inplace_c(
-        unsigned char [:, :, :] rgb_array_, float shift_=0):
+@cython.exceptval(check=False)
+cdef np.ndarray[np.uint8_t, ndim=1] hsv1d_cp_c(
+        const unsigned char [::1] bgr_array,
+        const float shift,
+        bint format_32=False):
+
     """
-    SHADER BRIGHTNESS (INPLACE)
+    Rotate hue of a C-buffer array (return a copy)
+    
+    HSV 1d array (C buffer) uint8 data types BGR(A) format 
 
-    This shader control the pygame display brightness level
-    It uses two external functions coded in C, struct_rgb_to_hsl & struct_hsl_to_rgb
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into
-    a 3d array (library surfarray)
+    This method will works with other buffer format such as BGR, BGRA
 
     e.g:
-    brightness(surface, 0.2)
+    # 32-bit image
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    arr = hsv1d_cp_c(image.get_buffer(), angle/360.0, format_32=True) 
+    image = pygame.image.frombuffer(arr, (WIDTH, HEIGHT), "BGRA")
+    
+    # 24-bit image 
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    arr = hsv1d_cp_c(image.get_buffer(), angle/360.0, format_32=False)
+    
 
-    :param rgb_array_: numpy ndarray shape (w, h, 3) containing RGB pixels values
-    :param shift_    : float; values in range [-1.0 ... 1.0], 0 no change,
-    -1 lowest brightness, +1 highest brightness
-    :return          : void
+    Parameters
+    ----------
+    bgr_array: 
+        numpy.ndarray 1d array, memoryviewslice uint8 data type containing 
+        BGR(A) pixel format, works also with other format pixel (RGB, RGBA etc)
+         
+    shift: 
+        float; Hue value in range [0 ... 1.0] corresponding to 0.0 - 360.0 degrees
+         
+    format_32: 
+        bool True | for 'BGR' buffer type (24-bit) or False 'BGRA' (32-bit)
+         
+
+    Returns
+    -------
+    numpy.ndarray 1d array uint8 type equivalent to the input array with rotated hue
+
     """
 
+    cdef unsigned int l = bgr_array.shape[0]
+
+    cdef:
+        int i=0
+        unsigned char tmp
+        unsigned char [::1] destination = numpy.empty(l, dtype=uint8)
+        const unsigned char * r
+        const unsigned char * g
+        const unsigned char * b
+        unsigned short int bit = 3
+        unsigned int sum_rgb
+        hsv hsv_
+        rgb rgb_
+        float h_
+
+    if format_32:
+        bit = 4
+
+    with nogil:
+        # noinspection SpellCheckingInspection
+        for i in prange(0, l, bit, schedule=SCHEDULE, num_threads=THREADS):
+
+            r = &bgr_array[ i ]
+            g = &bgr_array[ i + 1 ]
+            b = &bgr_array[ i + 2 ]
+
+            sum_rgb = r[ 0 ] + g[ 0 ] + b[ 0 ]
+            # hsl transform of null RGB (solid black) or solid white remain unchanged
+            if sum_rgb == 0 or sum_rgb == 765:
+                destination[ i ] = r[ 0 ]
+                destination[ i + 1 ] = g[ 0 ]
+                destination[ i + 2 ] = b[ 0 ]
+                if format_32:
+                    destination[ i + 3 ] = bgr_array[ i + 3 ]
+                continue
+
+            hsv_ = struct_rgb_to_hsv(
+                r[ 0 ] * <float> ONE_255, g[ 0 ] *
+                <float> ONE_255, b[ 0 ] * <float> ONE_255)
+
+            h_ = hsv_.h + shift
+            rgb_ = struct_hsv_to_rgb(h_, hsv_.s, hsv_.v)
+
+            destination[ i     ] = <unsigned char> (rgb_.r * <float> 255.0)
+            destination[ i + 1 ] = <unsigned char> (rgb_.g * <float> 255.0)
+            destination[ i + 2 ] = <unsigned char> (rgb_.b * <float> 255.0)
+
+            if format_32:
+                destination[ i + 3 ] = bgr_array[ i + 3 ]
+
+    return numpy.ndarray(shape=l, buffer=destination, dtype=uint8)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void brightness_c(
+        unsigned char [:, :, :] rgb_array,
+        float shift=0):
+    """
+    Adjust the brightness of an image or surface (inplace).
+
+    This method allows you to modify the brightness of the provided game display or surface.
+    The array (rgb_array) should be a numpy array with the shape (w, h, 3), representing RGB pixel values.
+    The brightness is controlled by adjusting the intensity of all colors in the image.
+
+    e.g:
+    brightness_c(pixels3d(surface), 0.2)
+
+    Parameters
+    ----------
+    rgb_array : 
+        numpy.ndarray of shape (w, h, 3) with dtype uint8. The array references the game display 
+        or surface containing the RGB pixel values. Any modifications to this array will directly 
+        affect the game display or SDL surface.
+
+    shift : 
+        float; a value in the range [-1.0 ... 1.0], where 0.0 means no change to the brightness.
+        A value of -1.0 results in the lowest brightness (darkest), while 1.0 represents the maximum brightness 
+        (brightest) achievable.
+
+    Returns
+    -------
+    void
+        This method modifies the array in-place and does not return any value.
+    """
+
+
     cdef Py_ssize_t width, height
-    width, height = rgb_array_.shape[:2]
+    width, height = rgb_array.shape[:2]
 
     cdef:
         int i=0, j=0
@@ -6134,7 +12612,7 @@ cdef inline void brightness_inplace_c(
         for j in prange(height, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(width):
 
-                r, g, b = &rgb_array_[i, j, 0], &rgb_array_[i, j, 1], &rgb_array_[i, j, 2]
+                r, g, b = &rgb_array[i, j, 0], &rgb_array[i, j, 1], &rgb_array[i, j, 2]
 
                 hsl_ = struct_rgb_to_hsl(
                     r[0] * <float>ONE_255,
@@ -6142,16 +12620,16 @@ cdef inline void brightness_inplace_c(
                     b[0] * <float>ONE_255
                 )# struct_rgb_to_hsl returns floats, range 0.0 ... 1.0
 
-                # l = min((hsl_.l + shift_), <float>1.0)
-                # l = max(l, <float>0.0)
+                # l = min((hsl_.l + shift), <float> 1.0)
+                # l = max(l, <float> 0.0)
 
-                # compensate hsl_.l
-                l = hsl_.l + shift_
+
+                l = hsl_.l + shift
 
                 # force white pixel, we do not need to run
                 # struct_hsl_to_rgb to convert hsl to rgb as we know that
                 # the color will be white
-                if (hsl_.l + shift_) > 1:
+                if l >= <float>1.0:
                     r[ 0 ] = <unsigned char> 255
                     g[ 0 ] = <unsigned char> 255
                     b[ 0 ] = <unsigned char> 255
@@ -6160,7 +12638,7 @@ cdef inline void brightness_inplace_c(
                 # force black pixel, we do not need to run
                 # struct_hsl_to_rgb to convert hsl to rgb as we know that
                 # the color will be black
-                if l < 0:
+                if l <= <float>0:
                     r[ 0 ] = <unsigned char> 0
                     g[ 0 ] = <unsigned char> 0
                     b[ 0 ] = <unsigned char> 0
@@ -6181,29 +12659,37 @@ cdef inline void brightness_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline object brightness_c(
-        unsigned char [:, :, :] rgb_array_, float shift_=0):
+@cython.exceptval(check=False)
+cdef inline object brightness_copy_c(
+        unsigned char [:, :, :] rgb_array, float shift=0):
+
     """
-    BRIGHTNESS
+    Brightness (return a copy)
 
-    This shader control the pygame display brightness level
-    It uses two external functions coded in C, struct_rgb_to_hsl & struct_hsl_to_rgb
+    Return a 24-bit surface type with adjusted brightness.  
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into
-    a 3d array (library surfarray)
+    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels
 
     e.g:
-    surface = brightness_c(pixels3d(surface), 0.2)
+    surface = brightness_copy_c(pixels3d(surface), 0.2)
 
-    :param rgb_array_: numpy ndarray shape (w, h, 3) containing RGB pixels values
-    :param shift_    : float; values in range [-1.0 ... 1.0], 0 no change,
-    -1 lowest brightness, +1 highest brightness
-    :return          : pygame surface
+    :param rgb_array: 
+        numpy ndarray shape (w, h, 3) containing RGB pixels values
+        
+    :param shift: 
+        float; values in range [-1.0 ... 1.0], 0.0 no change,
+        -1 lowest brightness, +1 max brightness
+        
+    :return: 
+        24-bit pygame surface (copy)
+        
     """
 
-    cdef Py_ssize_t width, height
-    width, height = rgb_array_.shape[:2]
+    cdef:
+        Py_ssize_t width, height
+        unsigned int bit_size
+
+    width, height, bit_size = rgb_array.shape[:3]
 
     cdef:
         int i=0, j=0
@@ -6213,36 +12699,35 @@ cdef inline object brightness_c(
         float l
         hsl hsl_
         rgb rgb_
-        unsigned char [:, :, ::1] array_tmp = \
-            numpy.empty((height, width, 3), dtype=numpy.uint8, order='C')
+        unsigned char [:, :, :] array_tmp = \
+            numpy.empty((height, width, bit_size), dtype=numpy.uint8)
 
     with nogil:
         for j in prange(height, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(width):
 
                 r, g, b = \
-                    &rgb_array_[ i, j, 0 ],\
-                    &rgb_array_[ i, j, 1 ],\
-                    &rgb_array_[ i, j, 2 ]
+                    &rgb_array[ i, j, 0 ],\
+                    &rgb_array[ i, j, 1 ],\
+                    &rgb_array[ i, j, 2 ]
 
                 hsl_ = struct_rgb_to_hsl(
                     r[ 0 ] * <float> ONE_255,
                     g[ 0 ] * <float> ONE_255,
                     b[ 0 ] * <float> ONE_255
-                )  # struct_rgb_to_hsl returns floats, range 0.0 ... 1.0
+                )
 
-                l = min((hsl_.l + shift_), <float>1.0)
+                l = min((hsl_.l + shift), <float>1.0)
                 l = max(l, <float>0.0)
 
-                # Below does not works with dirst_lens
+                # investigate bug below causing black layer
 
-                # # compensate hsl_.l
-                # l = hsl_.l + shift_
+                # l = hsl_.l + shift
                 #
                 # # force white pixel, we do not need to run
                 # # struct_hsl_to_rgb to convert hsl to rgb as we know that
                 # # the color will be white
-                # if (hsl_.l + shift_) > 1:
+                # if l >= 1:
                 #     r[ 0 ] = <unsigned char> 255
                 #     g[ 0 ] = <unsigned char> 255
                 #     b[ 0 ] = <unsigned char> 255
@@ -6251,7 +12736,7 @@ cdef inline object brightness_c(
                 # # force black pixel, we do not need to run
                 # # struct_hsl_to_rgb to convert hsl to rgb as we know that
                 # # the color will be black
-                # if l < 0:
+                # if l <= 0:
                 #     r[ 0 ] = <unsigned char> 0
                 #     g[ 0 ] = <unsigned char> 0
                 #     b[ 0 ] = <unsigned char> 0
@@ -6266,6 +12751,8 @@ cdef inline object brightness_c(
     return frombuffer(array_tmp, (width, height), "RGB")
 
 
+
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -6273,26 +12760,242 @@ cdef inline object brightness_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void brightness_exclude_inplace_c(
-        unsigned char [:, :, :] rgb_array_, float shift_=0.0, color_=(0, 0, 0)):
+@cython.exceptval(check=False)
+cdef inline void brightness1d_c(unsigned char [:] bgr_array, const float shift, bint format_32=False)nogil:
     """
-    SHADER BRIGHTNESS (EXCLUDE A SPECIFIC COLOR FROM THE PROCESS, DEFAULT BLACK COLOR)
-
-    This shader control the pygame display brightness level
-    It uses two external functions coded in C, struct_rgb_to_hsl & struct_hsl_to_rgb
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame function pixels3d or array3d to convert an image into a
-     3d array (library surfarray)
+    
+    Brightness
+    
+    Control brightness of an image given its C buffer, 1d array shape (w, )
+     BGRA or RGBA (inplace)
 
     e.g:
-    brightness_exclude(surface, 0.2)
+    # for 24-bit  
+    array_bck = brightness1d_c(background.get_buffer(), 0.1, False)
+    background = pygame.image.frombuffer(array_bck, (800, 600), 'BGR')
+    
+    # for 32-bit 
+    array_bck = brightness1d_c(background.get_buffer(), 0.1, True)
+    background = pygame.image.frombuffer(array_bck, (800, 600), 'BGRA')
 
-    :param rgb_array_: numpy ndarray shape (w, h, 3) containing RGB pixels values
-    :param shift_    : float; values in range [-1.0 ... 1.0], 0 no change,
-    -1 lowest brightness, +1 highest brightness
-    :param color_    : tuple; Color to exclude from the brightness process
+    :param bgr_array: 
+        numpy ndarray shape (w, h, 3) containing BGRA pixels values
+        
+    :param shift: 
+        float; values in range [-1.0 ... 1.0], 0.0 no change,
+        -1 lowest brightness, +1 max brightness
+        
+    :param format_32: 
+        bool True for 'BGRA' buffer type (32-bit) or False 'BGR' (24-bit) 
+        
     :return          : void
+    
+    """
+
+    cdef unsigned int length = bgr_array.shape[0]
+
+    cdef:
+        int i=0
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
+        unsigned short int bit = 3
+        float l
+        hsl hsl_
+        rgb rgb_
+
+    if format_32:
+        bit = 4
+
+    # noinspection SpellCheckingInspection
+    for i in prange(0, length, bit, schedule=SCHEDULE, num_threads=THREADS):
+
+        r = &bgr_array[ i     ]
+        g = &bgr_array[ i + 1 ]
+        b = &bgr_array[ i + 2 ]
+
+        hsl_ = struct_rgb_to_hsl(
+            r[ 0 ] * <float> ONE_255,
+            g[ 0 ] * <float> ONE_255,
+            b[ 0 ] * <float> ONE_255
+        )
+
+        # compensate hsl_.l
+        l = hsl_.l + shift
+
+        # force white pixel, we do not need to run
+        # struct_hsl_to_rgb to convert hsl to rgb as we know that
+        # the color will be white
+        if l  >= <float>1.0:
+            r[ 0 ] = <unsigned char> 255
+            g[ 0 ] = <unsigned char> 255
+            b[ 0 ] = <unsigned char> 255
+            continue
+
+        # force black pixel, we do not need to run
+        # struct_hsl_to_rgb to convert hsl to rgb as we know that
+        # the color will be black
+        if l <= <float>0.0:
+            r[ 0 ] = <unsigned char> 0
+            g[ 0 ] = <unsigned char> 0
+            b[ 0 ] = <unsigned char> 0
+            continue
+
+        rgb_ = struct_hsl_to_rgb(hsl_.h, hsl_.s, l)
+
+        r[ 0 ] = <unsigned char> (rgb_.r * <float> 255.0)
+        g[ 0 ] = <unsigned char> (rgb_.g * <float> 255.0)
+        b[ 0 ] = <unsigned char> (rgb_.b * <float> 255.0)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline np.ndarray[np.uint8_t, ndim=1] brightness1d_copy_c(
+        unsigned char [:] bgr_array,
+        const float shift,
+        bint format_32=False
+):
+    """
+
+     Brightness control (return a copy)
+    
+    Control brightness of an image given its C buffer, 1d array shape (w, )
+    The bgr_array is a C-buffer with pixel format BGR or BGRA 
+
+    e.g:
+    # for 24-bit 
+    array_bck = brightness1d_copy_c(background.get_buffer(), 0.1, False)
+    background = pygame.image.frombuffer(array_bck, (800, 600), 'BGR')
+    
+    # for 32-bit 
+    array_bck = brightness1d_copy_c(background.get_buffer(), 0.1, True)
+    background = pygame.image.frombuffer(array_bck, (800, 600), 'BGRA')
+
+    :param bgr_array: 
+        numpy ndarray shape (w, ) containing BGR or BGRA pixels values.
+        
+    :param shift: 
+        float; values in range [-1.0 ... 1.0], 0.0 no change,
+        -1 lowest brightness, +1 max brightness
+        
+    :param format_32: 
+        bool; True for 'BGRA' buffer type (32-bit) or False 'RGB' (24-bit)
+         
+    :return: Return a copy of the original SDL surface with adjusted brightness
+    
+    """
+
+    cdef unsigned int length = bgr_array.shape[0]
+
+    cdef:
+        int i=0
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
+        unsigned short int bit = 3
+        float l
+        hsl hsl_
+        rgb rgb_
+        unsigned char [::1] bgr_array_cp = numpy.ndarray(shape=length, buffer=bgr_array, dtype=uint8)
+
+    if format_32:
+        bit = 4
+
+    with nogil:
+        # noinspection SpellCheckingInspection
+        for i in prange(0, length, bit, schedule=SCHEDULE, num_threads=THREADS):
+
+            r = &bgr_array_cp[ i     ]
+            g = &bgr_array_cp[ i + 1 ]
+            b = &bgr_array_cp[ i + 2 ]
+
+            hsl_ = struct_rgb_to_hsl(
+                r[ 0 ] * <float> ONE_255,
+                g[ 0 ] * <float> ONE_255,
+                b[ 0 ] * <float> ONE_255
+            )
+
+            # compensate hsl_.l
+            l = hsl_.l + shift
+
+            # force white pixel, we do not need to run
+            # struct_hsl_to_rgb to convert hsl to rgb as we know that
+            # the color will be white
+            if l >= <float>1.0:
+                r[ 0 ] = <unsigned char> 255
+                g[ 0 ] = <unsigned char> 255
+                b[ 0 ] = <unsigned char> 255
+                continue
+
+            # force black pixel, we do not need to run
+            # struct_hsl_to_rgb to convert hsl to rgb as we know that
+            # the color will be black
+            if l <= <float>0.0:
+                r[ 0 ] = <unsigned char> 0
+                g[ 0 ] = <unsigned char> 0
+                b[ 0 ] = <unsigned char> 0
+                continue
+
+            rgb_ = struct_hsl_to_rgb(hsl_.h, hsl_.s, l)
+
+            r[ 0 ] = <unsigned char> (rgb_.r * <float> 255.0)
+            g[ 0 ] = <unsigned char> (rgb_.g * <float> 255.0)
+            b[ 0 ] = <unsigned char> (rgb_.b * <float> 255.0)
+
+    return numpy.ndarray(shape=length, buffer=bgr_array_cp, dtype=uint8)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void brightness_ex_c(
+        unsigned char [:, :, :] rgb_array_, float shift_=0.0, color_=(0, 0, 0)):
+    """
+    
+    Brightness adjustment with color exclusion (inplace)
+    
+    Exclusion:
+    Set the parameter color to exclude a specific color from the transformation process.
+    parameter shift control the brightness transformation, with +1.0 being the maximum 
+    brightness possible. 
+    
+    Compatible with 24, 32-bit images 
+    
+    e.g
+    # 24-bit
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    brightness_ex_c(image, +0.5, color=(0, 0, 0))
+    
+    # 32-bit
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    brightness_ex_c(image, +0.5, color=(0, 0, 0))
+
+    :param rgb_array_:
+        numpy ndarray shape (w, h, 3) containing RGB pixels values
+        
+    :param shift_: 
+        float; values in range [-1.0 ... 1.0], 0 no change, -1.0 lowest brightness effect, 
+        +1.0 highest brightness effect.
+        
+    :param color_: 
+        tuple; Color to exclude from the brightness process, default black color tuple(0, 0, 0)
+        
+    :return: 
+        void
+        
     """
 
     cdef Py_ssize_t width, height
@@ -6325,7 +13028,7 @@ cdef inline void brightness_exclude_inplace_c(
                         b[0] * <float>ONE_255
                     )  # struct_rgb_to_hsl returns floats, range 0.0 ... 1.0
 
-                    # l = min((hsl_.l + shift_), <float>1.0)
+                    # l = min((hsl_.l + shift), <float>1.0)
                     # l = max(l, <float>0.0)
 
                     # compensate hsl_.l
@@ -6334,7 +13037,7 @@ cdef inline void brightness_exclude_inplace_c(
                     # force white pixel, we do not need to run
                     # struct_hsl_to_rgb to convert hsl to rgb as we know that
                     # the color will be white
-                    if (hsl_.l + shift_) > 1:
+                    if l >= <float>1.0:
                         r[ 0 ] = <unsigned char> 255
                         g[ 0 ] = <unsigned char> 255
                         b[ 0 ] = <unsigned char> 255
@@ -6343,7 +13046,7 @@ cdef inline void brightness_exclude_inplace_c(
                     # force black pixel, we do not need to run
                     # struct_hsl_to_rgb to convert hsl to rgb as we know that
                     # the color will be black
-                    if l < 0:
+                    if l <= <float>0.0:
                         r[ 0 ] = <unsigned char> 0
                         g[ 0 ] = <unsigned char> 0
                         b[ 0 ] = <unsigned char> 0
@@ -6351,10 +13054,9 @@ cdef inline void brightness_exclude_inplace_c(
 
                     rgb_ = struct_hsl_to_rgb(hsl_.h, hsl_.s, l)
 
-                    rgb_array_[i, j, 0] = <unsigned char> (rgb_.r * <float>255.0)
-                    rgb_array_[i, j, 1] = <unsigned char> (rgb_.g * <float>255.0)
-                    rgb_array_[i, j, 2] = <unsigned char> (rgb_.b * <float>255.0)
-
+                    r[0] = <unsigned char> (rgb_.r * <float>255.0)
+                    g[0] = <unsigned char> (rgb_.g * <float>255.0)
+                    b[0] = <unsigned char> (rgb_.b * <float>255.0)
 
 
 @cython.binding(False)
@@ -6364,17 +13066,45 @@ cdef inline void brightness_exclude_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void brightness_bpf_c(
         unsigned char [:, :, :] rgb_array_,
         float shift_=0.0,
         unsigned char bpf_threshold_=64):
     """
     
-    :param rgb_array_: numpy ndarray shape (w, h, 3) containing RGB pixels values
-    :param shift_    : float; values in range [-1.0 ... 1.0], 0 no change,
-    -1 lowest brightness, +1 highest brightness
-    :param bpf_threshold_ : integer; Bright pass filter threshold value 
-    :return          : void
+    Brightness adjustment with *bpf filter (inplace)
+    *bpf stand for bright pass filter
+    
+    Exclusion:
+    bpf_threshold is an integer value in range [0..255] that 
+    determines the pixels threshold for the brightness algorithm. 
+    The RGB sum below this threshold will not be included in the process.  
+    
+    Compatible with 24, 32-bit images
+    
+    e.g:
+     24-bit
+    image = pygame.image.load('../Assets/px.png').convert()
+    brightness_bpf_c(image, 0.5, bpf_threshold=200)
+
+    # 32-bit 
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    brightness_bpf_c(image, 0.5, bpf_threshold=200)
+    
+    :param rgb_array_: 
+        Pygame.Surface compatible with 24 - 32 bit
+         
+    :param shift_: 
+        float, must be in range [-1.00 ... +1.00] this value control the brightness
+         
+    :param bpf_threshold_: 
+        integer value in range [0 ... 255]. Bright pass filter value. 
+        Equivalent to a threshold RGB. e.g sum of pixel values < threshold will not be modified. Default is 64
+        
+    :return:
+        void
+         
     """
 
 
@@ -6415,7 +13145,8 @@ cdef inline void brightness_bpf_c(
                 # force white pixel, we do not need to run
                 # struct_hsl_to_rgb to convert hsl to rgb as we know that
                 # the color will be white
-                if (hsl_.l + shift_) > 1:
+
+                if l >= <float>1.0:
                     r[0] = <unsigned char> 255
                     g[0] = <unsigned char> 255
                     b[0] = <unsigned char> 255
@@ -6424,7 +13155,7 @@ cdef inline void brightness_bpf_c(
                 # force black pixel, we do not need to run
                 # struct_hsl_to_rgb to convert hsl to rgb as we know that
                 # the color will be black
-                if l < 0:
+                if l <= <float>0.0:
                     r[0] = <unsigned char>0
                     g[0] = <unsigned char>0
                     b[0] = <unsigned char>0
@@ -6432,9 +13163,9 @@ cdef inline void brightness_bpf_c(
 
                 rgb_ = struct_hsl_to_rgb(hsl_.h, hsl_.s, l)
 
-                rgb_array_[i, j, 0] = <unsigned char> (rgb_.r * <float>255.0 )
-                rgb_array_[i, j, 1] = <unsigned char> (rgb_.g * <float>255.0 )
-                rgb_array_[i, j, 2] = <unsigned char> (rgb_.b * <float>255.0 )
+                r[0] = <unsigned char> (rgb_.r * <float>255.0 )
+                g[0] = <unsigned char> (rgb_.g * <float>255.0 )
+                b[0] = <unsigned char> (rgb_.b * <float>255.0 )
 
 
 
@@ -6445,88 +13176,45 @@ cdef inline void brightness_bpf_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void brightness_inplace1_c(
-        unsigned char [:, :, :] rgb_array_, float shift_, float [:, :, :, :] rgb_to_hsl_model):
+@cython.exceptval(check=False)
+cdef inline void saturation_c(unsigned char [:, :, :] rgb_array_, const float shift_):
     """
-    SHADER BRIGHTNESS USING STORED RGB TO HSL VALUES (SLOWEST VERSION)
+    Adjust the saturation level of an image or surface (in-place).
 
-    This method is fetching all the HSL values from an array instead
-    In theory this method should be faster than the direct calculation therefore the size of the
-    array degrade the performance somehow.
+    This function modifies the saturation of an image by adjusting the intensity of its colors. 
+    A positive `shift_` value increases saturation (making colors more vivid), while a negative 
+    value decreases it (making colors more grayscale). A shift of `0.0` leaves the image unchanged.
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a
-    3d array (library surfarray)
+    The function operates directly on the provided `rgb_array_`, modifying the pixel values in place.
 
-    e.g:
-    brightness_model(surface, 0.2 rgb_to_hsl_model)
+    Example:
+        saturation_c(surface, 0.2)  # Increase saturation
+        saturation_c(surface, -0.5) # Decrease saturation (closer to grayscale)
 
-    :param rgb_array_      : numpy.ndarray containing RGB values array shapes (w, h, 3) uint8
-    :param shift_          : float; value in range[-1.0 ... 1.0]
-    :param rgb_to_hsl_model: Array shape (r, g, b, 3) containing all pre-calculated HSL values
-    :return                : void
+    Parameters
+    ----------
+    rgb_array_ : numpy.ndarray
+        A 3D NumPy array with shape (width, height, 3), containing RGB pixel values.
+        Each color channel should be an unsigned 8-bit integer (uint8) with values in the range [0, 255].
+
+    shift_ : float
+        A value in the range [-1.0, 1.0] that controls the saturation level:
+        - `0.0`: No change.
+        - Positive values increase saturation (enhance colors).
+        - Negative values decrease saturation (desaturate colors toward grayscale).
+
+    Returns
+    -------
+    void
+        This function modifies `rgb_array_` in place and does not return a new array.
+
+    Notes
+    -----
+    - The function applies a per-pixel transformation to adjust saturation.
+    - Since the function operates in place, the original array is directly modified.
+    - The function does not support RGBA images (alpha channels).
     """
 
-    cdef Py_ssize_t width, height
-    width, height = rgb_array_.shape[:2]
-
-    cdef:
-        int i=0, j=0
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
-        float l, h, s
-
-        rgb rgb_
-        float high, low, high_
-
-    with nogil:
-
-        for i in prange(width, schedule=SCHEDULE, num_threads=THREADS):
-            for j in range(height):
-
-                r, g, b = &rgb_array_[i, j, 0], &rgb_array_[i, j, 1], &rgb_array_[i, j, 2]
-
-                h = rgb_to_hsl_model[r[0], g[0], b[0], 0]
-                s = rgb_to_hsl_model[r[0], g[0], b[0], 1]
-                l = rgb_to_hsl_model[r[0], g[0], b[0], 2]
-
-                l = min((l + shift_), <float>1.0)
-                l = max(l, <float>0.0)
-
-                rgb_ = struct_hsl_to_rgb(h, s, l)
-                r[0] = <unsigned char> (rgb_.r * <float>255.0)
-                g[0] = <unsigned char> (rgb_.g * <float>255.0)
-                b[0] = <unsigned char> (rgb_.b * <float>255.0)
-
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void saturation_inplace_c(
-        unsigned char [:, :, :] rgb_array_, float shift_):
-    """
-    SHADER SATURATION
-
-    This shader control the saturation level of the pygame display or surface/texture
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3)
-    containing RGB pixels, please refer to pygame
-    function pixels3d or array3d to convert an image into a 3d array (library surfarray)
-
-    e.g:
-    saturation(surface, 0.2)
-
-    :param rgb_array_: numpy.ndarray shape (w, h, 3) containing RGB values uint8
-    :param shift_    : float; value in range[-1.0...1.0], control the saturation level
-    :return          : void
-    """
 
     assert -1.0 <= shift_ <= 1.0, \
         "Argument shift must be in range[-1.0 ... 1.0]"
@@ -6539,18 +13227,26 @@ cdef inline void saturation_inplace_c(
         unsigned char *r
         unsigned char *g
         unsigned char *b
+        unsigned int sum_rgb
         float s
         hsl hsl_
         rgb rgb_
 
     with nogil:
-        for j in prange(height, schedule=SCHEDULE, num_threads=THREADS):
-            for i in range(width):
+        for i in prange(width, schedule=SCHEDULE, num_threads=THREADS):
+            for j in range(height):
 
                 r, g, b = \
                     &rgb_array_[i, j, 0], \
                     &rgb_array_[i, j, 1], \
                     &rgb_array_[i, j, 2]
+
+                sum_rgb = r[0] + g[0] + b[0]
+
+                # hsl transformation of solid white or
+                # solid black color is invariant
+                if sum_rgb == 0 or sum_rgb == 765:
+                    continue
 
                 hsl_ = struct_rgb_to_hsl(
                     <float>r[0] * <float>ONE_255,
@@ -6558,8 +13254,10 @@ cdef inline void saturation_inplace_c(
                     <float>b[0] * <float>ONE_255
                 )
 
-                s = min((hsl_.s + shift_), <float>1.0)
-                s = max(s, <float>0.0)
+                # Modifying the saturation level and apply
+                # the transformation to the pixel
+                s = min((hsl_.s + shift_), <float> 1.0)
+                s = max(s, <float> 0.0)
 
                 rgb_ = struct_hsl_to_rgb(hsl_.h, s, hsl_.l)
 
@@ -6569,6 +13267,112 @@ cdef inline void saturation_inplace_c(
 
 
 
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void saturation1d_c(
+        unsigned char [:] buffer,
+        const float shift,
+        bint format_32=False
+)nogil:
+
+    """
+
+    Saturate 1d array shape (w, ) (inplace)
+     
+    The array must be a numpy.ndarray or memoryviewslice shape (w, ) type uint8 containing
+    RGB(A) or any other pixel format and referencing an SDL surface or image. 
+    The pixel format must have tha alpha channel placed last such as RGBA or BGRA   
+
+    e.g:
+    # for 24-bit  
+    image = pygame.image.load("../Assets/px.png").convert(24)
+    saturation1d_c(image.get_buffer(), 0.5, False)
+    
+    # for 32-bit  
+    image = pygame.image.load("../Assets/px.png").convert_alpha()
+    saturation1d_c(image.get_buffer(), 0.5, True)
+
+    :param buffer: 
+        numpy.ndarray or memoryviewslice shape(w,) uint8 data type, (unsigned char 0...255) 
+        containing RGB(A), BGR(A) or any other pixel format.
+        
+    :param shift: 
+        float; values in range [-1.0 ... 1.0], 0.0 no change, -1 lowest saturation, +1 max saturation
+        Shift value control the saturation level.
+        
+    :param format_32: 
+        bool; False for 'RGB' buffer type (24-bit) or True for 'RGBA' (32-bit). 
+        This bit enable/disable the alpha layer.
+        
+    :return: 
+        void; Inplace transformation. 
+        
+    """
+
+    assert -1.0 <= shift <= 1.0, \
+        "Argument shift (float) must be in range[-1.0 ... 1.0]"
+
+    cdef:
+        Py_ssize_t length
+
+    length  = len(buffer)
+
+    cdef:
+        int i = 0
+        unsigned char *r
+        unsigned char *g
+        unsigned char *b
+        unsigned int sum_rgb
+        float s
+        hsl hsl_
+        rgb rgb_
+        int bit = 3
+
+    if format_32:
+        bit = 4
+
+    # noinspection SpellCheckingInspection
+    for i in prange(0, length, bit, schedule = SCHEDULE, num_threads = THREADS):
+
+        r = &buffer[ i ]
+        g = &buffer[ i + 1 ]
+        b = &buffer[ i + 2 ]
+
+        # No transformation for invisible pixels
+        if format_32:
+           if buffer[i + 3] == 0:
+               continue
+
+        sum_rgb = r[ 0 ] + g[ 0 ] + b[ 0 ]
+
+        # hsl transformation of solid white or
+        # solid black color is invariant
+        if sum_rgb == 0 or sum_rgb == 765:
+            continue
+
+        hsl_ = struct_rgb_to_hsl(
+            <float> r[ 0 ] * <float> ONE_255,
+            <float> g[ 0 ] * <float> ONE_255,
+            <float> b[ 0 ] * <float> ONE_255
+        )
+
+        # Modifying the saturation level and apply
+        # the transformation to the pixel
+        s = min((hsl_.s + shift), <float> 1.0)
+        s = max(s, <float> 0.0)
+
+        rgb_ = struct_hsl_to_rgb(hsl_.h, s, hsl_.l)
+
+        r[ 0 ] = <unsigned char> (rgb_.r * <float> 255.0)
+        g[ 0 ] = <unsigned char> (rgb_.g * <float> 255.0)
+        b[ 0 ] = <unsigned char> (rgb_.b * <float> 255.0)
+
 
 
 @cython.binding(False)
@@ -6578,52 +13382,435 @@ cdef inline void saturation_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-# e.g
-# heatwave_vertical(
-#         surface_, numpy.full((w, h), 255, dtype=numpy.uint8),
-#         b*random.uniform(55.0, 100), 0, sigma_=random.uniform(0.4, 1), mu_=b*2)
-cdef inline void heatwave24_vertical_inplace_c(
-        unsigned char [:, :, :] rgb_array_,
-        unsigned char [:, :] mask,
-        float amplitude_,
-        float center_,
-        float sigma_,
-        float mu_):
+@cython.exceptval(check=False)
+cdef np.ndarray[np.uint8_t, ndim=1] saturation1d_cp_c(
+        const unsigned char [:] buffer,
+        const float shift,
+        bint format_32=False
+):
+
     """
-    APPLY A GAUSSIAN TRANSFORMATION TO AN ARRAY
 
-    This effect can be use for simulate air turbulence or heat flow/convection
+    Saturate 1d array shape (w, ) (return a copy)
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels, please refer to pygame
-    function pixels3d or array3d to convert an image into a 3d array (library surfarray)
+    The array must be a numpy.ndarray|buffer or memoryviewslice shape (w, ) type uint8 containing
+    RGB(A) or any other pixel format and referencing an SDL surface or image.
+     
+    The pixel format must have alpha channel placed last such as RGB(A) or BGR(A) 
+    for 32-bit image data.   
 
+    e.g:
+    # for buffer 32-bit 
+    image = pygame.image.load("../Assets/px.png").convert_alpha()
+    buffer_cp = saturation1d_cp_c(image.get_buffer(), 0.5, True)
+    
+    # for 24-bit
+    image = pygame.image.load("../Assets/px.png").convert(24)
+    buffer_cp = saturation1d_cp_c(image.get_buffer(), 0.5, False)
 
-    :param rgb_array_: numpy.ndarray shape (width, height, 3) uint8 containing RGB pixels
-    :param mask      : numpy.ndarray shape (x, y) uint8, (values 255 or 0).
-    Apply transformation to the original array
-    if the value @(x, y) is 255 else remain unchanged.
-    :param amplitude_: Control the maximum of the gaussian equation.
-    No transformation if factor_ equal zero
-    :param center_   : Control the center of the gaussian equation (if center_ equal zero,
-     the Gauss equation is centered
-    at x=0 and maximum is 0.4 with amplitude_ = 1.0)
-    :param sigma_    : float; sigma value of the gauss equation
-    :param mu_       : float; mu value of the gauss equation
-    :return          : void
+    :param buffer: 
+        numpy ndarray|buffer or memoryviewslice shape (w,) type uint8 containing RGB(A) or any other
+        pixel format.
+          
+    :param shift: 
+        float; values in range [-1.0 ... 1.0], 0.0 no change,-1 lowest saturation, +1 max saturation.
+        Shift control the saturation level
+        
+    :param format_32: 
+        bool; False for 'RGB' buffer type (24-bit) or True for 'RGBA' (32-bit). 
+        This bit enable/disable the alpha layer
+        
+    :return: 
+        numpy.ndarray 1d array shape (w, ) type uint8 containing same pixel 
+        format than input array
+         
     """
-    # TODO MASK
 
-    cdef Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
+    assert -1.0 <= shift <= 1.0, \
+        "Argument shift must be in range[-1.0 ... 1.0]"
 
     cdef:
-        unsigned char [:, :, :] rgb_array_copy = numpy.array(rgb_array_, copy=False)
-        int x = 0, y = 0
-        int yy
-        int h_1 = <int>h - 1
-        unsigned char *r
-        float [::1] f_gauss = linspace(-4, 4, w, dtype=float32)
+        Py_ssize_t length
 
+    length  = len(buffer)
+
+    cdef:
+        int i = 0
+        const unsigned char *r
+        const unsigned char *g
+        const unsigned char *b
+        unsigned int sum_rgb
+        unsigned char [::1] buffer_cp = numpy.ndarray(shape=length, buffer=buffer, dtype=uint8)
+        float s
+        hsl hsl_
+        rgb rgb_
+        int bit = 3
+        unsigned char * p1
+
+    if format_32:
+        bit = 4
+
+    with nogil:
+        # noinspection SpellCheckingInspection
+        for i in prange(0, length, bit, schedule = SCHEDULE, num_threads = THREADS):
+
+            b = &buffer[ i ]
+
+            # No transformation for invisible pixels
+            if format_32:
+                if (b + 3)[ 0 ] == 0:
+                    continue
+
+            g = b + 1
+            r = b + 2
+
+            sum_rgb = r[ 0 ] + g[ 0 ] + b[ 0 ]
+
+            # hsl transformation of solid white or
+            # solid black color is invariant
+            if sum_rgb == 0 or sum_rgb == 765:
+                continue
+
+            hsl_ = struct_rgb_to_hsl(
+                <float> r[ 0 ] * <float> ONE_255,
+                <float> g[ 0 ] * <float> ONE_255,
+                <float> b[ 0 ] * <float> ONE_255
+            )
+
+            # Modifying the saturation level and apply
+            # the transformation to the pixel
+            s = min((hsl_.s + shift), <float> 1.0)
+            s = max(s, <float> 0.0)
+
+            rgb_ = struct_hsl_to_rgb(hsl_.h, s, hsl_.l)
+
+            p1 = &buffer_cp[ i ]
+
+            p1[ 0 ]     = <unsigned char> (rgb_.r * <float> 255.0)
+            (p1+1)[ 0 ] = <unsigned char> (rgb_.g * <float> 255.0)
+            (p1+2)[ 0 ] = <unsigned char> (rgb_.b * <float> 255.0)
+
+            # buffer_cp is a copy of the input array.
+            # The alpha array should be identical to the input so no need
+            # to change it.
+            # if format_32:
+            #     (p1 + 3)[0] = <unsigned char> (b + 3)[ 0 ]
+
+    return numpy.ndarray(shape=length, buffer=buffer_cp, dtype=uint8)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline saturation_mask(
+        const unsigned char [:, :, :] rgb_array,
+        const float shift,
+        const unsigned char [:, :] mask,
+):
+    """
+    Apply a saturation mask to an image (returns a copy).
+
+    This function modifies the saturation of an image (`rgb_array`) based on the given `shift` value, 
+    while applying a mask to selectively disable the effect in certain areas.
+
+    ### Parameters:
+    - **rgb_array** (`numpy.ndarray` or `memoryviewslice`):  
+    A 3D array of shape `(width, height, 3)`, with `dtype=uint8`, representing an image in RGB, BGR, or any similar pixel format.
+
+    - **shift** (`float`):  
+    A value in the range `[-1.0, 1.0]` that determines the saturation adjustment:
+    - `[-1.0, 0.0]` → Decreases saturation.
+    - `[0.0, 1.0]` → Increases saturation.
+
+    - **mask** (`numpy.ndarray`):  
+    A 2D array of shape `(width, height)`, with `dtype=uint8`, representing the mask layer.  
+    Ideally, values should be either `255` (enable saturation effect) or `0` (disable saturation effect).  
+    If `mask` and `rgb_array` have different dimensions, a `ValueError` is raised.
+
+    ### Returns:
+    - **pygame.Surface**:  
+    A 24-bit surface without a transparency layer.
+
+    ### Example Usage:
+    ```python
+    import pygame
+    from pygame.surfarray import pixels3d
+
+    # Load and prepare the mask
+    mask = pygame.image.load('../Assets/alpha.png').convert_alpha()
+    mask = pygame.transform.smoothscale(mask, (800, 600))
+    mask_array = pygame.surfarray.pixels_alpha(mask)
+    mask_array = BW(mask_array)  # Convert to black & white if needed
+
+    # Apply saturation mask to the background
+    background = saturation_mask(pixels3d(background), 0.5, mask_array)
+    SCREEN.blit(background, (0, 0))
+
+
+    """
+
+    if shift == <float>0.0:
+        return numpy.array(rgb_array)
+
+    assert -1.0 <= shift <= 1.0, 'Argument shift must be in range [-1.0 .. 1.0].'
+
+    if not is_uint8(rgb_array):
+        raise TypeError(
+            "\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    if not is_uint8(mask):
+        raise TypeError(
+            "\nExpecting uint8 (unsigned char) data type got %s" % rgb_array.dtype)
+
+    cdef Py_ssize_t w, h, w_mask, h_mask
+
+    try:
+        w, h = rgb_array.shape[ :2 ]
+
+    except (ValueError, pygame.error):
+        raise ValueError(
+            '\nArray bgr_array shape not understood.')
+
+    try:
+        w_mask, h_mask = mask.shape[ :2 ]
+
+    except (ValueError, pygame.error):
+        raise ValueError(
+            '\nArray mask shape not understood.')
+
+    if w != w_mask or h != h_mask:
+        raise ValueError(
+            "\nExpecting array bgr_array (%s, %s)"
+            " and mask (%s, %s) to have same shapes." % (w, h, w_mask, h_mask))
+
+    cdef:
+        const unsigned char *r
+        const unsigned char *g
+        const unsigned char *b
+        unsigned int sum_rgb
+        unsigned char [:, :, ::1] tmp_array = numpy.empty((h, w, 3), dtype = numpy.uint8, order='C')
+        float s
+        hsl hsl_
+        rgb rgb_
+        int i, j
+
+
+    with nogil:
+        for j in prange(h, schedule = SCHEDULE, num_threads = THREADS):
+            for i in range(w):
+
+                if mask[i, j] == 0:
+                    continue
+
+                r, g, b = \
+                    &rgb_array[ i, j, 0 ], \
+                    &rgb_array[ i, j, 1 ], \
+                    &rgb_array[ i, j, 2 ]
+
+                sum_rgb = r[0] + g[0] + b[0]
+
+                if sum_rgb == 0 or sum_rgb == 765:
+                    continue
+
+                hsl_ = struct_rgb_to_hsl(
+                    r[0] * <float>ONE_255,
+                    g[0] * <float>ONE_255,
+                    b[0] * <float>ONE_255
+                )
+                s = min((hsl_.s + shift), <float>1.0)
+                s = max(s, <float>0.0)
+
+                rgb_ = struct_hsl_to_rgb(hsl_.h, s, hsl_.l)
+
+                tmp_array[ j, i, 0 ] = <unsigned char> (rgb_.r * <float> 255.0)
+                tmp_array[ j, i, 1 ] = <unsigned char> (rgb_.g * <float> 255.0)
+                tmp_array[ j, i, 2 ] = <unsigned char> (rgb_.b * <float> 255.0)
+
+    return frombuffer(tmp_array, (w, h) , 'RGB')
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void saturation_mask_inplace(
+        unsigned char [:, :, :] rgb_array,
+        const float shift,
+        const unsigned char [:, :] mask,
+        int w, int h
+)nogil:
+    """
+    Saturation effect with mask designed for class area24_cc (light effect)
+    
+    rgb_array is a numpy.ndarray shape (w, h, 3) type uint8 with RGB or BGR or any
+    other pixel format. This array reference the SDL surface or image and any changes
+    to this array will modify the image directly.
+    
+    The mask layer should be a 2d array filled with uint8 values. Ideally the values
+    must be in either 255 or 0. Zero will disable the effect
+    Mask and rgb_array must have the same width and height,
+    but mask (w, h) is transposed compared to rgb_array (h, w, 3) 
+    
+    e.g:
+    mask = pygame.image.load('../Assets/alpha.png').convert_alpha()
+    mask = pygame.transform.smoothscale(mask, (800, 600))
+    mask_array = pygame.surfarray.pixels_alpha(mask)
+    # mask_array is transposed 
+    mask_array = BW(mask_array).T
+    
+    background = saturation_mask(pixels3d(background), 0.5, mask_array)
+    SCREEN.blit(background, (0, 0))
+       
+    :param rgb_array: 
+        3d numpy.ndarray or memoryviewslice shapes (h, w, 3) type uint8
+        containing RGB or BGR or any other pixel format.
+        This array reference the SDL surface or image
+        
+    :param shift: 
+        Value must be in range [-1.0 ... 1.0],
+        between [-1.0 ... 0.0] decrease saturation.
+        between [0.0  ... 1.0] increase saturation.
+                   
+    :param mask: 
+        unsigned char numpy.ndarray shape (w, h) type uint8, 
+        layer mask to use for disabling the saturation effect
+        
+    :param w: 
+        int width of the array
+         
+    :param h:
+        int height of the array
+    
+    return:Void
+    """
+
+    cdef:
+        unsigned char *r
+        unsigned char *g
+        unsigned char *b
+        unsigned char sum_rgb
+        float s
+        hsl hsl_
+        rgb rgb_
+        int i, j
+
+
+    for i in prange(w, schedule=SCHEDULE, num_threads=THREADS):
+        for j in range(h):
+
+                if mask[i, j] == 0:
+                     continue
+
+                r, g, b = \
+                    &rgb_array[ j, i, 0 ], \
+                    &rgb_array[ j, i, 1 ], \
+                    &rgb_array[ j, i, 2 ]
+
+                sum_rgb = r[ 0 ] + g[ 0 ] + b[ 0 ]
+
+                if sum_rgb == 0 or sum_rgb == 765:
+                    continue
+
+                hsl_ = struct_rgb_to_hsl(
+                    <float> r[ 0 ] * <float> ONE_255,
+                    <float> g[ 0 ] * <float> ONE_255,
+                    <float> b[ 0 ] * <float> ONE_255
+                )
+
+                s = min((hsl_.s + shift), <float> 1.0)
+                s = max(s, <float> 0.0)
+
+                rgb_ = struct_hsl_to_rgb(hsl_.h, s, hsl_.l)
+
+                r[ 0 ] = <unsigned char> (rgb_.r * <float> 255.0)
+                g[ 0 ] = <unsigned char> (rgb_.g * <float> 255.0)
+                b[ 0 ] = <unsigned char> (rgb_.b * <float> 255.0)
+
+
+
+
+
+# ------------------------------------ OTHER
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void heatconvection_inplace_c(
+        unsigned char [:, :, :] rgb_array,
+        float amplitude,
+        float center=0.0,
+        float sigma=2.0,
+        float mu=0.0):
+
+    """
+    Heat flow convection
+    
+    Convection (or convective heat transfer) is the transfer of heat from one place to another 
+    due to the movement of fluid. Although often discussed as a distinct method of heat transfer, 
+    convective heat transfer involves the combined processes of conduction (heat diffusion).    
+    This effect can be use to simulate air turbulence or heat flow/convection
+    it applies a gaussian transformation at the base of the image (vertical flow)   
+    
+    # for 32-24 bit image format 
+     image = pygame.image.load("../Assets/fire.jpg").convert()
+     b = math.cos(i * 3.14 / 180.0) * random.uniform(0, 2)
+     heatconvection(image, abs(b) * random.uniform(20.0, 80.0),
+         0, sigma = random.uniform(0.8, 4), mu_ = b)
+    # Restore the original image 
+     image = image_copy.copy()
+
+    :param rgb_array: 
+        numpy.ndarray shape (w, h, n) type uint8 containing RGB pixels or any other format
+         
+    :param amplitude: 
+        Control the maximum amplitude (pixels displacement on the Y-axis, vertical effect) 
+        of the gaussian equation. No transformation if amplitude equal zero. example of 
+        an variable amplitude issue from a periodic function:
+        b = math.cos(i * 3.14 / 180.0) * random.uniform(0, 2) with i linear.
+         
+    :param center: 
+        Control the center of the gaussian equation (if center equal zero,
+        the Gauss equation is centered (default is 0.0)
+                   
+    :param sigma: 
+        float; sigma value of the gauss equation, a small value will create a 
+        narrow effect while a stronger value will wider the effect. Please refers 
+        to the gaussian distribution for further analysis on the sigma values (default is 2.0).
+        
+    :param mu: 
+        float; mu value of the gauss equation. when mu is periodic such as a cosine trigonometric 
+        function, it allows to displace the effect along the X-axis (default is 0.0).
+        
+    """
+
+    cdef Py_ssize_t w, h
+
+    w, h = rgb_array.shape[:2]
+
+    cdef:
+        unsigned char [:, :, ::1] array_cp = \
+            numpy.asarray(rgb_array, dtype=uint8, order='C')
+        int x = 0, y = 0
+        unsigned int yy
+        unsigned int h_1 = <int>h - 1
+        float [::1] f_gauss = linspace(-4, 4, w, dtype=float32)
 
     with nogil:
 
@@ -6631,18 +13818,17 @@ cdef inline void heatwave24_vertical_inplace_c(
 
             for y in range(h):
 
-                yy =<int>(gauss(f_gauss[x], center_, sigma_, mu_) * amplitude_ + y)
+                yy =<int>(gauss(f_gauss[x], center, sigma, mu) * amplitude + y)
 
-                # printf("\n %i ", yy)
                 if yy > h_1:
                     yy = h_1
 
                 if yy < 0:
                     yy = 0
 
-                rgb_array_[x, y, 0] = rgb_array_copy[x, yy, 0]
-                rgb_array_[x, y, 1] = rgb_array_copy[x, yy, 1]
-                rgb_array_[x, y, 2] = rgb_array_copy[x, yy, 2]
+                rgb_array[x, y, 0] = array_cp[x, yy, 0]
+                rgb_array[x, y, 1] = array_cp[x, yy, 1]
+                rgb_array[x, y, 2] = array_cp[x, yy, 2]
 
 
 @cython.binding(False)
@@ -6652,40 +13838,55 @@ cdef inline void heatwave24_vertical_inplace_c(
 @cython.cdivision(False)
 @cython.profile(False)
 @cython.initializedcheck(False)
-# e.g horizontal_glitch(surface, 0.5, 0.08, frame % 20)
-cdef inline void horizontal_glitch_inplace_c(
-        unsigned char [:, :, :] rgb_array_,
-        float rad1_,
-        float frequency_,
-        float amplitude_):
+@cython.exceptval(check=False)
+cdef inline void horizontal_glitch_c(
+        unsigned char [:, :, :] rgb_array,
+        const float deformation,
+        const float frequency,
+        const float amplitude):
 
     """
-    SHADER GLITCH EFFECT
+    Apply a horizontal glitch effect to an image (in-place).
 
-    Deform the pygame display to create a glitch appearance
+    This function distorts an image (`rgb_array`) by shifting pixels horizontally 
+    based on a cosine wave, creating a glitch effect.
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a
-    3d array (library surfarray)
+    ### Parameters:
+    - **rgb_array** (`numpy.ndarray`):  
+    A 3D array of shape `(width, height, 3)`, with `dtype=uint8`, representing an image with RGB pixels.  
+    The transformation is applied in-place.
 
-    :param rgb_array_: numpy.ndarray shape (w, h, 3) uint8 containing RGB pixels
-    :param rad1_     : float; Angle in radians, this value control the angle variation over the time
-    :param frequency_:  float; signal frequency, factor that amplify the angle variation
-    :param amplitude_: float; cos amplitude value
-    :return:
+    - **deformation** (`float`):  
+    An angle in radians that controls the variation of the distortion over time.
+
+    - **frequency** (`float`):  
+    A factor that amplifies the deformation angle, controlling the periodicity of the distortion.
+
+    - **amplitude** (`float`):  
+    The amplitude of the cosine wave, determining the maximum horizontal displacement of pixels.
+
+    ### Returns:
+    - **None** (modifies `rgb_array` in-place).
+
+    ### Example Usage:
+    ```python
+    horizontal_glitch_c(
+        bgr_array, 
+        deformation=0.5, 
+        frequency=0.08, 
+        amplitude=FRAME % 20
+    )
     """
     cdef Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
+    w, h = rgb_array.shape[:2]
 
     cdef:
         int i=0, j=0
         float rad = <float>(<float>3.14/<float>180.0)
         float angle = <float>0.0
         float angle1 = <float>0.0
-        # unsigned char [:, :, :] rgb_array_copy = \
-        #     numpy.array(rgb_array_, copy=True, dtype=
-        unsigned char [::1, :, :] rgb_array_copy = \
-            numpy.array(rgb_array_, copy=False, dtype=uint8, order='F')
+        unsigned char [::1, :, :] rgb_array_cp = \
+            numpy.asarray(rgb_array, dtype=uint8, order='F')
         int ii=0
 
     with nogil:
@@ -6694,18 +13895,20 @@ cdef inline void horizontal_glitch_inplace_c(
 
             for i in range(w):
 
-                ii = (i + <int>(<float>cos(angle) * amplitude_))
+                ii = (i + <int>(<float>cos(angle) * amplitude))
                 if ii > w - 1:
                     ii = w - 1
                 if ii < 0:
                     ii = 0
 
-                rgb_array_[i, j, 0] = rgb_array_copy[ii, j, 0]
-                rgb_array_[i, j, 1] = rgb_array_copy[ii, j, 1]
-                rgb_array_[i, j, 2] = rgb_array_copy[ii, j, 2]
+                rgb_array[i, j, 0] = rgb_array_cp[ii, j, 0]
+                rgb_array[i, j, 1] = rgb_array_cp[ii, j, 1]
+                rgb_array[i, j, 2] = rgb_array_cp[ii, j, 2]
 
-            angle1 = angle1 + frequency_ * rad
-            angle = angle + (rad1_ * rad + rand() % angle1 - rand() % angle1)
+            angle1 = angle1 + frequency * rad
+            angle = angle + (deformation * rad + rand() % angle1 - rand() % angle1)
+
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -6714,36 +13917,56 @@ cdef inline void horizontal_glitch_inplace_c(
 @cython.cdivision(False)
 @cython.profile(False)
 @cython.initializedcheck(False)
-# e.g horizontal_glitch(surface, 0.5, 0.08, frame % 20)
-cdef inline void horizontal_glitch_static_inplace_c(
-        unsigned char [:, :, :] rgb_array_,
-        unsigned char [:, :, :] array_,
-        float rad1_,
-        float frequency_,
-        float amplitude_):
+@cython.exceptval(check=False)
+cdef inline void horizontal_sglitch_c(
+        unsigned char [:, :, :] bck_array,
+        unsigned char [:, :, :] array,
+        const float deformation,
+        const float frequency,
+        const float amplitude):
 
     """
-    SHADER GLITCH EFFECT ON STATIC IMAGE/BACKGROUND (INPLACE)
+    Glitch for static image/background (inplace)
 
-    Deform the pygame display to create a glitch appearance
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a
-    3d array (library surfarray)
-
-    :param rgb_array_: numpy.ndarray shape (w, h, 3) uint8 containing RGB pixels
-    :param array_    : numpy.ndarray shape (w, h, 3) copy
-    :param rad1_     : float; Angle in radians, this value control the angle variation over the time
-    :param frequency_:  float; signal frequency, factor that amplify the angle variation
-    :param amplitude_: float; cos amplitude value
-    :return:
+    Deform the pygame display to create a glitch appearance.
+    The Arrays (bgr_array, array) must both be numpy arrays shape (w, h, 3) containing RGB pixels.
+    
+    e.g:
+     # for 24 - 32 bit
+    horizontal_sglitch_c(
+         bck_array,
+         array, 
+         deformation = 0.5,
+         frequency   = 0.08, 
+         amplitude   = FRAME % 20)
+    
+    :param bck_array: 
+        numpy.ndarray shape (w, h, 3) uint8 containing RGB pixels
+        
+    :param array: 
+        numpy.ndarray shape (w, h, 3) copy, background array copy.
+        
+    :param deformation: 
+        float; Angle in radians, this value control the angle variation over the time
+        
+    :param frequency: 
+        float; signal frequency, factor that amplify the angle variation
+        
+    :param amplitude: 
+        float; cos amplitude value
+        
+    :return: 
+    void
+    
     """
+
     cdef Py_ssize_t w, h, ww, hh
-    w, h = rgb_array_.shape[:2]
-    ww, hh = array_.shape[:2]
+
+    w, h = bck_array.shape[:2]
+    ww, hh = array.shape[:2]
 
     if w!=ww and h!=hh:
-        raise ValueError("\nBoth surface and array_ must have the same sizes/dimensions")
+        raise ValueError("\nBoth surface and bgr_array must have the same sizes/dimensions")
 
     cdef:
         int i=0, j=0
@@ -6758,20 +13981,19 @@ cdef inline void horizontal_glitch_static_inplace_c(
 
             for i in range(w):
 
-                ii = (i + <int>(<float>cos(angle) * amplitude_))
+                ii = (i + <int>(<float>cos(angle) * amplitude))
                 if ii > <int>w - 1:
                     ii = <int>w - 1
                 if ii < 0:
                     ii = 0
 
-                rgb_array_[i, j, 0],\
-                rgb_array_[i, j, 1],\
-                rgb_array_[i, j, 2] = array_[ii, j, 0],\
-                    array_[ii, j, 1], array_[ii, j, 2]
+                bck_array[i, j, 0],\
+                bck_array[i, j, 1],\
+                bck_array[i, j, 2] = array[ii, j, 0],\
+                    array[ii, j, 1], array[ii, j, 2]
 
-            angle1 = angle1 + frequency_ * rad
-            angle = angle + (rad1_ * rad + rand() % angle1 - rand() % angle1)
-
+            angle1 = angle1 + frequency * rad
+            angle = angle + (deformation * rad + rand() % angle1 - rand() % angle1)
 
 
 
@@ -6782,27 +14004,43 @@ cdef inline void horizontal_glitch_static_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void bpf24_inplace_c(
-        unsigned char [:, :, :] rgb_array_, int threshold = 128):
+@cython.exceptval(check=False)
+cdef inline void bpf_inplace_c(
+        unsigned char [:, :, :] rgb_array_, int w, int h, int threshold = 128)nogil:
+    
     """
-    SHADER BRIGHT PASS FILTER (INPLACE)
+    Apply a Bright Pass Filter (BPF) to an image in-place.
 
-    Conserve only the brightest pixels in an array
+    This function retains only the brightest pixels in the given image (`rgb_array_`),  
+    effectively filtering out darker regions. The modification is applied in-place.
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame function pixels3d or array3d to convert an image into a
-     3d array (library surfarray)
+    ### Parameters:
+    - **rgb_array_** (`numpy.ndarray`):  
+    A 3D array of shape `(width, height, 3)`, with `dtype=uint8`, representing an image with RGB pixels.  
+    Pixels below the given `threshold` are set to zero.
 
-    :param rgb_array_: numpy.ndarray shape (w, h, 3) uint8 containing RGB pixels
-    :param threshold : integer; Bright pass threshold default 128
-    :return          :  void
+    - **w** (`int`):  
+    The width of the array.
+
+    - **h** (`int`):  
+    The height of the array.
+
+    - **threshold** (`int`, default=128):  
+    The brightness threshold.  
+    Pixels with values below this threshold are set to zero.
+
+    ### Returns:
+    - **None** (modifies `rgb_array_` in-place).
+
+    ### Example Usage:
+    ```python
+    # Apply a bright pass filter with a threshold of 60
+    bpf_inplace_c(image, w=image.shape[0], h=image.shape[1], threshold=60)
     """
+    
 
     assert 0 <= threshold <= 255, "Argument threshold must be in range [0 ... 255]"
 
-    cdef:
-        Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
 
     cdef:
         int i = 0, j = 0
@@ -6820,7 +14058,11 @@ cdef inline void bpf24_inplace_c(
                 g = &rgb_array_[i, j, 1]
                 b = &rgb_array_[i, j, 2]
 
+                if r[0] + g[0] + b[0] == 0:
+                    continue
+
                 lum = r[0] * <float>0.299 + g[0] * <float>0.587 + b[0] * <float>0.114
+
                 if lum < threshold:
                     r[ 0 ], g[ 0 ], b[ 0 ] = 0, 0, 0
                     continue
@@ -6831,6 +14073,83 @@ cdef inline void bpf24_inplace_c(
                 b[0] = <unsigned char>(b[0] * c)
 
 
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void bpf_c(
+        object surface_,
+        int threshold = 128):
+
+    """
+    
+    Apply a Bright Pass Filter (BPF) to a pygame surface.
+
+    This function enhances the brightest areas of the given `surface_`  
+    by filtering out pixels below the specified `threshold`.
+
+    ### Parameters:
+    - **surface_** (`pygame.Surface`):  
+    The source surface to which the bright pass filter is applied.
+
+    - **threshold** (`int`, default=128):  
+    The brightness threshold.  
+    Pixels with values below this threshold are suppressed.
+
+    ### Returns:
+    - **None** (modifies `surface_` in-place).
+
+    ### Example Usage:
+    ```python
+    bpf_c(image, threshold=100)
+
+    
+    """
+
+    assert 0 <= threshold <= 255, \
+        "Argument threshold must be in range [0 ... 255]"
+
+    cdef:
+        Py_ssize_t w, h
+
+    cdef unsigned char [:, :, :] rgb_array = pixels3d(surface_)
+
+    w, h = rgb_array.shape[:2]
+
+    cdef:
+        int i = 0, j = 0
+        float lum, c
+        unsigned char *r
+        unsigned char *g
+        unsigned char *b
+
+
+    with nogil:
+        for j in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
+            for i in range(0, w):
+
+                # ITU-R BT.601 luma coefficients
+                r = &rgb_array[i, j, 0]
+                g = &rgb_array[i, j, 1]
+                b = &rgb_array[i, j, 2]
+
+                if r[0] + g[0] + b[0] == 0:
+                    continue
+
+                lum = r[0] * <float>0.299 + g[0] * <float>0.587 + b[0] * <float>0.114
+
+                if lum < threshold:
+                    r[ 0 ], g[ 0 ], b[ 0 ] = 0, 0, 0
+                    continue
+
+                c = (lum - threshold) / lum
+                r[0] = <unsigned char>(r[0] * c)
+                g[0] = <unsigned char>(g[0] * c)
+                b[0] = <unsigned char>(b[0] * c)
 
 
 @cython.binding(False)
@@ -6840,28 +14159,35 @@ cdef inline void bpf24_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline bpf24_c(
-        unsigned char [:, :, :] input_array_,
+        unsigned char [:, :, :] rgb_array,
         int threshold = 128,
         ):
+
     """
-    SHADER BRIGHT PASS FILTER
+    
+    Bright Pass Filter (bpf)
 
     Conserve only the brightest pixels in an array
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame function pixels3d or array3d to convert an image into a
-    3d array (library surfarray)
+    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels
 
-    :param input_array_: numpy.ndarray shape (w, h, 3) uint8 containing RGB pixels
-    :param threshold   : float Bright pass threshold default 128
-    :return            :  Return the modified array shape (w, h, 3) uint8
+    :param rgb_array: 
+        numpy.ndarray shape (w, h, 3) uint8 containing RGB pixels
+        
+    :param threshold: 
+        float Bright pass threshold default 128
+        
+    :return: 
+        Return the modified array shape (w, h, 3) uint8
+        
     """
     assert 0 <= threshold <= 255, "Argument threshold must be in range [0 ... 255]"
 
     cdef:
         Py_ssize_t w, h
-    w, h = input_array_.shape[:2]
+    w, h = rgb_array.shape[:2]
 
     cdef:
         int i = 0, j = 0
@@ -6876,9 +14202,12 @@ cdef inline bpf24_c(
             for i in range(0, w):
 
                 # ITU-R BT.601 luma coefficients
-                r = &input_array_[i, j, 0]
-                g = &input_array_[i, j, 1]
-                b = &input_array_[i, j, 2]
+                r = &rgb_array[i, j, 0]
+                g = &rgb_array[i, j, 1]
+                b = &rgb_array[i, j, 2]
+
+                if r[0] + g[0] + b[0] == 0:
+                    continue
 
                 lum = r[0] * <float>0.299 + g[0] * <float>0.587 + b[0] * <float>0.114
 
@@ -6894,6 +14223,94 @@ cdef inline bpf24_c(
 
 
 
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void filtering24_c(object surface_, mask_):
+    """
+    Apply an internal optimized filtering to a 24/32-bit surface (in-place).
+
+    This function processes a 24-bit or 32-bit `surface_` using a 32-bit `mask_`.  
+    The mask's alpha values are converted to float and used to adjust the filtering effect.  
+    Modifications are applied directly to `surface_`.
+
+    ### Parameters:
+    - **surface_** (`pygame.Surface`):  
+      A 24-bit or 32-bit surface that will be filtered.
+
+    - **mask_** (`pygame.Surface`):  
+      A 32-bit surface containing an alpha channel.  
+      The alpha values are used to modulate the effect during processing.  
+      The mask must be a 32-bit surface; otherwise, a `ValueError` is raised.
+
+    ### Returns:
+    - **None** (modifies `surface_` in-place).
+
+    ### Raises:
+    - `ValueError`:  
+      - If `mask_` is not a 32-bit surface (missing alpha channel or incorrect format).
+      - If `surface_` cannot create a C buffer.
+
+    ### Example Usage:
+    ```python
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    image = pygame.transform.smoothscale(image, (800, 600))
+
+    mask = pygame.image.load('../Assets/alpha.png').convert_alpha()
+    mask = pygame.transform.smoothscale(mask, (800, 600))
+
+    filtering24_c(image, mask)
+    ```
+    """
+
+    # Get surface dimensions
+    cdef:
+        int w, h
+        unsigned short int byte_size  # Bytes per pixel for surface_
+        unsigned short int m_bytesize # Bytes per pixel for mask_
+
+    w, h = surface_.get_size()
+    byte_size = surface_.get_bytesize()  # Determine surface pixel format
+    m_bytesize = mask_.get_bytesize()    # Determine mask pixel format
+
+    # Ensure the mask is 32-bit (RGBA)
+    if m_bytesize != 4:
+        raise ValueError("\nMask argument is incorrect, missing alpha channels or wrong shape.")
+
+    # Attempt to retrieve a buffer from the surface
+    cdef unsigned char [::1] rgb
+
+    try:
+        rgb = surface_.get_buffer()
+    except (ValueError, pygame.error):
+        raise ValueError("\nCannot create a C buffer from the given surface.")
+
+    # Retrieve mask buffer
+    cdef:
+        unsigned char [::1] mask = mask_.get_buffer()
+        int i
+        Py_ssize_t l = (w * h) << 2 if byte_size == 4 else w * h * 3  # Compute buffer size
+        unsigned char * p1
+        float a  # Alpha multiplier
+
+    # Perform pixel-wise modification in parallel with OpenMP
+    with nogil:
+        for i in prange(0, l, byte_size, schedule=SCHEDULE, num_threads=THREADS):
+
+            # Compute alpha multiplier based on mask's alpha channel
+            a = mask[i + 3] * <float>ONE_255 if byte_size == 4 \
+                else mask[((i / byte_size) << 2) + 3] * <float>ONE_255
+
+            # Apply alpha multiplication to each color channel
+            p1 = &rgb[i]
+            p1[0] = <unsigned char> (p1[0] * a)       # Red channel
+            (p1 + 1)[0] = <unsigned char> ((p1 + 1)[0] * a)  # Green channel
+            (p1 + 2)[0] = <unsigned char> ((p1 + 2)[0] * a)  # Blue channel
 
 
 @cython.binding(False)
@@ -6903,55 +14320,84 @@ cdef inline bpf24_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline filtering24_c(object surface_, mask_):
+@cython.exceptval(check=False)
+cdef inline void filtering_inplace_c(object surface_, mask_):
     """
-    MULTIPLY MASK VALUES WITH AN ARRAY REPRESENTING THE SURFACE PIXELS (COMPATIBLE 24 BIT ONLY).
-    Mask values are floats in range (0 ... 1.0)
+    
+    Surface masking (inplace), use a 2d numpy.ndarray for masking
 
-    :param surface_: pygame.Surface compatible 24-bit
-    :param mask_: 2d array (MemoryViewSlice) containing alpha values (float).
-    The mask_ output image is monochromatic (values range [0 ... 1.0] and R=B=G.
-    :return: Return a pygame.Surface 24 bit
+    selectively modify the opacity (transparency) of a surface with the 
+    given mask alpha (array). 
+
+    `mask_` is a numpy.ndarray or memoryviewslice shape (w, h) type uint8, 
+    containing alpha values range [ 0 ... 255].
+    it hides anything that falls outside of its transparency shape (zero values hiding pixels 
+    and 255.0 giving full texture opacity.
+    
+    e.g:
+    # creating the mask array
+    mask = pygame.image.load('../Assets/alpha.png').convert_alpha()
+    mask = pygame.transform.smoothscale(mask, (800, 600))
+    mask_array = pygame.surfarray.pixels_alpha(mask)
+    
+    # in the main loop
+    filtering_inplace_c(source, mask_array)
+
+    :param surface_: 
+        pygame.Surface compatible 24-32 bit
+        
+    :param mask_: 
+        numpy.ndarray shape(w, h) containing alpha values range [ 0 ... 255] 
+        Value 0 hides pixels and 255 gives full texture opacity
+        
+    :return: 
+    void
+
     """
-    cdef int w, h, w_, h_
+    cdef:
+        int w, h, w_, h_
+
     w, h = surface_.get_size()
 
     try:
-        w_, h_ = mask_.shape[:2]
+        w_, h_ = mask_.shape[:3]
 
     except (ValueError, pygame.error):
        raise ValueError(
-           '\nArgument mask_ type not understood, '
+           '\nArgument mask type not understood, '
            'expecting numpy.ndarray type (w, h) got %s ' % type(mask_))
-
 
     assert w == w_ and h == h_, \
         '\nSurface and mask size does not match (w:%s, h:%s), ' \
         '(w:%s, h:%s) ' % (w, h, w_, h_)
 
-    try:
-        rgb_ = surface_.get_view('3')
-    except (ValueError, pygame.error):
-        raise ValueError('Incompatible surface.')
-
     cdef:
-        unsigned char [:, :, :] rgb = rgb_.transpose(1, 0, 2)
-        unsigned char [:, :, ::1] rgb1 = numpy.empty((h, w, 3), numpy.uint8)
-        float [:, :] mask = numpy.asarray(mask_, numpy.float32)
+        unsigned char [:, :, :] rgb = surface_.get_view('3')
+        float [:, :] mask = numpy.asarray(mask_, dtype=numpy.float32)
         int i, j
+        unsigned char * r
+        unsigned char * g
+        unsigned char * b
+        float a
 
     with nogil:
 
-        for i in prange(0, w, schedule=SCHEDULE, num_threads=THREADS):
-            for j in range(h):
-                rgb1[j, i, 0] = <unsigned char>(rgb[j, i, 0] * mask[i, j])
-                rgb1[j, i, 1] = <unsigned char>(rgb[j, i, 1] * mask[i, j])
-                rgb1[j, i, 2] = <unsigned char>(rgb[j, i, 2] * mask[i, j])
+        for j in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
 
-    return frombuffer(rgb1, (w, h), 'RGB')
+            for i in range(w):
+
+                r = &rgb[i, j, 2]
+                g = &rgb[i, j, 1]
+                b = &rgb[i, j, 0]
+                a = mask[i, j] * <float>ONE_255
+
+                r[0] = <unsigned char>(r[0] * a)
+                g[0] = <unsigned char>(g[0] * a)
+                b[0] = <unsigned char>(b[0] * a)
 
 
-
+# todo check if really compatible with 24 bit
+#  surface if not delete same function that the optimized one above
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -6959,60 +14405,77 @@ cpdef inline filtering24_c(object surface_, mask_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void filtering_inplace_c(object surface_, mask_):
+@cython.exceptval(check=False)
+cdef inline void filtering1d_inplace_c(object surface_, mask_):
     """
-    MULTIPLY MASK VALUES WITH AN ARRAY REPRESENTING
-    THE SURFACE PIXELS (COMPATIBLE 24 BIT ONLY).
 
-    Transformation is applied inplace
+    Surface masking (inplace), use a surface for masking
+    
+    selectively modify the opacity (transparency) of a surface with the 
+    given mask alpha (32-bit surface with channel alpha). 
 
-    Mask values are floats in range (0 ... 1.0)
+    `mask_` is a 32-bit pygame.Surface containing RGB(A) color components. 
+    The alpha transparency channel is used for masking the input surface.
+    The pixels will be hidden if the alpha channel is closing to 0.0 and fully
+    opaque when alpha is closing to 255.0
 
-    :param surface_: pygame.Surface compatible 24-bit
-    :param mask_: 2d array (MemoryViewSlice) containing alpha values (float).
-        The mask_ output image is monochromatic (values range [0 ... 1.0] and R=B=G.
-    :return: void
+    e.g:
+    # Creating the mask alpha
+    mask = pygame.image.load('../Assets/alpha.png').convert_alpha()
+    mask = pygame.transform.smoothscale(mask, (800, 600))
+    
+    # in the game loop
+    filtering1d_inplace_c(source, mask)
+    
+    :param surface_: 
+        pygame.Surface compatible 24-32 bit
 
+    :param mask_: 
+        32-bit Pygame.Surface format RGBA
+        The alpha transparency channel(A) is used for masking the input surface.
+        The pixels will be hidden if the alpha channel is closing to 0.0 and fully
+        opaque when alpha is closing to 255.0
+
+    :return: 
+        void
     """
-    cdef int w, h, w_, h_
+
+    cdef:
+        int w, h, w_, h_
+        short int byte_size = surface_.get_bytesize()
+        short int byte_size1 = mask_.get_bytesize()
+
     w, h = surface_.get_size()
+    w_, h_ = mask_.get_size()
 
-    try:
-        w_, h_ = mask_.shape[:2]
-    except (ValueError, pygame.error):
-       raise ValueError(
-           '\nArgument mask_ type not understood, '
-           'expecting numpy.ndarray type (w, h) got %s ' % type(mask_))
+    if byte_size1 != 4:
+        raise AttributeError(
+            '\n mask_ attribute must be a 32-bit pygame.Surface with layer alpha.')
 
-
-    assert w == w_ and h == h_, \
-        '\nSurface and mask size does not match (w:%s, h:%s), ' \
-        '(w:%s, h:%s) ' % (w, h, w_, h_)
-
-    try:
-        rgb_ = surface_.get_view('3')
-
-    except (ValueError, pygame.error):
-        raise ValueError('Incompatible surface.')
+    assert w * h == w_ * h_, \
+        '\nSurface and mask size does not match ' \
+        'surface (w:%s, h:%s), mask (w:%s, h:%s) ' % (w, h, w_, h_)
 
     cdef:
-        unsigned char [:, :, :] rgb = rgb_
-        float [:, :] mask = numpy.asarray(mask_, numpy.float32)
-        int i, j
+        unsigned char [::1] bgr = surface_.get_buffer()
+        unsigned char [::1] mask = mask_.get_buffer()
+        int i
+        unsigned char *p1
+        float a
 
     with nogil:
 
-        for i in prange(0, w, schedule=SCHEDULE, num_threads=THREADS):
+        # Here we are forcing the byte_size to 4 due to get_buffer()
+        # get_buffer always returns BGRA pixels format regardless of the input image 24-bit for e.g
+        for i in prange(0, w * h * 4, 4, schedule=SCHEDULE, num_threads=THREADS):
 
-            for j in range(h):
+            p1 = &bgr[ i ]
 
-                rgb[i, j, 0] = <unsigned char>(rgb[i, j, 0] * mask[i, j])
-                rgb[i, j, 1] = <unsigned char>(rgb[i, j, 1] * mask[i, j])
-                rgb[i, j, 2] = <unsigned char>(rgb[i, j, 2] * mask[i, j])
+            a = <float>mask[ i + 3 ] * <float>ONE_255
 
-
-
-
+            p1[0] = <unsigned char>(p1[0] * a)
+            (p1 + 1)[0] = <unsigned char>((p1 + 1)[0] * a)
+            (p1 + 2)[0] = <unsigned char>((p1 + 2)[0] * a)
 
 
 @cython.binding(False)
@@ -7022,152 +14485,135 @@ cpdef inline void filtering_inplace_c(object surface_, mask_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void bloom_array24_c(
+@cython.exceptval(check=False)
+cdef inline void bloom_c(
         surface_,
         int threshold_,
         bint fast_ = False,
         object mask_ = None
 ):
     """
-    CREATE A BLOOM EFFECT
+    Apply a bloom effect to a 24/32-bit surface (in-place).
 
-    * Surface must be a pygame Surface 24-32 bit format
+    This function enhances bright areas of an image by applying a bloom effect, 
+    which creates a glowing appearance around high-intensity pixels. The effect 
+    is applied by downscaling, filtering, and blending multiple layers.
 
-    :param surface_     : pygame.Surface; Game display or texture
-    :param threshold_   : integer; Threshold value uint8 in range [0 ... 255].
-    The threshold value is used by a bright
-     pass filter to determine the bright pixels above the given threshold.
-      Below 128 the bloom effect will be more
-     noticeable and above 128 a bit less.
-    :param fast_        : bool; True | False; If True the bloom effect will be approximated
-    and only the x16 subsurface
-    will be processed to maximize the overall processing time, default is False).
-    :param mask_        : 
-    :return             : void
+    ### Parameters:
+    - **surface_** (`pygame.Surface`):  
+      The target surface (must be in 24-bit or 32-bit format).  
+      The bloom effect is applied directly to this surface.
+
+    - **threshold_** (`int`):  
+      Bright pass filter threshold (`0 - 255`).  
+      Pixels with brightness above this value will contribute to the bloom effect.
+
+    - **fast_** (`bool`, optional):  
+      Enables a faster approximation of the bloom effect (default: `False`).  
+      When `True`, the function processes fewer downscaling layers for improved performance.
+
+    - **mask_** (`numpy.ndarray` or `memoryviewslice`, optional):  
+      A `float32` mask of shape `(w, h)` with values in the range `[0.0 - 1.0]`.  
+      - A mask filled with `1.0` applies the bloom effect to the entire image.  
+      - A mask filled with `0.0` disables the effect entirely.  
+      - Intermediate values control selective bloom intensity.  
+      If `None`, the effect is applied uniformly across the surface.
+
+    ### Returns:
+    - **None** (modifies `surface_` in-place).
+
+    ### Raises:
+    - `ValueError`:  
+      - If `threshold_` is outside the valid range `[0 - 255]`.
+      - If the image is too small for processing.
+
+    ### Example Usage:
+    ```python
+    # Check demo_bloom_mask.py in the Demo folder
+    bloom_c(SCREEN, threshold=128, fast=True, mask=mask_array)
+    ```
     """
 
+    # Ensure threshold is within the valid range
     assert 0 <= threshold_ <= 255, "Argument threshold must be in range [0 ... 255]"
 
     cdef:
-        Py_ssize_t  w, h
-        int bit_size
-        int w2, h2, w4, h4, w8, h8, w16, h16
-        bint x2, x4, x8, x16 = False
+        Py_ssize_t w, h  # Surface dimensions
+        int bit_size      # Bit depth of the surface
+        int w2, h2, w4, h4, w8, h8, w16, h16  # Downscaled dimensions
+        bint x2, x4, x8, x16 = False  # Flags to control processing steps
 
+    # Get surface dimensions and bit depth
     w, h = surface_.get_size()
     bit_size = surface_.get_bitsize()
 
-
+    # Compute downscaled dimensions
     w2, h2   = <int>w >> 1, <int>h >> 1
     w4, h4   = w2 >> 1, h2 >> 1
     w8, h8   = w4 >> 1, h4 >> 1
     w16, h16 = w8 >> 1, h8 >> 1
 
+    # Ensure image is large enough for processing
     if w16 == 0 or h16 == 0:
         raise ValueError(
             "\nImage too small and cannot be processed.\n"
-            "Try to increase the size of the image")
+            "Try increasing the image size."
+        )
 
-    if w2 > 0 and h2 > 0:
-        x2 = True
-    else:
-        x2 = False
+    # Determine which subsampling levels are possible
+    x2 = w2 > 0 and h2 > 0
+    x4 = w4 > 0 and h4 > 0
+    x8 = w8 > 0 and h8 > 0
+    x16 = w16 > 0 and h16 > 0
 
-    if w4 > 0 and h4 > 0:
-        x4 = True
-    else:
-        x4 = False
-
-    if w8 > 0 and h8 > 0:
-        x8 = True
-    else:
-        x8 = False
-
-    if w16 > 0 and h16 > 0:
-        x16 = True
-    else:
-        x16 = False
-
-    s2, s4, s8, s16 = None, None, None, None
-
-    # SUBSURFACE DOWNSCALE CANNOT
-    # BE PERFORMED AND WILL RAISE AN EXCEPTION
+    # Skip processing if the image is too small for the first downscale step
     if not x2:
         return
 
+    # Optimize processing levels for fast mode
     if fast_:
-        x2, x4, x8 = False, False, False
+        # Skip x2 and x8 processing for improved speed
+        x2, x4, x8, x16 = False, True, False, True
 
+    # Initialize subsampled surfaces
+    s2, s4, s8, s16 = None, None, None, None
 
-    # FIRST SUBSURFACE DOWNSCALE x2
-    # THIS IS THE MOST EXPENSIVE IN TERM OF PROCESSING TIME
+    # Apply successive downscaling, filtering, and blending steps
+    # Each step progressively applies the bloom effect at different levels of detail.
+
+    # Step 1: Downscale x2, apply bright pass filter, blur, then upscale
     if x2:
-        s2 = scale(surface_, (w2, h2))
-        s2 = bpf24_c(pixels3d(s2), threshold=threshold_)
-        s2_array = numpy.array(s2.get_view('3'), dtype=numpy.uint8)
-        blur_array_inplace_c(s2_array)
-        # b2_blurred = frombuffer(numpy.array(s2_array.transpose(1, 0, 2),
-        # order='C', copy=False), (w2, h2), 'RGB')
-        b2_blurred = make_surface(s2_array)
-        s2 = smoothscale(b2_blurred, (w, h))
-        surface_.blit(s2, (0, 0), special_flags=BLEND_RGB_ADD)
+        s2 = scale(surface_, (w2, h2))      # Downscale
+        bpf_c(s2, threshold=threshold_)     # Apply bright pass filter
+        blur4bloom_c(s2, npass=2)           # Apply blur
+        s2 = smoothscale(s2, (w, h))        # Upscale back
+        surface_.blit(s2, (0, 0), special_flags=BLEND_RGB_ADD)  # Blend back
 
-        # OTHER TECHNIQUE
-
-        # Rescale the image (create a new surface)
-        # s2_surf = scale(surface_, (w2, h2))
-        # Create array referencing the pixels
-        # s2_array = pixels3d(s2_surf)
-        # Bright pass filter inplace
-        # bpf24_inplace_c(s2_array, threshold=threshold_)
-        # Bloom inplace
-        # blur_array_inplace_c(s2_array)
-        # create surface from array
-        # array_to_surface(s2_surf, s2_array)
-        # Re-scale the surface to original dim (w, h),
-        # use bilinear filtering with smoothscale
-        # s2 = smoothscale(s2_surf, (w, h))
-        # Blend original image with bloom effect
-        # blend_add_surface(surface_, s2)
-
-    # SECOND SUBSURFACE DOWNSCALE x4
-    # THIS IS THE SECOND MOST EXPENSIVE IN TERM OF PROCESSING TIME
+    # Step 2: Downscale x4, apply filters, then upscale
     if x4:
         s4 = scale(surface_, (w4, h4))
-        s4 = bpf24_c(pixels3d(s4), threshold=threshold_)
-        s4_array = numpy.array(s4.get_view('3'), dtype=numpy.uint8)
-        blur_array_inplace_c(s4_array)
-        # b4_blurred = frombuffer(numpy.array(s4_array.transpose(1, 0, 2),
-        # order='C', copy=False), (w4, h4), 'RGB')
-        b4_blurred = make_surface(s4_array)
-        s4 = smoothscale(b4_blurred, (w, h))
+        bpf_c(s4, threshold=threshold_)
+        blur4bloom_c(s4)
+        s4 = smoothscale(s4, (w, h))
         surface_.blit(s4, (0, 0), special_flags=BLEND_RGB_ADD)
 
-    # THIRD SUBSURFACE DOWNSCALE x8
+    # Step 3: Downscale x8, apply filters, then upscale
     if x8:
         s8 = scale(surface_, (w8, h8))
-        s8 = bpf24_c(pixels3d(s8), threshold=threshold_)
-        s8_array = numpy.array(s8.get_view('3'), dtype=numpy.uint8)
-        blur_array_inplace_c(s8_array)
-        # b8_blurred = frombuffer(numpy.array(s8_array.transpose(1, 0, 2),
-        # order='C', copy=False), (w8, h8), 'RGB')
-        b8_blurred = make_surface(s8_array)
-        s8 = smoothscale(b8_blurred, (w, h))
+        bpf_c(s8, threshold=threshold_)
+        blur4bloom_c(s8)
+        s8 = smoothscale(s8, (w, h))
         surface_.blit(s8, (0, 0), special_flags=BLEND_RGB_ADD)
 
-    # FOURTH SUBSURFACE DOWNSCALE x16
-    # LESS SIGNIFICANT IN TERMS OF RENDERING AND PROCESSING TIME
+    # Step 4: Downscale x16, apply filters, then upscale
     if x16:
         s16 = scale(surface_, (w16, h16))
-        s16 = bpf24_c(pixels3d(s16), threshold=threshold_)
-        s16_array = numpy.array(s16.get_view('3'), dtype=numpy.uint8)
-        blur_array_inplace_c(s16_array)
-        # b16_blurred = frombuffer(numpy.array(s16_array.transpose(1, 0, 2),
-        # order='C', copy=False), (w16, h16), 'RGB')
-        b16_blurred = make_surface(s16_array)
-        s16 = smoothscale(b16_blurred, (w, h))
+        bpf_c(s16, threshold=threshold_)
+        blur4bloom_c(s16)
+        s16 = smoothscale(s16, (w, h))
         surface_.blit(s16, (0, 0), special_flags=BLEND_RGB_ADD)
 
+    # Apply optional mask for selective bloom effect
     if mask_ is not None:
         filtering_inplace_c(surface_, mask_)
 
@@ -7183,146 +14629,158 @@ cdef inline void bloom_array24_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline object shader_bloom_fast(
         surface_,
-        int threshold_,
-        bint fast_ = False,
-        unsigned short int factor_ = 2
+        int threshold,
+        bint fast = False,
+        unsigned short int factor = 2
 ):
     """
-    BLOOM EFFECT
+    Applies a fast bloom effect to an input surface.
 
-    :param surface_  : pygame.Surface; compatible 32-24 bit containing RGB pixel values
-    :param threshold_: integer; Bloom threshold value, small value cause greater bloon effect
-    :param fast_     : boolean; True will increase the speed of the algorithm since only the S16 surface is blit
-    :param factor_   : integer; Texture reduction value, must be in range [0, 4] and correspond to the dividing texture
-        factor (div 1, div 2, div 4, div 8)
-    :return          : Return a pygame Surface with the bloom effect (24 bit format)
+    The bloom effect brightens pixels in the image above a specified threshold 
+    and then applies blur to create a glowing effect. This function performs a 
+    series of downscaling operations and blurs, which are then combined to produce 
+    the final bloom effect. 
+
+    Example:
+        image = shader_bloom_fast(image, 60)
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface containing RGB pixel data (32-bit or 24-bit color format).
+
+    threshold : int
+        The brightness threshold for the bloom effect. Pixels with values above 
+        this threshold will contribute to the bloom effect. A smaller value will 
+        cause a stronger bloom.
+
+    fast : bint, optional
+        If True, the algorithm will prioritize speed over visual quality by only 
+        applying the blur to the lowest downscaled surface (S16). Default is False.
+
+    factor : int, optional
+        A value between 0 and 4 that controls the level of downscaling for the 
+        textures used in the bloom. Higher values result in more aggressive downscaling 
+        (default is 2, which corresponds to a division by 4).
+
+    Returns
+    -------
+    pygame.Surface
+        A Pygame surface with the bloom effect applied, in 24-bit color format.
+
+    Raises
+    ------
+    ValueError
+        If the surface is too small to process (e.g., after downscaling).
     """
 
-    assert isinstance(surface_, pygame.Surface), "Argument surface_ must be a pygame.Surface got %s " % type(surface_)
-    assert 0 <= threshold_ <= 255, "Argument threshold must be in range [0 ... 255] got %s " % threshold_
-    assert 0 <= factor_ <= 4, "Argument factor_ must be in range [0 ... 4] got %s " % factor_
-    assert isinstance(fast_, bool), "Argument fast_ must be boolean True | False got %s " % type(fast_)
+    # Check input validity
+    assert isinstance(surface_, pygame.Surface), "Argument surface_ must be a pygame.Surface, got %s " % type(surface_)
+    assert 0 <= threshold <= 255, "Argument threshold must be in range [0 ... 255], got %s " % threshold
+    assert 0 <= factor <= 4, "Argument factor must be in range [0 ... 4], got %s " % factor
+    assert isinstance(fast, bool), "Argument fast must be boolean True | False, got %s " % type(fast)
 
     cdef:
-        Py_ssize_t  w, h
+        Py_ssize_t w, h
         int bit_size
         int w2, h2, w4, h4, w8, h8, w16, h16
         bint x2, x4, x8, x16 = False
 
+    # Make a copy of the original surface for manipulation
     cp = surface_.copy()
 
+    # Scale down the surface based on the provided factor
+    surface_ = smoothscale(surface_, (surface_.get_width() >> factor, surface_.get_height() >> factor))
 
-    surface_ = \
-        smoothscale(
-            surface_,
-            (surface_.get_width() >> factor_,
-             surface_.get_height() >> factor_)
-        )
-
+    # Get the new width and height after scaling
     w, h = surface_.get_size()
     bit_size = surface_.get_bitsize()
 
-
-
-    w2, h2   = <int>w >> 1, <int>h >> 1
-    w4, h4   = w2 >> 1, h2 >> 1
-    w8, h8   = w4 >> 1, h4 >> 1
+    # Calculate various downscale sizes (x2, x4, x8, x16)
+    w2, h2 = w >> 1, h >> 1
+    w4, h4 = w2 >> 1, h2 >> 1
+    w8, h8 = w4 >> 1, h4 >> 1
     w16, h16 = w8 >> 1, h8 >> 1
 
+    # Check if the image is large enough to process after downscaling
     if w16 == 0 or h16 == 0:
         raise ValueError(
             "\nImage too small and cannot be processed.\n"
-            "Try to increase the size of the image or decrease the factor_ value (default 2)")
+            "Try to increase the size of the image or decrease the factor value (default 2)"
+        )
 
-    if w2 > 0 and h2 > 0:
-        x2 = True
-    else:
-        x2 = False
+    # Set flags to indicate which downscaled versions are usable
+    x2 = w2 > 0 and h2 > 0
+    x4 = w4 > 0 and h4 > 0
+    x8 = w8 > 0 and h8 > 0
+    x16 = w16 > 0 and h16 > 0
 
-    if w4 > 0 and h4 > 0:
-        x4 = True
-    else:
-        x4 = False
-
-    if w8 > 0 and h8 > 0:
-        x8 = True
-    else:
-        x8 = False
-
-    if w16 > 0 and h16 > 0:
-        x16 = True
-    else:
-        x16 = False
-
+    # Initialize surfaces for the different downscaled versions
     s2, s4, s8, s16 = None, None, None, None
 
-    # SUBSURFACE DOWNSCALE CANNOT
-    # BE PERFORMED AND WILL RAISE AN EXCEPTION
+    # If downscale x2 is not possible, abort the operation
     if not x2:
         return
 
-    if fast_:
+    # If fast mode is enabled, limit processing to the x16 surface only
+    if fast:
         x2, x4, x8 = False, False, False
 
+    # Perform downscale and blur operations for the x2, x4, x8, and x16 surfaces
 
-    # FIRST SUBSURFACE DOWNSCALE x2
-    # THIS IS THE MOST EXPENSIVE IN TERM OF PROCESSING TIME
+    # Apply the most expensive downscale (x2)
     if x2:
         s2 = scale(surface_, (w2, h2))
-        s2 = bpf24_c(pixels3d(s2), threshold=threshold_)
+        s2 = bpf24_c(pixels3d(s2), threshold=threshold)
         s2_array = numpy.array(s2.get_view('3'), dtype=numpy.uint8)
-        blur_array_inplace_c(s2_array)
+        blur3d_c(s2_array)
         b2_blurred = make_surface(s2_array)
         s2 = smoothscale(b2_blurred, (w, h))
 
-
-    # SECOND SUBSURFACE DOWNSCALE x4
-    # THIS IS THE SECOND MOST EXPENSIVE IN TERM OF PROCESSING TIME
+    # Apply second most expensive downscale (x4)
     if x4:
         s4 = scale(surface_, (w4, h4))
-        s4 = bpf24_c(pixels3d(s4), threshold=threshold_)
+        s4 = bpf24_c(pixels3d(s4), threshold=threshold)
         s4_array = numpy.array(s4.get_view('3'), dtype=numpy.uint8)
-        blur_array_inplace_c(s4_array)
+        blur3d_c(s4_array)
         b4_blurred = make_surface(s4_array)
         s4 = smoothscale(b4_blurred, (w, h))
 
-
-    # THIRD SUBSURFACE DOWNSCALE x8
+    # Apply third downscale (x8)
     if x8:
         s8 = scale(surface_, (w8, h8))
-        s8 = bpf24_c(pixels3d(s8), threshold=threshold_)
+        s8 = bpf24_c(pixels3d(s8), threshold=threshold)
         s8_array = numpy.array(s8.get_view('3'), dtype=numpy.uint8)
-        blur_array_inplace_c(s8_array)
-        # order='C', copy=False), (w8, h8), 'RGB')
+        blur3d_c(s8_array)
         b8_blurred = make_surface(s8_array)
         s8 = smoothscale(b8_blurred, (w, h))
 
-
-    # FOURTH SUBSURFACE DOWNSCALE x16
-    # LESS SIGNIFICANT IN TERMS OF RENDERING AND PROCESSING TIME
+    # Apply the least significant downscale (x16)
     if x16:
         s16 = scale(surface_, (w16, h16))
-        s16 = bpf24_c(pixels3d(s16), threshold=threshold_)
+        s16 = bpf24_c(pixels3d(s16), threshold=threshold)
         s16_array = numpy.array(s16.get_view('3'), dtype=numpy.uint8)
-        blur_array_inplace_c(s16_array)
-        blur_array_inplace_c(s16_array)
+        blur3d_c(s16_array)
+        blur3d_c(s16_array)  # Apply blur twice for stronger effect
         b16_blurred = make_surface(s16_array)
         s16 = smoothscale(b16_blurred, (w, h))
 
-
-    if fast_:
-        s16 = smoothscale(s16, (w << factor_, h << factor_))
+    # Combine the downscaled surfaces into the final image
+    if fast:
+        s16 = smoothscale(s16, (w << factor, h << factor))
         cp.blit(s16, (0, 0), special_flags=BLEND_RGB_ADD)
     else:
         s2.blit(s4, (0, 0), special_flags=BLEND_RGB_ADD)
         s2.blit(s8, (0, 0), special_flags=BLEND_RGB_ADD)
         s2.blit(s16, (0, 0), special_flags=BLEND_RGB_ADD)
-        s2 = smoothscale(s2, (w << factor_, h << factor_))
+        s2 = smoothscale(s2, (w << factor, h << factor))
         cp.blit(s2, (0, 0), special_flags=BLEND_RGB_ADD)
 
     return cp
+
 
 
 
@@ -7333,48 +14791,71 @@ cpdef inline object shader_bloom_fast(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef void shader_bloom_fast1(
         object surface_,
         unsigned short int smooth_ = 3,
         unsigned int threshold_ = 0,
         unsigned short int flag_ = BLEND_RGB_ADD,
-        bint saturation_ = False
+        bint saturation_ = False,
+        mask_ = None
 ):
     """
-    BLOOM EFFECT (SIMPLIFY VERSION) 
+    Bloom effect inplace (simplified version for better performances)    
     
-    This version is compatible with moving object in the display.
+    The other bloom versions in PygameShader such as bloom and shader_bloom_fast, 
+    cause the halo of light to be offset from moving objects due to the re-scaling (down sampling) 
+    of the sub-surfaces in addition to the loss of accuracy.
+    This version is compatible with moving object in the display since the algorithm do not use 
+    the exact same technics. 
     
-    The other bloom versions cause the halo of light to be offset from moving 
-    objects due to the re-scaling (down sampling) of the sub-surfaces and the loss 
-    of accuracy.
+    The bloom effect can be adjust with the bright pass filter threshold (variable threshold).
+    Adjust threshold value for the bloom intensity, zero being the maximum bloom.
     
-    The quantity of bloom can be adjust with the bright pass filter threshold
-     (variable threshold_). The variable can help you to choose what level of 
-     light can trigger a bloom effect. 
-    The lowest the value the brightest the effect. 
-    
-    The smooth factor will help to spread the light homogeneously around the objects. 
-    A large number of smooth will cast the bloom over the entire scene and diminished 
+    The smooth factor (smooth_) will help to spread the light homogeneously around the objects. 
+    A large number of smooth will cast the bloom over the entire scene but diminished 
     the overall bloom effect, while a small value will pixelate the hallo around objects 
     but will generate the brightest effect on objects. 
     When smooth is below 3, the halo appear to be slightly pixelated. 
     
-    You can use the saturation to generate saturated colors within the light 
-    effect.
-    The flag can be used to create different special effect with the light within the 
+    You can use (saturation_) to generate saturated colors within the light bloom effect.
+    
+    The flag (flag) can be used for special effect with the light within the 
     pygame display. The default value is pygame.BLEND_RGB_ADD and allow to blend 
-    the bloom to the display. 
-    Nevertheless you cann also use any of the other flags such as BLEND_RGB_MAX, BLEND_RGB_SUB etc 
+    the bloom to the display. Option are BLEND_RGB_MAX, BLEND_RGB_SUB etc, refers to Pygame blend 
+    attributes. 
     
     This effect is applied inplace
     
-    :param surface_    : pygame.Surface; compatible 32-24 bit containing RGB pixel values 
-    :param smooth_     : integer; Smooth the hallow default 3 (gaussian kernel)
-    :param threshold_  : integer; BPF threshold default 20
-    :param flag_       : integer; pygame flag to use (default is BLEND_RGB_ADD)
-    :param saturation_ : bool; True | False include saturation effect to the halo  
-    :return            : void 
+    e.g:
+    shader_bloom_fast1(image)
+    
+    :param surface_: 
+        pygame.Surface; image compatible 32-24 bit
+        
+    :param smooth_: 
+        integer; Smooth the hallow default 3 (gaussian kernel)
+        
+    :param threshold_: 
+        integer; control the bloom intensity default value 0
+        
+    :param flag_: 
+        integer; pygame flag to use (default is BLEND_RGB_ADD), refers to pygame bend attributes
+        
+    :param saturation_: 
+        bool; True | False include saturation effect to the halo
+        
+    :param mask_:
+        numpy.ndarray or memoryviewslice shape (w, h) type float32 containing values in range
+        (0 .. 255) representing the mask alpha. Array (w, h) filled with 255 will render and 
+        bloom the entire image. Array (w, h) filled with zero will disable the bloom effect. 
+        Any values in between ]0 and 255[ will filter the pixels and create selective bloom effect.
+        mask is optional.
+    
+          
+    :return: 
+        void
+         
     """
 
     cdef:
@@ -7385,8 +14866,9 @@ cpdef void shader_bloom_fast1(
 
     assert isinstance(surface_, pygame.Surface), \
         "Argument surface_ must be a pygame.Surface got %s " % type(surface_)
+
     if flag_ < 0:
-        raise ValueError("Argument flag_ cannot be < 0")
+        raise ValueError("Argument flag cannot be < 0")
     if smooth_ < 0:
         raise ValueError("Argument smooth_ cannot be < 0")
 
@@ -7408,11 +14890,11 @@ cpdef void shader_bloom_fast1(
     # blend_add_surface_c(s2, s2)
 
     cdef unsigned char [ :, :, : ] s2_array = s2.get_view('3')
-    bpf24_inplace_c(s2_array, threshold=threshold_)
+    bpf_inplace_c(s2_array, w16, h16, threshold=threshold_)
 
     for r in range(smooth_):
-        blur_array_inplace_c(s2_array)
-        if saturation_ : saturation_inplace_c(s2_array, <float>0.3)
+        blur3d_c(s2_array)
+        if saturation_ : saturation_c(s2_array, <float>0.3)
 
     pygame.surfarray.array_to_surface(s2, asarray(s2_array, dtype=uint8))
     s2 = smoothscale(s2, (w, h))
@@ -7422,6 +14904,8 @@ cpdef void shader_bloom_fast1(
     else:
         surface_.blit(s2, (0, 0))
 
+    if mask_ is not None:
+        filtering_inplace_c(surface_, mask_)
 
 
 @cython.binding(False)
@@ -7431,38 +14915,54 @@ cpdef void shader_bloom_fast1(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline fisheye_footprint_c(
-        Py_ssize_t w,
-        Py_ssize_t h,
-        unsigned int centre_x,
-        unsigned int centre_y
+@cython.exceptval(check=False)
+cdef inline np.ndarray[np.uint32_t, ndim=2] fisheye_footprint_c(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        const unsigned int centre_x,
+        const unsigned int centre_y
 ):
 
     """
-    CREATE A FISHEYE MODEL TO HOLD THE PIXEL COORDINATES OF A SURFACE/ GAME DISPLAY
+    Create a fisheye lens footprint (return new array) 
+    
+    Create a fisheye lens model holding pixel coordinates 
+    of a surface within a numpy array shape (w, h, 2). Third array dimension holds 
+    the texture pixel coordinates (x, y) 
 
-    * The surface and the model must have the same dimensions.
+    The model variables w & h must have the same dimensions than the projected texture/surface.  
+    
+    e.g 
+     width, height = surface.get_size()
+     f_model = fisheye_footprint_c(w=width, h=height, centre_x=width >> 1, centre_y=height >> 1)
+     fisheye(surface, f_model)
+        
+    Parameters
+    ----------
+    w : 
+        integer; centre position x of the effect
+        
+    h : 
+        integer; centre position y of the effect
+        
+    centre_x : 
+        integer; width of the surface to project ino the fisheye model
+         
+    centre_y : 
+        integer; height of the surface to project into the fisheye model
 
-    Store the fisheye model into an external array image_fisheye_model shape (width, height, 2)
-
-    IMAGE_FISHEYE_MODEL contains the fisheye transformation coordinate (x2 & y2) that reference
-    the final image pixel position (fisheye model)
-    This method has to be call once before the main loop in order to calculate
-    the projected position for each pixels.
-
-    :param centre_y: integer; centre y of the effect
-    :param centre_x: integer; centre x of the effect
-    :param w       : integer; width of the model
-    :param h       : integer; height of the model
-    :return        : Return a numpy.ndarray type (w, h, 2) representing the
-    fisheye model (coordinates of all surface pixels passing through the fisheye lens model)
+    Returns
+    -------
+        Return a numpy.ndarray type (w, h, 2) of unsigned int representing the
+        fisheye model (coordinates of all pixels passing through the fisheye lens model)
+      
     """
 
     assert w > 0, "Argument w must be > 0"
     assert h > 0, "Argument h must be > 0"
 
     cdef:
-        unsigned int [:, :, :] image_fisheye_model = numpy.zeros((w, h, 3), numpy.uint32)
+        unsigned int [:, :, :] image_fisheye_model = numpy.empty((w, h, 2), numpy.uint32)
         int y, x
         float ny, ny2, nx, nx2, r, theta, nr
         float c1 = <float>2.0/w
@@ -7482,18 +14982,21 @@ cdef inline fisheye_footprint_c(
 
                 r = <float>sqrt(nx2 + ny2)
 
-                if r >1:
-                    image_fisheye_model[x, y, 0] = <unsigned int>0
-                    image_fisheye_model[x, y, 1] = <unsigned int>0
+                if r > 1:
+                    image_fisheye_model[ x, y, 0 ] = <unsigned int> 0
+                    image_fisheye_model[ x, y, 1 ] = <unsigned int> 0
                     continue
 
                 nr = (r + <float>1.0 - <float>sqrt(
                 <float>1.0 - (nx2 + ny2))) * <float>0.5
 
                 theta = <float>atan2(ny, nx)
-                image_fisheye_model[x, y, 0] = <unsigned int> (nr * <float>cos(theta) * w2 + w2)
-                image_fisheye_model[x, y, 1] = <unsigned int> (nr * <float>sin(theta) * h2 + h2)
-    return image_fisheye_model
+                image_fisheye_model[ x, y, 0 ] = <unsigned int> (nr * <float>cos(theta) * w2 + w2)
+                image_fisheye_model[ x, y, 1 ] = <unsigned int> (nr * <float>sin(theta) * h2 + h2)
+
+    return numpy.ndarray(shape=(w, h, 2), dtype=numpy.uint32, order='C', buffer=image_fisheye_model)
+
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -7502,90 +15005,87 @@ cdef inline fisheye_footprint_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void fisheye_inplace_c(
-        unsigned char [:, :, :] rgb_array_,
-        unsigned int [:, :, ::1] fisheye_model
+        unsigned char [:, :, :] rgb_array,
+        const unsigned int [:, :, ::1] fisheye_model
 ):
     """
-    THIS SHADER CAN BE USE TO DISPLAY THE GAME THROUGH A LENS EFFECT
+    Create a fisheye lens effect (inplace)
+    
+    Display a fisheye lens effect in real time.
 
-    Display a fisheye effect in real time given a numpy ndarray referencing the
-    pixels RGB of a Pygame.Surface. In order to accomplish a real time
-    calculation, this algorithm is using a pre-calculated transformation stored
-    in the array fisheye_model.
-    The function fisheye_footprint_c has to be called prior
-    fisheye_inplace_c in order to store the transformation values.
+    This method takes an array shape (w, h, 3) containing RGB pixel format as input.
+    The array reference an SDL pygame.Surface. Any changes to the array's data will affect 
+     the surface directly. The input array data must be compatible with 24-bit pixel format, this means 
+    that the array shape must be (w, h, 3) format RGB. 
+    
+    In order to accomplish a real time calculation, this algorithm is using 
+    a pre-calculated lens model transformation stored in a numpy.ndarray, 
+    argument fisheye_model (numpy.ndarray shape (w, h, 2) of type uint).
+    The numpy array contains the pixel's coordinates of a surface after 
+    a lens transformation. All calculation are performed upstream. 
+    
+    Use the function fisheye_footprint_c to create the pre-calculated array.
+    This method needs to be called once only. 
+    
+    The fisheye lens transformation is applied inplace.
+    
+    e.g 
+     width, height = surface.get_size()
+     f_model = fisheye_inplace_c(rgb_array, fisheye_model)
+     fisheye(surface, f_model)
+ 
+    Parameters
+    ----------
+    
+    rgb_array :
+        numpy.ndarray shape (w, h, 3) of type uint8 containing RGB pixels or any other
+        pixel format. Any changes made to this array will affect the pygame surface directly.  
+        
+    fisheye_model : 
+        numpy.ndarray shape (w, h, 2) int32, fisheye model containing uint values 
+        x' & y'. x' & y' are the surface pixels coordinates after transformation. Values calculated 
+        upstream with the function fisheye_footprint_c      
 
-    This shader can be applied directly to the pygame display
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-     please refer to pygame
-    function pixels3d or array3d to convert an image into a 3d array (library surfarray)
-
-    :param rgb_array_       : numpy.ndarray shape (width, height, 3) containing RGB pixels
-    :param fisheye_model    : numpy.ndarray shape (width, height, 2) int32, fisheye model
-        containing the pixels coordinates after the fisheye transformation
-    :return                 : void
+    Returns
+    -------
+    void
+    
     """
 
     cdef:
         Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
+
+    w, h = rgb_array.shape[:2]
 
     cdef:
         int x, y
-        # unsigned char [:, :, :] rgb_array_copy = \
-        #     numpy.array(rgb_array_, copy=False, order='C')
-        unsigned char [::1, :, :] rgb_array_copy = \
-            numpy.array(rgb_array_, copy=False, order='F')
+        const unsigned char [::1, :, :] rgb_array_copy = \
+            numpy.asarray(rgb_array, order='F')
 
         unsigned int x2
         unsigned int y2
         unsigned int w_1 = w - 1
         unsigned int h_1 = h - 1
+        const unsigned int * f_xy
+
 
     with nogil:
         for x in prange(w, schedule=SCHEDULE, num_threads=THREADS):
             for y in range(h):
 
-                x2 = min(fisheye_model[x, y, 0], w_1)
-                y2 = min(fisheye_model[x, y, 1], h_1)
+                f_xy = &fisheye_model[x, y, 0]
+
+                x2 = min(f_xy[0], w_1)
+                y2 = min((f_xy+1)[0], h_1)
 
                 if x2==0 and y2==0:
                     continue
 
-                rgb_array_[x, y, 0] = rgb_array_copy[x2, y2, 0]
-                rgb_array_[x, y, 1] = rgb_array_copy[x2, y2, 1]
-                rgb_array_[x, y, 2] = rgb_array_copy[x2, y2, 2]
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline flip_array_vertically(unsigned int [:, :, :] rgb_array_):
-
-    cdef:
-        Py_ssize_t w, h
-
-    w, h = rgb_array_.shape[:2]
-
-    cdef:
-        int x, y
-        unsigned int [:, :, :] new_array = numpy.empty((w, h, 3), dtype=numpy.uint32)
-        unsigned int yy
-    with nogil:
-        for x in prange(w, schedule=SCHEDULE, num_threads=THREADS):
-            for y in range(h):
-                yy = h - 1 - y
-                new_array[x, yy, 0] = rgb_array_[x, y, 0]
-                new_array[x, yy, 1] = rgb_array_[x, y, 1]
-                new_array[x, yy, 2] = rgb_array_[x, y, 2]
-
-    return numpy.asarray(new_array)
+                rgb_array[x, y, 0] = rgb_array_copy[x2, y2, 0]
+                rgb_array[x, y, 1] = rgb_array_copy[x2, y2, 1]
+                rgb_array[x, y, 2] = rgb_array_copy[x2, y2, 2]
 
 
 
@@ -7596,118 +15096,68 @@ cpdef inline flip_array_vertically(unsigned int [:, :, :] rgb_array_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void tv_scanline_inplace_c(
-        unsigned char [:, :, :] rgb_array_,
-        int frame_):
+@cython.exceptval(check=False)
+cdef inline void tv_scanline_c(
+        unsigned char [:, :, :] rgb_array,
+        int space):
+
     """
-    SHADER CREATING A TV SCANLINE EFFECT ON PYGAME SURFACE
+     TV scanline effect on pygame surface
 
-    The space between each scanline can by adjusted with the frame_ value.
-    The scanline intensity/colors is lower that the original pixel value 
+    The space between each scanline can by adjusted with the space value.
+
+    rgb_array - must be a numpy array shape (w, h, 3) type uint8 containing RGB pixels or any 
+    other pixel format. Any change made to this array will affect the surface directly. 
+    The referenced surface must be format 24 or 32-bit format.
     
-    * This shader can be apply directly to the pygame display as long as rgb_array_ array reference
-    directly the screen pixels
+    e.g:
+    tv_scanline_c(pixels3d(image))
+    
+    Parameters
+    ----------
+    
+    rgb_array : 
+        numpy.ndarray shape (w, h, 3) type uint8 containing RGB pixels or any other pixel format. 
+        Any changes made to this array will affect the surface directly 
+    
+    space : 
+        integer; space between each lines, choose a constant or a variable for a dynamic effect
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3) containing RGB pixels,
-    please refer to pygame
-    function pixels3d or array3d to convert an image into a 3d array (library surfarray)
-
-    :param rgb_array_   : numpy.ndarray shape (w, h, 3) containing RGB pixels
-    :param frame_       : integer; Frame numbre (linear value)
-    :return             : void
+    Returns
+    -------
+    void
+    
     """
 
 
     cdef:
         Py_ssize_t w, h
-    w, h = rgb_array_.shape[:2]
+    w, h = rgb_array.shape[:2]
 
     cdef:
         int x, y, j
         unsigned char *r
         unsigned char *g
         unsigned char *b
-        int frame_2 = frame_ >> 1
+        int frame_2 = space >> 1
 
     with nogil:
-        for y in prange(0, h, frame_, schedule=SCHEDULE, num_threads=THREADS):
+        for y in prange(0, h, space, schedule=SCHEDULE, num_threads=THREADS):
             for x in range(w):
                 for j in range(frame_2):
                     if y + j < h - 1:
-                        r = &rgb_array_[x, y + j, <unsigned short int>0]
-                        g = &rgb_array_[x, y + j, <unsigned short int>1]
-                        b = &rgb_array_[x, y + j, <unsigned short int>2]
+                        r = &rgb_array[x, y + j, <unsigned short int>0]
+                        g = &rgb_array[x, y + j, <unsigned short int>1]
+                        b = &rgb_array[x, y + j, <unsigned short int>2]
                     else:
-                        r = &rgb_array_[x, y, <unsigned short int>0]
-                        g = &rgb_array_[x, y, <unsigned short int>1]
-                        b = &rgb_array_[x, y, <unsigned short int>2]
+                        r = &rgb_array[x, y, <unsigned short int>0]
+                        g = &rgb_array[x, y, <unsigned short int>1]
+                        b = &rgb_array[x, y, <unsigned short int>2]
                     r[0] = <unsigned char> (r[0] * <float>0.65)
                     g[0] = <unsigned char> (g[0] * <float>0.65)
                     b[0] = <unsigned char> (b[0] * <float>0.65)
 
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void rgb_split_inplace_c(object surface_, int offset_):
-    """
-    THIS SHADER CREATE AN RGB SPLIT EFFECT (SUPERPOSED CHANNEL R, G, B WITH GIVEN OFFSET)
-    The transformation apply inplace
-
-    The original surface will be used and used for the subsurface blit operation.
-    Each channels will be blit sequentially in the following order RGB
-    Note that channel green and blue will be blit with an additional flag BLEND_RGB_ADD, to mix
-    the channel with the lower layers.
-
-    * FPS BOOST
-    In order to boost the fps frame rate the original surface to process can be downscale x2
-    and rescale after processing.
-
-    * This shader can be apply directly to the pygame display by passing the screen equ
-    surface to the
-    method. This is true if the surface passed to the method is not a screen copy or a
-    modified/altered
-    surface (e.g downscale / upscale surface)
-
-    :param surface_ : pygame Surface to process (24bit format)
-    :param offset_  : integer; offset to add to each channels RGB
-    :return         : void
-    """
-    cdef:
-        Py_ssize_t w, h
-    w, h = surface_.get_size()
-
-    cdef:
-        int i, j
-        int z = <int>h * <int>w * <unsigned short int>3
-        unsigned char [:] rgb   = numpy.frombuffer(surface_.get_buffer(), dtype=numpy.uint8)
-        unsigned char [::1] red   = numpy.empty(z, uint8, order='C')
-        unsigned char [::1] green = numpy.empty(z, uint8, order='C')
-        unsigned char [::1] blue  = numpy.empty(z, uint8, order='C')
-
-
-    with nogil:
-
-        for i in prange(0, w * h * 4, 4,
-                        schedule=SCHEDULE, num_threads=THREADS):#, chunksize=8):
-            j = (i >> 2) * <unsigned short int>3
-            red[j]     = rgb[i + 2]
-            green[j+1] = rgb[i + 1]
-            blue[j+2]  = rgb[i    ]
-
-    del rgb
-    surface_.blit(fromstring(bytes(red), (w, h), 'RGB'), (0, 0))
-    surface_.blit(fromstring(bytes(green), (w, h), 'RGB'), (offset_, offset_),
-                  special_flags=BLEND_RGB_ADD)
-    surface_.blit(fromstring(bytes(blue), (w, h), 'RGB'), (offset_ << 1, offset_ << 1),
-                  special_flags=BLEND_RGB_ADD)
-
-
-
 
 
 
@@ -7718,53 +15168,112 @@ cdef inline void rgb_split_inplace_c(object surface_, int offset_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef rgb_split_c(object surface_, int offset_):
+@cython.exceptval(check=False)
+cpdef object split_channels(
+        object surface_,
+        char offset_,
+        array_ = None):
+
     """
-    THIS SHADER CREATE AN RGB SPLIT EFFECT (SUPERPOSED CHANNEL R, G, B WITH GIVEN OFFSET)
+    RGB split effect (return copy) 
+    
+    e.g
+    im = split_channels(im, 10)
+    
+    :param surface_: 
+        Pygame surface, Image compatible 24 - 32 bit
+         
+    :param offset_: 
+        char; Offset to add between each channels. offset_ must be in range [ -128 to 127] 
+        When offset_ > 0 RGB channels are displayed in this order (BGR). 
+        If offset_ < 0 RGB channels are display in following order RGB
+         
+    :param array_: 
+        numpy.ndarray shape (w, h, 3) type uint8; (Optional). Speed-up the process when 
+        an array is provided
+        
+    :return: 
+        surface (copy) with split channels
+       
+    """
 
-    The final image has a different width and height since the offset value is removed to keep only 
-    the overlapping R, G, B channels 
-    Setting the Offset_ to zero will have no effect to the original image.
+    return split_channels_c(surface_, offset_, array_)
 
-    :param surface_ : pygame Surface to process (24bit format)
-    :param offset_  : integer; offset to add to each channels RGB
-    :return         : void
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef object split_channels_c(
+        object surface_,
+        char offset_,
+        array_ = None):
+
+    """
+    RGB split effect (return copy) 
+
+    e.g
+    im = split_channels_c(im, 10)
+
+    :param surface_:
+        Pygame surface, Image compatible 24 - 32 bit
+         
+    :param offset_: 
+        char; Offset to add between each channels. offset_ must be in range [ -128 to 127] 
+        When offset_ > 0 RGB channels are displayed in this order (BGR). 
+        If offset_ < 0 RGB channels are display in following order RGB
+         
+    :param array_: 
+        numpy.ndarray shape (w, h, 3) type uint8; (Optional). Speed-up the process when 
+        an array is provided
+        
+    :return: 
+        surface (copy) with split channels
+        
     """
 
     cdef:
         Py_ssize_t w, h
+
     w, h = surface_.get_size()
+
+    cdef unsigned char [:, :, :] rgb
+    try:
+        rgb   = surface_.get_view('3')
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    cdef unsigned char [:, :, :] new_rgb
+
+    try:
+        new_rgb = empty((h, w, 3), dtype=numpy.uint8) if array_ is None else array_
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
     cdef:
         int i, j
-        int z = <int>h * <int>w * <unsigned short int>3
-        unsigned char [::1] rgb   = numpy.frombuffer(surface_.get_buffer(), dtype=numpy.uint8)
-        unsigned char [::1] red   = numpy.empty(z, uint8, order='C')
-        unsigned char [::1] green = numpy.empty(z, uint8, order='C')
-        unsigned char [::1] blue  = numpy.empty(z, uint8, order='C')
-
-    # Create a new surface (sizes - offset)
-    new_surface = Surface((w-offset_, h-offset_))
-
+        unsigned int ofs_x_green = w - offset_
+        unsigned int ofs_y_green = h - offset_
+        unsigned int ofs_x_blue  = w - offset_ * 2
+        unsigned int ofs_y_blue  = h - offset_ * 2
 
     with nogil:
 
-        for i in prange(0, w * h * <unsigned short int>4, <unsigned short int>4,
-                        schedule=SCHEDULE, num_threads=THREADS, chunksize=8):
-            j = (i >> <unsigned short int>2) * <unsigned short int>3
-            red[j]     = rgb[i + <unsigned short int>2]
-            green[j + <unsigned short int>1] = rgb[i + <unsigned short int>1]
-            blue[j  + <unsigned short int>2]  = rgb[i    ]
+        for i in prange(0, w, schedule=SCHEDULE, num_threads=THREADS):
 
-    del rgb
+            for j in range(0, h):
+                new_rgb[j, i, 0] = rgb[i, j, 0]
+                new_rgb[j, i, 1] = rgb[i + offset_ if i < ofs_x_green else 0, j + offset_ if j < ofs_y_green else 0, 1]
+                new_rgb[j, i, 2] = rgb[i + offset_ * 2 if i < ofs_x_blue else 0,
+                                       j + offset_ * 2 if j < ofs_y_blue else 0, 2]
 
-    new_surface.blit(fromstring(
-        bytes(red), (w, h), 'RGB'), (-offset_, -offset_), special_flags=0)
-    new_surface.blit(fromstring(
-        bytes(green), (w, h), 'RGB'), (0, 0), special_flags=BLEND_RGB_ADD)
-    new_surface.blit(fromstring(
-        bytes(blue), (w, h), 'RGB'), (offset_, offset_), special_flags=BLEND_RGB_ADD)
-    return new_surface
+    return frombuffer(new_rgb, (w, h), 'RGB')
 
 
 
@@ -7775,44 +15284,114 @@ cdef rgb_split_c(object surface_, int offset_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void putmask_c(
-        int [:, :, :] array_, Py_ssize_t rows_, Py_ssize_t cols_, int v_=0)nogil:
+@cython.exceptval(check=False)
+cpdef void split_channels_inplace(
+        object surface_,
+        char offset_,
+        array_=None):
+
     """
-    EQUIVALENT METHOD TO numpy.putmask BUT MUCH FASTER FOR OPERATION WITH OPERAND < V_
-
-    * Cython cpdef function, this function can be called directly and do not require a
-      hook function.
-
-    numpy.putmask(array_, array_<0, 0) --> putmask_c(array_, w, h, 0)
-
-    :param array_   : numpy.ndarray shape (w, h, 3) of integer
-    :param rows_    : integer;
-    :param cols_    : integer;
-    :param v_       : Value for filter < v_
-    :return         : void
+    RGB split (inplace)
+    
+    e.g
+    split_channels_inplace(im, 10)
+    
+    :param surface_: 
+        pygame surface, image compatible 24 - 32 bit
+         
+    :param offset_: 
+        char; offset to add between each channels. offset_ must be in range [ -128 to 127] 
+        when offset_ > 0 rgb channels are displayed in this order (bgr), 
+        offset_ < 0 rgb channels are display in order rgb
+         
+    :param array_: 
+        numpy.ndarray shape (w, h, 3) type uint8; (optional). boost performances when 
+        an array is provided
+         
+    :return: 
+        void
+        
     """
+    split_channels_inplace_c(surface_, offset_, array_)
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef void split_channels_inplace_c(
+        object surface_,
+        char offset_,
+        array_=None):
+
+    """
+    RGB split (inplace)
+    
+    e.g
+    split_channels_inplace_c(im, 10)
+    
+    :param surface_: 
+        pygame surface, image compatible 24 - 32 bit
+         
+    :param offset_: 
+        char; offset to add between each channels. offset_ must be in range [ -128 to 127]
+        when offset_ > 0 rgb channels are displayed in this order (bgr), offset_ < 0 rgb channels are display
+        in order rgb
+         
+    :param array_: 
+        numpy.ndarray shape (w, h, 3) type uint8; (optional). boost performances when 
+        an array is provided 
+     
+    :return : 
+        void
+    """
+
+    cdef:
+        Py_ssize_t w, h
+
+    w, h = surface_.get_size()
+
+    cdef unsigned char [:, :, :] rgb
+
+    try:
+        rgb   = surface_.get_view('3')
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    cdef unsigned char [::1, :, :] rgb_array_copy
+
+    try:
+        rgb_array_copy = numpy.asarray(rgb, order='F') if array_ is None else array_
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
     cdef:
         int i, j
-        int *r
-        int *g
-        int *b
+        unsigned int ofs_x_green = w - offset_
+        unsigned int ofs_y_green = h - offset_
+        unsigned int ofs_x_blue  = w - offset_ * 2
+        unsigned int ofs_y_blue  = h - offset_ * 2
 
-    for i in prange(0, rows_, schedule=SCHEDULE, num_threads=THREADS):
-        for j in range(0, cols_):
-            r = &array_[i, j, <unsigned short int>0]
-            g = &array_[i, j, <unsigned short int>1]
-            b = &array_[i, j, <unsigned short int>2]
-            if r[0] < 0:
-                r[0] = 0
-                g[0] = 0
-                b[0] = 0
+    with nogil:
 
-            # if r[0] > 255:
-            #     r[0] = 255
-            # if g[0] > 255:
-            #     g[0] = 255
-            # if b[0] > 255:
-            #     b[0] = 255
+        for i in prange(0, w, schedule=SCHEDULE, num_threads=THREADS):
+
+            for j in range(0, h):
+
+                rgb[i, j, 1] = rgb_array_copy[i + offset_ if i < ofs_x_green else 0,
+                        j + offset_ if j < ofs_y_green else 0, 1]
+                rgb[i, j, 2] = rgb_array_copy[i + offset_ * 2 if i < ofs_x_blue else 0,
+                        j + offset_ * 2 if j < ofs_y_blue else 0, 2]
+
+
+
 
 
 
@@ -7823,33 +15402,56 @@ cpdef inline void putmask_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline tuple ripple_c(
        Py_ssize_t rows_, Py_ssize_t cols_,
-       float [:, ::1] previous,
-       float [:, ::1] current,
-       unsigned char [:, :, :] array,
+       const float [:, ::1] previous_,
+       float [:, ::1] current_,
+       unsigned char [:, :, :] array_,
        float dispersion_ = 0.008
        ):
     """
-    THIS SHADER CREATE A WATER EFFECT ON A PYGAME SURFACE
-    This version does not include any background deformation to keep a reasonable fps rate
+    Ripple effect without background deformation
 
-    Check demo_ripple.py in the Demo folder 
+    Check demo_ripple.py, demo_ripple1.py in the Demo folder 
+    e.g:
+    previous, current = ripple(width, height, previous, current, back_array,  dispersion_=0.008)
+  
+    rows_ : 
+        integer; Screen width or surface width
+        
+    cols_ : 
+        integer; Screen height or surface height
+        
+    previous_ : 
+        numpy.ndarray type (w, h) type float; array use for the transformation. 
+        Array holding the previous_ data
+          
+    current_ : 
+        numpy.ndarray type (w, h) type float; array use for the transformation. 
+        Array holding the current_ data
+         
+    array : 
+        numpy.ndarray type (w, h, 3) type unsigned char. Array containing the 
+        background image RGB pixels.
+        The content of this array is invariant (static background image). 
+    
+    dispersion_ :
+        float; ripple dampening factor, higher values decrease the ripple effect 
+        radius default 0.008
 
-    :param rows_        : integer; Array width
-    :param cols_        : integer; Array height
-    :param previous     : numpy.ndarray type (w, h) type float; array use for the transformation
-    :param current      : numpy.ndarray type (w, h) type float; array use for the transformation
-    :param array        : numpy.ndarray type (w, h, 3) type unsigned char
-    :paran dispersion   : float; ripple dampening factor, higher values decrease the ripple effect radius
-    :return             : Return a tuple containing 3 arrays
+    Returns
+    -------
+    Return a tuple containing 2 arrays (current_, previous_)
+    see Parameters for each array sizes
+        
     """
 
     cdef:
         int i, j, a, b
         float data
         float *c
-        float *d
+        const float *d
         unsigned char *e
         float r
         unsigned int row_1 = rows_ - 1
@@ -7860,24 +15462,25 @@ cdef inline tuple ripple_c(
         for j in prange(0, cols_, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(0, rows_):
 
-                data = (previous[i + 1 if i <row_1 else 0, j]
-                        + previous[i - 1 if i > 1 else 0, j] +
-                              previous[i, j - 1 if j > 1 else 0] +
-                        previous[i, j + 1 if j <col_1 else 0]) * <float>0.5
+                data = (previous_[i + 1 if i <row_1 else 0, j]
+                        + previous_[i - 1 if i > 1 else 0, j] +
+                              previous_[i, j - 1 if j > 1 else 0] +
+                        previous_[i, j + 1 if j <col_1 else 0]) * <float>0.5
 
-                c = &current[i, j]
+                c = &current_[i, j]
                 data = data - <float>c[0]
                 c[0] = data - (data * dispersion_)
-                d = &previous[i,j]
-                e = &array[i, j, <unsigned short int>0]
+                d = &previous_[i,j]
+                e = &array_[i, j, 0]
                 e[0] = <unsigned char> d[0] if d[0] > 0 else 0
-                array[i, j, <unsigned short int>1] = e[0]
-                array[i, j, <unsigned short int>2] = e[0]
+                array_[i, j, 1] = e[0]
+                array_[i, j, 2] = e[0]
 
-    return current, previous
+    return current_, previous_
 
 
-
+# Todo this can be simplify with buffer
+#  and pointers once all the array are contiguous
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -7885,14 +15488,58 @@ cdef inline tuple ripple_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline ripple_seabed_c(
            int rows_, int cols_,
-           float [:, ::1] previous,                       # type numpy.float32 (w, h)
-           float [:, ::1] current,                        # type numpy.float32 (w, h)
-           unsigned char [:, :, ::1] texture_array,       # type numpy.ndarray (w, h, 3)
-           unsigned char [:, :, :] background_array,    # type numpy.ndarray (w, h, 3)
+           const float [:, ::1] previous_,                 # type numpy.float32 (w, h)
+           float [:, ::1] current_,                        # type numpy.float32 (w, h)
+           const unsigned char [:, :, ::1] texture_array_, # type numpy.ndarray (w, h, 3)
+           unsigned char [:, :, :] background_array_,      # type numpy.ndarray (w, h, 3)
            float dispersion_ = 0.008
            ):
+    """
+    Ripple effect with background deformation
+
+    Check demo_ripple_seabed.py in the Demo folder 
+    e.g:
+    previous, current, back_array = ripple_seabed(height, width, previous,\
+                   current, texture_array, back_array, dispersion_=0.009)
+    
+    Parameters
+    ----------
+    rows_              : 
+        integer; Screen width or surface width
+    
+    cols_              : 
+        integer; Screen height or surface height
+    
+    previous_          : 
+        numpy.ndarray type (w, h) type float; array use for the transformation. 
+        Array holding the previous_ data
+          
+    current_           : 
+        numpy.ndarray type (w, h) type float; array use for the transformation. 
+        Array holding the current_ data
+         
+    texture_array_     : 
+        numpy.ndarray type (w, h, 3) type unsigned char. 
+        Array containing the background image RGB pixels.
+        The content of this array is invariant (static background image).
+         
+    background_array_  : 
+        numpy.ndarray type (w, h, 3) of type unsigned char containing the background image RGB pixels.
+        The background array is equivalent to the texture array with current_ ripple effect transformation.
+    
+    dispersion_        :  
+        float; ripple dampening factor, higher values decrease the ripple effect 
+        radius default 0.008
+
+    Returns
+    -------
+    Return a tuple containing 3 arrays (current_, previous_, bck_array)
+    see Parameters for each array sizes
+        
+    """
 
     cdef:
         float cols2 = cols_ >> 1
@@ -7902,6 +15549,7 @@ cdef inline ripple_seabed_c(
         unsigned int cols_1 = cols_ - 1
         unsigned int rows_1 = rows_ - 1
         float data
+        unsigned char * index
 
     # from 1 to w - 1 to avoid python wraparound error
     # same for j (1 to h - 1)
@@ -7909,25 +15557,27 @@ cdef inline ripple_seabed_c(
         for j in prange(1, cols_1, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(1, rows_1):
 
-                # data = (previous[i + 1, j] + previous[i - 1, j] +
-                #         previous[i, j - 1] + previous[i, j + 1]) * <float>0.5
+                # data = (previous_[i + 1, j] + previous_[i - 1, j] +
+                #         previous_[i, j - 1] + previous_[i, j + 1]) * <float>0.5
 
-                data = (previous[i + 1 if i < rows_1 else 0, j]
-                        + previous[i - 1 if i > 1 else 0, j] +
-                        previous[i, j - 1 if j > 1 else 0] +
-                        previous[i, j + 1 if j < rows_1 else 0]) * <float> 0.5
+                data = (previous_[i + 1 if i < rows_1 else 0, j]
+                        + previous_[i - 1 if i > 1 else 0, j] +
+                        previous_[i, j - 1 if j > 1 else 0] +
+                        previous_[i, j + 1 if j < rows_1 else 0]) * <float> 0.5
 
 
-                data -= current[i, j]
+                data -= current_[i, j]
                 data -= data * dispersion_
-                current[i, j] = data
+                current_[i, j] = data
                 data = <float>1.0 - data * <float>ONE_1024
                 a = max(<int>(((i - rows2) * data) + rows2) % rows_, 0)
                 b = max(<int>(((j - cols2) * data) + cols2) % cols_, 0)
-                background_array[i, j, 0], background_array[i, j, 1], background_array[i, j, 2] = \
-                    texture_array[a, b, 0], texture_array[a, b, 1], texture_array[a, b, 2]
 
-    return current, previous, asarray(background_array)
+                background_array_[i, j, 0], background_array_[i, j, 1], background_array_[i, j, 2] = \
+                    texture_array_[a, b, 0], texture_array_[a, b, 1], texture_array_[a, b, 2]
+
+    return current_, previous_, background_array_
+
 
 
 @cython.binding(False)
@@ -7937,16 +15587,14 @@ cdef inline ripple_seabed_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef tuple heat_map(int wavelength, float gamma=1.0):
+@cython.exceptval(check=False)
+cpdef (int, int, int) wavelength2rgb(int wavelength, float gamma=1.0):
     """
-    RETURN AN RGB COLOR VALUE MATCHING A SPECIFIC WAVELENGTH
-
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
-
-    This function return a tuple (R,G,B) corresponding to the
-    color wavelength (wavelength_to_rgb is an External C
-    routine with pre-defined wavelength such as :
+    Color wavelength to RGB
+    
+    Return tuple of rgb components corresponding to a specific color wavelength
+    wavelength_to_rgb is an External C routine with pre-defined wavelength such as :
+    
     Color   Wavelength(nm) Frequency(THz)
     Red     620-750        484-400
     Orange  590-620        508-484
@@ -7954,16 +15602,29 @@ cpdef tuple heat_map(int wavelength, float gamma=1.0):
     Green   495-570        606-526
     Blue    450-495        668-606
     Violet  380-450        789-668
+    
     e.g If the routine is called with a wavelength of 620, the returned color
-    will be a red gradient
+    will be a red gradient.
+    
+    # Return orange color 255, 137, 0 (RGB)
+    wavelength2rgb(610) 
 
-    :param wavelength   : integer; Wavelength
-    :param gamma        : float; Gamma value
-    :return             : tuple RGB values (0 ... 255)
+    :param wavelength: 
+        integer; Wavelength
+        
+    :param gamma: 
+        float; Gamma value
+        
+    :return: 
+        tuple RGB values uint8 (0 ... 255)
+        
+    
     """
+
     cdef  rgb_color_int rgb_c
     rgb_c = wavelength_to_rgb(wavelength, gamma)
     return rgb_c.r, rgb_c.g, rgb_c.b
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -7972,39 +15633,53 @@ cpdef tuple heat_map(int wavelength, float gamma=1.0):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef tuple custom_map(int wavelength, int [:] color_array_, float gamma=1.0):
+@cython.exceptval(check=False)
+cpdef tuple custom_map(int wavelength, int [::1] color_array, float gamma=1.0):
+
     """
-    RETURN AN RGB COLOR VALUE MATCHING A CUSTOM WAVELENGTH
-
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
-
-    This function return a tuple (R,G,B) corresponding to the
-    color wavelength define in color_array_
-    (wavelength_to_rgb_custom is an External C
-    routine with customize wavelength and allow the user to defined
-    a customize palette according to an input value)
-
-    example for a Fire palette
+    
+    Return tuple RGB components corresponding to a customized wavelength domain.
+    unlike wavelength2rgb, this method will return a tuple RGB color components corresponding 
+    to a wavelength defined within a customized wavelength domain.
+    
+    see - demo_fire for a real time presentation.
+    
+    # example of customized nm wavelength. 
+    # from 0-1 nm wavelength, the RGB components will be mostly black 
+    # from 2 - 619 nm, the RGB components will be yellow 
     arr = numpy.array(
         [0, 1,       # violet is not used
          0, 1,       # blue is not used
          0, 1,       # green is not used
-         2, 619,     # yellow, return a yellow gradient for values [2...619]
+         570, 619,     # yellow, return a yellow gradient for values [2...619]
          620, 650,   # orange return a orange gradient for values [620 ... 650]
          651, 660    # red return a red gradient for values [651 ... 660]
-         ], numpy.int)
+         ], numpy.int32)
 
-
-    :param wavelength   : integer; Wavelength
-    :param gamma        : float; Gamma value
-    :param color_array_ : numpy array containing the min and max of each color (red,
-    orange, yellow, green, blue, violet)
-    :return             : tuple RGB values (0 ... 255)
+    heatmap = [custom_map(i - 20, arr, 1.0) for i in range(380, 800)]
+    
+    Parameters
+    ----------
+    
+    wavelength : 
+        integer; Wavelength in nm 
+    
+    color_array : 
+        numpy.array (buffer) containing the min and max of each color (red,
+        orange, yellow, green, blue, violet)
+    
+    gamma : 
+        float; Gamma value
+        
+    Returns
+    -------
+    tuple RGB uint values in range (0 ... 255)
+    
     """
+
     cdef  rgb_color_int rgb_c
     cdef int *p
-    p = &color_array_[0]
+    p = &color_array[0]
     rgb_c = wavelength_to_rgb_custom(wavelength, p, gamma)
     return rgb_c.r, rgb_c.g, rgb_c.b
 
@@ -8012,7 +15687,7 @@ cpdef tuple custom_map(int wavelength, int [:] color_array_, float gamma=1.0):
 
 
 cdef int i = 0
-HEATMAP = [heat_map(i, 1.0) for i in range(380, 750)]
+HEATMAP = [ wavelength2rgb(i, 1.0) for i in range(380, 750) ]
 
 cdef float f_map = (<float>750.0 - <float>380.0 -<float>1.0) / (<float>255.0 * <float>3.0)
 
@@ -8034,16 +15709,24 @@ for t in HEATMAP:
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline void heatmap_convert(object surface_, bint rgb_=True):
+@cython.exceptval(check=False)
+cdef inline void heatmap_c(object surface_, bint rgb_=True):
     """
-    TRANSFORM AN IMAGE INTO A HEATMAP EQUIVALENT
+    Transform an image into a heatmap equivalent
 
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
-
-    :param surface_ : pygame.Surface
-    :param rgb_     : boolean; True transformed the image into a RGB heatmap model of False (BGR)
-    :return         : void
+    e.g: 
+    # for 24, 32-bit
+    image = pygame.image.load("../Assets/px.png").convert_alpha()
+    heatmap_c(pixels3d(image), True)
+    
+    :param surface_: 
+        pygame.Surface 24, 32-bit 
+        
+    :param rgb_: 
+        boolean; True transformed the image into a RGB heatmap model of False (BGR)
+        
+    :return: 
+        void
     """
 
     cdef:
@@ -8051,10 +15734,10 @@ cpdef inline void heatmap_convert(object surface_, bint rgb_=True):
     w, h = surface_.get_size()
 
     cdef:
-        unsigned char [::1] rgb_array  = surface_.get_buffer()
+        unsigned char [::1] bgr_array  = surface_.get_buffer()
         unsigned int s
         int i
-        int size = rgb_array.size
+        int size = bgr_array.size
         unsigned int index = 0
         unsigned char *r
         unsigned char *g
@@ -8067,13 +15750,15 @@ cpdef inline void heatmap_convert(object surface_, bint rgb_=True):
         if rgb_:
             for i in prange(0, size, bytesize, schedule=SCHEDULE, num_threads=THREADS):
 
-                r = &rgb_array[i]
-                g = &rgb_array[i + <unsigned short int>1]
-                b = &rgb_array[i + <unsigned short int>2]
+                # RGB model
+                r = &bgr_array[i]
+                g = &bgr_array[i + <unsigned short int>1]
+                b = &bgr_array[i + <unsigned short int>2]
 
                 s = r[0] + g[0] + b[0]
                 index = <int>(s * f_map)
 
+                #RGB 
                 r[0] = <unsigned char>heatmap_array[index, <unsigned short int>0]
                 g[0] = <unsigned char>heatmap_array[index, <unsigned short int>1]
                 b[0] = <unsigned char>heatmap_array[index, <unsigned short int>2]
@@ -8081,17 +15766,17 @@ cpdef inline void heatmap_convert(object surface_, bint rgb_=True):
         else:
             for i in prange(0, size, bytesize, schedule=SCHEDULE, num_threads=THREADS):
 
-                r = &rgb_array[i]
-                g = &rgb_array[i + <unsigned short int>1]
-                b = &rgb_array[i + <unsigned short int>2]
+                r = &bgr_array[i]
+                g = &bgr_array[i + <unsigned short int>1]
+                b = &bgr_array[i + <unsigned short int>2]
 
                 s = r[0] + g[0] + b[0]
                 index = <int>(s * f_map)
 
+                # BGR
                 r[0] = <unsigned char>heatmap_array[index, <unsigned short int>2]
                 g[0] = <unsigned char>heatmap_array[index, <unsigned short int>1]
                 b[0] = <unsigned char>heatmap_array[index, <unsigned short int>0]
-
 
 
 @cython.binding(False)
@@ -8101,17 +15786,25 @@ cpdef inline void heatmap_convert(object surface_, bint rgb_=True):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef tuple blue_map(int wavelength, float gamma=1.0):
+@cython.exceptval(check=False)
+cpdef (int, int, int) blue_map(int wavelength, float gamma=1.0):
     """
-    RETURN AN RGB COLOR VALUE MATCHING A SPECIFIC WAVELENGTH
-
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
-
-    :param wavelength   : integer; Wavelength
-    :param gamma        : float; Gamma value
-    :return             : tuple RGB values (0 ... 255)
+    Return tuple RGB components matching a specific wavelength in nm
+    
+    e.g
+    rgb = blue_map(600)
+    
+    :param wavelength: 
+        integer; Wavelength in nm
+        
+    :param gamma: 
+        float; Gamma value
+        
+    :return: 
+        tuple RGB uint8 values (0 ... 255)
+    
     """
+
     cdef  rgb_color_int rgb_c
     rgb_c = wavelength_to_rgb(wavelength, gamma)
     return rgb_c.r, rgb_c.g, rgb_c.b
@@ -8130,6 +15823,8 @@ for t in BLUEMAP:
     bluemap_array[i, 2] = t[2]
     i += 1
 
+
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -8137,29 +15832,35 @@ for t in BLUEMAP:
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void bluescale(object surface_):
     """
-    MAP AN IMAGE INTO A BLUE EQUIVALENT FORMAT
-    THIS ALGORITHM IS USING THE WAVELENGTH FROM 450-495 NM TO
-    REPRESENT THE IMAGE IN BLUE SHADES
+       
+    Map an image into a blue equivalent format
+    
+    this algorithm is using the wavelength from 450-495 nm to
+    represent the image in blue shades
 
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
-
-    :param surface_ : pygame.Surface to transform
-    :return         : void
+    e.g:
+    bluescale(image)
+    
+    :param surface_: 
+        pygame.Surface to transform
+        
+    :return: 
+        void
+    
     """
-
 
     cdef:
         unsigned int w, h
     w, h = surface_.get_size()
 
     cdef:
-        unsigned char [::1] rgb_array  = surface_.get_buffer()
+        unsigned char [::1] bgr_array  = surface_.get_buffer()
         unsigned int s
         int i
-        int size = rgb_array.size
+        int size = bgr_array.size
         unsigned int index = 0
         unsigned char *r
         unsigned char *g
@@ -8169,9 +15870,9 @@ cpdef inline void bluescale(object surface_):
     with nogil:
         for i in prange(0, size, bytesize, schedule=SCHEDULE, num_threads=THREADS):
 
-            r = &rgb_array[i]
-            g = &rgb_array[i + <unsigned short int>1]
-            b = &rgb_array[i + <unsigned short int>2]
+            r = &bgr_array[i]
+            g = &bgr_array[i + <unsigned short int>1]
+            b = &bgr_array[i + <unsigned short int>2]
 
             s = r[0] + g[0] + b[0]
             index = <unsigned int>(s * f_bluemap)
@@ -8189,17 +15890,25 @@ cpdef inline void bluescale(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef tuple red_map(int wavelength, float gamma=1.0):
+@cython.exceptval(check=False)
+cpdef (int, int, int) red_map(int wavelength, float gamma=1.0):
     """
-    RETURN AN RGB COLOR VALUE MATCHING A SPECIFIC WAVELENGTH
-
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
-
-    :param wavelength   : integer; Wavelength
-    :param gamma        : float; Gamma value
-    :return             : tuple RGB values (0 ... 255)
+    Return tuple RGB components matching a specific wavelength in nm
+    
+    e.g:
+    rgb = red_map(610)
+    
+    :param wavelength: 
+        integer; Wavelength in nm
+        
+    :param gamma: 
+        float; Gamma value
+        
+    :return: 
+        tuple RGB uint8 values (0 ... 255)
+    
     """
+
     cdef  rgb_color_int rgb_c
     rgb_c = wavelength_to_rgb(wavelength, gamma)
     return rgb_c.r, rgb_c.g, rgb_c.b
@@ -8227,17 +15936,30 @@ for t in REDMAP:
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline void redscale(object surface_):
     """
-    MAP AN IMAGE INTO A RED EQUIVALENT FORMAT
-    THIS ALGORITHM IS USING THE WAVELENGTH FROM 620 TO 750 NM TO
-    REPRESENT THE IMAGE IN RED SHADES
+    Apply a redscale effect to an image.
 
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
+    This algorithm maps the input image into shades of red by adjusting the 
+    color channels according to wavelengths typically associated with the 
+    red portion of the visible light spectrum, ranging from 620 to 750 nm. 
+    The redscale effect retains the intensity variations of the red color while 
+    reducing or removing the influence of other color channels.
 
-    :param surface_ : pygame.Surface to transform
-    :return         : void
+    Example:
+        redscale(image)
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface representing the image to be transformed into redscale.
+        The surface must contain valid RGB pixel data.
+
+    Returns
+    -------
+    void
+        This function modifies the input surface directly and does not return a new surface.
     """
 
 
@@ -8246,10 +15968,10 @@ cpdef inline void redscale(object surface_):
     w, h = surface_.get_size()
 
     cdef:
-        unsigned char [::1] rgb_array  = surface_.get_buffer()
+        unsigned char [::1] bgr_array  = surface_.get_buffer()
         unsigned int s
         int i
-        int size = rgb_array.size
+        int size = bgr_array.size
         unsigned int index = 0
         unsigned char *r
         unsigned char *g
@@ -8259,9 +15981,9 @@ cpdef inline void redscale(object surface_):
     with nogil:
         for i in prange(0, size, bytesize, schedule=SCHEDULE, num_threads=THREADS):
 
-            r = &rgb_array[i]
-            g = &rgb_array[i + <unsigned short int>1]
-            b = &rgb_array[i + <unsigned short int>2]
+            r = &bgr_array[i]
+            g = &bgr_array[i + <unsigned short int>1]
+            b = &bgr_array[i + <unsigned short int>2]
 
             s = r[0] + g[0] + b[0]
             index = <unsigned int>(s * f_redmap)
@@ -8279,41 +16001,60 @@ cpdef inline void redscale(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void blood_inplace_c(
-        unsigned char [:, :, :] rgb_array_, float [:, :] mask_, float perc_):
+        Py_ssize_t w,
+        Py_ssize_t h,
+        unsigned char [:, :, :] rgb_array,
+        const float [:, :] mask,
+        float percentage)nogil:
 
     """
-    SHADER HURT EFFECT (INPLACE)
+    Blood effect (inplace)
     
-    THE MASK DETERMINE THE CONTOUR USED FOR THE BLOOD EFFECT.
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3)
-    containing RGB pixels, please refer to pygame
-    function pixels3d or array3d to convert an image into a
-    3d array (library surfarray)
+    The mask array determines the contour used for the blood effect.
+    Compatible with surface 24, 32-bit format.
     
-    e.g
-    # Outside the main loop 
+    rgb_array and mask must have the same dimensions.
+    
+    e.g 
+    background = pygame.image.load("../Assets/Aliens.jpg").convert()
+    background = pygame.transform.smoothscale(background, (800, 600))
+    image = background.copy()
     blood_surface = pygame.image.load("../Assets/redvignette.png").convert_alpha()
-    blood_surface = pygame.transform.smoothscale(blood_surface, (WIDTH, HEIGHT))
-    BLOOD_MASK = numpy.asarray(
-    pygame.surfarray.pixels_alpha(blood_surface) / 255.0, numpy.float32)
+    blood_surface = pygame.transform.smoothscale(blood_surface, (800, 600))
+    BLOOD_MASK = numpy.asarray(pygame.surfarray.pixels_alpha(blood_surface) / 255.0, numpy.float32)
     
-    # In the main loop (percentage must change overtime)
-    blood(BCK, BLOOD_MASK, percentage)
-
-    :param rgb_array_   : numpy.ndarray shape (w, h, 3) of unsigned
-    char representing the surface pixels
-    :param mask_        : numpy.ndarray shape (w, h) of float values in range [0.0...1.0]
-    :param perc_        : Percentage value in range [0.0 ... 1.0] with 1.0 being 100%
-
-    :return: void
+    # Then call the method in your main loop (percentage must vary overtime)
+    blood_inplace_c(800, 600, pixels3d(image), BLOOD_MASK, percentage)
+    
+    
+    Parameters
+    ----------
+    
+    w : 
+        width of the array 
+    
+    h : 
+        height of the array 
+    
+    rgb_array : 
+        numpy.ndarray or memoryviewslice shape (w, h, 3) type uint8 containing RGB pixels or any other 
+        pixel format. Any changes to this array will modify the surface directly
+    
+    mask : 
+        Normalised numpy.ndarray or cython memoryviewslice shape (w, h) of type float. 
+        Values must be float in range [0.0...1.0].
+        
+    percentage : 
+        float; Percentage value in range [0.0 ... 1.0] with 1.0 being 100%
+        
+    Returns
+    -------
+        void
     """
-    assert 0.0 <= perc_ <= 1.0, "perc_ variable must be in range[0.0 ... 1.0] got %s " % perc_
-
-    cdef:
-        int w, h, bytesize
-    w, h, bytesize = (<object> rgb_array_).shape
+    assert 0.0 <= percentage <= 1.0, \
+        "percentage variable must be in range[0.0 ... 1.0] got %s " % percentage
 
     cdef:
         unsigned int s
@@ -8324,20 +16065,17 @@ cdef inline void blood_inplace_c(
         unsigned char *b
         float theta
 
+    for j in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
+        for i in range(0, w):
 
-    with nogil:
-        for j in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
-            for i in range(0, w):
+            r = &rgb_array[i, j, <unsigned short int>0]
 
-                r = &rgb_array_[i, j, <unsigned short int>0]
+            index = <int>(r[0] * f_redmap)
+            theta = <float>(mask[i, j] * percentage)
 
-                index = <int>(r[0] * f_redmap)
-                theta = <float>(mask_[i, j] * perc_)
-
-                # ALTERNATIVE WITH BEST PERFORMANCES
-                r[0] = <unsigned char> (
-                    min(r[0] + <float> redmap_array[
-                        index, <unsigned short int>0] * theta, <unsigned char>255))
+            # ALTERNATIVE WITH BEST PERFORMANCES
+            r[0] = <unsigned char> (
+                min(r[0] + <float> redmap_array[index, 0] * theta, <unsigned char>255))
 
 
 
@@ -8348,1138 +16086,85 @@ cdef inline void blood_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline unsigned int rgb_to_int(int red, int green, int blue)nogil:
+@cython.exceptval(check=False)
+cdef inline unsigned char [:, :, :] mirroring_c(
+        Py_ssize_t w,
+        Py_ssize_t h,
+        const unsigned char[:, :, :] rgb_array,
+        unsigned char [:, :, :] new_array
+) nogil:
     """
-    CONVERT RGB MODEL INTO A PYTHON INTEGER EQUIVALENT TO THE FUNCTION PYGAME MAP_RGB()
+    Apply a horizontal mirroring effect to a given RGB array.
 
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
+    This function mirrors the input RGB array along the vertical axis (horizontally) 
+    and stores the result in a new array. The mirrored pixels are written to the 
+    `new_array`, which should have the same shape and size as the input array.
 
-    :param red   : Red color value,  must be in range [0..255]
-    :param green : Green color value, must be in range [0..255]
-    :param blue  : Blue color, must be in range [0.255]
-    :return      : returns a positive python integer representing the RGB values(int32)
-    """
-    return <unsigned int>65536 * red + <unsigned int>256 * green + blue
+    Example:
+        rgb_array = mirroring_c(800, 600, bgr_array, new_array)
+        surface = make_surface(rgb_array)
 
+    Parameters
+    ----------
+    w : int
+        The width of the image array, typically the number of columns in the input array.
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline unsigned int rgb_to_int_c(
-        unsigned int red,
-        unsigned int green,
-        unsigned int blue
-)nogil:
-    """
-    CONVERT RGB MODEL INTO A PYTHON INTEGER EQUIVALENT TO THE FUNCTION PYGAME MAP_RGB()
+    h : int
+        The height of the image array, typically the number of rows in the input array.
 
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
+    rgb_array : numpy.ndarray or memoryviewslice
+        A 3D array or memoryview of shape (w, h, 3) containing pixel data, where 
+        each pixel is represented by three values (RGB or BGR format). The array must 
+        be of type `uint8`.
 
-    :param red   : Red color value,  must be in range [0..255]
-    :param green : Green color value, must be in range [0..255]
-    :param blue  : Blue color, must be in range [0.255]
-    :return      : returns a positive python integer representing the RGB values(int32)
-    """
-    return <unsigned int>65536 * red + <unsigned int>256 * green + blue
+    new_array : numpy.ndarray or memoryviewslice
+        A 3D array or memoryview of shape (w, h, 3) that will store the mirrored 
+        result. It should have the same shape and type as `rgb_array`, but initially 
+        should be empty.
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef inline rgb int_to_rgb(unsigned int n)nogil:
-    """
-    CONVERT A PYTHON INTEGER INTO A RGB COLOUR MODEL (UNSIGNED CHAR VALUES [0..255]).
-    EQUIVALENT TO PYGAME UNMAP_RGB()
+    Returns
+    -------
+    memoryviewslice
+        A 3D memoryviewslice of shape (w, h, 3) containing the mirrored pixel data.
+        This array will be filled with the horizontally mirrored pixels from the 
+        `rgb_array`.
 
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
-
-    :param n : positive integer value to convert
-    :return  : return a C structure rgb containing RGB values
-    """
-    cdef:
-        rgb rgb_
-
-    rgb_.r = <float>((n >> <unsigned short int>16) & <unsigned char>255)
-    rgb_.g = <float>((n >> <unsigned short int>8) & <unsigned char>255)
-    rgb_.b = <float>(n & <unsigned char>255)
-    return rgb_
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline rgb int_to_rgb_c(unsigned int n)nogil:
-    """
-    CONVERT A PYTHON INTEGER INTO A RGB COLOUR MODEL (UNSIGNED CHAR VALUES [0..255]).
-    EQUIVALENT TO PYGAME UNMAP_RGB()
-
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
-
-    :param n : positive integer value to convert
-    :return  : return a C structure rgb containing RGB values
-    """
-    cdef:
-        rgb rgb_
-
-    rgb_.r = <float>((n >> <unsigned short int>16) & <unsigned char>255)
-    rgb_.g = <float>((n >> <unsigned short int>8) & <unsigned char>255)
-    rgb_.b = <float>(n & <unsigned char>255)
-    return rgb_
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline unsigned int [::1] make_palette_c(int width, float fh, float fs, float fl):
+    Notes
+    -----
+    - The function modifies `new_array` in place and does not create a new array.
+    - This function operates under the `nogil` context to improve performance when 
+      used in multi-threaded environments.
     """
 
-    CREATE A PALETTE OF MAPPED RGB COLORS VALUES 
-    FROM HSL VALUES (HUE, SATURATION, LIGHTNESS)
-    
-    
-    h, s, l = color[i] * fh,  min(fs, 255.0), min(color[i] * fl, 255.0)
-    e.g:
-        # below: palette of 256 colors (256 colors).
-        # hue * 6, saturation = 255.0, lightness * 2.0
-        palette, surf = make_palette(256, 6, 255, 2)
-        palette, surf = make_palette(256, 4, 255, 2)
-
-    :param width  : integer, Palette width
-    :param fh     : float, hue factor
-    :param fs     : float, saturation factor
-    :param fl     : float, lightness factor
-    :return       : Return a tuple ndarray type uint32 and pygame.Surface (width, height)
-    """
-    assert width > 0, "Argument width should be > 0, got %s " % width
 
     cdef:
-        unsigned int [::1] palette = numpy.empty(width, uint32)
         int x, y
-        float h, s, l
-        rgb rgb_
-
-    with nogil:
-        for x in prange(width, schedule=SCHEDULE, num_threads=THREADS):
-            h, s, l = <float>x * fh,  min(fs, <float>255.0), min(<float>x * fl, <float>255.0)
-            rgb_ = struct_hsl_to_rgb(h * <float>ONE_360, s * <float>ONE_255, l * <float>ONE_255)
-            # build the palette (1d buffer int values)
-            palette[x] = rgb_to_int_c(<unsigned int>(rgb_.r * <float>255.0),
-                                    <unsigned int>(rgb_.g * <float>255.0),
-                                    <unsigned int>(rgb_.b * <float>255.0 * <float>0.5))
-
-    return palette
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef fire_surface24_c(
-        int width,
-        int height,
-        float factor,
-        unsigned int [::1] palette,
-        float [:, ::1] fire,
-        unsigned int intensity = 0,
-        unsigned int low       = 0,
-        unsigned int high      = 0,
-):
-    """
-
-    CREATE A FIRE EFFECT
-
-    * Do not call this function directly
-
-    :param width    : integer; max width of the effect
-    :param height   : integer; max height of the effect
-    :param factor   : float; factor to reduce the flame effect
-    :param palette  : ndarray; Color palette 1d numpy array (colors buffer unsigned int values)
-    :param fire     : ndarray; 2d array (x, y) (contiguous) containing float values
-    :param intensity: integer; Control the flame intensity default 0 (low intensity), range [0...32]
-    :param low      : integer; The x lowest position of the effect, x must be >=0 and < high
-    :param high     : integer; The x highest position of the effect, x must be > low and <= high
-    :return         : Return a numpy array containing the fire effect array shape
-     (w, h, 3) of RGB pixels
-    """
-
-    cdef:
-        # flame opacity palette
-        unsigned char [:, :, ::1] out = zeros((width, height, 3), dtype=uint8)
-        int x = 0, y = 0
-        float d
-        unsigned int ii=0
-        unsigned c1 = 0, c2 = 0
-
-    cdef int min_, max_, middle
-
-
-    if low != 0 or high != 0:
-        assert 0 <= low < high, "Argument low_ must be < high_"
-        assert high <= width, "Argument high must be <= width"
-
-        middle = low + ((high - low) >> 1)
-        min_ = randRange(low, middle)
-        max_ = randRange(middle + <unsigned short int>1, high)
-
-    else:
-        middle = width >> 1
-        min_ = randRange(0, middle)
-        max_ = randRange(middle + <unsigned short int>1, width)
-
-
-    with nogil:
-        # POPULATE TO THE BASE OF THE FIRE (THIS WILL CONFIGURE THE FLAME ASPECT)
-        for x in prange(min_, max_, schedule=SCHEDULE, num_threads=THREADS):
-                fire[height-1, x] = <float>randRange(intensity, <unsigned int>260)
-
-
-        # DILUTE THE FLAME EFFECT (DECREASE THE MAXIMUM INT VALUE) WHEN THE FLAME TRAVEL UPWARD
-        for y in prange(1, height-1, schedule=SCHEDULE, num_threads=THREADS):
-
-            c1 = (y + <unsigned short int> 1) % height
-            for x in range(0, width):
-
-                    c2 = x % width
-                    d = (fire[c1, (x - <unsigned short int>1 + width) % width]
-                       + fire[c1, c2]
-                       + fire[c1, (x + <unsigned short int>1) % width]
-                       + fire[(y + <unsigned short int>2) % height, c2]) * factor
-
-                    d = d - <float>(<float>rand() * <float>0.0001)
-
-                    # Cap the values
-                    if d < <unsigned short int>0:
-                        d = <float>0.0
-
-                    # CAP THE VALUE TO 255
-                    if d > <unsigned char>255:
-                        d = <float>255.0
-                    fire[y, x] = d
-
-                    ii = palette[<unsigned int>d % width]
-
-                    out[x, y, 0] = (ii >> <unsigned short int>16) & <unsigned char>255
-                    out[x, y, 1] = (ii >> <unsigned short int>8) & <unsigned char>255
-                    out[x, y, 2] = ii & <unsigned char>255
-
-    return asarray(out)
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(False)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef fire_surface24_c_border(
-        int width,
-        int height,
-
-        float factor,
-        unsigned int [::1] palette,
-        float [:, ::1] fire,
-        int intensity = 0,
-        int low       = 0,
-        int high      = 0,
-):
-    """
-
-    CREATE A FIRE EFFECT (BORDER EFFECT)
-
-    * Do not call this function directly
-
-    :param width    : integer; max width of the effect
-    :param height   : integer; max height of the effect
-    :param factor   : float; factor to reduce the flame effect
-    :param palette  : ndarray; Color palette 1d numpy array (colors buffer unsigned int values)
-    :param fire     : ndarray; 2d array (x, y) (contiguous) containing float values
-    :param intensity: integer; Control the flame intensity default 0 (low intensity), range [0...32]
-    :param low      : integer; The x lowest position of the effect, x must be >=0 and < high
-    :param high     : integer; The x highest position of the effect, x must be > low and <= high
-    :return         : Return a numpy array containing the fire effect array
-    shape (w, h, 3) of RGB pixels
-    """
-
-    cdef:
-        # flame opacity palette
-        unsigned char [:, :, ::1] out = zeros((width, height, 3), dtype=uint8)
-        int x = 0, y = 0
-        float d
-        unsigned int ii=0
-        unsigned c1 = 0, c2 = 0
-
-    cdef int min_, max_, middle
-
-
-    if low != 0 or high != 0:
-        assert 0 <= low < high, "Argument low_ must be < high_"
-        assert high <= width, "Argument high must be <= width"
-
-        middle = low + ((high - low) >> 1)
-        min_ = randRange(low, middle)
-        max_ = randRange(middle + 1, high)
-    else:
-        middle = width >> 1
-        min_ = randRange(0, middle)
-        max_ = randRange(middle +1, width)
-
-
-    with nogil:
-        # POPULATE TO THE BASE OF THE FIRE (THIS WILL CONFIGURE THE FLAME ASPECT)
-        # for x in prange(min_, max_, schedule=SCHEDULE, num_threads=THREADS
-        #         fire[height - 1, x] = randRange(intensity, 260)
-
-        # FIRE ARRAY IS [HEIGHT, WIDTH]
-        for x in prange(min_, max_, schedule=SCHEDULE, num_threads=THREADS):
-                fire[x % height, (height - 1) % width] = <float>randRange(intensity, <int>260)
-
-
-        # DILUTE THE FLAME EFFECT (DECREASE THE MAXIMUM INT VALUE) WHEN THE FLAME TRAVEL UPWARD
-        for y in prange(1, height - 1, schedule=SCHEDULE, num_threads=THREADS):
-            c1 = (y + 1) % height
-            for x in range(0, width):
-
-                    c2 = x % width
-                    d = (fire[c1, (x - 1 + width) % width]
-                       + fire[c1, c2]
-                       + fire[c1, (x + 1) % width]
-                       + fire[(y + 2) % height, c2]) * factor
-
-                    d = d - <float>(rand() * <float>0.0001)
-
-                    # Cap the values
-                    if d <0:
-                        d = 0.0
-
-                    if d>255.0:
-                        d = <float>255.0
-
-                    fire[x % height , y % width] = d
-
-                    ii = palette[<unsigned int>d % width]
-
-                    out[x, y, 0] = (ii >> 16) & 255
-                    out[x, y, 1] = (ii >> 8) & 255
-                    out[x, y, 2] = ii & 255
-
-    return asarray(out)
-
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline fire_effect_c(
-        int width_,
-        int height_,
-        float factor_,
-        unsigned int [::1] palette_,
-        float [:, ::1] fire_,
-        unsigned short int reduce_factor_ = 3,
-        unsigned short int fire_intensity_= 32,
-        bint smooth_                      = True,
-        bint bloom_                       = True,
-        bint fast_bloom_                  = False,
-        unsigned char bpf_threshold_      = 0,
-        unsigned int low_                 = 0,
-        unsigned int high_                = 600,
-        bint brightness_                  = True,
-        float brightness_intensity_       = 0.15,
-        object surface_                   = None,
-        bint adjust_palette_              = False,
-        tuple hsl_                        = (10, 80, 1.8),
-        bint transpose_                   = False,
-        bint border_                      = False,
-        bint blur_                        = True
-        ):
-    """
-
-    FIRE SHADER EFFECT 
-
-    * FIRE TEXTURE SIZES 
-    
-    input width_  : integer,  
-    input height_ : integer
-    
-    width_ and height_ values define the size of the texture e.g Surface(width x height)
-
-    * FIRE ASPECT (CONTROL OVER THE WIDTH): 
-    
-    inputs low_ : integer  
-    input high_ : integer 
-    
-    Optional arguments low_ & high_ (integer values) define the width 's limits of the fire effect. 
-    low_ for the starting point and high_ for the ending of the effect.
-    e.g low_ = 10 and high_ = 200. The fire effect will be contain within width = 10 and 200
-    low_ & high_ values must be in range [0 ... width_]  
-        
-    * FIRE HEIGHT:
-    
-    input factor_ : float
-    
-    The fire maximum height can be adjust with the variable factor_ (float value)
-    value > 3.95 will contain the effect within the display 
-    value < 3.95 will enlarge the effect over the display height  
-    Recommended value is 3.95 with reduce_factor_ = 3 otherwise adjust the value manually 
-    to contain the fire effect within the display
-        
-    * SPEED CONSIDERATION
-    
-    input reduce_factor_ : integer
-    
-    The argument reduce_factor_ control the size of the texture to be processed 
-    e.g : a value of 2, divide by 4 the pygame surface define by the values (width_ & height_)
-    Smaller texture improve the overall performances but will slightly degrade the fire aspect, 
-    especially if the blur and smooth option are not enabled.
-    Recommended value for reduce_factor_ is 3 (fast process)   
-    reduce_factor_ values must be an integer in range [ 0 ... 4] 
-    The reduce_factor_ value will have a significant impact on the fire effect maximum height, 
-    adjust the argument factor_ accordingly
-
-    * FIRE INTENSITY AT THE SOURCE
-    
-    input fire_intensity_: integer
-    
-    Set the fire intensity with the variable fire_intensity_, 0 low flame,
-    32 maximum flame effect
-    Values must be an int in range [0 ... 32] 
-
-    * SMOOTHING THE EFFECT
-    
-    input smooth_: True | False
-    
-    When smooth_ is True the algorithm will use the pygame function smoothscale (bi-linear 
-    filtering) or False the final texture will be adjust with the scale function.
-    Set this variable to False if you need the best performance for the effect or if you require
-    a pixelated fire effect. Otherwise set the variable to True for a more realistic effect. 
-
-    
-    * BLOOM EFFECT 
-    
-    input bloom_         : True | False
-    input fast_bloom_    : True | False
-    input bpf_threshold_ : integer
-       
-    Fire effect produce a bright and smooth light effect to the background texture where the fire 
-    intensity is at its maximum.
-    Use the flag fast_bloom_ for a compromise between a realistic effect and the best performances
-    The flag fast_bloom_ define a very fast bloom algo using only the smallest texture 
-    to create a bloom effect (all the intermediate textures will be bypassed). See the bloom effect 
-    project for more details.
-    When fast_bloom is False, all the sub-surfaces will be blit to the final effect and will 
-    produce a more realistic fire effect (this will slightly degrade the overall performances). 
-    If the fire effect is too bright, you can always adjust the bright pass filter value
-    bpf_threshold_(this will adjust the bloom intensity)
-    bpf_threshold_ value must be in range [ 0 ... 255]   
-    Below 128 the bloom effect will be more noticeable and above 128 only the brightest
-    area will be enhanced.
-
-    * LIGHT EFFECT INTENSITY
-
-    input brightness_            : True | False
-    input brightness_intensity_  : float
-
-    When the flag is set to True, the algorithm will use an external function, 
-    <brightness_exclude_inplace_c> to increase the brightness of the effect / texture
-    A custom color can be passed to the function defining the pixels to be ignored during the 
-    process (default is black color).
-    the value must be in range [-1.0 ... 1.0]. Values below zero will decrease the brightness 
-    of the flame effect and positive values will increase the brightness of the effect (causing
-    bright white patches on the fire texture). 
-    Values below -0.4 will cause the fire effect to be translucent and this effect can also be 
-    used for simulating ascending heat convection effects on a background texture.
-    
-    
-    * OPTIONAL SURFACE
-      
-    input surface_ : pygame.Surface
-      
-    This is an optional surface that can be passed to the shader to improve the performances 
-    and to avoid a new surface to be generated every iterations. The surface size must match 
-    exactly the reduce texture dimensions otherwise an exception will be raise. 
-    see reduce_factor_ option to determine the fire texture size that will be processed.
-    
-    * COLOR PALETTE ADJUSTMENT  
-    
-    input adjust_palette_ : True | False
-    input hsl_            : (10, 80, 1.8)
-
-    Set this flag to True to modify the color palette of the fire texture. 
-    This allow the HSL color model to be apply to the palette values
-    You can redefine the palette when the flag is True and by customizing a tuple of 3 float 
-    values, default is (10, 80, 1.8). 
-    The first value control the palette hue value, the second is for the saturation and last, 
-    the palette color lightness. 
-    With the variable hsl_ you can rotate the palette colors and define a new flame
-    aspect/color/intensity
-
-    * FLAME ORIENTATION / DIRECTION & BORDER FLAME EFFECT
-     
-    input transpose_ = True | False,
-    input border_    = True | False,
-    
-    transpose_ = True, this will transpose the final array 
-    for e.g :  
-    If the final fire texture is (w, h) after setting the transpose flag, the final 
-    fire texture will become (h, w). As a result the fire effect will be transversal (starting 
-    from the right of the display to the left side). 
-    You can always transpose / flip the texture to get the right flame orientation  
-    BORDER FLAME EFFECT 
-    border_ = True to create a flame effect burning the edge of the display
-    
-    * FINAL TOUCH
-    
-    input blur_ : True | False
-    
-    This will will blur the fire effect for a more realistic appearance, remove all the jagged 
-    edge when and pixelated effect
-    
-    
-    :param width_           : integer; Size (width) of the surface or display in pixels
-    :param height_          : integer; size (height) of the surface or display in pixels
-    :param factor_          : float; Value controlling the fire height value
-                              must be in range [3.95 ... 4.2].
-                              The value 3.95 gives the highest flame effect
-    :param palette_         : numpy.ndarray, buffer containing mapped RGB colors (uint values)
-    :param fire_            : numpy.ndarray shape (w, h) containing float values (fire intensity).
-                              For better performance it is advised to set the array to the size 
-                              of the texture after applying the reduction_factor_.
-                              For example if the reduction_factor_ is 2, the texture would have 
-                              width >> 1 and height >> 1 and the fire_array should be set to 
-                              numpy.empty((height >> 1, width >> 1), float32)
-    :param reduce_factor_   : unsigned short int ; Can be either 0, 1, 2, 3, 4. 
-                              2 and 3 provide the best performance and the best looking effect.
-    :param fire_intensity_  : Integer; Control the original amount of energy at the
-                              bottom of the fire, must be in range of [0 ... 32]. 
-                              32 being the maximum value and the maximum fire intensity
-    :param smooth_          : boolean; True smoothscale (bi-linear filtering) or
-                              scale algorithm jagged edges (mush faster)
-    :param bloom_           : boolean; True or False, True apply a bloom effect to the fire effect
-    :param fast_bloom_      : boolean; Fastest bloom. This reduce the amount of calculation
-    :param bpf_threshold_   : integer; control the bright pass filter threshold
-                              value, must be in range [0 ... 255].
-                              Maximum brightness amplification with threshold = 0, 
-                              when bpf_threshold_ = 255, no change.
-    :param low_             : integer; Starting position x for the fire effect
-    :param high_            : integer; Ending position x for the fire effect
-    :param brightness_      : boolean; True apply a bright filter shader to the array.
-                              Increase overall brightness of the effect
-    :param brightness_intensity_: float; must be in range [-1.0 ... 1.0] control
-                              the brightness intensity
-                              of the effect
-    :param surface_         : pygame.Surface. Pass a surface to the shader for
-                              better performance, otherwise algo is creating a new surface each 
-                              calls.
-    :param adjust_palette_  : boolean; True adjust the palette setting HSL
-                              (hue, saturation, luminescence).
-                              Be aware that if adjust_palette is True, the optional palette 
-                              passed to the Shader will be disregarded
-    :param hsl_             : tuple; float values of hue, saturation and luminescence.
-                              Hue in range [0.0 ... 100],  saturation [0...100], 
-                              luminescence [0.0 ... 2.0]
-    :param transpose_       : boolean; Transpose the array (w, h) become (h, w).
-                              The fire effect will start from the left and move to the right
-    :param border_          : boolean; Flame effect affect the border of the texture
-    :param blur_            : boolean; Blur the fire effect
-    :return                 : Return a pygame surface that can be blit directly to the game display
-
-    """
-
-
-    cdef int w4, h4
-
-    # TEXTURE DIVIDE BY POWER OF 2
-    if reduce_factor_ in (0, 1, 2):
-        w4, h4 = width_ >> reduce_factor_, height_ >> reduce_factor_
-
-    # TEXTURE 150 x 150 * ratio
-    elif reduce_factor_ == 3:
-        # CUSTOM SIZE WIDTH 150 AND RATIO * HIGH
-        w4 = 150
-        h4 = <int>(<float>150.0 * height_/width_)
-        low_ = <int>(low_ * low_/width_)
-        high_ = <int>(high_ * <float>150.0/width_)
-        reduce_factor_ = 0
-
-    # TEXTURE 100 x 100 * ratio
-    elif reduce_factor_ == 4:
-        w4 = 100
-        h4 = <int> (<float>100.0 * height_ / width_)
-        low_ = <int> (low_ * low_ / width_)
-        high_ = <int> (high_ * <float>100.0 / width_)
-        reduce_factor_ = 0
-
-    cdef int f_height, f_width
-    f_height, f_width = (<object>fire_).shape[:2]
-
-    assert f_width >= w4 or f_height >= h4,\
-        "Fire array size mismatch the texture size.\n" \
-        "Set fire_ array to numpy.empty((%s, %s), dtype=numpy.float32)" % (h4, w4)
-
-    if surface_ is None:
-        fire_surface_smallest = pygame.Surface((w4, h4)).convert()
-
-    else:
-        if PyObject_IsInstance(surface_, pygame.Surface):
-            assert surface_.get_width() == w4 and surface_.get_height() == h4, \
-            "Surface argument has incorrect dimension surface must be (w:%s, h:%s) got (%s, %s)\n" \
-            "Set argument surface_ to None to avoid this error message"\
-            % (w4, h4, surface_.get_width(), surface_.get_height())
-            fire_surface_smallest = surface_
-        else:
-            raise ValueError("Argument surface_ must be a Surface type got %s " % type(surface_))
-
-    if adjust_palette_:
-        palette_= make_palette_c(w4, hsl_[0], hsl_[1], hsl_[2])
-
-    if border_:
-        # CREATE THE FIRE EFFECT ONTO A PYGAME SURFACE
-        rgb_array_ = fire_surface24_c_border(
-            w4, h4, <float>1.0 / factor_, palette_, fire_, fire_intensity_,
-            low_ >> reduce_factor_, high_ >> reduce_factor_)
-    else:
-        rgb_array_ = fire_surface24_c(
-            w4, h4, <float>1.0 / factor_, palette_, fire_, fire_intensity_,
-                    low_ >> reduce_factor_, high_ >> reduce_factor_)
-
-    # BRIGHTNESS SHADER
-    if brightness_:
-        # EXCLUDE BLACK COLORS (DEFAULT)
-        assert -1.0 <= brightness_intensity_ <= 1.0, \
-            "Argument brightness intensity must be in range [-1.0 ... 1.0]"
-
-        # brightness_exclude_inplace_c(rgb_array_=rgb_array_,
-        #                                      shift_=brightness_intensity_, color_=(0, 0, 0))
-        brightness_bpf_c(rgb_array_, brightness_intensity_, 16)
-
-    if blur_:
-        blur_array_inplace_c(rgb_array_)
-
-    if transpose_:
-        rgb_array_ = rgb_array_.transpose(1, 0, 2)
-        fire_surface_smallest = rotate(fire_surface_smallest, 90)
-
-
-    # CONVERT THE ARRAY INTO A PYGAME SURFACE
-    array_to_surface(fire_surface_smallest, rgb_array_)
-
-
-    # BLOOM SHADER EFFECT
-    if bloom_:
-        assert 0 <= bpf_threshold_ < 256, \
-            "Argument bpf_threshold_ must be in range [0 ... 256] got %s " % bpf_threshold_
-        # bloom_array24_c(fire_surface_smallest, bpf_threshold_, fast_=fast_bloom_)
-        try:
-            # fire_surface_smallest = shader_bloom_fast(
-            #     fire_surface_smallest, bpf_threshold_, fast_=fast_bloom_, factor_=1)
-
-            shader_bloom_fast1(
-                fire_surface_smallest,
-                threshold_ = bpf_threshold_,
-                smooth_    = 0,
-                saturation_= True
-            )
-
-        except ValueError:
-            raise ValueError(
-                "The surface is too small and cannot be bloomed with shader_bloom_fast1.\n"
-                "Increase the size of the image")
-
-    # RESCALE THE SURFACE TO THE FULL SIZE
-    if smooth_:
-        return smoothscale(fire_surface_smallest, (width_, height_))
-
-    else:
-        return scale(fire_surface_smallest, (width_, height_))
-
-
-
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(False)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef cloud_surface24_c(
-        int width,
-        int height,
-        float factor,
-        unsigned int [::1] palette,
-        float [:, ::1] cloud_,
-        int intensity = 0,
-        int low       = 0,
-        int high      = 0,
-    ):
-
-    """
-    CLOUD PROCESSING FUNCTION
-
-    * Do not call that function directly, this function is a sub function of cloud_effect
-
-    :param width    : integer; Size (width) of the surface or display in pixels
-    :param height   : integer; size (height) of the surface or display in pixels
-    :param factor   : float; Value controlling the cloud size value must
-                      be in range [3.95 ... 4.2].
-                      value 3.95 will fill entirely the display with the cloud while value
-                      above 3.95 will shrink the cloud effect
-    :param palette  : numpy.ndarray, buffer containing mapped RGB colors (uint values)
-    :param cloud_   : numpy.ndarray shape (w, h) containing float values (cloud intensity).
-    :param intensity: integer; Determine the guaranteed amount of smoke the cloud
-                      effect will generate at the base
-                      of the effect (value must be in range [0 .. 260]). If you provide zero a 
-                      random value between 0 ... 260 will be
-                      assigned. If you provide 250, a random value between 250 and 260 will be set.
-    :param low      : integer; low determine the X starting position on the display,
-                      if you provide a value of
-                      100 pixels, the effect will start at the position 100 from the display
-                      (first 100 pixels will bot be affected by the cloud/smoke effect)
-    :param high     : integer; high determine the X ending position on the display,
-                      if you provide a value of 800 pixels, the effect will end at the 
-                      position 800 from the display (last remaining pixels will not be affected
-                      by the cloud/smoke effect)
-    :return         : Return a numpy array shape (w, h, 3) containing the RGB pixels (smoke effect)
-    """
-
-    cdef:
-        int new_height = height
-        unsigned char [:, :, ::1] out = empty((width, new_height, 3), dtype=uint8)
-        int x = 0, y = 0
-        float d
-        unsigned int ii=0
-        unsigned c1 = 0, c2 = 0
-        int p_length = (<object>palette).size
-
-    cdef int min_, max_, middle
-
-    if low != 0 or high != 0:
-        assert 0 <= low < high, "Argument low_ must be < high_"
-        assert high <= width,   "Argument high must be <= width"
-
-        middle = low + ((high - low) >> 1)
-        min_ = randRange(low, middle)
-        max_ = randRange(middle + 1, high)
-    else:
-        middle = width >> 1
-        min_ = randRange(0, middle)
-        max_ = randRange(middle +1, width)
-
-
-    with nogil:
-        # POPULATE TO THE BASE OF THE FIRE (THIS WILL CONFIGURE THE FLAME ASPECT)
-        for x in prange(min_, max_, schedule=SCHEDULE, num_threads=THREADS):
-                cloud_[(new_height - 1) % height, x % width] = randRange(intensity, 260)
-
-
-        # DILUTE THE FLAME EFFECT (DECREASE THE MAXIMUM INT VALUE) WHEN THE FLAME TRAVEL UPWARD
-        for y in prange(0, new_height - 1, schedule=SCHEDULE, num_threads=THREADS):
-            c1 = (y + 1) % height
-            for x in range(0, width):
-
-                    c2 = x % width
-                    d = (cloud_[c1, (x - 1 + width) % width]
-                       + cloud_[c1, c2]
-                       + cloud_[c1, (x + 1) % width]
-                       + cloud_[(y + 2) % height, c2]) * factor
-
-                    d = d - <float>(rand() * 0.0001)
-
-                    # Cap the values
-                    if d <0:
-                        d = 0.0
-
-                    # CAP THE VALUE TO 255
-                    if d>512.0:
-                        d = <float>512.0
-                    cloud_[y % height, x % width] = d
-
-                    ii = palette[<unsigned int>d % p_length]
-
-                    out[x, y, 0] = (ii >> 16) & 255
-                    out[x, y, 1] = (ii >> 8) & 255
-                    out[x, y, 2] = ii & 255
-
-    return asarray(out[:, 0:height, :])
-
-
-# TODO MASK ? TO MOVE CLOUD ?
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(False)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline cloud_effect_c(
-        int width_,
-        int height_,
-        float factor_,
-        unsigned int [::1] palette_,
-        float [:, ::1] cloud_,
-
-        # OPTIONAL
-        unsigned short int reduce_factor_   = 2,
-        unsigned short int cloud_intensity_ = 16,
-        bint smooth_                        = True,
-        bint bloom_                         = False,
-        bint fast_bloom_                    = True,
-        unsigned short int bpf_threshold_   = 128,
-        unsigned int low_                   = 0,
-        unsigned int high_                  = 0,
-        bint brightness_                    = False,
-        float brightness_intensity_         = 0.0,
-        object surface_                     = None,
-        bint transpose_                     = False,
-        bint blur_                          = True
-        ):
-    """
-    GENERATE CLOUD /SMOKE ON THE GAME DISPLAY 
-    
-    * CLOUD TEXTURE SIZES 
-    
-    input width_  : integer,  
-    input height_ : integer
-    
-    width_ and height_ values define the size of the texture e.g Surface(width x height)
-
-    * CLOUD ASPECT (CONTROL OVER THE WIDTH): 
-    
-    inputs low_ : integer  
-    input high_ : integer 
-    
-    Optional arguments low_ & high_ (integer values) define the width 's limits of the cloud 
-    effect. low_ for the starting point and high_ for the ending of the effect.
-    e.g low_ = 10 and high_ = 200. The cloud effect will be contain within width = 10 and 200
-    low_ & high_ values must be in range [0 ... width_]  
-        
-    * CLOUD HEIGHT:
-    
-    input factor_ : float
-    
-    The cloud maximum height can be adjust with the variable factor_ (float value)
-    value > 3.95 will contain the effect within the display 
-    value < 3.95 will enlarge the effect over the display height  
-    Recommended value is 3.95 with reduce_factor_ = 3 otherwise adjust the value manually 
-    to contain the cloud effect within the display
-        
-    * SPEED CONSIDERATION
-    
-    input reduce_factor_ : integer
-    
-    The argument reduce_factor_ control the size of the texture to be processed 
-    e.g : a value of 2, divide by 4 the pygame surface define by the values (width_ & height_)
-    Smaller texture improve the overall performances but will slightly degrade the cloud aspect, 
-    especially if the blur and smooth option are not enabled.
-    Recommended value for reduce_factor_ is 3 (fast process)   
-    reduce_factor_ values must be an integer in range [ 0 ... 4] 
-    The reduce_factor_ value will have a significant impact on the cloud effect maximum height, 
-    adjust the argument factor_ accordingly
-
-    * CLOUD INTENSITY AT THE SOURCE
-    
-    input cloud_intensity_: integer
-    
-    Set the cloud intensity with the variable cloud_intensity_, 0 low flame,
-    32 maximum flame effect
-    Values must be an int in range [0 ... 32] 
-
-    * SMOOTHING THE EFFECT
-    
-    input smooth_: True | False
-    
-    When smooth_ is True the algorithm will use the pygame function smoothscale (bi-linear 
-    filtering) or False the final texture will be adjust with the scale function.
-    Set this variable to False if you need the best performance for the effect or if you require
-    a pixelated cloud effect. Otherwise set the variable to True for a more realistic effect. 
-   
-    * BLOOM EFFECT 
-    
-    input bloom_         : True | False
-    input fast_bloom_    : True | False
-    input bpf_threshold_ : integer
-       
-    Bloom effect produce a bright and smooth light effect to the background texture where the cloud 
-    intensity is at its maximum.
-    Use the flag fast_bloom_ for a compromise between a realistic effect and the best performances
-    The flag fast_bloom_ define a very fast bloom algo using only the smallest texture 
-    to create a bloom effect (all the intermediate textures will be bypassed). See the bloom effect 
-    project for more details.
-    When fast_bloom is False, all the sub-surfaces will be blit to the final effect and will 
-    produce a more realistic cloud effect (this will slightly degrade the overall performances). 
-    If the cloud effect is too bright, you can always adjust the bright pass filter value
-    bpf_threshold_(this will adjust the bloom intensity)
-    bpf_threshold_ value must be in range [ 0 ... 255]   
-    Below 128 the bloom effect will be more noticeable and above 128 only the brightest
-    area will be enhanced.
-
-    * LIGHT EFFECT INTENSITY
-
-    input brightness_            : True | False
-    input brightness_intensity_  : float
-
-    When the flag is set to True, the algorithm will use an external function, 
-    <brightness_exclude_inplace_c> to increase the brightness of the effect / texture
-    A custom color can be passed to the function defining the pixels to be ignored during the 
-    process (default is black color).
-    the value must be in range [-1.0 ... 1.0]. Values below zero will decrease the brightness 
-    of the cloud effect and positive values will increase the brightness of the effect (causing
-    bright white patches on the cloud texture). 
-    Values below -0.4 will cause the cloud effect to be translucent 
-    
-    
-    * OPTIONAL SURFACE
-      
-    input surface_ : pygame.Surface
-      
-    This is an optional surface that can be passed to the shader to improve the performances 
-    and to avoid a new surface to be generated every iterations. The surface size must match 
-    exactly the reduce texture dimensions otherwise an exception will be raise. 
-    see reduce_factor_ option to determine the cloud texture size that will be processed.
-    
-
-    * CLOUD ORIENTATION / DIRECTION 
-     
-    input transpose_ = True | False,
-    
-    transpose_ = True, this will transpose the final array 
-    for e.g :  
-    If the final cloud texture is (w, h) after setting the transpose flag, the final 
-    cloud texture will become (h, w). As a result the cloud effect will be transversal (starting 
-    from the right of the display to the left side). 
-    You can always transpose / flip the texture to get the right cloud orientation  
-    
-    * FINAL TOUCH
-    
-    input blur_ : True | False
-    
-    This will will blur the cloud effect for a more realistic appearance, remove all the jagged 
-    edge when and pixelated effect
-    
-    :param width_               : integer; Texture size (width) 
-    :param height_              : integer; Texture size (height)
-    :param factor_              : float; Floating value used to control the size of the cloud
-                                  effect. Value must be in range [3.95 ... 4.2]. Value > 3.95 
-                                  will contain the smoke/ cloud effect within the display. 
-                                  Values < 3.95 will enlarge the smoke effect.                              
-    :param palette_             : numpy.ndarray or cython memoryview containing the color for the 
-                                  cloud effect (buffer containing mapped RGB colors (uint values))
-    :param cloud_               : numpy.ndarray shape (w, h) containing float values 
-                                  (cloud intensity). For better performance it is advised to set the
-                                  array to the size of the texture after applying the 
-                                  reduction_factor_. For example if the reduction_factor_ is 2, 
-                                  the texture would have to be width >> 1 and height >> 1 and the 
-                                  cloud_ array should be equivalent to numpy.empty((height >> 1, 
-                                  width >> 1), float32)
-    :param reduce_factor_       : integer; unsigned short int ; Can be either 0, 1, 2, 3, 4. 
-                                  2 and 3 provide the best performance and the best looking effect.
-    :param cloud_intensity_     : integer; Determine the amount of smoke the cloud
-                                  effect will generate at the base of the effect (value must be in 
-                                  range [0 .. 260]). If you provide zero a random value between 
-                                  0 ... 260 will be assigned. If you provide 250, a random value 
-                                  between 250 and 260 will be set for the amount of smoke. 
-                                  The highest the value, the more dense the cloud effect will be
-    :param smooth_              : boolean; True use a smoothscale (bi-linear filtering) or
-                                  False -> scale algorithm jagged edges (mush faster)
-    :param bloom_               : True | False, Add a bloom effect when the flag is set to True
-                                  The bloom effect will smooth the cloud and create a dense smoke 
-                                  areas where the cloud is the brightest.  
-    :param fast_bloom_          : True | False; This set a fast algorithm for the bloom effect (the 
-                                  bloom effect will use the smallest texture)
-    :param bpf_threshold_       : integer; Bright pass filter value must be in range [ 0 ... 255]
-                                  0 produce the maximum bloom effect
-    :param low_                 : integer; must be in range [ 0 ... width_], left position of the 
-                                  cloud effect 
-    :param high_                : integer; must be in range [ 0 ... height_], right position of the
-                                  cloud effect
-    :param brightness_          : True | False; Increase the brightness of the cloud effect when 
-                                  True
-    :param brightness_intensity_: float; Set the brightness intensity of the cloud. The value must 
-                                  be in range [-1.0 ... +1.0]. Changing the value overtime will 
-                                  generate a realistic cloud effect. Negative value will generate 
-                                  translucent patch of smoke on the background image
-    :param surface_             : Pygame.Surface; Pass a surface to the shader for
-                                  better performance, otherwise a new surface will be created each 
-                                  calls.
-    :param transpose_           : boolean; Transpose the array (w, h) become (h, w).
-                                  The cloud effect will start from the left and move to the right
-    :param blur_                : boolean; Blur the cloud effect
-    :return                     : Return a pygame surface that can be blit directly to the game 
-                                  display
-    """
-
-
-    cdef int w4, h4
-
-    # TEXTURE DIVIDE BY POWER OF 2
-    if reduce_factor_ in (0, 1, 2):
-        w4, h4 = width_ >> reduce_factor_, height_ >> reduce_factor_
-
-    # TEXTURE 150 x 150 * ratio
-    elif reduce_factor_ == 3:
-        # CUSTOM SIZE WIDTH 150 AND RATIO * HIGH
-        w4 = 150
-        h4 = <int>(150 * height_/width_)
-        low_ = <int>(low_ * low_/width_)
-        high_ = <int>(high_ * 150/width_)
-        reduce_factor_ = 0
-
-    # TEXTURE 100 x 100 * ratio
-    elif reduce_factor_ == 4:
-        w4 = 100
-        h4 = <int> (100 * height_ / width_)
-        low_ = <int> (low_ * low_ / width_)
-        high_ = <int> (high_ * 100 / width_)
-        reduce_factor_ = 0
-
-    cdef int f_height, f_width
-    f_height, f_width = (<object> cloud_).shape[:2]
-
-    assert f_width >= w4 or f_height >= h4, \
-        "Cloud array size mismatch the texture size.\n" \
-        "Set cloud array to numpy.empty((%s, %s), dtype=numpy.float32)" % (h4, w4)
-
-    if surface_ is None:
-        cloud_surface_smallest = pygame.Surface((w4, h4)).convert()
-
-    else:
-        if PyObject_IsInstance(surface_, pygame.Surface):
-            assert surface_.get_width() == w4 and surface_.get_height() == h4, \
-            "Surface argument has incorrect dimension surface must be (w:%s, h:%s) got (%s, %s)\n" \
-            "Set argument surface_ to None to avoid this error message"\
-            % (w4, h4, surface_.get_width(), surface_.get_height())
-            cloud_surface_smallest = surface_
-        else:
-            raise ValueError("Argument surface_ must be a Surface type got %s " % type(surface_))
-
-    rgb_array_ = cloud_surface24_c(
-        w4, h4, <float>1.0 / factor_, palette_, cloud_, cloud_intensity_,
-                low_ >> reduce_factor_, high_ >> reduce_factor_)
-
-    # BRIGHTNESS SHADER
-    if brightness_:
-        # EXCLUDE BLACK COLORS (DEFAULT)
-        assert -1.0 <= brightness_intensity_ <= 1.0, \
-            "Argument brightness intensity must be in range [-1.0 ... 1.0]"
-        brightness_exclude_inplace_c(rgb_array_=rgb_array_,
-                                              shift_=brightness_intensity_, color_=(0, 0, 0))
-
-    if blur_:
-        blur_array_inplace_c(rgb_array_)
-
-    if transpose_:
-        rgb_array_ = rgb_array_.transpose(1, 0, 2)
-        cloud_surface_smallest = make_surface(rgb_array_)
-    else:
-        # CONVERT THE ARRAY INTO A PYGAME SURFACE
-        array_to_surface(cloud_surface_smallest, rgb_array_)
-
-
-    # BLOOM SHADER EFFECT
-    if bloom_:
-        assert 0 <= bpf_threshold_ < 256, \
-            "Argument bpf_threshold_ must be in range [0 ... 256] got %s " % bpf_threshold_
-        bloom_array24_c(cloud_surface_smallest, bpf_threshold_, fast_=fast_bloom_)
-
-    # RESCALE THE SURFACE TO THE FULL SIZE
-    if smooth_:
-        cloud_effect = smoothscale(cloud_surface_smallest, (width_, height_))
-    else:
-        cloud_effect = scale(cloud_surface_smallest, (width_, height_))
-
-    return cloud_effect
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline mirroring_c(unsigned char[:, :, :] rgb_array_):
-
-    """
-    SHADER MIRRORING
-
-    This method create a mirror image placed to the right side of the
-     original image referenced by rgb_array_
-
-    The Array (rgb_array) must be a numpy array shape (w, h, 3)
-    containing RGB pixels, please refer to pygame
-    function pixels3d or array3d to convert an image into a 3d
-    array (library surfarray)
-
-    :param rgb_array_: numpy ndarray shape (w, h, 3) containing RGB pixels
-    :return          : returns a numpy ndarray shape (w, h, 3) with transformation
-    """
-
-    cdef:
-        Py_ssize_t w, h
         int x2, x3
-    w, h = rgb_array_.shape[:2]
+        const unsigned char *r
+        const unsigned char *g
+        const unsigned char *b
 
 
-    cdef:
-        int x, y
-        unsigned char [:, :, :] new_array = empty((w, h, 3), uint8)
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
+    for x in prange(w, schedule=SCHEDULE, num_threads=THREADS):
 
-    with nogil:
-        for x in prange(w, schedule=SCHEDULE, num_threads=THREADS):
-            x2 = x >> <unsigned short int> 1
-            x3 = <int> w - x2 - <unsigned short int> 1
-            for y in range(h):
+        x2 = x >> 1
+        x3 = <int> w - x2 - 1
 
-                r = &rgb_array_[x, y, <unsigned short int>0]
-                g = &rgb_array_[x, y, <unsigned short int>1]
-                b = &rgb_array_[x, y, <unsigned short int>2]
+        for y in range(h):
 
-                new_array[x2, y, <unsigned short int>0] = r[<unsigned short int>0]
-                new_array[x2, y, <unsigned short int>1] = g[<unsigned short int>0]
-                new_array[x2, y, <unsigned short int>2] = b[<unsigned short int>0]
+            r = &rgb_array[x, y, 0]
+            g = &rgb_array[x, y, 1]
+            b = &rgb_array[x, y, 2]
 
-                new_array[x3, y, <unsigned short int>0] = r[<unsigned short int>0]
-                new_array[x3, y, <unsigned short int>1] = g[<unsigned short int>0]
-                new_array[x3, y, <unsigned short int>2] = b[<unsigned short int>0]
+            new_array[x2, y, 0] = r[0]
+            new_array[x2, y, 1] = g[0]
+            new_array[x2, y, 2] = b[0]
 
-    return asarray(new_array)
+            new_array[x3, y, 0] = r[0]
+            new_array[x3, y, 1] = g[0]
+            new_array[x3, y, 2] = b[0]
+
+    return new_array
 
 
 
@@ -9490,52 +16175,85 @@ cdef inline mirroring_c(unsigned char[:, :, :] rgb_array_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline mirroring_inplace_c(unsigned char[:, :, :] rgb_array_):
-
+@cython.exceptval(check=False)
+cdef inline void mirroring_inplace_c(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        unsigned char[:, :, :] rgb_array,
+        const unsigned char [:, :, :] rgb_array_cp
+) nogil:
     """
-    SHADER MIRRORING (INPLACE)
+    Apply an in-place horizontal mirroring effect to the given RGB array.
 
-    This method create a mirror image placed to the right side of
-     the original image referenced by rgb_array_
+    This function performs horizontal mirroring of the input `rgb_array` by 
+    copying the mirrored data from the `rgb_array_cp` into `rgb_array` itself. 
+    The original `rgb_array` is modified directly, and no new array is returned.
 
-    The Array (rgb_array) must be a numpy array shape (w, h, 3)
-    containing RGB pixels, please refer to pygame
-    function pixels3d or array3d to convert an image into a 3d array (library surfarray)
+    Example:
+        image_copy = image.copy()
+        mirroring_inplace_c(800, 600, image.get_buffer(), image_copy.get_buffer())
 
-    :param rgb_array_: numpy ndarray shape (w, h, 3) containing RGB pixels
-    :return          : void
+    Parameters
+    ----------
+    w : int
+        The width of the image array, representing the number of columns in the 
+        input array.
+
+    h : int
+        The height of the image array, representing the number of rows in the 
+        input array.
+
+    rgb_array : numpy.ndarray or memoryviewslice
+        A 3D array or memoryview of shape (w, h, 3) containing the pixel data 
+        (RGB or BGR format). This array will be modified directly by the function.
+
+    rgb_array_cp : numpy.ndarray or memoryviewslice
+        A 3D array or memoryview of shape (w, h, 3) containing the original 
+        pixel data. This serves as the source for the mirrored pixels and is 
+        not modified by the function.
+
+    Returns
+    -------
+    void
+        This function modifies the `rgb_array` in-place and does not return any value.
+
+    Notes
+    -----
+    - The function operates in-place, meaning that it modifies the original `rgb_array` directly.
+    - The `rgb_array_cp` serves as a reference and should contain the original (non-mirrored) pixel data.
+    - This function is designed to be used in performance-sensitive applications, with the `nogil` context allowing 
+      it to run efficiently in multi-threaded environments.
     """
+
+
 
     cdef:
-        Py_ssize_t w, h
+        int x, y
         int x2, x3
-    w, h = rgb_array_.shape[:2]
+        const unsigned char *r
+        const unsigned char *g
+        const unsigned char *b
 
-    cdef:
-        int x, y
-        # unsigned char [:, :, :] rgb_array_copy = numpy.array(rgb_array_, copy=True)
-        unsigned char [::1, :, :] rgb_array_copy = numpy.array(rgb_array_, copy=False, order='F')
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
+    for x in prange(w, schedule=SCHEDULE, num_threads=THREADS):
 
-    with nogil:
-        for x in prange(w, schedule=SCHEDULE, num_threads=THREADS):
-            x2 = x >> <unsigned short int> 1
-            x3 = <int> w - x2 - <unsigned short int> 1
-            for y in range(h):
+        x2 = x >> 1
+        x3 = <int> w - x2 - 1
 
-                r = &rgb_array_copy[x, y, <unsigned short int>0]
-                g = &rgb_array_copy[x, y, <unsigned short int>1]
-                b = &rgb_array_copy[x, y, <unsigned short int>2]
+        for y in range(h):
 
-                rgb_array_[x2, y, <unsigned short int>0] = r[<unsigned short int>0]
-                rgb_array_[x2, y, <unsigned short int>1] = g[<unsigned short int>0]
-                rgb_array_[x2, y, <unsigned short int>2] = b[<unsigned short int>0]
+            r = &rgb_array_cp[x, y, 0]
+            g = &rgb_array_cp[x, y, 1]
+            b = &rgb_array_cp[x, y, 2]
 
-                rgb_array_[x3, y, <unsigned short int>0] = r[<unsigned short int>0]
-                rgb_array_[x3, y, <unsigned short int>1] = g[<unsigned short int>0]
-                rgb_array_[x3, y, <unsigned short int>2] = b[<unsigned short int>0]
+
+            rgb_array[x2, y, 0] = r[0]
+            rgb_array[x2, y, 1] = g[0]
+            rgb_array[x2, y, 2] = b[0]
+
+            rgb_array[x3, y, 0] = r[0]
+            rgb_array[x3, y, 1] = g[0]
+            rgb_array[x3, y, 2] = b[0]
+
 
 
 @cython.binding(False)
@@ -9545,66 +16263,102 @@ cdef inline mirroring_inplace_c(unsigned char[:, :, :] rgb_array_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef tuple dampening(
         object surface_,
-        int frame_,
+        int frame,
         int display_width,
-        int display_height_,
-        float amplitude_=50.0,
-        int duration_=30,
-        float freq_=20.0):
+        int display_height,
+        float amplitude = 50.0,
+        int duration = 30,
+        float freq = 20.0):
 
     """
-    DAMPENING EFFECT
+    Apply a dampening effect to a surface.
 
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
+    This effect simulates a gradual scaling or shrinking of the surface based on a 
+    damped oscillation function. The length of the effect is determined by the product 
+    of duration and frequency. The position of the surface is adjusted according to 
+    its new size to maintain its centered position on the display.
 
-    Compatible with image 24-32 bit
-    The length of the effect equal duration_ * freq_
+    Example:
+        surf, xx, yy = dampening(BCK, frame, w, h, amplitude=100, duration=40, freq=15)
+        SCREEN.blit(surf, (xx, yy))
 
-    e.g :
-    surf, xx, yy = dampening(BCK, frame, width, height,
-    amplitude_=100, duration_=40, freq_=15)
-    SCREEN.blit(surf, (xx, yy))
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A Pygame surface that is compatible with 24-32 bit color depth.
 
-    :param surface_       : pygame.Surface (compatible 24 - 32 bit)
-    :param frame_         : integer; Frame number (linear variable changing overtime)
-    :param display_width  : integer; Size of your game display (width)
-    :param display_height_: integer; size of your game display (height)
-    :param amplitude_     : float; Amplitude of the dampening effect  (default is 50)
-    :param duration_      : integer; Duration of the effect (default value is 30)
-    :param freq_          : float; change the speed of the effect default value is 20.0.
-    A small value will decrease
-    the overall timing of the effect while a larger value will increase the duration of the effect.
-    :return               : Tuple values containing the Surface and the position (x, y)
-    with x & y are the top
-     left corner of the
-    image
+    frame : int
+        The current frame number in the animation sequence. This should be incremented 
+        with each frame update.
+
+    display_width : int
+        The width of the game display window.
+
+    display_height : int
+        The height of the game display window.
+
+    amplitude : float, optional
+        The amplitude of the dampening effect, which determines the maximum amount 
+        of scaling (default is 50.0).
+
+    duration : int, optional
+        The duration of the effect, which controls how long the effect lasts 
+        in terms of frames (default is 30).
+
+    freq : float, optional
+        The frequency of the dampening effect, which affects how fast the scaling 
+        oscillates. A smaller value will make the effect last longer, while a larger 
+        value shortens the effect (default is 20.0).
+
+    Returns
+    -------
+    Tuple
+        A tuple containing:
+            - A new Pygame Surface with the dampening effect applied.
+            - The x-coordinate of the new position of the surface (top-left corner).
+            - The y-coordinate of the new position of the surface (top-left corner).
+            The surface is centered in the display area.
     """
 
-    assert freq_ > <float>0.0, "Argument freq_ must be > 0"
-    assert duration_ > <float>0.0, "Argument duration_ must be > 0"
+    # Ensure that frequency and duration are positive
+    assert freq > 0.0, "Argument freq must be > 0"
+    assert duration > 0.0, "Argument duration must be > 0"
 
-    cdef float t = damped_oscillation(<float>((<float>frame_ / freq_) % duration_))
-    cdef int width, height,
-    cdef float tm = t * amplitude_
+    # Calculate dampened oscillation effect based on the frame number
+    cdef float t = damped_oscillation(<float>((<float>frame / freq) % duration))
+    cdef int width, height
+    cdef float tm = t * amplitude
 
+    # Get the current width and height of the surface
     width, height = surface_.get_size()
 
+    # Ensure that the surface does not shrink below a certain size
     if width + tm < 0:
         tm = 0
     if height + tm < 0:
         tm = 0
-    cdef object surf = smoothscale(surface_, (<int>tm +<int> (width + <int>tm),
-                                              <int>tm +<int> (height + <int>tm)))
+
+    # Apply the dampening effect by scaling the surface
+    cdef object surf = smoothscale(
+        surface_, 
+        (<int>tm + <int>(width + <int>tm), 
+         <int>tm + <int>(height + <int>tm))
+    )
+
+    # Get the new size of the scaled surface
     cdef int new_width, new_height
     new_width, new_height = surf.get_size()
 
+    # Calculate the difference in position to center the surface
     cdef int diff_x = display_width - new_width
-    cdef int diff_y = display_height_ - new_height
+    cdef int diff_y = display_height - new_height
 
+    # Return the modified surface and its centered position (x, y)
     return surf, diff_x >> 1, diff_y >> 1
+
 
 
 @cython.binding(False)
@@ -9614,44 +16368,78 @@ cpdef tuple dampening(
 @cython.cdivision(False)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline float lateral_dampening(int frame_, float amplitude_=50.0,
-                                     int duration_=30, float freq_=20.0):
+@cython.exceptval(check=False)
+cpdef inline float lateral_dampening(
+        int frame,
+        float amplitude = 50.0,
+        int duration = 30,
+        float freq = 20.0):
+
     """
-    DAMPENING EFFECT
+    Apply lateral dampening effect to produce horizontal displacement.
 
-    * This method return the lateral displacement (x)
+    This method calculates the lateral displacement (x-coordinate) based on a dampened 
+    oscillation function. The displacement value oscillates between positive and negative 
+    values, gradually decaying according to the amplitude, frequency, and duration parameters.
 
-    e.g:
-    tm = lateral_dampening(frame, amplitude_=50.0, duration_=35, freq_=5.0)
-    SCREEN.blit(BCK, (tm, 0), special_flags=0)
+    Example:
+        tm = lateral_dampening(frame, amplitude=50.0, duration=35, freq=5.0)
+        SCREEN.blit(BCK, (tm, 0), special_flags=0)
 
-    Cython cpdef function, this function can be called directly and do not require a
-    hook function.
+    Parameters
+    ----------
+    frame : int
+        The current frame number in the animation sequence. This value must be incremented 
+        with each frame to produce smooth animation.
 
-    The length of the effect equal duration_ * freq_
+    amplitude : float, optional
+        The amplitude of the lateral dampening effect. This value controls the maximum 
+        displacement of the surface. A higher value results in larger horizontal movement. 
+        Default is 50.0.
 
-    :param frame_    : integer; Your game frame number
-    :param amplitude_: float; Represent the amplitude of the dampening effect.
-                       An amplitude of 1.0 will have no effect.Default value is 50.0
-    :param duration_ : float; This represent the duration of the effect, default value is 30
-    :param freq_     : float; change the speed of the effect default value is 20.0.
-                       A small value will decrease
-                       the overall timing of the effect while a larger value will increase the 
-                       duration of the effect.
-    :return          : Return a float corresponding to the lateral displacement (x)
+    duration : int, optional
+        The total duration of the effect, in terms of frames. This defines how long the 
+        oscillations will last. The default value is 30 frames.
+
+    freq : float, optional
+        The frequency of the dampening oscillation. This controls how fast the oscillations 
+        occur. A lower value makes the effect take longer to complete (slower oscillation), 
+        while a higher value speeds up the oscillation. Default is 20.0.
+
+    Returns
+    -------
+    float
+        The lateral displacement value (x) that can be used to shift the object horizontally 
+        on the screen (e.g., when blitting an image). The value will oscillate within a 
+        range determined by the amplitude.
+
+    Notes
+    -----
+    - The displacement follows a damped oscillation model, where the value decays 
+      over time based on the frequency and duration parameters.
     """
-    assert freq_ > 0, "Argument freq_ must be > 0"
-    assert duration_ > 0, "Argument duration_ must be > 0"
 
-    cdef float t = damped_oscillation(<float>((<float>frame_ / freq_) % duration_)) * amplitude_
+    # Ensure that frequency and duration are positive to avoid invalid values
+    assert freq > 0, "Argument freq must be > 0"
+    assert duration > 0, "Argument duration must be > 0"
+
+    # Calculate the dampened oscillation value based on the current frame
+    # The damped_oscillation function should return a value that simulates 
+    # oscillations over time, based on frequency and duration.
+    cdef float t = damped_oscillation(<float>((<float>frame / freq) % duration)) * amplitude
+
+    # Return the lateral displacement value (x)
     return t
+
 
 # --------------------------------------------------------------------------------------------------------
 # KERNEL DEFINITION FOR SHARPEN ALGORITHM
-cdef float [:, ::1] SHARPEN_KERNEL = numpy.array(([0, -1, 0],
+cdef const float [:, ::1] SHARPEN_KERNEL = numpy.array(([0, -1, 0],
                       [-1, 5, -1],
                       [0, -1, 0]), order='C').astype(dtype=float32)
 cdef int HALF_KERNEL = <int>len(SHARPEN_KERNEL) >> 1
+
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -9660,105 +16448,274 @@ cdef int HALF_KERNEL = <int>len(SHARPEN_KERNEL) >> 1
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void sharpen_inplace_c(unsigned char [:, :, :] rgb_array_):
-        """
-        SHARPEN IMAGE APPLYING THE BELOW 3 X 3 KERNEL OVER EVERY PIXELS.
+@cython.exceptval(check=False)
+cdef inline void sharpen_inplace_c(unsigned char [:, :, :] rgb_array):
+    """
+    Apply a sharpen effect on an image using a 3x3 convolution kernel (inplace).
 
-        The Array (rgb_array) must be a numpy array shape (w, h, 3)
-        containing RGB pixels, please refer to pygame
-        function pixels3d or array3d to convert an image into a 3d array (library surfarray)
+    This function modifies the provided image (rgb_array) in place by applying a 
+    sharpen filter using a 3x3 convolution kernel. The sharpen effect increases the 
+    contrast of the image by emphasizing edges. The kernel used is as follows:
 
-        pixels convoluted outside image edges will be set to adjacent edge value
-        [0 , -1,  0]
-        [-1,  5, -1]
-        [0 , -1,  0]
+    [ 0, -1,  0 ]
+    [-1,  5, -1 ]
+    [ 0, -1,  0 ]
 
-        e.g
-        sharpen(surface_)
+    The kernel works by increasing the central pixel's value (multiplied by 5) while 
+    subtracting values from its immediate neighbors (multiplied by -1). This sharpens 
+    the image by increasing edge contrasts.
 
-        :param rgb_array_: numpy.ndarray shape (w, h, 3) containing all the RGB pixels
-        :return          : void
-        """
+    Note:
+    - The function works in-place, so the original `rgb_array` is modified.
+    - Pixels on the image edges are handled by setting them to adjacent edge values.
 
-        # texture sizes
-        cdef Py_ssize_t w, h
-        w, h = rgb_array_.shape[:2]
+    Example:
+        sharpen_inplace_c(bgr_array)
 
-        cdef:
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray or memoryviewslice
+        A 3D numpy array or memoryviewslice with shape (w, h, 3|4) where w and h 
+        are the image width and height, and the third dimension contains RGB, RGBA, 
+        BGR, or BGRA pixel values in uint8 format. The array is modified in place.
 
-            unsigned char [:, :, :] rgb_array_1 = \
-                numpy.empty((w, h, 3), uint8)
-            int x, y, xx, yy
-            short kernel_offset_y, kernel_offset_x
-            float r, g, b
-            float * k
-            unsigned char *rr
-            unsigned char *gg
-            unsigned char *bb
-            int w_1 = <int>w - 1
-            int h_1 = <int>h - 1
+    Returns
+    -------
+    void
+        The function modifies the `rgb_array` in place and does not return any value.
+    """
 
-        with nogil:
+    # texture sizes
+    cdef Py_ssize_t w, h
+    w, h = rgb_array.shape[:2]
 
-            for y in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+    cdef:
 
-                for x in range(w):
+        unsigned char [:, :, :] rgb_array_1 = numpy.empty((w, h, 3), uint8)
+        int x, y, xx, yy
+        short kernel_offset_y, kernel_offset_x
+        float r, g, b
+        const float * k
+        unsigned char *rr
+        unsigned char *gg
+        unsigned char *bb
+        int w_1 = <int>w - 1
+        int h_1 = <int>h - 1
 
-                    rr = &rgb_array_1[x, y, 0]
-                    gg = &rgb_array_1[x, y, 1]
-                    bb = &rgb_array_1[x, y, 2]
+    with nogil:
 
-                    r, g, b = <unsigned char>0, <unsigned char>0, <unsigned char>0
+        for y in prange(h, schedule=SCHEDULE, num_threads=THREADS):
 
-                    for kernel_offset_y in range(
+            for x in range(w):
+
+                rr = &rgb_array_1[x, y, 0]
+                gg = &rgb_array_1[x, y, 1]
+                bb = &rgb_array_1[x, y, 2]
+
+                r, g, b = 0, 0, 0
+
+                for kernel_offset_y in range(-HALF_KERNEL, HALF_KERNEL + 1):
+
+                    yy = y + kernel_offset_y
+
+                    if yy < 0:
+                        yy = <unsigned short int> 0
+
+                    if yy > h_1:
+                        yy = h_1
+
+                    for kernel_offset_x in range(
                             -HALF_KERNEL, HALF_KERNEL + 1):
-                        yy = y + kernel_offset_y
-                        if yy < 0:
-                            yy = <unsigned short int> 0
-                        if yy > h_1:
-                            yy = h_1
 
-                        for kernel_offset_x in range(
-                                -HALF_KERNEL, HALF_KERNEL + 1):
-                            xx = x + kernel_offset_x
-                            if xx < 0:
-                                xx = <unsigned short int>0
-                            if xx > w_1:
-                                xx = w_1
+                        xx = x + kernel_offset_x
 
-                            k = &SHARPEN_KERNEL[kernel_offset_y + HALF_KERNEL,
-                                               kernel_offset_x + HALF_KERNEL]
+                        if xx < 0:
+                            xx = 0
 
-                            r = r + rgb_array_[xx, yy, 0] * k[0]
-                            g = g + rgb_array_[xx, yy, 1] * k[0]
-                            b = b + rgb_array_[xx, yy, 2] * k[0]
+                        if xx > w_1:
+                            xx = w_1
 
-                    if r < 0:
-                        r = <float>0
-                    if g < 0:
-                        g = <float>0
-                    if b < 0:
-                        b = <float>0
-                    if r > 255:
-                        r= <float>255
-                    if g > 255:
-                        g = <float>255
-                    if b > 255:
-                        b = <float>255
+                        k = &SHARPEN_KERNEL[kernel_offset_y + HALF_KERNEL,
+                                           kernel_offset_x + HALF_KERNEL]
+                        if k[0] != 0.0:
+                            r = r + rgb_array[xx, yy, 0] * k[0]
+                            g = g + rgb_array[xx, yy, 1] * k[0]
+                            b = b + rgb_array[xx, yy, 2] * k[0]
 
-                    rr[0] = <unsigned char>r
-                    gg[0] = <unsigned char>g
-                    bb[0] = <unsigned char>b
+                if r < 0:
+                    r = <float>0
 
-            for y in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+                if g < 0:
+                    g = <float>0
 
-                for x in range(w):
-                    rgb_array_[x, y, 0] =\
-                        rgb_array_1[x, y, 0]
-                    rgb_array_[x, y, 1] =\
-                        rgb_array_1[x, y, 1]
-                    rgb_array_[x, y, 2] =\
-                        rgb_array_1[x, y, 2]
+                if b < 0:
+                    b = <float>0
+
+                if r > 255:
+                    r= <float>255
+
+                if g > 255:
+                    g = <float>255
+
+                if b > 255:
+                    b = <float>255
+
+                rr[0] = <unsigned char>r
+                gg[0] = <unsigned char>g
+                bb[0] = <unsigned char>b
+
+        for y in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+
+            for x in range(w):
+
+                rgb_array[x, y, 0] = rgb_array_1[x, y, 0]
+                rgb_array[x, y, 1] = rgb_array_1[x, y, 1]
+                rgb_array[x, y, 2] = rgb_array_1[x, y, 2]
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void sharpen32_inplace_c(unsigned char [:, :, :] rgba_array_):
+    """
+    Apply a sharpen effect to an image using a 3x3 convolution kernel (in-place).
+
+    This function modifies the provided image (rgba_array_) in place by applying 
+    a sharpen filter using a 3x3 convolution kernel. The sharpen effect enhances 
+    the contrast by emphasizing edges. The kernel used is:
+
+    [ 0, -1,  0 ]
+    [-1,  5, -1 ]
+    [ 0, -1,  0 ]
+
+    The kernel works by multiplying the central pixel by 5 and subtracting values 
+    from its immediate neighbors (multiplied by -1). This sharpen filter emphasizes 
+    edge details by increasing contrast around the edges.
+
+    Note:
+    - The operation is performed in-place, meaning the original `rgba_array_` will 
+      be modified directly.
+    - Pixels on the edges of the image are handled by replicating the adjacent edge values.
+
+    Example:
+        sharpen32_inplace_c(rgba_array)
+
+    Parameters
+    ----------
+    rgba_array_ : numpy.ndarray or memoryviewslice
+        A 3D numpy array or memoryviewslice with shape (w, h, 4) where `w` and `h` 
+        are the image's width and height, and the third dimension contains RGBA pixel 
+        values (each channel being uint8). The array will be modified in place.
+
+    Returns
+    -------
+    void
+        The function modifies the `rgba_array_` in place and does not return any value.
+    """
+
+    # texture sizes
+    cdef Py_ssize_t w, h
+    w, h = rgba_array_.shape[:2]
+
+    cdef:
+
+        unsigned char [:, :, :] rgba_array_1 = numpy.empty((w, h, 4), uint8)
+        int x, y, xx, yy
+        short kernel_offset_y, kernel_offset_x
+        float r, g, b
+        const float * k
+        unsigned char *rr
+        unsigned char *gg
+        unsigned char *bb
+        unsigned char *aa
+        int w_1 = <int>w - 1
+        int h_1 = <int>h - 1
+
+    with nogil:
+
+        for y in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+
+            for x in range(w):
+
+                aa = &rgba_array_[ x, y, 3 ]
+                # skip transparent pixels
+                if aa[0] == 0:
+                    continue
+
+                rr = &rgba_array_1[x, y, 0]
+                gg = &rgba_array_1[x, y, 1]
+                bb = &rgba_array_1[x, y, 2]
+
+
+                r, g, b = 0, 0, 0
+
+                for kernel_offset_y in range(-HALF_KERNEL, HALF_KERNEL + 1):
+
+                    yy = y + kernel_offset_y
+
+                    if yy < 0:
+                        yy = <unsigned short int> 0
+
+                    if yy > h_1:
+                        yy = h_1
+
+                    for kernel_offset_x in range(
+                            -HALF_KERNEL, HALF_KERNEL + 1):
+
+                        xx = x + kernel_offset_x
+
+                        if xx < 0:
+                            xx = 0
+
+                        if xx > w_1:
+                            xx = w_1
+
+                        k = &SHARPEN_KERNEL[kernel_offset_y + HALF_KERNEL,
+                                            kernel_offset_x + HALF_KERNEL]
+                        if k[0] != 0.0:
+                            r = r + rgba_array_[xx, yy, 0] * k[0]
+                            g = g + rgba_array_[xx, yy, 1] * k[0]
+                            b = b + rgba_array_[xx, yy, 2] * k[0]
+
+                if r < 0:
+                    r = <float>0
+
+                if g < 0:
+                    g = <float>0
+
+                if b < 0:
+                    b = <float>0
+
+                if r > 255:
+                    r= <float>255
+
+                if g > 255:
+                    g = <float>255
+
+                if b > 255:
+                    b = <float>255
+
+                rr[0] = <unsigned char>r
+                gg[0] = <unsigned char>g
+                bb[0] = <unsigned char>b
+
+
+        for y in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+
+            for x in range(w):
+
+                rgba_array_[x, y, 0] = rgba_array_1[x, y, 0]
+                rgba_array_[x, y, 1] = rgba_array_1[x, y, 1]
+                rgba_array_[x, y, 2] = rgba_array_1[x, y, 2]
+
+
+
 
 
 # Added to version 1.0.1
@@ -9769,38 +16726,79 @@ cdef inline void sharpen_inplace_c(unsigned char [:, :, :] rgb_array_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef cartoon_c(
         object surface_,
-        unsigned int sobel_threshold_,
-        unsigned int median_kernel_,
-        unsigned int color_,
-        unsigned int flag_):
+        unsigned int sobel_threshold = 128,
+        unsigned int median_kernel   = 2,
+        unsigned int color           = 8,
+        unsigned int flag            = BLEND_RGB_ADD):
     """
+    Apply a cartoon effect to an image.
 
-    :param surface_: pygame.Surface compatible 24 - 32 bit 
-    :param sobel_threshold_: integer sobel threshold
-    :param median_kernel_  : integer median kernel  
-    :param color_          : integer; color reduction value (max color)
-    :param flag_           : integer; Blend flag e.g (BLEND_RGB_ADD, BLEND_RGB_SUB, 
-                             BLEND_RGB_MULT, BLEND_RGB_MAX, BLEND_RGB_MIN  
-    :return               : Return a pygame Surface with the cartoon effect 
+    This function applies a series of image processing techniques to simulate a 
+    cartoon-style effect on an input image. It combines edge detection (using Sobel), 
+    median filtering for smoothing, and color reduction to achieve a cartoonish look.
+
+    Example:
+        cartoon_image = cartoon_c(image)
+
+    Parameters
+    ----------
+    surface_ : pygame.Surface
+        A pygame.Surface object compatible with 24-bit or 32-bit images (RGB or RGBA).
+
+    sobel_threshold : int, optional
+        The threshold value for Sobel edge detection (default is 128). 
+        Higher values result in stronger edge detection.
+
+    median_kernel : int, optional
+        The size of the kernel used for median filtering (default is 2).
+        Larger values result in greater smoothing.
+
+    color : int, optional
+        The number of colors to reduce the image to (default is 8).
+        This controls the level of color reduction to create a "posterized" effect.
+
+    flag : int, optional
+        The blending flag used for the final image composition (default is BLEND_RGB_ADD).
+        It determines how the processed image is combined with the original.
+
+    Returns
+    -------
+    pygame.Surface
+        A pygame.Surface object with the cartoon effect applied.
     """
-
+    
+    # Create a copy of the surface to work with
     surface_branch_1 = surface_.copy()
 
+    # Attempt to get a 3D array view of the pixel data
     try:
         array_ = surface_branch_1.get_view('3')
-
     except Exception as e:
         raise ValueError(
-        "Cannot reference source pixels into a 3d array.\n %s " % e)
+            "\nCannot reference source pixels into a 3D array.\n %s " % e)
 
-    sobel_inplace_c(array_, sobel_threshold_)
-    median_fast(surface_, kernel_size_=median_kernel_, reduce_factor_=1)
+    # Apply Sobel edge detection to the image to highlight edges
+    sobel_inplace_c(array_, sobel_threshold)
+
+    # Apply median filtering to smooth the image and reduce noise
+    median_fast(surface_, kernel_size_=median_kernel, reduce_factor_=1)
+
+    # Transfer the processed array back to the surface
     pygame.surfarray.array_to_surface(surface_branch_1, array_)
+
+    # Clean up the array reference after use
     del array_
-    surface_.blit(surface_branch_1, (0, 0), special_flags=flag_)
-    color_reduction(surface_, color_)
+
+    # Blend the processed image with the original surface using the specified blend flag
+    surface_.blit(surface_branch_1, (0, 0), special_flags=flag)
+
+    # Posterize the surface to reduce the number of colors (to simulate cartoon shading)
+    posterize_surface(surface_, color)
+
+    # Return the surface with the cartoon effect applied
     return surface_
 
 
@@ -9811,31 +16809,35 @@ cdef cartoon_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef object blending(object source_, unsigned char[:, :, :] destination_, float percentage_):
+@cython.exceptval(check=False)
+cdef object blend_c(
+        unsigned char[:, :, :] source_array,
+        unsigned char[:, :, :] destination_array,
+        float percentage):
+
     """
-    BLEND A SOURCE TEXTURE TOWARD A DESTINATION TEXTURE (TRANSITION EFFECT)
+    Alpha Blending 
+    
+    Blend two images together.
+    
+    e.g:
+    # compatible 24, 32-bit data
+    image = blend_c(source_array, destination_array, percentage)
 
-    * Video system must be initialised 
-    * source_ & destination_ Textures must be same sizes
-    * Compatible with 24 - 32 bit surface
-    * Output create a new surface
 
-
-    :param source_     : pygame.Surface (Source)
-    :param destination_: pygame.Surface (Destination)
-    :param percentage_ : float; Percentage value between [0.0 ... 100.0]
-    :return: return    : Return a 24 bit pygame.Surface and blended with a percentage
-                         of the destination texture.
+    :param source_array:
+        numpy.ndarray or memoryviewslice shape (w, h, 3) type uint8
+        
+    :param destination_array: 
+        numpy.ndarray or memoryviewslice shape (w, h, 3) type uint8
+        
+    :param percentage: 
+        float; Percentage value between [0.0 ... 100.0]
+        
+    :return: return: 
+        Return a 24-bit surface, blend of both input images
+        
     """
-
-    cdef:
-            unsigned char [:, :, :] source_array
-
-    try:
-        source_array      = source_.get_view('3')
-
-    except Exception as e:
-        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
     cdef:
 
@@ -9843,30 +16845,36 @@ cdef object blending(object source_, unsigned char[:, :, :] destination_, float 
         int i=0, j=0
         Py_ssize_t w = source_array.shape[0]
         Py_ssize_t h = source_array.shape[1]
-        unsigned char[:, :, ::1] final_array = \
-            numpy.ascontiguousarray(empty((h, w, 3), dtype=uint8))
-        float c4 = percentage_ * <float>0.01
+        unsigned char[:, :, ::1] final_array = numpy.ascontiguousarray(empty((h, w, 3), dtype=uint8))
+        float c4 = percentage * <float>0.01
         float tmp = <float> 1.0 - c4
+        unsigned char * v
 
     with nogil:
         for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(w):
 
-                c1 = min(<unsigned char> (<float> destination_[i, j, 0] * c4 +
+                c1 = min(<unsigned char> (<float> destination_array[i, j, 0] * c4 +
                                 source_array[i, j, 0] * tmp),
                          <unsigned char>255)
-                c2 = min(<unsigned char> (<float> destination_[i, j, 1] * c4 +
+                c2 = min(<unsigned char> (<float> destination_array[i, j, 1] * c4 +
                                 source_array[i, j, 1] * tmp),
                          <unsigned char>255)
-                c3 = min(<unsigned char> (<float> destination_[i, j, 2] * c4 +
+                c3 = min(<unsigned char> (<float> destination_array[i, j, 2] * c4 +
                                 source_array[i, j, 2] * tmp),
                          <unsigned char>255)
 
-                final_array[j, i, 0] = c1 # if c1>0 else 0
-                final_array[j, i, 1] = c2 # if c2>0 else 0
-                final_array[j, i, 2] = c3 # if c3>0 else 0
+                v = &final_array[j, i, 0]
+
+                v[0] = c1
+                (v + 1)[0] = c2
+                (v + 2)[0] = c3
+                # final_array[j, i, 0] = c1 # if c1>0 else 0
+                # final_array[j, i, 1] = c2 # if c2>0 else 0
+                # final_array[j, i, 2] = c3 # if c3>0 else 0
 
     return frombuffer(final_array, (w, h), 'RGB')
+
 
 
 @cython.binding(False)
@@ -9876,41 +16884,48 @@ cdef object blending(object source_, unsigned char[:, :, :] destination_, float 
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void blend_inplace_c(
-        object source_,
-        unsigned char[:, :, :] destination_,
-        float percentage_
+        unsigned char[:, :, :] destination,
+        const unsigned char[:, :, :] source,
+        const float percentage
        ):
+
     """
-    BLEND A SOURCE TEXTURE TOWARD A DESTINATION TEXTURE (TRANSITION EFFECT)
-
-    * Video system must be initialised 
-    * source_ & destination_ Textures must be same sizes
-    * Compatible with 24 - 32 bit surface
-    * Output create a new surface
-
-    :param source_     : pygame.Surface (Source)
-    :param destination_: 3d array, numpy.ndarray  (Destination)
-    :param percentage_ : float; Percentage value between [0.0 ... 100.0]
-    :return: return    : Return a 24 bit pygame.Surface and blended with a percentage
-                         of the destination texture.
+    Blend the source image into the destination (inplace) 
+    
+    source & destination Textures must be same sizes
+    Compatible with 24 - 32 bit surface
+    
+    e.g:
+    blend_inplace(DESTINATION, BACKGROUND, percentage = VALUE)
+    
+    :param destination: 
+        numpy.ndarray shape(w, h, 3) or memoryviewslice type uint8 containing RGB pixel 
+        format or any other pixel format.
+        This array will receive the transformation (blend of both images,
+        source and destination)
+        
+    :param source: 
+        numpy.ndarray shape(w, h, 3) or memoryviewslice type uint8 containing RGB pixel 
+        format or any other pixel format.
+        This array will remain unchanged.
+        
+    :param percentage: 
+        float; Percentage value between [0.0 ... 100.0]
+        
+    :return:
+        void
+    
     """
-
-    cdef:
-            unsigned char [:, :, :] source_array
-    try:
-        source_array  =  source_.get_view('3')
-
-    except Exception as e:
-        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
     cdef:
 
         unsigned char c1, c2, c3
         int i=0, j=0
-        Py_ssize_t w = source_array.shape[0]
-        Py_ssize_t h = source_array.shape[1]
-        float c4 = percentage_ * <float> 0.01
+        Py_ssize_t w = source.shape[0]
+        Py_ssize_t h = source.shape[1]
+        float c4 = percentage * <float> 0.01
         float tmp = <float> 1.0 - c4
 
     with nogil:
@@ -9918,16 +16933,16 @@ cdef inline void blend_inplace_c(
         for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(w):
 
-                c1 = min(<unsigned char> (<float> destination_[i, j, 0] * c4 +
-                                source_array[i, j, 0] * tmp), <unsigned char>255)
-                c2 = min(<unsigned char> (<float> destination_[i, j, 1] * c4 +
-                                source_array[i, j, 1] * tmp), <unsigned char>255)
-                c3 = min(<unsigned char> (<float> destination_[i, j, 2] * c4 +
-                                source_array[i, j, 2] * tmp), <unsigned char>255)
+                c1 = min(<unsigned char> (<float> source[i, j, 0] * c4 +
+                                destination[i, j, 0] * tmp), <unsigned char>255)
+                c2 = min(<unsigned char> (<float> source[i, j, 1] * c4 +
+                                destination[i, j, 1] * tmp), <unsigned char>255)
+                c3 = min(<unsigned char> (<float> source[i, j, 2] * c4 +
+                                destination[i, j, 2] * tmp), <unsigned char>255)
 
-                source_array[ i, j, 0 ] = c1 # if c1 > 0 else 0
-                source_array[ i, j, 1 ] = c2 # if c2 > 0 else 0
-                source_array[ i, j, 2 ] = c3 # if c3 > 0 else 0
+                destination[ i, j, 0 ] = c1 # if c1 > 0 else 0
+                destination[ i, j, 1 ] = c2 # if c2 > 0 else 0
+                destination[ i, j, 2 ] = c3 # if c3 > 0 else 0
 
 
 
@@ -9939,87 +16954,104 @@ cdef inline void blend_inplace_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef object alpha_blending(object source_, object destination_):
+@cython.exceptval(check=False)
+cpdef object alpha_blending(source, destination):
     """
-    ALPHA BLENDING 
-
-    * Video system must be initialised 
-    * source_ & destination_ Textures must be same sizes
-    * Compatible with 32 bit surfaces only
-    * Output create a new surface
-
-    :param source_     : pygame.Surface (Source) 32-bit with alpha channel
-    :param destination_: pygame.Surface (Destination) 32-bit with alpha channel
-    :return: return    : Return a 24 bit pygame.Surface with alpha blending
+    Alpha blending (return new surface)
+    
+    Blend two 32-bit images together. 
+    Both images must be format 32-bit with alpha layers.
+    The source image will be draw on the top of the destination image.
+    
+    e.g:
+    new_image = alpha_blending(source, destination)
+    
+    :param source     : 
+        pygame.Surface (Source) 32-bit with alpha channel
+        
+    :param destination: 
+        pygame.Surface (Destination) 32-bit with alpha channel
+        
+    :return: return   : 
+        Return a 32 bit pygame.Surface with both images blended together
     """
 
     cdef:
-            float [:] source_array
-            float [:] destination_array
-            int w, h
+        Py_ssize_t w, h, w2, h2
+        int bit_size, bit_size2
+        unsigned char [ ::1 ] source_array,
+        unsigned char[ ::1 ] destination_array
 
-    w, h = source_.get_size()
+    w, h = source.get_size()
+    w2, h2 = destination.get_size()
+    bit_size = source.get_bytesize()
+    bit_size2 = destination.get_bytesize()
+
+    if bit_size != 4:
+        raise ValueError("\n Source image is not a 32-bit")
+
+    if bit_size2 != 4:
+        raise ValueError("\n Destination image is not a 32-bit")
 
     # source & destination array are normalized
     try:
-        source_array      = \
-            (numpy.frombuffer(source_.get_view('0').raw,
-             dtype=numpy.uint8) / <float>255.0).astype(dtype=numpy.float32)
+        # source array is BGRA format
+        source_array = numpy.ascontiguousarray(source.get_buffer(), dtype=uint8)
 
     except Exception as e:
-        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError(
+            "\nCannot reference source pixels into a 1d memoryviewslice array.\n %s " % e)
 
     try:
-        destination_array =\
-            (numpy.frombuffer(destination_.get_view('0').raw,
-             dtype=numpy.uint8) / <float>255.0).astype(dtype=numpy.float32)
+        # destination array is BGRA format
+        destination_array = numpy.ascontiguousarray(destination.get_buffer(), dtype=uint8)
+
 
     except Exception as e:
-        raise ValueError("\nCannot reference destination pixels into a 3d array.\n %s " % e)
+        raise ValueError(
+            "\nCannot reference destination pixels into a 1d memoryviewslice array.\n %s " % e)
 
     cdef:
 
-        float rr, gg, bb, alpha, tmp
+        float rr, gg, bb, tmp
         int i=0
-        int l = w * h * 4
-        unsigned char[:] final_array = empty(l, dtype=uint8)
-
-
-        float *r
-        float *g
-        float *b
+        int l = w * h * bit_size
+        int l2 = w2 * h2 * bit_size2
+        unsigned char[::1] final_array = numpy.ascontiguousarray(empty(l, dtype=uint8))
+        float r, g, b
         float *a
+        unsigned char *p1
+        unsigned char *d1
+
+    if l!=l2:
+        raise ValueError("\nSource and destination must be same sizes.")
 
     with nogil:
         # noinspection SpellCheckingInspection
-        for i in prange(0, l, 4, schedule=SCHEDULE, num_threads=THREADS):
+        for i in prange(0, l, bit_size, schedule=SCHEDULE, num_threads=THREADS):
 
-                r = &source_array[i+2]
-                g = &source_array[i+1]
-                b = &source_array[i]
-                a = &source_array[i+3]
+                p1 = &source_array[ i ]
+                d1 = &destination_array[ i ]
 
-                # premult with alpha
-                r[0] = r[0] * a[0]
-                g[0] = g[0] * a[0]
-                b[0] = b[0] * a[0]
+                tmp = (<float> 255.0 - (p1 + 3)[0]) *  (d1 + 3)[0] * <float>ONE_65025
 
-                tmp = (<float>1.0 - a[0]) * destination_array[i+3]
-                alpha = a[0] + tmp
+                r = (p1 + 2)[0] * (p1 + 3)[0] * <float>ONE_65025
+                g = (p1 + 1)[0] * (p1 + 3)[0] * <float>ONE_65025
+                b = p1[0] * (p1 + 3)[0] * <float>ONE_65025
 
                 # premult with alpha
-                rr = r[0] + destination_array[i+2] *  tmp
-                gg = g[0] + destination_array[i+1] *  tmp
-                bb = b[0] + destination_array[i  ] *  tmp
+                rr = r + (d1+2)[0] * <float>ONE_255 *  tmp
+                gg = g + (d1+1)[0] * <float>ONE_255 *  tmp
+                bb = b + d1[0] * <float>ONE_255 *  tmp
 
                 # back to [0 ... 255]
                 final_array[i]   = <unsigned char>min(rr * <float>255.0, <unsigned char>255)
                 final_array[i+1] = <unsigned char>min(gg * <float>255.0, <unsigned char>255)
                 final_array[i+2] = <unsigned char>min(bb * <float>255.0, <unsigned char>255)
-                final_array[i+3] = <unsigned char>min(alpha * <float>255.0, <unsigned char>255)
+                final_array[i+3] = <unsigned char>min(((p1 + 3)[0] + tmp * <float>255.0), <unsigned char>255)
 
-    return pygame.image.frombuffer(numpy.asarray(
-        final_array).reshape(w, h, 4), (w, h), 'RGBA')
+    return pygame.image.frombuffer(final_array, (w, h), 'RGBA')
+
 
 # new version 1.0.5
 @cython.binding(False)
@@ -10029,87 +17061,114 @@ cpdef object alpha_blending(object source_, object destination_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef void alpha_blending_inplace(object source_, object destination_):
+@cython.exceptval(check=False)
+cpdef void alpha_blending_inplace(object image1, object image2):
     """
-    ALPHA BLENDING INPLACE
+    Alpha blending (inplace)
 
-    * Video system must be initialised 
-    * source_ & destination_ Textures must be same sizes
-    * Compatible with 32 bit surfaces only
-    * Output create a new surface
+    Blend two images together, 
+    image1 and image2 must have the same dimensions and be format 32-bit with 
+    layer alpha. The pixels format must be RGB(A) in range (0 ... 255). 
+    
+    e.g:
+    
+    alpha_blending_inplace(source, destination)
 
-
-    :param source_     : pygame.Surface (Source) 32-bit with alpha channel
-    :param destination_: pygame.Surface (Destination) 32-bit with alpha channel
-    :return: return    : Return a 24 bit pygame.Surface with alpha blending
+    :param image2     : 
+        pygame.Surface 32-bit must have an alpha channel
+        an exception will be raised otherwise
+        
+    :param image1: 
+        pygame.Surface 32-bit must have an alpha channel
+        an exception will be raised otherwise
+        
+    :return: return    : 
+        Return a 32 bit pygame.Surface, 
+        with blended images. 
     """
 
     cdef:
-            float [:, :, :] source_array
-            float [:, :, :] destination_array
-            unsigned char [:, :, :] dest_rgb
-            unsigned char [:, :] dest_alpha
-            int w, h
+        unsigned char [::1] image1_array
+        unsigned char [::1] image2_array
+        Py_ssize_t w, h, w2, h2
+        int bit_size, bit_size2
 
-    w, h = source_.get_size()
+    w, h = image2.get_size()
+    w2, h2 = image1.get_size()
+    bit_size = image2.get_bytesize()
+    bit_size2 = image1.get_bytesize()
+
+    if bit_size != 4:
+        raise ValueError("\n Source image is not a 32-bit")
+
+    if bit_size2 != 4:
+        raise ValueError("\n Destination image is not a 32-bit")
 
     # source & destination array are normalized
     try:
-        source_rgb = (pixels3d(source_)/<float>255.0)
-        source_alpha = (pixels_alpha(source_)/<float>255.0)
-        source_array = numpy.dstack((source_rgb, source_alpha)).astype(dtype=numpy.float32)
+        image1_array = numpy.ascontiguousarray(image2.get_buffer(), dtype = uint8)
 
     except Exception as e:
-        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+        raise ValueError(
+            "\nCannot reference image2 pixels into a 1d memoryviewslice array.\n %s " % e)
 
     try:
-        dest_rgb = destination_.get_view('3')
-        dest_alpha = pixels_alpha(destination_)
-        destination_array = (numpy.dstack(
-            (numpy.asarray(dest_rgb), numpy.asarray(dest_alpha)))/<float>255.0
-                             ).astype(dtype=numpy.float32)
-
+        image2_array = numpy.ascontiguousarray(image1.get_buffer(), dtype = uint8)
 
     except Exception as e:
-        raise ValueError("\nCannot reference destination pixels into a 3d array.\n %s " % e)
+        raise ValueError(
+            "\nCannot reference image1 pixels into a 1d memoryviewslice array.\n %s " % e)
 
     cdef:
 
-        float rr, gg, bb, alpha, tmp
+        float rr, gg, bb, tmp
         int i=0, j=0
+        int l = w * h * bit_size
+        int l2 = w2 * h2 * bit_size2
+        float r, g, b
+        float alpha, beta
+        unsigned char *p1
+        unsigned char *p2
 
-        float *r
-        float *g
-        float *b
-        float *a
+
+    if l!=l2:
+        raise ValueError("\nimage1 and image2 must be same sizes.")
 
     with nogil:
         # noinspection SpellCheckingInspection
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
-            for i in range(w):
-                r = &source_array[i, j, 0]
-                g = &source_array[i, j, 1]
-                b = &source_array[i, j, 2]
-                a = &source_array[i, j, 3]
+        for i in prange(0, l, bit_size, schedule=SCHEDULE, num_threads=THREADS):
+
+                p1 = &image1_array[ i ]
+                p2 = &image2_array[ i ]
+
+                # image 1alpha
+                alpha = (p1 + 3)[0] * <float>ONE_255
+                # image2 alpha
+                beta = (p2 + 3)[0] * <float>ONE_255
+
+                # RGB premultiplied
+                r = (p1 + 2)[0] * <float>ONE_255 * alpha
+                g = (p1 + 1)[0] * <float>ONE_255 * alpha
+                b = p1[ 0 ] * <float>ONE_255 * alpha
+
+                tmp = (<float> 1.0 - alpha) * <float>ONE_255 * beta
 
                 # premult with alpha
-                r[0] = r[0] * a[0]
-                g[0] = g[0] * a[0]
-                b[0] = b[0] * a[0]
-
-                tmp = (<float>1.0 - a[0]) * destination_array[i, j, 3]
-                alpha = a[0] + tmp
-
-                # premult with alpha
-                rr = r[0] + destination_array[i, j, 0] *  tmp
-                gg = g[0] + destination_array[i, j, 1] *  tmp
-                bb = b[0] + destination_array[i, j, 2] *  tmp
+                rr = r + (p2 + 2)[0] * tmp
+                gg = g + (p2 + 1)[0] * tmp
+                bb = b + p2[ 0 ] * tmp
 
                 # back to [0 ... 255]
-                dest_rgb[i, j, 0] = <unsigned char>min(rr * <float>255.0, <unsigned char>255)
-                dest_rgb[i, j, 1] = <unsigned char>min(gg * <float>255.0, <unsigned char>255)
-                dest_rgb[i, j, 2] = <unsigned char>min(bb * <float>255.0, <unsigned char>255)
-                dest_alpha[i, j] = <unsigned char>min(alpha * <float>255.0, <unsigned char>255)
+                # Source array buffer is BGRA format
+                (p1 + 2)[0] = <unsigned char> min(rr * <float> 255.0, <unsigned char> 255)
+                (p1 + 1)[0] = <unsigned char> min(gg * <float> 255.0, <unsigned char> 255)
+                p1[ 0 ] = <unsigned char> min(bb * <float> 255.0, <unsigned char> 255)
+                (p1 + 3)[0] = <unsigned char> min(
+                    (alpha + beta * (1 - alpha)) * <float> 255.0, <unsigned char> 255)
+
+
+
+
 
 
 
@@ -10121,15 +17180,73 @@ cpdef void alpha_blending_inplace(object source_, object destination_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void dirt_lens_c(
         object source_,
         object lens_model_,
         int flag_,
         float light_=0.0):
 
+    """
+    Dirt lens effect (inplace)
+    
+    This function display a dirt lens texture on the top of your game display to 
+    simulate a camera artefact or realistic camera effect when the light from the
+    scene is oriented directly toward the camera. 
+    
+    Choose a lens texture from the Assets directory (free textures provided in Assets directory 
+    of this project). All textures are sizes 5184x3456 and would have to be re-sized beforehand.
+    
+    The setting `light_` is a float values cap between -1.0 to 0.2 and allow you to increase the 
+    light source oriented toward the camera. Values <0.0 will decrease the lens dirt 
+    effect and values >0.0 will increase the brightness of the display and increase the 
+    amount of dirt on the camera lens (your display).
+    
+    Optionally the setting flag can be changed from BLEND_RGB_ADD to any other pygame optional 
+    flags value. BLEND_RGB_ADD is the default setting and allow the pixels from the dirt lens 
+    texture to be blended (added) to the display.
+    
+    e.g:
+    dirt_lens(image, flag_=BLEND_RGB_ADD, lens_model_=lens, light_=VALUE)
+    
+    :param source_: 
+        Surface 24 - 32 bit represent the surface or the display 
+    
+    :param lens_model_: 
+        Surface The Lens model is a pygame Surface. PygameShader provide 6 
+        different surfaces that can be used as a layer to generate a dirt lens effect on your game 
+        display. See below for the name of the free dirt lens textures. 
+     
+        Assets/Bokeh__Lens_Dirt_9.jpg
+        Assets/Bokeh__Lens_Dirt_38.jpg
+        Assets/Bokeh__Lens_Dirt_46.jpg
+        Assets/Bokeh__Lens_Dirt_50.jpg
+        Assets/Bokeh__Lens_Dirt_54.jpg
+        Assets/Bokeh__Lens_Dirt_67.jpg
+     
+        The texture has to be loaded prior calling this effect and passed as an argument. By default 
+        the textures sizes are 5184x3456 (w & h). The texture(s) have to be re-scale once to the game 
+        display dimensions (e.g 1027x768)
+     
+    :param flag_: 
+        integer; pygame flags such as BLEND_RGB_ADD, BLEND_RGB_MAX etc. These flags 
+        will change the overall appearance of the effect. BLEND_RGB_ADD is the default flag and blend 
+        together the dirt_lens image and the game display.
+    
+    :param light_: 
+        float; Float value cap between [-1.0 ... 0.2] to increase or decrease 
+        the overall brightness of the dirt lens texture. This setting can be used to simulate a 
+        texture transition when sweeping the values from -1.0 toward 0.2 by a small increment.
+        Values < 0 will tend to diminish the effect and values > 0 will increase the brightness 
+        and the dirt lens effect. 
+     
+    :return: 
+        void; Inplace transformation.
+    """
+
     if light_!=0.0:
 
-        lens_model_ = brightness_c(lens_model_.get_view('3'), light_)
+        lens_model_ = brightness_copy_c(lens_model_.get_view('3'), light_)
 
     source_.blit(lens_model_, (0, 0), special_flags=flag_)
 
@@ -10142,21 +17259,43 @@ cdef inline void dirt_lens_c(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef object dithering_c(float [:, :, :] rgb_array_):
+    """
+    Apply Floyd-Steinberg Dithering to an image.
 
-    """
-    Dithering is used in computer graphics to create the illusion of "color depth" in images with
-    a limited color palette - a technique also known as color quantization. In a dithered image,
-    colors that are not available in the palette are approximated by a diffusion of colored pixels
-    from within the available palette. The human eye perceives the diffusion as a mixture of 
-    the colors within it (see color vision). Dithered images, particularly those with relatively
-    few colors, can often be distinguished by a characteristic graininess or speckled appearance.
+    Dithering is a technique used in computer graphics to simulate the appearance of colors
+    that are not present in a limited color palette. It works by diffusing the error between 
+    the desired color and the available color to neighboring pixels, creating the illusion of 
+    more colors. The human eye perceives this diffusion as a smooth transition between colors, 
+    even when fewer colors are available. Dithering can give images a characteristic grainy or 
+    speckled appearance, particularly when the number of colors is low.
+
+    The Floyd-Steinberg algorithm is a widely used dithering method that disperses the quantization
+    error to adjacent pixels, producing visually appealing results.
+
+    Example:
+        image = dithering_c(bgr_array)
+
+    Parameters
+    ----------
+    rgb_array_ : numpy.ndarray
+        A 3D numpy array (w, h, 3) of type float32 representing the input image in RGB format, 
+        where each pixel value is normalized in the range [0.0, 1.0].
+
+    Returns
+    -------
+    numpy.ndarray
+        A 2D numpy array representing the output image, in a 24-bit color format (8 bits per channel),
+        regardless of the input image format.
     
-    :param rgb_array_: pygame.Surface compatible 24-32 bit
-    
-    A value of 2 means a total of 8 colors
-    :return: pygame surface 24-32 bit    
+    Notes
+    -----
+    - This function performs Floyd-Steinberg dithering to reduce the color depth of the image.
+    - The input image must be in RGB format with pixel values normalized between 0.0 and 1.0.
+    - The output image will be in 24-bit format (8 bits per channel).
     """
+
 
     cdef Py_ssize_t w, h
     w = <object> rgb_array_.shape[ 0 ]
@@ -10229,10 +17368,8 @@ cdef object dithering_c(float [:, :, :] rgb_array_):
                         b1 = &rgb_array_[x + 1, y + 1, 2]
                         b1[0] = b1[0] + quantization_error_blue * C4
 
-    # return make_surface((asarray(rgb_array_) * <float>255.0).astype(dtype=numpy.uint8))
     arr = (asarray(rgb_array_).transpose(1, 0, 2) * <float> 255.0).astype(dtype=numpy.uint8, order='C')
     return frombuffer(arr, (w, h), "RGB")
-
 
 
 
@@ -10243,8 +17380,39 @@ cdef object dithering_c(float [:, :, :] rgb_array_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void dithering_inplace_c(float [:, :, :] rgb_array_, unsigned char[:, :, :] tmp):
-
+    """
+    Dithering Floyd Steinberg (inplace)
+    
+    Dithering is used in computer graphics to create the illusion of "color depth" in images with
+    a limited color palette - a technique also known as color quantization. In a dithered image,
+    colors that are not available in the palette are approximated by a diffusion of colored pixels
+    from within the available palette. The human eye perceives the diffusion as a mixture of 
+    the colors within it (see color vision). Dithered images, particularly those with relatively
+    few colors, can often be distinguished by a characteristic graininess or speckled appearance
+    
+    Take a pygame surface as argument format 24-32 bit and convert it to a 3d array format 
+    (w, h, 3) type float (float32, single precision). 
+    As the image is converted to a different data type format (uint8 to float32), 
+    the transformation cannot be applied inplace. The image returned by the method dithering 
+    is a copy of the original image.   
+    
+    e.g:
+    # for 24 - 32 bit 
+    dithering_inplace_c(image)
+       
+    :param rgb_array_: 
+        numpy.ndarray shape (w, h, 3) of type float32 containing RGB pixel format, all the pixels 
+        are normalized between 0.0 ... 1.0
+          
+    :param tmp: 
+        numpy.ndarray shape (w, h, 3) of type uint8 containing the source RGB pixels
+          
+    :return: 
+        void
+             
+    """
 
     cdef Py_ssize_t w, h
     w = <object> rgb_array_.shape[ 0 ]
@@ -10314,6 +17482,7 @@ cdef inline void dithering_inplace_c(float [:, :, :] rgb_array_, unsigned char[:
                         b1 = &rgb_array_[x + 1, y + 1, 2]
                         b1[0] = b1[0] + quantization_error_blue * C4
 
+
         for y in prange(1, h, schedule=SCHEDULE, num_threads=THREADS):
             for x in range(1, w):
                 tmp[x, y, 0] = <unsigned char>(rgb_array_[x, y, 0] * <float>255.0)
@@ -10329,20 +17498,41 @@ cdef inline void dithering_inplace_c(float [:, :, :] rgb_array_, unsigned char[:
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef object dithering_atkinson_c(float [:, :, :] rgb_array_):
 
     """
+    
+    Dithering atkinson (copy)
+    
+    Atkinson dithering is a variant of Floyd–Steinberg dithering designed by 
+    Bill Atkinson at Apple Computer, and used in the original Macintosh computer. 
+    
     Dithering is used in computer graphics to create the illusion of "color depth" in images with
     a limited color palette - a technique also known as color quantization. In a dithered image,
     colors that are not available in the palette are approximated by a diffusion of colored pixels
     from within the available palette. The human eye perceives the diffusion as a mixture of 
     the colors within it (see color vision). Dithered images, particularly those with relatively
     few colors, can often be distinguished by a characteristic graininess or speckled appearance.
-
-    :param rgb_array_: pygame.Surface compatible 24-32 bit
-
-    A value of 2 means a total of 8 colors
-    :return: pygame surface 24-32 bit    
+    
+    Take a pygame surface as argument format 24-32 bit and convert it to a 3d array format 
+    (w, h, 3) type float (float32, single precision) containing RGB pixels format
+    
+    As the image is converted to a different data type format (conversion from uint8 to float32), 
+    the transformation cannot be applied inplace. 
+    
+    The image returned is a copy of the original image.   
+    
+    e.g:
+    # for 24, 32-bit image format 
+    rgb_array = dithering_atkinson_c(rgb_array)
+    
+    :param rgb_array_:
+        numpy.ndarray shape (w, h, 3) of type float32 containing all the normalized pixels format RGB
+        
+    :return: 
+        pygame surface 24-bit format.
+           
     """
 
     cdef Py_ssize_t w, h
@@ -10431,9 +17621,151 @@ cdef object dithering_atkinson_c(float [:, :, :] rgb_array_):
                     b1 = &rgb_array_[x, y + 2, 2]
                     b1[0] += quantization_error_blue
 
-
     arr = (asarray(rgb_array_).transpose(1,0,2) * <float>255.0).astype(dtype=numpy.uint8, order='C')
     return frombuffer(arr, (w, h), "RGB")
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef dithering1D_atkinson_c(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        unsigned char [::1] bgr_array,
+        bint format_32 = False
+        ):
+    """
+    Apply 1D Atkinson dithering to a BGR or BGRA image buffer.
+
+    This function uses the Atkinson dithering algorithm, which is a type of ordered dithering 
+    designed to reduce the color depth of an image while maintaining visual quality. The Atkinson 
+    algorithm works by diffusing the quantization error to adjacent pixels, creating a visually 
+    smoother transition between colors in low-color images.
+
+    This implementation operates on a C-buffer (1D array), which can represent either a BGR or BGRA 
+    image format. The dithering process alters the pixel values in place to simulate a larger color 
+    palette in the final image.
+
+    Example:
+        dithering1D_atkinson_c(w, h, bgr_array, format_32=True)
+
+    Parameters
+    ----------
+    w : int
+        The width of the image (number of pixels along the x-axis).
+    
+    h : int
+        The height of the image (number of pixels along the y-axis).
+    
+    bgr_array : unsigned char [::1]
+        A 1D C-buffer (array) containing the pixel data of the image in BGR format. 
+        The image can either be in BGR or BGRA format, depending on the value of `format_32`.
+    
+    format_32 : bool, optional, default=False
+        If True, the input image is in BGRA format (with 4 channels per pixel); 
+        if False, the input image is in BGR format (3 channels per pixel).
+    
+    Returns
+    -------
+    void
+        The function modifies the input `bgr_array` in place, applying the Atkinson dithering 
+        algorithm to reduce the color depth of the image.
+
+    Notes
+    -----
+    - The dithering algorithm works by diffusing quantization errors to neighboring pixels in 
+      the image, creating a smoother gradient with fewer colors.
+    - This function modifies the image buffer directly and does not return a new buffer.
+    - The `bgr_array` should be a C-buffer (1D array) containing BGR or BGRA pixel data, 
+      depending on the `format_32` parameter.
+    """
+
+
+    cdef short int bytesize = 4 if format_32==True else 3
+    cdef unsigned int row = w * bytesize
+
+    cdef:
+        int i
+        int l = w * h * bytesize
+        float new_red, new_green, new_blue
+        float quantization_error_red, quantization_error_green, quantization_error_blue
+        float oldr, oldg, oldb
+        float * p1
+        float [::1] tmp = numpy.asarray(bgr_array, dtype=numpy.float32) * <float>ONE_255
+
+    with nogil:
+
+        for i in prange(0, l, bytesize,  schedule=SCHEDULE, num_threads=1): #=THREADS):
+
+                p1 = &tmp[ i ]
+
+                # skip when alpha is null.
+                # neighborhood pixels are most likely transparent as well
+                if bytesize == 4:
+                    if (p1 + 3)[ 0 ] == 0:
+                        continue
+
+                oldr = p1[0]
+                oldg = (p1 + 1)[ 0 ]
+                oldb = (p1 + 2)[ 0 ]
+
+                new_red   = round_c(oldr)
+                new_green = round_c(oldg)
+                new_blue  = round_c(oldb)
+
+                p1[ 0 ]= new_red
+                (p1 + 1)[ 0 ] = new_green
+                (p1 + 2)[ 0 ] = new_blue
+
+                quantization_error_red   = <float>(oldr - new_red) * <float>0.125
+                quantization_error_green = <float>(oldg - new_green) * <float>0.125
+                quantization_error_blue  = <float>(oldb - new_blue) * <float>0.125
+
+                if i < l - bytesize:
+                    p1 = &tmp[ i + bytesize ]
+                    p1[0] += quantization_error_red
+                    (p1 + 1)[0] += quantization_error_green
+                    (p1 + 2)[0] += quantization_error_blue
+
+                if i < l - 2 * bytesize:
+                    p1 = &tmp[ i + bytesize * 2 ]
+                    p1[0] += quantization_error_red
+                    (p1 + 1)[0] += quantization_error_green
+                    (p1 + 2)[0] += quantization_error_blue
+
+                if i < l - (bytesize + row):
+                    p1 = &tmp[ i - bytesize + row ]
+                    p1[0] += quantization_error_red
+                    (p1 + 1)[0] +=  quantization_error_green
+                    (p1 + 2)[0] += quantization_error_blue
+
+                if i < l - row:
+                    p1 = &tmp[ i + row ]
+                    p1[0] += quantization_error_red
+                    (p1 + 1)[0] += quantization_error_green
+                    (p1 + 2)[0] += quantization_error_blue
+
+                if i < l - (bytesize + row):
+                    p1 = &tmp[ i + bytesize + row ]
+                    p1[0] += quantization_error_red
+                    (p1 + 1)[0] += quantization_error_green
+                    (p1 + 2)[0] += quantization_error_blue
+
+                if i < l - row * 2 :
+                    p1 = &tmp[ i + row * 2 ]
+                    p1[ 0 ] += quantization_error_red
+                    (p1 + 1)[ 0 ] += quantization_error_green
+                    (p1 + 2)[ 0 ] += quantization_error_blue
+
+        for i in prange(0, l, schedule=SCHEDULE, num_threads=THREADS):
+            bgr_array [ i ] = <unsigned char>(tmp [ i ] * <float>255.0)
+
 
 
 
@@ -10445,18 +17777,51 @@ cdef object dithering_atkinson_c(float [:, :, :] rgb_array_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void convert_27colors_c(
-        unsigned char [:, :, :] rgb_array):
-
+@cython.exceptval(check=False)
+cdef inline void convert_27_c(
+        const Py_ssize_t w,
+        const Py_ssize_t h,
+        unsigned char [:, :, :] rgb_array) nogil:
     """
-    THIS ALGORITHM CONVERT AN IMAGE USING 27 COLORS ONLY
+    Convert an image to 27 unique colors using a quantization algorithm.
+
+    This function reduces the colors in the input image to a palette of only 27 distinct colors 
+    by applying a color quantization technique. This technique is often used in image processing 
+    to reduce the color depth of an image while preserving its visual structure as much as possible. 
+    The result is an image with limited color options, making it suitable for applications like 
+    low-color displays or stylistic effects.
+
+    Example:
+        convert_27_c(800, 600, bgr_array)
+
+    Parameters
+    ----------
+    w : int
+        The width of the input image (in pixels).
     
-    :param rgb_array: numpy.ndarray; containing the pixels RGB. Array shape (w, h, 3)  
-    :return: void 
+    h : int
+        The height of the input image (in pixels).
+    
+    rgb_array : unsigned char[:, :, :]
+        A 3D numpy array or memory view with shape (w, h, 3) containing the RGB pixel data 
+        of the image. This array must reference a pygame.Surface. 
+        Any modifications to this array will directly alter the referenced surface.
+
+    Returns
+    -------
+    void
+        This function modifies the input `rgb_array` in place, converting the pixel colors 
+        to one of the 27 distinct colors.
+
+    Notes
+    -----
+    - The algorithm quantizes the RGB color space to only 27 colors. This is achieved 
+      by selecting the closest matching color from a predefined palette.
+    - The input `rgb_array` must have a shape of (w, h, 3), where `w` and `h` are the image 
+      dimensions and the third dimension holds the RGB values (3 channels).
+    - This function operates in place, meaning the original `rgb_array` will be modified directly.
     """
 
-    cdef Py_ssize_t w, h
-    w, h = rgb_array.shape[:2]
 
     cdef:
         int x=0
@@ -10482,57 +17847,6 @@ cdef inline void convert_27colors_c(
                 b[ 0 ] = <unsigned char>(round_c(c1 * <float> b[ 0 ] ) * f)
 
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef object spectrum_c(int width, int height, float gamma=1.0):
-
-    """
-    CREATE A PYGAME SURFACE DISPLAYING THE LIGHT SPECTRUM 380-750 nm
-    
-    Color   Wavelength(nm) Frequency(THz)
-    Red     620-750        484-400
-    Orange  590-620        508-484
-    Yellow  570-590        526-508
-    Green   495-570        606-526
-    Blue    450-495        668-606
-    Violet  380-450        789-668
-    
-    :param width: integer; width of the image
-    :param height: integer; height of the image
-    :param gamma: float; gamma value 
-    :return: Return a pygame surface 24-bit (width, height) converted for fast 
-    blit 
-    
-    """
-
-    cdef:
-        int i, j, k
-        rgb_color_int rgb_c
-        unsigned char [:, :, :] spectrum_array =\
-            numpy.empty((370, 1, 3), numpy.uint8)
-        object surface
-
-    with nogil:
-        for i in prange(380, 750, schedule=SCHEDULE, num_threads=THREADS):
-            rgb_c = wavelength_to_rgb(i, gamma)
-            k = i - 380
-            spectrum_array[ k, 0, 0 ] = rgb_c.r
-            spectrum_array[ k, 0, 1 ] = rgb_c.g
-            spectrum_array[ k, 0, 2 ] = rgb_c.b
-            spectrum_array[ k, 1, 0 ] = rgb_c.r
-            spectrum_array[ k, 1, 1 ] = rgb_c.g
-            spectrum_array[ k, 1, 2 ] = rgb_c.b
-
-    surface = make_surface(asarray(spectrum_array))
-    surface = scale(surface, (width, height)).convert()
-    return surface
-
-
 
 
 @cython.binding(False)
@@ -10542,156 +17856,51 @@ cdef object spectrum_c(int width, int height, float gamma=1.0):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline void palette_change_c(
-        unsigned char [:, :, :] rgb_array_,
-        float [:, :] palette_,
-        float [:, ::1] tmp_v_
-        ):
-    """
-    CHANGE AN IMAGE COLOR USING A GIVEN PALETTE
-
-    The palette contains RGB values (float in range 0.0 - 255.0)
-
-    :param rgb_array_: numpy.ndarray containing RGB pixel values, type (w, h, 3)
-        dtype uint8 range (0 .. 255)
-        
-    :param palette_: numpy.ndarray containing the palette colors to use for
-        substituting the image colors, array format (w, 3) of type float range (0.0 ... 255.0)
-        e.g 
-        from PygameShader import IRIDESCENTCRYSTAL
-        
-    :param tmp_v_ : numpy.ndarray (contiguous array) shape 
-        (rgb_array_.shape[0] * rgb_array_.shape[1], len(palette_.shape[0])) of type float32
-        Temporary array to increase performance (the array does not have to be redeclared every
-        frames. 
-        e.g 
-        tmp_v = numpy.ascontiguousarray(numpy.ndarray(
-            (SURFACE.get_width()*SURFACE.get_height(),
-            IRIDESCENTCRYSTAL.shape[0]), dtype=float32
-        ))
-    """
-
-    cdef:
-        int i, j, k
-        int w = <object>rgb_array_.shape[0]
-        int h = <object>rgb_array_.shape[1]
-        Py_ssize_t p_length = <object>palette_.shape[0]
-        # float * tmp_v = <float *> malloc(p_length * sizeof(float))
-        # float [:, ::1] tmp_v = ascontiguousarray(empty((w*h, p_length), dtype=numpy.float32))
-        # unsigned int s_min = 0
-        unsigned char * r
-        unsigned char * g
-        unsigned char * b
-        float min_v
-        unsigned int index, ji
-
-
-    with nogil:
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS): #, chunksize=h):
-            for i in range(w):
-                ji = j*i
-                # Get the RGB values of the current pixel
-                r = &rgb_array_[i, j, 0]
-                g = &rgb_array_[i, j, 1]
-                b = &rgb_array_[i, j, 2]
-
-                # Get the Distance for all palette colors using the current pixels and
-                # place the distance values into a buffer 1d C array
-                for k in range(0, p_length):
-                    tmp_v_[ji, k ] = <float>(
-                       (<float>r[0] - <float>palette_[ k, 0 ]) ** 2 + \
-                       (<float>g[0] - <float>palette_[ k, 1 ]) ** 2 + \
-                       (<float>b[0] - <float>palette_[ k, 2 ]) ** 2)
-
-                # Use an external C function to find the smallest distance from
-                # the current pixel. The smallest difference will be the closest
-                # color from the palette and the original RGB pixel colors will be
-                # substitute with the equivalent palette color.
-                # !! This algorithm does not take into account other solutions!!
-                # More than one palette colors might have the same distance to the original
-                # RGB pixel but only the first found color will be returned.
-
-                # s_min = <unsigned int>min_index(&tmp_v[0], p_length)
-
-                # Below same function min_index but allow, multi-processing without
-                # chunking (for j in prange(h, schedule=SCHEDULE, num_threads=THREADS)
-                # index = 0
-                index = 0
-                min_v = tmp_v_[ji, 0 ]
-                for k in range(0, p_length):
-                    if tmp_v_[ji, k ] < min_v:
-                        min_v = tmp_v_[ji, k ]
-                        index = k;
-
-                # Substitute the current pixel with the equivalent palette colors
-                r[0] = <unsigned char>palette_[ index, 0 ]
-                g[0] = <unsigned char>palette_[ index, 1 ]
-                b[0] = <unsigned char>palette_[ index, 2 ]
-
-    # free(tmp_v)
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline float distance_ (float x, float y)nogil:
-  return <float>sqrt(x*x + y*y)
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline float gaussian_ (float v, float sigma2)nogil:
-  # return (<float>1.0 / (<float>M_PI * sigma2)) * <float>exp(-(v * v ) / sigma2)
-
-  # sigma2 is inversed
-  return (INV_M_PI * sigma2)* <float>exp(-(v * v) * sigma2)
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef bilateral_c(
-        unsigned char [:, :, :] rgb_array_,
-        float sigma_s_,
-        float sigma_i_,
+        const unsigned char [:, :, :] rgb_array_,
+        const float sigma_s_,
+        const float sigma_i_,
         unsigned int kernel_size = 3
 ):
     """
-    A bilateral filter is a non-linear, edge-preserving, and noise-reducing
-    smoothing filter for images. It replaces the intensity of each pixel with a
-    weighted average of intensity values from nearby pixels. This weight can be
-    based on a Gaussian distribution.
-
-    Here, the normalization factor and the range weight are new terms added to 
-    the previous equation. sigma_s  denotes the spatial extent of the kernel, i.e. 
-    the size of the neighborhood, and sigma_r  denotes the minimum amplitude of an edge.
-    It ensures that only those pixels with intensity values similar to that of the
-    central pixel are considered for blurring, while sharp intensity changes are maintained.
-    The smaller the value of sigma_r  , the sharper the edge. As sigma_r  tends to infinity,  
-    the equation tends to a Gaussian blur.
+    Applies bilateral filtering to an image and returns a filtered copy.
     
-    :param kernel_size: integer; kernel size; default is 3 
-    :param rgb_array_: Surface, 24-32 bit format (alpha channel will be ignored)
+    Bilateral filtering is a non-linear, edge-preserving, and noise-reducing 
+    smoothing filter. It replaces the intensity of each pixel with a weighted 
+    average of nearby pixel intensities. The weight for each neighboring pixel 
+    is determined by both spatial proximity (distance) and intensity similarity.
     
-    :param sigma_s_: float sigma_s : Spatial extent of the kernel, size of the 
-    considered neighborhood
+    The filter is controlled by two parameters:
+    - sigma_s_: Spatial standard deviation, which defines the size of the neighborhood.
+    - sigma_i_: Intensity standard deviation, which controls the degree to which 
+      intensity differences affect the weight.
     
-    :param sigma_i_: float sigma_i (also call sigma_r) range kernel, minimum amplitude of an edge.
+    - A smaller value for `sigma_i_` keeps sharp edges, while larger values result in 
+      more smoothing across edges.
+    - As `sigma_i_` increases, the filter approximates a Gaussian blur.
     
-    :return: return a filtered Surface
+    **Example:**
+        image = bilateral_c(bgr_array, 16, 18, 3)
+    
+    :param rgb_array_: 
+        3D numpy array representing the image, with dimensions (height, width, 3).
+        Each pixel contains RGB values (ignores alpha channel if present).
+    
+    :param sigma_s_: 
+        Float; Spatial standard deviation. Determines the size of the spatial neighborhood 
+        to consider during filtering.
+    
+    :param sigma_i_: 
+        Float; Intensity standard deviation. Controls how much intensity difference affects the weight.
+    
+    :param kernel_size: 
+        Integer (default 3); The size of the square kernel. Defines the extent of the neighborhood 
+        around each pixel to be considered in the filtering.
+    
+    :return: 
+        A filtered image as a 24-bit RGB surface.
+    
     """
 
     cdef Py_ssize_t w, h
@@ -10700,30 +17909,39 @@ cdef bilateral_c(
 
     cdef:
         unsigned char [:, :, :] bilateral = empty((h, w, 3), dtype=uint8)
-        int x, y, xx, yy
+        int x, y, xx, yy, kx, ky
         int k = kernel_size
-        int kx, ky
-        float gs, wr, wg, wb, ir, ig, ib , wpr, wpg, wpb
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
-        unsigned char * rr
-        unsigned char * gg
-        unsigned char * bb
-        float sigma_i2 = <float>1.0/(<float>2.0 * sigma_i_ * sigma_i_)
-        float sigma_s2 = <float>1.0/(<float>2.0 * sigma_s_ * sigma_s_)
+        float sigma_i2 = 1.0 / (2.0 * sigma_i_ * sigma_i_)
+        float sigma_s2 = 1.0 / (2.0 * sigma_s_ * sigma_s_)
+        float ir, ig, ib
+        float wr, wg, wb
+        float wpr, wpg, wpb
+        unsigned char rr, gg, bb
+        unsigned char r, g, b
+        # Precompute the Gaussian spatial kernel (weights based on distance)
+        float [:, :] spatial_kernel = empty((2*k + 1, 2*k + 1), dtype=numpy.float32)
+        float dist, gs
 
+
+    for ky in range(-k, k + 1):  # Loop over vertical range of the kernel
+        for kx in range(-k, k + 1):  # Loop over horizontal range of the kernel
+            dist = <float>kx * kx + <float>ky * ky  # Calculate the squared distance
+            gs = <float>exp(-dist * sigma_s2)  # Compute the Gaussian weight based on distance
+            spatial_kernel[ky + k, kx + k] = gs  # Store the spatial weight in the kernel
+
+    # Start the bilateral filtering with parallelization
     with nogil:
 
-        for y in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
-            for x in range(0, w):
+        for x in prange(0, w, schedule=SCHEDULE, num_threads=THREADS):
+
+            for y in range(0, h):
 
                 ir, ig, ib = <float>0.0, <float>0.0, <float>0.0
                 wpr, wpg, wpb = <float>0.0, <float>0.0, <float>0.0
 
-                rr = &rgb_array_[x, y, 0]
-                gg = &rgb_array_[x, y, 0]
-                bb = &rgb_array_[x, y, 0]
+                rr = rgb_array_[x, y, 0]
+                gg = rgb_array_[x, y, 0]
+                bb = rgb_array_[x, y, 0]
 
                 for ky in range(-k, k + 1):
                     yy = y + ky
@@ -10741,19 +17959,23 @@ cdef bilateral_c(
                         elif xx >= w:
                             continue
 
-                        gs = gaussian_(distance_(<float>kx, <float>ky), sigma_s2)
+                        # Get the spatial weight based on distance from the center
+                        gs = spatial_kernel[ky + k, kx + k]
 
-                        r = &rgb_array_[xx, yy, 0]
-                        g = &rgb_array_[xx, yy, 1]
-                        b = &rgb_array_[xx, yy, 2]
+                        # Get the RGB values of the neighboring pixel
 
-                        wr = gaussian_(<float>r[0] - <float>rr[0], sigma_i2) * gs
-                        wg = gaussian_(<float>g[0] - <float>gg[0], sigma_i2) * gs
-                        wb = gaussian_(<float>b[0] - <float>bb[0], sigma_i2) * gs
+                        r = rgb_array_[xx, yy, 0]
+                        g = rgb_array_[xx, yy, 1]
+                        b = rgb_array_[xx, yy, 2]
 
-                        ir = ir + r[0] * wr
-                        ig = ig + g[0] * wg
-                        ib = ib + b[0] * wb
+                        # Compute the range weights based on intensity differences
+                        wr = exp(-((r - rr) ** 2) * sigma_i2) * gs
+                        wg = exp(-((g - gg) ** 2) * sigma_i2) * gs
+                        wb = exp(-((b - bb) ** 2) * sigma_i2) * gs
+
+                        ir = ir + r * wr
+                        ig = ig + g * wg
+                        ib = ib + b * wb
 
                         wpr = wpr + wr
                         wpg = wpg + wg
@@ -10772,22 +17994,15 @@ cdef bilateral_c(
 
 
 
-EMBOSS_KERNEL5x5= \
-    numpy.array((
-        [-1.0, -1.0, -1.0, -1.0, 0.0],
-        [-1.0, -1.0, -1.0, 0.0,  1.0],
-        [-1.0, -1.0,  0.0, 1.0,  1.0],
-        [-1.0,  0.0,  1.0, 1.0,  1.0],
-        [ 0.0,  1.0,  1.0, 1.0,  1.0])).astype(dtype=numpy.float32, order='C')
 
-EMBOSS_KERNEL5x5 = \
+EMBOSS_KERNEL3x3 = \
     numpy.array((
-        [-2.0, -1.0, 0.0],
-        [-1.0,  1.0, 1.0],
-        [ 0.0,  1.0, 2.0],
-    )).astype(dtype=numpy.float32, order='C')
+        [-2, -1, 0],
+        [-1,  1, 1],
+        [ 0,  1, 2],
+    )).astype(dtype=numpy.int8, order='C')
 
-cdef float EMBOSS_KERNEL_WEIGHT = numpy.sum(EMBOSS_KERNEL5x5)
+
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -10796,29 +18011,57 @@ cdef float EMBOSS_KERNEL_WEIGHT = numpy.sum(EMBOSS_KERNEL5x5)
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef object emboss5x5_c(unsigned char [:, :, :] rgb_array_):
+@cython.exceptval(check=False)
+cdef object emboss3d_c(const unsigned char [:, :, :] rgb_array_):
+    """
+    Apply a 3D emboss filter to an image, returning a modified copy.
+
+    This function applies an embossing filter to an image, which creates a 3D-like effect 
+    by simulating the appearance of raised or recessed areas on the image's surface, similar to 
+    the look of an embossed paper or metal design. This effect highlights edges and creates 
+    a visually distinct texture that simulates depth.
+
+    Example:
+        # Apply the emboss effect and return a 24-bit pygame.Surface
+        embossed_image = emboss3d_c(bgr_array)
+
+    Parameters
+    ----------
+    rgb_array_ : unsigned char[:, :, :]
+        A 3D numpy array or memoryview with shape (w, h, 3) containing RGB pixel data 
+        (or any other compatible pixel format). The image to which the emboss filter is applied.
+    
+    Returns
+    -------
+    pygame.Surface
+        A pygame.Surface object with the embossed effect applied. The surface is in 24-bit format.
+        This is a copy of the original image, with the 3D emboss effect applied.
+
+    Notes
+    -----
+    - The resulting image will have a pseudo-3D effect, with edges being more pronounced.
+    - The function operates by simulating depth through pixel value manipulation, highlighting 
+      contrasts based on the original image's structure.
+    - The returned surface is a copy of the input image and will not modify the original image.
+    """
+
 
     cdef:
-        float k_weight = EMBOSS_KERNEL_WEIGHT
-        unsigned int k_length = <unsigned int>len(EMBOSS_KERNEL5x5)
-        unsigned int half_kernel = <unsigned int>len(EMBOSS_KERNEL5x5) >> 1
+        short kernel_half = <unsigned int>len(EMBOSS_KERNEL3x3) >> 1
 
     # texture sizes
-    cdef int w, h
-    w = <object>rgb_array_.shape[0]
-    h = <object>rgb_array_.shape[1]
+    cdef int w = <object>rgb_array_.shape[0]
+    cdef int h = <object>rgb_array_.shape[1]
 
     cdef:
-        float [:, ::1] kernel = EMBOSS_KERNEL5x5
-        float kernel_weight = k_weight
-        short kernel_half = half_kernel
+        char [:, ::1] kernel = EMBOSS_KERNEL3x3
         unsigned char [:, :, ::1] emboss = empty((h, w, 3), order='C', dtype=uint8)
-        int kernel_length = k_length
         int x, y
         unsigned int xx, yy
         unsigned short red, green, blue,
         short kernel_offset_y, kernel_offset_x
-        float r, g, b, k
+        int r, g, b
+        short k
 
     with nogil:
 
@@ -10826,11 +18069,12 @@ cdef object emboss5x5_c(unsigned char [:, :, :] rgb_array_):
 
             for x in range(0, w):
 
-                r, g, b = <float>0.0, <float>0.0, <float>0.0
+                r, g, b = <unsigned char>0, <unsigned char>0, <unsigned char>0
 
                 for kernel_offset_y in range(-kernel_half, kernel_half + 1):
 
                     yy = y + kernel_offset_y
+
                     if yy < 0:
                         continue
                     elif yy > h - 1:
@@ -10850,26 +18094,134 @@ cdef object emboss5x5_c(unsigned char [:, :, :] rgb_array_):
                             rgb_array_[xx, yy, 1],\
                             rgb_array_[xx, yy, 2]
 
-                        k = kernel[kernel_offset_y + kernel_half, kernel_offset_x + kernel_half]
+                        k = <short>kernel[kernel_offset_y + kernel_half, kernel_offset_x + kernel_half]
                         r = r + red * k
                         g = g + green * k
                         b = b + blue * k
 
                 if r < 0:
-                    r = <float>0.0
+                    r = <unsigned char>0
                 if g < 0:
-                    g = <float>0.0
+                    g = <unsigned char>0
                 if b < 0:
-                    b = <float>0.0
+                    b = <unsigned char>0
                 if r > 255:
-                    r= <float>255.0
+                    r= <unsigned char>255
                 if g > 255:
-                    g = <float>255.0
+                    g = <unsigned char>255
                 if b > 255:
-                    b = <float>255.0
+                    b = <unsigned char>255
 
-                emboss[y, x, 0], emboss[y, x, 1], \
-                emboss[y, x, 2] = <unsigned char>r, <unsigned char>g, <unsigned char>b
+                emboss[y, x, 0] = <unsigned char>r
+                emboss[y, x, 1] = <unsigned char>g
+                emboss[y, x, 2] = <unsigned char>b
+
+    return frombuffer(emboss, (w, h), 'RGB')
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef object emboss3d_gray_c(const unsigned char [:, :, :] rgb_array_):
+    """
+    Apply a grayscale 3D emboss filter to an image, returning a modified copy.
+
+    This function applies an embossing filter to an image, similar to traditional embossing, 
+    but with a grayscale effect. The result simulates raised or recessed areas, giving the image 
+    a depth-like appearance with grayscale shading based on the original image's luminance.
+
+    Example:
+        # Apply the grayscale emboss effect and return a 24-bit pygame.Surface
+        embossed_image = emboss3d_gray_c(bgr_array)
+
+    Parameters
+    ----------
+    rgb_array_ : unsigned char[:, :, :]
+        A 3D numpy array or memoryview with shape (w, h, 3) containing RGB pixel data 
+        (or any other compatible pixel format). The image to which the grayscale emboss filter is applied.
+
+    Returns
+    -------
+    pygame.Surface
+        A pygame.Surface object with the grayscale embossed effect applied. 
+        The surface is in 24-bit format, representing the modified version of the input image.
+
+    Notes
+    -----
+    - The grayscale effect focuses on the brightness of the image and applies the emboss effect 
+      based on the lightness or darkness of the original pixels.
+    - The function operates by modifying the pixel values to create a pseudo-3D depth effect using 
+      grayscale luminance values.
+    - The returned surface is a copy of the input image and does not modify the original image.
+    """
+
+    cdef:
+        short kernel_half = <unsigned int>len(EMBOSS_KERNEL3x3) >> 1
+
+    # texture sizes
+    cdef int w = <object>rgb_array_.shape[0]
+    cdef int h = <object>rgb_array_.shape[1]
+
+    cdef:
+        char [:, ::1] kernel = EMBOSS_KERNEL3x3
+        unsigned char [:, :, ::1] emboss = empty((h, w, 3), order='C', dtype=uint8)
+        int x, y
+        unsigned int xx, yy
+        unsigned short red, green, blue,
+        short kernel_offset_y, kernel_offset_x
+        short k,
+        unsigned char grey
+        int g
+
+    with nogil:
+
+        for y in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
+
+            for x in range(0, w):
+
+                g = <unsigned char>0
+
+                for kernel_offset_y in range(-kernel_half, kernel_half + 1):
+
+                    yy = y + kernel_offset_y
+                    if yy < 0:
+                        continue
+                    elif yy > h - 1:
+                        continue
+
+                    for kernel_offset_x in range(-kernel_half, kernel_half + 1):
+
+                        xx = x + kernel_offset_x
+
+                        if xx < 0:
+                            continue
+                        elif xx > w - 1:
+                            continue
+
+                        grey = <unsigned char>((
+                                rgb_array_[xx, yy, 0] +
+                                rgb_array_[xx, yy, 1] +
+                                rgb_array_[xx, yy, 2])/<float>3.0)
+
+                        k = kernel[kernel_offset_y + kernel_half, kernel_offset_x + kernel_half]
+
+                        g = g + grey * k
+
+                if g < 0:
+                    g = <unsigned char>0
+                if g > 255:
+                    g = <unsigned char>255
+
+                emboss[y, x, 0] = <unsigned char>g
+                emboss[y, x, 1] = <unsigned char>g
+                emboss[y, x, 2] = <unsigned char>g
 
     return frombuffer(emboss, (w, h), 'RGB')
 
@@ -10877,6 +18229,7 @@ cdef object emboss5x5_c(unsigned char [:, :, :] rgb_array_):
 
 
 
+
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -10884,151 +18237,425 @@ cdef object emboss5x5_c(unsigned char [:, :, :] rgb_array_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void emboss3d_inplace_c(unsigned char [:, :, :] rgb_array, copy = None):
+    """
+    Apply an embossing effect to a 3D RGB array in-place.
+
+    The embossing effect highlights edges in an image, producing a raised or relief-like appearance 
+    by emphasizing intensity changes between neighboring pixels. This effect mimics an engraving or 
+    embossing process on materials like paper or metal.
+
+    Example Usage:
+    --------------
+    # Apply embossing effect to a 24-bit image
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    pixel_copy = numpy.ascontiguousarray(array3d(image).transpose(1, 0, 2))
+    emboss3d_inplace_c(image, copy=pixel_copy)
+
+    # Apply embossing effect to a 32-bit image with alpha channel
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    pixel_copy = numpy.ascontiguousarray(array3d(image).transpose(1, 0, 2))
+    emboss3d_inplace_c(image, copy=pixel_copy)
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray, shape (w, h, 3), dtype uint8
+        A 3D NumPy array representing an RGB image with shape (width, height, 3). 
+        The embossing effect is applied directly to this array in-place, modifying 
+        the original image data. The array should contain pixel data in RGB format (uint8).
+
+    copy : numpy.ndarray, shape (w, h, 3), dtype uint8, optional (default=None)
+        A copy of the original `rgb_array` that can be used as a reference during processing.
+        Providing a `copy` array is optional but may improve performance in certain cases. 
+        If not provided, the function will operate directly on `rgb_array`.
+
+    Returns
+    -------
+    None
+        This function modifies the input `rgb_array` in-place and does not return a value.
+
+    Notes
+    -----
+    - The embossing effect is applied by calculating pixel intensity differences with neighboring 
+      pixels, enhancing edges to create a 3D relief effect.
+    - The input `rgb_array` is modified in-place, so ensure to provide a copy if preserving the 
+      original data is necessary.
+    """
+
+    cdef:
+        short kernel_half = len(EMBOSS_KERNEL3x3) >> 1
+
+    # texture sizes
+    cdef int w = <object>rgb_array.shape[0]
+    cdef int h = <object>rgb_array.shape[1]
+
+    cdef:
+        char [:, ::1] kernel = EMBOSS_KERNEL3x3
+
+        # below create a copy False of the array and do not reference the pixels.
+        # The real time transformation of the identical copy of the array will not be functional as all the pixels
+        # undergo constant transformations. It is then necessary to load the pixels from a copy of the source array
+        # to implement the inplace transformation. Such as below
+        unsigned char [:, :, :] rgb_array_cp = \
+            numpy.ndarray(shape=(h, w, 3), buffer=rgb_array, dtype=uint8).copy() \
+                if copy is None else copy
+
+        # The below will also works, but this is slightly slower.
+        # unsigned char [::1, :, :] rgb_array_cp = numpy.asarray(bgr_array, order='F')
+        # This works with the below pixels within the xx and yy loops
+        # red, green, blue = \
+        #     rgb_array_cp[ xx, yy, 0 ], \
+        #     rgb_array_cp[ xx, yy, 1 ], \
+        #     rgb_array_cp[ xx, yy, 2 ]
+
+        int x, y
+        unsigned int xx, yy
+        unsigned char * red
+        unsigned char * green
+        unsigned char * blue
+        short kernel_offset_y, kernel_offset_x
+        int r, g, b
+        char * k
+
+    with nogil:
+
+        for y in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
+
+            for x in range(0, w):
+
+                r, g, b = <unsigned char> 0, <unsigned char> 0, <unsigned char> 0
+
+                for kernel_offset_y in range(-kernel_half, kernel_half + 1):
+
+                    yy = y + kernel_offset_y
+
+                    if yy < 0:
+                        continue
+                    elif yy > h - 1:
+                        continue
+
+                    for kernel_offset_x in range(-kernel_half, kernel_half + 1):
+
+                        xx = x + kernel_offset_x
+
+                        if xx < 0:
+                            continue
+                        elif xx > w - 1:
+                            continue
+
+                        if copy is not None:
+                            red   = &rgb_array_cp[ yy, xx, 0 ]
+                            green = &rgb_array_cp[ yy, xx, 1 ]
+                            blue  = &rgb_array_cp[ yy, xx, 2 ]
+
+                        else:
+                            red   = &rgb_array_cp[ yy, xx, 0 ]
+                            green = &rgb_array_cp[ yy, xx, 2 ]
+                            blue  = &rgb_array_cp[ yy, xx, 1 ]
+
+
+                        k = &kernel[ kernel_offset_y + kernel_half, kernel_offset_x + kernel_half ]
+
+                        r = r + red[0]   * k[0]
+                        g = g + green[0] * k[0]
+                        b = b + blue[0]  * k[0]
+
+                if r < 0:
+                    r = <unsigned char> 0
+                if g < 0:
+                    g = <unsigned char> 0
+                if b < 0:
+                    b = <unsigned char> 0
+                if r > 255:
+                    r = <unsigned char> 255
+                if g > 255:
+                    g = <unsigned char> 255
+                if b > 255:
+                    b = <unsigned char> 255
+
+                rgb_array[ x, y, 0 ] = <unsigned char> r
+                rgb_array[ x, y, 1 ] = <unsigned char> g
+                rgb_array[ x, y, 2 ] = <unsigned char> b
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cdef inline void emboss1d_c(
+        const Py_ssize_t w,
+        const Py_ssize_t l,
+        unsigned char [:] bgr_array,
+        const unsigned char [:] bgr_array_cp,
+        bint format_32 = False)nogil:
+
+    """
+    
+    Emboss directly a C-buffer type (inplace) 
+    
+    Applying an embossing filter to an image often results in an image resembling a paper
+    or metal embossing of the original image, hence the name. 
+    
+    If you are using tmp_array to improve the performances, make sure to have the same 
+    array size and shape than the source array bgr_array
+    
+    e.g
+    # 24 - bit 
+    image = pygame.image.load('../Assets/px.png').convert(24)
+    image = pygame.transform.smoothscale(image, (800, 600))
+     
+    emboss1d_c(800, 800*600*3, image.get_view('0'), None, False)
+    
+    # 32 - bit 
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    image = pygame.transform.smoothscale(image, (800, 600))
+    image_copy = image.copy()
+     
+    emboss1d_c(800, 800*600*4, image.get_view('0'), image_copy.get_buffer(), True)
+    
+    Parameters
+    ----------
+    w : 
+        int; width of the surface 
+         
+    l : 
+        int; length of the raw data 
+        
+    bgr_array :
+        numpy.ndarray or memoryviewslice shape (l, ) type uint8 containing BGR pixels or any other format 
+        bgr_array represent the source data that will be modify. The changes are applied inplace - meaning 
+        that the surface will be automatically changed after updating the source array data. 
+    
+    bgr_array_cp : 
+        numpy.ndarray or memoryviewslice shape (l, ) type uint8 containing BGR pixels or any other format 
+        This array is a copy of the source array 
+    
+    format_32 :
+        bool; default is False. Select True if the source array contains alpha transparency (32 - bit format).
+
+    Returns
+    -------
+    void
+    
+    """
+
+    cdef short bitsize
+    bitsize = 3 if format_32 == False else 4
+
+    cdef:
+
+        int i
+        int r, g, b
+        unsigned int row = w * bitsize
+        const unsigned char * p1
+        const unsigned char * p2
+        const unsigned char * p3
+        const unsigned char * p4
+        const unsigned char * p5
+        const unsigned char * p6
+        const unsigned char * p7
+
+    for i in prange(0, l, bitsize, schedule=SCHEDULE, num_threads=THREADS):
+
+        p4 = &bgr_array_cp[ i ]
+
+        if row + bitsize < i < l - row - bitsize:
+
+            # Emboss kernel 3x3
+            # [-2, -1, 0]
+            # [-1,  1, 1]
+            # [ 0,  1, 2]
+
+            p1 = &bgr_array_cp[ i - row - bitsize ]
+            p2 = &bgr_array_cp[ i - row ]
+            p3 = &bgr_array_cp[ i - bitsize ]
+
+            p5 = &bgr_array_cp[ i + bitsize ]
+            p6 = &bgr_array_cp[ i + row ]
+            p7 = &bgr_array_cp[ i + row + bitsize ]
+
+            b = -p1[ 0 ] * <int> 2 - p2[ 0 ] - p3[ 0 ] + p4[ 0 ] + p5[ 0 ] + p6[ 0 ] + p7[ 0 ] * <int> 2
+
+            g = -(p1 + 1)[ 0 ] * <int> 2 - (p2 + 1)[ 0 ] - (p3 + 1)[ 0 ] + (p4 + 1)[ 0 ] + (p5 + 1)[ 0 ] +\
+                (p6 + 1)[ 0 ] + (p7 + 1)[ 0 ] * <int> 2
+
+            r = -(p1 + 2)[ 0 ] * <int> 2 - (p2 + 2)[ 0 ] - (p3 + 2)[ 0 ] + (p4 + 2)[ 0 ] + (p5 + 2)[ 0 ] +\
+                (p6 + 2)[ 0 ] + (p7 + 2)[ 0 ] * <int> 2
+
+        else:
+            bgr_array[ i     ] = p4[ 0 ]
+            bgr_array[ i + 1 ] = (p4 + 1)[ 0 ]
+            bgr_array[ i + 2 ] = (p4 + 2)[ 0 ]
+            continue
+
+        if r < 0:
+            r = <unsigned char> 0
+        if r > 255:
+            r = <unsigned char> 255
+        if g < 0:
+            g = <unsigned char> 0
+        if g > 255:
+            g = <unsigned char> 255
+        if b < 0:
+            b = <unsigned char> 0
+        if b > 255:
+            b = <unsigned char> 255
+
+        bgr_array[ i     ] = <unsigned char> b
+        bgr_array[ i + 1 ] = <unsigned char> g
+        bgr_array[ i + 2 ] = <unsigned char> r
+
+
+
+
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef object bilinear_c(
         unsigned char [:, :, :] rgb_array_,
         tuple size_,
-        fx=None, fy=None):
+        fx=None,
+        fy=None
+):
+    """
+    Resize an image using the bilinear filter algorithm (returns a copy).
 
+    Bilinear interpolation is a resampling method used to resize images. It 
+    calculates pixel values based on a weighted average of the four nearest 
+    pixels. This method provides smoother results compared to nearest neighbor 
+    interpolation.
+
+    This function accepts images in 24-bit or 32-bit formats, but always returns 
+    the resized image in 24-bit format without alpha transparency.
+
+    Example Usage:
+    --------------
+    # Resize an image to 600x600
+    image = bilinear(image, (600, 600))
+    
+    # Resize an image with scaling factors for both axes
+    image = bilinear(image, (600, 600), fx=2, fy=2)
+
+    Parameters
+    ----------
+    rgb_array_ : numpy.ndarray
+        A 3D NumPy array of type uint8 representing an RGB image with shape 
+        (width, height, n), where `n` is typically 3 for RGB images or 4 for RGBA 
+        images. The image is resized using bilinear interpolation.
+
+    size_ : tuple
+        A tuple (width, height) representing the new dimensions (in pixels) for 
+        the resized image.
+
+    fx : float, optional
+        The scaling factor for the width. If provided, it takes precedence over 
+        the width value from `size_`. Default is None.
+
+    fy : float, optional
+        The scaling factor for the height. If provided, it takes precedence over 
+        the height value from `size_`. Default is None.
+
+    Returns
+    -------
+    pygame.Surface
+        A new pygame.Surface object with the resized image in 24-bit format (RGB),
+        without alpha transparency.
+
+    """
+
+    # Extract the current image width (w) and height (h)
     cdef Py_ssize_t w, h
     w, h = rgb_array_.shape[:2]
 
+    # Initialize scale factors
     cdef:
         float rowscale, colscale
         float original_x, original_y
-        unsigned int bl, br, tl, tr,\
+        unsigned int bl, br, tl, tr, \
             modxiplusonelim, modyiplusonelim
         unsigned int modxi, modyi
         int x, y
         float modxf, modyf, b, t, xf, yf
-        int new_width = size_[0]
-        int new_height = size_[1]
+        unsigned int new_width = size_[0]
+        unsigned int new_height = size_[1]
 
-    rowscale = <float>w / <float>new_width
-    colscale = <float>h / <float>new_height
-
+    # Apply scaling factors if provided
     if fx is not None:
         new_width = <unsigned int> (w * fx)
     if fy is not None:
-       new_height = <unsigned int>(h * fy)
+        new_height = <unsigned int>(h * fy)
 
+    # Calculate the scale for resizing (row and column scaling)
+    rowscale = <float> w / <float> new_width
+    colscale = <float> h / <float> new_height
+
+    # Prepare an empty array to hold the resized image
     cdef unsigned char [: , :, ::1] new_rgb = \
         numpy.empty((new_height, new_width, 3), dtype=numpy.uint8)
 
+    # Perform the resizing using bilinear interpolation (no GIL)
     with nogil:
         for y in prange(0, new_height, schedule=SCHEDULE, num_threads=THREADS):
+            # Calculate the source y-coordinate (original position in the image)
             original_y = <float> y * colscale
             modyi = <unsigned int> original_y
             modyf = original_y - modyi
             modyiplusonelim = min(modyi + 1, h - 1)
             yf = <float> 1.0 - modyf
 
-            for x in prange(new_width):
+            for x in range(new_width):
+                # Calculate the source x-coordinate (original position in the image)
                 original_x = <float> x * rowscale
                 modxi = <unsigned int> original_x
                 modxf = original_x - modxi
                 modxiplusonelim = min(modxi + 1, w - 1)
                 xf = <float> 1.0 - modxf
 
+                # Interpolate the red channel values
                 bl = rgb_array_[modxi, modyi, 0]
                 br = rgb_array_[modxiplusonelim, modyi, 0]
                 tl = rgb_array_[modxi, modyiplusonelim, 0]
                 tr = rgb_array_[modxiplusonelim, modyiplusonelim, 0]
-
-                # Calculate interpolation
                 b = modxf * br + xf * bl
                 t = modxf * tr + xf * tl
+                new_rgb[y, x, 0] = <unsigned int> (modyf * t + yf * b + <float> 0.5)
 
-                new_rgb[y, x, 0] = \
-                    <unsigned int> (modyf * t + yf * b + <float> 0.5)
-
+                # Interpolate the green channel values
                 bl = rgb_array_[modxi, modyi, 1]
                 br = rgb_array_[modxiplusonelim, modyi, 1]
                 tl = rgb_array_[modxi, modyiplusonelim, 1]
                 tr = rgb_array_[modxiplusonelim, modyiplusonelim, 1]
-
-                # Calculate interpolation
                 b = modxf * br + xf * bl
                 t = modxf * tr + xf * tl
+                new_rgb[y, x, 1] = <unsigned int> (modyf * t + yf * b + <float> 0.5)
 
-                new_rgb[y, x, 1] =\
-                    <unsigned int> (modyf * t + yf * b + <float> 0.5)
-
+                # Interpolate the blue channel values
                 bl = rgb_array_[modxi, modyi, 2]
                 br = rgb_array_[modxiplusonelim, modyi, 2]
                 tl = rgb_array_[modxi, modyiplusonelim, 2]
                 tr = rgb_array_[modxiplusonelim, modyiplusonelim, 2]
-
-                # Calculate interpolation
                 b = modxf * br + xf * bl
                 t = modxf * tr + xf * tl
+                new_rgb[y, x, 2] = <unsigned int> (modyf * t + yf * b + <float> 0.5)
 
-                new_rgb[y, x, 2] = \
-                    <unsigned int> (modyf * t + yf * b + <float> 0.5)
-
+    # Return the resized image as a 24-bit pygame Surface
     return frombuffer(new_rgb, (new_width, new_height), 'RGB')
 
 
 
 
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef unsigned char[::1] stack_buffer_c(rgb_array_, alpha_, int w, int h, bint transpose=False):
-    """
-
-    STACK RGB & ALPHA MEMORYVIEWSLICE C-BUFFERS STRUCTURES TOGETHER.
-
-    If transpose is True, the output MemoryViewSlice is flipped.
-
-    :param h: integer; Texture height
-    :param w: integer; Texture width
-    :param transpose: boolean; Transpose rows and columns (default False)
-    :param rgb_array_: MemoryViewSlice or pygame.BufferProxy (C-buffer type) representing the texture
-    RGB values filled with uint8
-    :param alpha_:  MemoryViewSlice or pygame.BufferProxy (C-buffer type) representing the texture
-    alpha values filled with uint8
-    :return: Return a contiguous MemoryViewSlice representing RGBA pixel values
-    """
-
-    cdef:
-        int b_length = w * h * 3
-        int new_length = w * h * 4
-        unsigned char [:] rgb_array = rgb_array_
-        unsigned char [:] alpha = alpha_
-        unsigned char [::1] new_buffer =  numpy.empty(new_length, dtype=numpy.uint8)
-        unsigned char [::1] flipped_array = numpy.empty(new_length, dtype=numpy.uint8)
-        int i=0, j=0, ii, jj, index, k
-        int w4 = w * 4
-
-    with nogil:
-
-        for i in prange(0, b_length, 3, schedule=SCHEDULE, num_threads=THREADS):
-                ii = i // 3
-                jj = ii * 4
-                new_buffer[jj]   = rgb_array[i]
-                new_buffer[jj+1] = rgb_array[i+1]
-                new_buffer[jj+2] = rgb_array[i+2]
-                new_buffer[jj+3] = alpha[ii]
-
-        if transpose:
-            for i in prange(0, w4, 4, schedule=SCHEDULE, num_threads=THREADS):
-                for j in range(0, h):
-                    index = i + (w4 * j)
-                    k = (j * 4) + (i * h)
-                    flipped_array[k    ] = new_buffer[index    ]
-                    flipped_array[k + 1] = new_buffer[index + 1]
-                    flipped_array[k + 2] = new_buffer[index + 2]
-                    flipped_array[k + 3] = new_buffer[index + 3]
-            return flipped_array
-
-    return new_buffer
-
-
 
 @cython.binding(False)
 @cython.boundscheck(False)
@@ -11037,74 +18664,106 @@ cpdef unsigned char[::1] stack_buffer_c(rgb_array_, alpha_, int w, int h, bint t
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline float [:, :] array2d_normalized_c(unsigned char [:, :] array):
-
+@cython.exceptval(check=False)
+cpdef tuple render_light_effect24(
+        int x,
+        int y,
+        np.ndarray[np.uint8_t, ndim=3] background_rgb,
+        np.ndarray[np.uint8_t, ndim=2] mask_alpha,
+        float intensity        = 1.0,
+        float [:] color        = numpy.asarray([128.0, 128.0, 128.0], dtype=numpy.float32),
+        bint smooth            = False,
+        bint saturation        = False,
+        float sat_value        = 0.2,
+        bint bloom             = False,
+        unsigned int threshold = 110,
+        bint heat              = False,
+        float frequency        = 1
+):
     """
-    NORMALIZED AN ARRAY
+    Generates a realistic lighting effect on a Pygame surface or texture.
 
-    Transform/convert an array shapes (w, h) containing unsigned char values
-    into a MemoryViewSlice (2d array) with float values rescale in range [0 ... 1.0]
+    This function simulates a light effect that can be blended onto a surface 
+    using additive blending (`BLEND_RGBA_ADD` in Pygame). The effect is generated 
+    based on a mask texture and can include optional enhancements such as bloom, 
+    heat waves, and saturation adjustments.
 
-    :param array: numpy.array shape (w, h) containing unsigned int values (uint8)
-    :return     : a MemoryViewSlice 2d array shape (w, h) with float values in range [0 ... 1.0]
+    Example Usage:
+    --------------
+    lit_surface, sw, sh = render_light_effect24(
+        MOUSE_POS[0],
+        MOUSE_POS[1],
+        background_rgb,
+        lalpha,
+        intensity=5,
+        color=c,
+        smooth=False,
+        saturation=False,
+        sat_value=0.2,
+        bloom=True,
+        threshold=64,
+        heat=False,
+        frequency=1
+    )
 
+    Parameters:
+    -----------
+    x : int
+        X-coordinate of the light source (must be within the screen width).
+
+    y : int
+        Y-coordinate of the light source (must be within the screen height).
+
+    background_rgb : numpy.ndarray, shape (w, h, 3), dtype uint8
+        A 3D NumPy array representing the RGB values of the background surface.
+
+    mask_alpha : numpy.ndarray, shape (w, h), dtype uint8
+        A 2D NumPy array containing the alpha (transparency) values of the light mask.
+        Using a radial gradient mask with maximum intensity at the center is recommended.
+
+    intensity : float, default=1.0
+        Light intensity in the range [0.0, 20.0]. Higher values produce a stronger effect.
+
+    color : numpy.ndarray, default=[128.0, 128.0, 128.0]
+        A 3-element NumPy array representing the RGB color of the light in float format 
+        (values in the range [0.0, 255.0]).
+
+    smooth : bool, default=False
+        If True, applies a blur effect to smooth the lighting.
+
+    saturation : bool, default=False
+        If True, applies a saturation effect to enhance color vibrancy.
+
+    sat_value : float, default=0.2
+        Adjusts the saturation level. The valid range is [-1.0, 1.0].
+
+    bloom : bool, default=False
+        If True, enables a bloom effect, which enhances the brightness of intense areas.
+
+    threshold : int, default=110
+        The brightness threshold used in the bloom effect. Pixels above this value 
+        contribute to the bloom.
+
+    heat : bool, default=False
+        If True, applies a heat wave effect that distorts the lighting dynamically.
+
+    frequency : float, default=1
+        Determines the frequency of the heat wave effect. Must be an increasing value.
+
+    Returns:
+    --------
+    tuple
+        A tuple containing:
+        - A 24-bit Pygame surface representing the generated light effect.
+        - The surface width (`sw`).
+        - The surface height (`sh`).
+
+    Notes:
+    ------
+    - The output surface does not contain per-pixel alpha information.
+    - Use `BLEND_RGBA_ADD` when blitting the surface to achieve an additive lighting effect.
     """
-    cdef:
-        int w, h
-    try:
-        w, h = array.shape[:2]
-    except (ValueError, pygame.error) as e:
-        raise ValueError('\nArray shape not understood. Only 2d array shape (w, h) are compatible.')
 
-    cdef:
-        int i = 0, j = 0
-        float [:, :] array_f = numpy.empty((w, h), numpy.float32)
-
-    with nogil:
-        for i in prange(w, schedule=SCHEDULE, num_threads=THREADS):
-            for j in range(h):
-                array_f[i, j] = <float>(array[i, j] * <float>ONE_255)
-    return array_f
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef tuple area24_c(int x, int y, np.ndarray[np.uint8_t, ndim=3] background_rgb,
-              np.ndarray[np.uint8_t, ndim=2] mask_alpha, float intensity=1.0,
-              float [:] color=numpy.array([128.0, 128.0, 128.0], dtype=numpy.float32, copy=False),
-              bint smooth=False, bint saturation=False, float sat_value=0.2, bint bloom=False,
-              unsigned int threshold=110, bint heat=False, float frequency=1):
-    """
-
-    CREATE A REALISTIC LIGHT EFFECT ON A PYGAME.SURFACE OR TEXTURE.
-
-    You can blit the output surface with additive mode using pygame flag BLEND_RGBA_ADD.
-
-
-    :param x: integer, light x coordinates (must be in range [0..max screen.size x]
-    :param y: integer, light y coordinates (must be in range [0..max screen size y]
-    :param background_rgb: numpy.ndarray (w, h, 3) uint8. 3d array shape containing all RGB values
-    of the background surface (display background).
-    :param mask_alpha: numpy.ndarray (w, h) uint8, 2d array with light texture alpha values.
-    For better appearances, choose a texture with a radial mask shape (maximum light intensity in the center)
-    :param color: numpy.array; Light color (RGB float), default
-    array([128.0 / 255.0, 128.0 / 255.0, 128.0 / 255.0], float32, copy=False)
-    :param intensity: float; Light intensity range [0.0 ... 20.0]
-    :param bloom: boolean; Bloom effect, default False
-    :param threshold: unsigned int, default 110
-    :param sat_value: float; Set the saturation value
-    :param saturation: boolean; Saturation effect
-    :param smooth: boolean; Blur effect
-    :param frequency: float; frequency must be incremental
-    :param heat: boolean; Allow heat wave effect
-    :return: Return a pygame surface 24 bit without per-pixel information,
-    surface with same size as the light texture. Represent the lit surface.
-    """
 
     assert intensity >= <float>0.0, '\nIntensity value cannot be > 0.0'
 
@@ -11164,35 +18823,33 @@ cpdef tuple area24_c(int x, int y, np.ndarray[np.uint8_t, ndim=3] background_rgb
         for i in prange(ax, schedule=SCHEDULE, num_threads=THREADS):
             for j in range(ay):
                 f = alpha[i, j] * <float>ONE_255 * intensity
-                new_array[j, i, <unsigned short int>0] =\
-                    <unsigned char>fmin(rgb[i, j, <unsigned short int>0] * f *
-                                        color[<unsigned short int>0], <float>255.0)
-                new_array[j, i, <unsigned short int>1] =\
-                    <unsigned char>fmin(rgb[i, j, <unsigned short int>1] * f *
-                                        color[<unsigned short int>1], <float>255.0)
-                new_array[j, i, <unsigned short int>2] =\
-                    <unsigned char>fmin(rgb[i, j, <unsigned short int>2] * f *
-                                        color[<unsigned short int>2], <float>255.0)
+                new_array[j, i, 0] = <unsigned char>fmin(rgb[i, j, 0] * f * color[0], <float>255.0)
+                new_array[j, i, 1] = <unsigned char>fmin(rgb[i, j, 1] * f * color[1], <float>255.0)
+                new_array[j, i, 2] = <unsigned char>fmin(rgb[i, j, 2] * f * color[2], <float>255.0)
 
     ay, ax = new_array.shape[:2]
 
     if smooth:
-        blur_array_inplace_c(new_array, mask=None, t=<unsigned short int>1)
+        blur3d_c(new_array, npass=1)
 
     if saturation:
-        saturation_inplace_c(new_array, sat_value)
+        saturation_c(new_array, sat_value)
 
     if heat:
-        new_array = heatwave_array24_horiz_c(numpy.asarray(new_array).transpose(
-            <unsigned short int>1, <unsigned short int>0, <unsigned short int>2),
-            alpha, frequency, (frequency % <unsigned short int>8) / <float>1000.0,
-            attenuation=<unsigned int>100, threshold=<unsigned short int>10)
+        new_array = \
+            heatwave_array24_horiz_c(
+                numpy.asarray(new_array).transpose(1, 0, 2),
+                alpha,
+                frequency,
+                (frequency % <unsigned short int>8) / <float>1000.0,
+                attenuation=100,
+                threshold=<unsigned short int>10
+            )
 
     surface = pygame.image.frombuffer(new_array, (ax, ay), "RGB")
 
     if bloom:
-        mask = array2d_normalized_c(alpha)
-        bloom_array24_c(surface, threshold_=threshold, fast_=False, mask_=mask)
+        shader_bloom_fast1(surface, mask_=alpha)
 
     return surface, ax, ay
 
@@ -11206,101 +18863,111 @@ cpdef tuple area24_c(int x, int y, np.ndarray[np.uint8_t, ndim=3] background_rgb
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef inline object bpf24_c2(image, int threshold = 128, bint transpose=False):
+@cython.exceptval(check=False)
+cdef inline tuple bpf24_c2(image, int threshold = 128, bint transpose=False):
     """
-    BRIGHT PASS FILTER COMPATIBLE 24-BIT
 
-    Bright pass filter for 24bit image (method using 3d array data structure)
+    Bright pass filter for 24-bit image (return tuple)
+    
+    This method is used internally.
     Calculate the luminance of every pixels and applied an attenuation c = lum2 / lum
     with lum2 = max(lum - threshold, 0) and
     lum = rgb[i, j, 0] * 0.299 + rgb[i, j, 1] * 0.587 + rgb[i, j, 2] * 0.114
-    The output image will keep only bright areas. You can adjust the threshold value
-    default 128 in order to get the desire changes.
+    The output image will keep only bright areas. 
+    You can adjust the threshold value default is 128 in order to get the desire changes.
+    
+    return a tuple ( 24-bit surface, 3d array )
 
-    :param transpose: Transpose the final array (width and height are transpose if True)
-    :param image: pygame.Surface 24 bit format (RGB)  without per-pixel information
-    :param threshold: integer; Threshold to consider for filtering pixels luminance values,
-    default is 128 range [0..255] unsigned char (python integer)
-    :return: Return a Pygame Surface and a 3d numpy.ndarray format (w, h, 3)
-    (only bright area of the image remains).
+    e.g:
+    surf = bpf24_c2(image)
+    
+    :param transpose: 
+        Transpose the final array (w and h are transpose if True)
+        
+    :param image: 
+        pygame.Surface 24-bit format (RGB)  without per-pixel information
+        
+    :param threshold: 
+        integer; Threshold to consider for filtering pixels luminance values,
+        default is 128 range [0..255] unsigned char (python integer)
+    
+    :return: 
+        Return a tuple (24-bit surface, 3d array format (w, h, 3) or
+        (h, w, 3) if transposed).
+        
     """
 
     # Fallback to default threshold value if argument
     # threshold value is incorrect
     if 0 > threshold > 255:
-        printf("\nArgument threshold must be in range [0...255], fallback to default value 128.")
-        threshold = 128
+        raise AttributeError(
+            '\nArgument threshold must be in range [0...255], fallback to default value 128.')
 
     assert isinstance(image, pygame.Surface), \
            "\nExpecting pygame surface for argument image, got %s " % type(image)
 
     try:
         rgb_array = image.get_view('3')
+
     except (pygame.error, ValueError):
-        raise ValueError('\nInvalid surface.')
+        raise ValueError('\nCannot create a valid 3d array from the given surface.')
+
+    cdef unsigned char [:, :, :] rgb = rgb_array
 
     cdef:
         int w, h
-    w, h = rgb_array.shape[:2]
+
+    w, h = rgb.shape[:2]
 
     # check sizes
     assert w>0 and h>0,\
         'Incorrect surface dimensions should be (w>0, h>0) got (w:%s, h:%s)' % (w, h)
 
-
     cdef:
-        unsigned char [:, :, :] rgb = rgb_array
-        unsigned char [:, :, ::1] out_rgb= numpy.empty((w, h, 3), numpy.uint8)
-        unsigned char [:, :, ::1] out_rgb_transposed = numpy.empty((h, w, 3), numpy.uint8)
+        unsigned char [:, :, ::1] out_rgb= numpy.empty((w, h, 3), numpy.uint8) if \
+            transpose == False else numpy.empty((h, w, 3), numpy.uint8)
+
         int i = 0, j = 0
         float lum, c
         unsigned char *r
         unsigned char *g
         unsigned char *b
 
-    if transpose is not None and transpose==True:
-        with nogil:
-            for j in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
-                for i in range(0, w):
-                    # ITU-R BT.601 luma coefficients
-                    r = &rgb[i, j, 0]
-                    g = &rgb[i, j, 1]
-                    b = &rgb[i, j, 2]
 
-                    lum = r[0] * <float>0.299 + g[0] * <float>0.587 + b[0] * <float>0.114
+    with nogil:
+        for j in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
+            for i in range(0, w):
+                # ITU-R BT.601 luma coefficients
+                r = &rgb[i, j, 0]
+                g = &rgb[i, j, 1]
+                b = &rgb[i, j, 2]
 
-                    if lum > threshold:
-                        c = (lum - threshold) / lum
-                        out_rgb_transposed[j, i, 0] = <unsigned char>(r[0] * c)
-                        out_rgb_transposed[j, i, 1] = <unsigned char>(g[0] * c)
-                        out_rgb_transposed[j, i, 2] = <unsigned char>(b[0] * c)
+                lum = r[0] * <float>0.299 + g[0] * <float>0.587 + b[0] * <float>0.114
+
+                if lum > threshold:
+
+                    c = (lum - threshold) / lum
+
+                    if not transpose:
+                        out_rgb[ i, j, 0 ] = <unsigned char> (r[ 0 ] * c)
+                        out_rgb[ i, j, 1 ] = <unsigned char> (g[ 0 ] * c)
+                        out_rgb[ i, j, 2 ] = <unsigned char> (b[ 0 ] * c)
+
                     else:
-                        out_rgb_transposed[j, i, 0] = 0
-                        out_rgb_transposed[j, i, 1] = 0
-                        out_rgb_transposed[j, i, 2] = 0
+                        out_rgb[j, i, 0] = <unsigned char>(r[0] * c)
+                        out_rgb[j, i, 1] = <unsigned char>(g[0] * c)
+                        out_rgb[j, i, 2] = <unsigned char>(b[0] * c)
+                else:
+                    out_rgb[ j, i, 0 ] = 0
+                    out_rgb[ j, i, 1 ] = 0
+                    out_rgb[ j, i, 2 ] = 0
 
-        return frombuffer(out_rgb_transposed, (w, h), 'RGB'), out_rgb_transposed
-    else:
-        with nogil:
-            for j in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
-                for i in range(0, w):
-                    r = &rgb[i, j, 0]
-                    g = &rgb[i, j, 1]
-                    b = &rgb[i, j, 2]
-                    # ITU-R BT.601 luma coefficients
-                    lum = r[0] * <float>0.299 + g[0] * <float>0.587 + b[0] * <float>0.114
-                    if lum > threshold:
-                        c = (lum - threshold) / lum
-                        out_rgb[i, j, 0] = <unsigned char>(r[0] * c)
-                        out_rgb[i, j, 1] = <unsigned char>(g[0] * c)
-                        out_rgb[i, j, 2] = <unsigned char>(b[0] * c)
-                    else:
-                        out_rgb[i, j, 0], out_rgb[i, j, 1], out_rgb[i, j, 2] = 0, 0, 0
 
-        return frombuffer(out_rgb, (w, h), 'RGB'), out_rgb
+    return frombuffer(out_rgb, (w, h), 'RGB'), out_rgb
 
 
 
+# todo rename
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -11308,59 +18975,66 @@ cpdef inline object bpf24_c2(image, int threshold = 128, bint transpose=False):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef inline object bloom_effect_array24_c2(
-        object surface_, unsigned char threshold_,
-        int smooth_=1, mask_=None, bint fast_ = False):
+        object surface_,
+        const unsigned char threshold_,
+        int smooth_ = 1,
+        mask_       = None,
+        bint fast_  = False):
     """
 
-    CREATE A BLOOM EFFECT ON A PYGAME.SURFACE (COMPATIBLE 24 BIT SURFACE)
+    Create a bloom effect on a Pygame surface (compatible 24 bit surface)
 
-    This method is using array structure.
+    Definition:
+    Bloom is a computer graphics effect used in video games, demos,
+    and high dynamic range rendering to reproduce an imaging artifact of real-world cameras.
 
-    definition:
-        Bloom is a computer graphics effect used in video games, demos,
-        and high dynamic range rendering to reproduce an imaging artifact of real-world cameras.
+    e.g:
+    image = pygame.image.load('../Assets/px.png').convert_alpha()
+    image = pygame.transform.smoothscale(image, (800, 600))
 
-    1)First apply a bright pass filter to the pygame surface(SDL surface) using methods
-      bpf24_b_c  (adjust the threshold value to get the best filter effect).
-    2)Downside the newly created bpf image by factor x2, x4, x8, x16 using the pygame scale method (no need to
-      use smoothscale (bilinear filtering method).
-    3)Apply a Gaussian blur 5x5 effect on each of the downsized bpf images (if smooth_ is > 1, then the Gaussian
-      filter 5x5 will by applied more than once. Note, this have little effect on the final image quality.
-    4)Re-scale all the bpf images using a bilinear filter (width and height of original image).
-      Using an un-filtered rescaling method will pixelate the final output image.
-      For best performances sets smoothscale acceleration.
-      A value of 'GENERIC' turns off acceleration. 'MMX' uses MMX instructions only.
-      'SSE' allows SSE extensions as well.
-    5)Blit all the bpf images on the original surface, use pygame additive blend mode for
-      a smooth and brighter effect.
+    mask = pygame.image.load('../Assets/alpha.png').convert_alpha()
+    mask = pygame.transform.smoothscale(mask, (800, 600))
+    
+    # in the main loop 
+    image = bloom_effect_array24_c2(image, 0, 1, mask, True)
+    
 
-    Notes:
-    The downscaling process of all sub-images could be done in a single process to increase performance.
+    :param fast_: 
+        bool; True | False. Speed up the bloom process using only the x16 surface and using
+        an optimized bright pass filter (texture size downscale x4 prior processing)
 
-    :param fast_: bool; True | False. Speed up the bloom process using only the x16 surface and using
-    an optimized bright pass filter (texture size downscale x4 prior processing)
-
-    :param mask_:
-    :param surface_: pygame.Surface 24-bit format surface
-    :param threshold_: integer; Threshold value used by the bright pass algorithm (default 128)
-    :param smooth_: Number of Gaussian blur 5x5 to apply to downside images.
-    :return : Returns a pygame.Surface with a bloom effect (24 bit surface)
+    :param mask_: 
+        Pygame.Surface representing the mask alpha. 
+        Alpha values of 255 will render and bloom the entire image while zero will disable 
+        the bloom effect (hide the pixels). 
+    
+    :param surface_: 
+        pygame.Surface 24-bit format surface
+        
+    :param threshold_: 
+        integer; Threshold value used by the bright pass algorithm (default 128)
+        
+    :param smooth_: 
+        Number of Gaussian blur 5x5 to apply to downside images.
+        
+    :return : 
+        Returns a pygame.Surface with a bloom effect (24 bit surface)
 
 
     """
-    # todo mask_ doc
 
-    surface_cp = surface_.copy()
 
     assert smooth_ > 0, \
         "Argument smooth_ must be > 0, got %s " % smooth_
     assert -1 < threshold_ < 256, \
-        "Argument threshold_ must be in range [0...255] got %s " % threshold_
+        "Argument threshold must be in range [0...255] got %s " % threshold_
 
     cdef:
-        int w, h, bit_size
-        int w2, h2, w4, h4, w8, h8, w16, h16
+        Py_ssize_t w, h
+        unsigned short int bit_size
+        Py_ssize_t w2, h2, w4, h4, w8, h8, w16, h16
         bint x2, x4, x8, x16 = False
 
     w, h = surface_.get_size()
@@ -11372,7 +19046,7 @@ cpdef inline object bloom_effect_array24_c2(
         w8, h8 = w4 >> 1, h4 >> 1
         w16, h16 = w8 >> 1, h8 >> 1
 
-    with nogil:
+
         if w2 > 0 and h2 > 0:
             x2 = True
         else:
@@ -11412,60 +19086,82 @@ cpdef inline object bloom_effect_array24_c2(
 
     if x2:
         s2 = scale(bpf_surface, (w2, h2))
-        s2_array = numpy.array(s2.get_view('3'), dtype=numpy.uint8).transpose(1, 0, 2)
-        if smooth_ > 1:
-            for r in range(smooth_):
-                s2_array = blur5x5_array24_c2(s2_array)
-        else:
-            s2_array = blur5x5_array24_c2(s2_array)
+
+        s2_array = blur1d_cp_c(
+            s2.get_buffer(),
+            w2, h2,
+            npass=smooth_,
+            format_32=False
+        )
         b2_blurred = frombuffer(s2_array, (w2, h2), 'RGB')
+
         s2 = smoothscale(b2_blurred, (w, h))
-        surface_cp.blit(s2, (0, 0), special_flags=BLEND_RGB_ADD)
+
+        surface_.blit(s2, (0, 0), special_flags=BLEND_RGB_ADD)
 
     if x4:
         s4 = scale(bpf_surface, (w4, h4))
-        s4_array = numpy.array(s4.get_view('3'), dtype=numpy.uint8).transpose(1, 0, 2)
-        if smooth_ > 1:
-            for r in range(smooth_):
-                s4_array = blur5x5_array24_c2(s4_array)
-        else:
-            s4_array = blur5x5_array24_c2(s4_array)
+
+        s4_array = blur1d_cp_c(
+            s4.get_buffer(),
+            w4,
+            h4,
+            npass = smooth_,
+            format_32 = False
+        )
+
         b4_blurred = frombuffer(s4_array, (w4, h4), 'RGB')
         s4 = smoothscale(b4_blurred, (w, h))
-        surface_cp.blit(s4, (0, 0), special_flags=BLEND_RGB_ADD)
+        surface_.blit(s4, (0, 0), special_flags=BLEND_RGB_ADD)
 
     if x8:
         s8 = scale(bpf_surface, (w8, h8))
-        s8_array = numpy.array(s8.get_view('3'), dtype=numpy.uint8).transpose(1, 0, 2)
-        if smooth_ > 1:
-            for r in range(smooth_):
-                s8_array = blur5x5_array24_c2(s8_array)
-        else:
-            s8_array = blur5x5_array24_c2(s8_array)
+
+
+        s8_array = blur1d_cp_c(
+            s8.get_buffer(),
+            w8,
+            h8,
+            npass = smooth_,
+            format_32 = False
+        )
+
         b8_blurred = frombuffer(s8_array, (w8, h8), 'RGB')
         s8 = smoothscale(b8_blurred, (w, h))
-        surface_cp.blit(s8, (0, 0), special_flags=BLEND_RGB_ADD)
+        surface_.blit(s8, (0, 0), special_flags=BLEND_RGB_ADD)
 
+    # if x16:
+    #     s16 = scale(bpf_surface, (w16, h16))
+    #     s16_array = numpy.array(s16.get_view('3'))
+    #
+    #     if smooth_ > 1:
+    #         for r in range(smooth_):
+    #             s16_array = blur3d_cp_c(s16_array)
+    #     else:
+    #         s16_array = blur3d_cp_c(s16_array)
+    #     b16_blurred = frombuffer(s16_array, (w16, h16), 'RGB')
+    #     s16 = smoothscale(b16_blurred, (w, h))
+    #     surface_.blit(s16, (0, 0), special_flags = BLEND_RGB_ADD)
+
+    # Alternate way of x16 slightly faster
     if x16:
-        s16 = scale(bpf_surface, (w16, h16))
-        s16_array = numpy.array(s16.get_view('3'), dtype=numpy.uint8).transpose(1, 0, 2)
-        if smooth_ > 1:
-            for r in range(smooth_):
-                s16_array = blur5x5_array24_c2(s16_array)
-        else:
-            s16_array = blur5x5_array24_c2(s16_array)
+
+        s16_array = blur1d_cp_c(
+            bytearray(tobytes(scale(bpf_surface, (w16, h16)), 'RGB')),
+            w16,
+            h16,
+            npass = smooth_,
+            format_32 = False
+        )
+
         b16_blurred = frombuffer(s16_array, (w16, h16), 'RGB')
         s16 = smoothscale(b16_blurred, (w, h))
-        surface_cp.blit(s16, (0, 0), special_flags=BLEND_RGB_ADD)
+        surface_.blit(s16, (0, 0), special_flags=BLEND_RGB_ADD)
 
     if mask_ is not None:
-        # Multiply mask surface pixels with mask values.
-        # RGB pixels = 0 when mask value = 0.0, otherwise
-        # modify RGB amplitude
-        surface_cp = filtering24_c(surface_cp, mask_)
+        filtering24_c(surface_, mask_)
 
-    return surface_cp
-
+    return surface_
 
 
 @cython.binding(False)
@@ -11475,56 +19171,102 @@ cpdef inline object bloom_effect_array24_c2(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef area24_cc(
         int x, int y,
         np.ndarray[np.uint8_t, ndim=3] background_rgb,
-        np.ndarray[np.uint8_t, ndim=2] mask_alpha, float intensity=1.0,
-        float [::1] color=numpy.array([128.0, 128.0, 128.0], dtype=numpy.float32, copy=False),
-        bint smooth=False, bint saturation=False, float sat_value=0.2, bint bloom=False,
+        np.ndarray[np.uint8_t, ndim=2] mask_alpha,
+        float intensity=1.0,
+        float [::1] color=numpy.asarray([128.0, 128.0, 128.0], dtype=numpy.float32),
+        bint smooth=False,
+        bint saturation=False,
+        float sat_value=0.2,
+        bint bloom=False,
         unsigned char bloom_threshold=64
 ):
     """
-    CREATE A REALISTIC LIGHT EFFECT ON A PYGAME.SURFACE OR TEXTURE.
+    Generates a realistic lighting effect on a Pygame surface or texture.
 
-    Modes definition
-    ================
-    SMOOTH : Apply a Gaussian blur with kernel 5x5 over the output texture, 
-    the light effect will be slightly blurred.
-   
-    SATURATION : Create a saturation effect (increase of the texture lightness using 
-    HSL color conversion algorithm. saturation threshold value should be included 
-    in range [-1.0, 1.0] default is 0.2
-    Saturation above 0.5 will deteriorate the output coloration. Threshold value below zero will
-    greyscale output texture.
-    
-    BLOOM: Create a bloom effect to the output texture (using blend method)
+    This function simulates a light effect that can be blended onto a surface using
+    additive blending (`BLEND_RGBA_ADD` in Pygame). It supports optional enhancements
+    such as bloom, smoothing, and saturation adjustments.
 
-    intensity:
-    Intensity is a float value defining how bright will be the light effect.
-    If intensity is zero, a new pygame.Surface is returned with RLEACCEL flag (empty surface)
+    Lighting Modes:
+    ---------------
+    - **Smooth**: Applies a Gaussian blur with a 5x5 kernel to soften the lighting effect.
+    - **Saturation**: Adjusts color intensity using HSL color conversion. A value range 
+      of [-1.0, 1.0] is supported, with higher values increasing vibrancy and values below 
+      zero desaturating the output.
+    - **Bloom**: Enhances brightness by applying a bloom effect, making bright areas 
+      appear more intense.
 
-    Color allows you to change the light coloration, if omitted, the light color by default is
-    R = 128.0, G = 128.0 and B = 128.0
+    Lighting Parameters:
+    --------------------
+    - **Intensity**: Defines the brightness of the light. If set to zero, the function 
+      returns an empty `pygame.Surface` with the `RLEACCEL` flag.
+    - **Color**: Specifies the light’s RGB coloration. Defaults to (128, 128, 128).
 
-    :param x: integer, light x coordinates (must be in range [0..max screen.size x]
-    :param y: integer, light y coordinates (must be in range [0..max screen size y]
-    :param background_rgb: numpy.ndarray (w, h, 3) uint8. 3d array shape containing all RGB values
-    of the background surface (display background).
-    :param mask_alpha: numpy.ndarray (w, h) uint8, 2d array with light texture alpha values.
-    For better appearances, choose a texture with a radial mask shape (maximum light 
-    intensity in the center)
-    :param color: numpy.array; Light color (RGB float), default
-    array([128.0 / 255.0, 128.0 / 255.0, 128.0 / 255.0], float32, copy=False)
-    :param intensity: float; Light intensity range [0.0 ... 20.0]
-    :param bloom: boolean; Bloom effect, default False
-    :param bloom_threshold:unsigned char;
-    :param sat_value: float; Set the saturation value
-    :param saturation: boolean; Saturation effect
-    :param smooth: boolean; Blur effect
+    Example Usage:
+    --------------
+    lit_surface, sw, sh = area24_cc(
+        MOUSE_POS[0], MOUSE_POS[1], background_rgb, lalpha, 
+        intensity=5, color=c, smooth=False, saturation=False, 
+        sat_value=0.2, bloom=True, bloom_threshold=0
+    )
 
-    :return: Return a pygame surface 24 bit without per-pixel information,
-    surface with same size as the light texture. Represent the lit surface.
+    Parameters:
+    -----------
+    x : int
+        X-coordinate of the light source (must be within screen width).
+
+    y : int
+        Y-coordinate of the light source (must be within screen height).
+
+    background_rgb : numpy.ndarray, shape (w, h, 3), dtype uint8
+        A 3D NumPy array representing the RGB values of the background surface.
+
+    mask_alpha : numpy.ndarray, shape (w, h), dtype uint8
+        A 2D NumPy array containing the alpha values of the light mask.
+        Using a radial gradient mask with maximum intensity at the center is recommended.
+
+    color : numpy.ndarray, default=[128.0, 128.0, 128.0]
+        A 3-element NumPy array representing the RGB color of the light in float format
+        (values in the range [0.0, 255.0]).
+
+    intensity : float, default=1.0
+        Light intensity in the range [0.0, 20.0]. Higher values produce a stronger effect.
+
+    smooth : bool, default=False
+        If True, applies a blur effect to soften the lighting.
+
+    saturation : bool, default=False
+        If True, increases color intensity using HSL conversion.
+
+    sat_value : float, default=0.2
+        Adjusts the saturation level. The valid range is [-1.0, 1.0].
+        Higher values increase vibrancy, while negative values desaturate the effect.
+
+    bloom : bool, default=False
+        If True, enables a bloom effect, enhancing brightness.
+
+    bloom_threshold : int, default=64
+        The brightness threshold for the bloom effect, in the range [0, 255].
+        Lower values create a stronger bloom effect.
+
+    Returns:
+    --------
+    tuple
+        A tuple containing:
+        - A 24-bit Pygame surface representing the generated light effect.
+        - The surface width (`sw`).
+        - The surface height (`sh`).
+
+    Notes:
+    ------
+    - The output surface does not contain per-pixel alpha information.
+    - Use `BLEND_RGBA_ADD` when blitting the surface to achieve an additive lighting effect.
     """
+
 
     if intensity < 0.0:
         raise ValueError('\nIntensity value cannot be < 0.0')
@@ -11594,15 +19336,22 @@ cpdef area24_cc(
         float red   = color[0]
         float green = color[1]
         float blue  = color[2]
+        unsigned char * index
 
     with nogil:
 
         for j in prange(ay, schedule=SCHEDULE, num_threads=THREADS):
             for i in range(ax):
+                index = &new_array[ j, i, 0 ]
+                if alpha[i, j] == 0:
+                    index[0] = <unsigned char>0
+                    (index + 1)[0] = <unsigned char>0
+                    (index + 2)[0] = <unsigned char>0
+                    continue
                 f = alpha[i, j] * c1
-                new_array[j, i, 0] = <unsigned char>min(rgb[i, j, 0] * f * red, 255)
-                new_array[j, i, 1] = <unsigned char>min(rgb[i, j, 1] * f * green, 255)
-                new_array[j, i, 2] = <unsigned char>min(rgb[i, j, 2] * f * blue, 255)
+                index[0] = <unsigned char>min(rgb[i, j, 0] * f * red, <unsigned char>255)
+                (index + 1)[0] = <unsigned char>min(rgb[i, j, 1] * f * green, <unsigned char>255)
+                (index + 2)[0] = <unsigned char>min(rgb[i, j, 2] * f * blue, <unsigned char>255)
 
     # As the array is transposed we
     # we need to adjust ax and ay (swapped).
@@ -11613,26 +19362,26 @@ cpdef area24_cc(
         return Surface((ax, ay), SRCALPHA), ax if ax > 0 else 0, ay if ay > 0 else 0
 
     if saturation:
-        saturation_array_mask_inplace(
+        saturation_mask_inplace(
             new_array,
             sat_value,
             alpha,
-            swap_row_column=True
+            w = ax, h = ay
         )
 
     cdef unsigned char [:, :, :] n_cp =\
-        numpy.array(new_array, copy=False, dtype=uint8)
+        numpy.asarray(new_array, dtype=uint8)
 
     if bloom:
         # surf = bpf24_c(new_array, threshold = bloom_threshold)
         # blend_add_array_c(new_array, surf.get_view('3'))
 
-        bpf24_inplace_c(new_array, threshold=bloom_threshold)
+        bpf_inplace_c(new_array, ay, ax, threshold=bloom_threshold)
         blend_add_array_c(new_array, n_cp)
 
 
     if smooth:
-        blur_array_inplace_c(new_array, mask=None, t=1)
+        blur3d_c(new_array, npass=1)
 
     surface = frombuffer(new_array, (ax, ay), 'RGB')
     surface.set_colorkey((0, 0, 0, 0), pygame.RLEACCEL)
@@ -11648,6 +19397,7 @@ cpdef area24_cc(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef object chromatic(
         surface_,
         unsigned int delta_x,
@@ -11656,18 +19406,33 @@ cpdef object chromatic(
         float fx=0.02
 ):
     """
-    CHROMATIC ABERRATION
+    Chromatic aberration (return a new surface)
 
     Create a chromatic aberration with an amplitude proportional to the
     distance from the centre of the effect
-
-    :param surface_ : pygame.Surface
-    :param delta_x  : int; chromatic centre effect coordinate X, must be in range [0 ... w]
-    :param delta_y  : int; chromatic centre effect coordinate Y, must be in range [0 ... h]
-    :param zoom     : float; zoom factor 0.9999 (no zoom, full image), < 1.0 zoom-in. Must
+    
+    e.g:
+    source = chromatic(source, 400, 300, 0.999, fx=0.04)
+    
+    :param surface_:
+        pygame.Surface 24, 32-bit compatible
+        
+    :param delta_x: 
+        int; chromatic centre effect coordinate X, must be in range [0 ... w]
+        
+    :param delta_y: 
+        int; chromatic centre effect coordinate Y, must be in range [0 ... h]
+        
+    :param zoom: 
+        float; zoom factor 0.9999 (no zoom, full image), < 1.0 zoom-in. Must
         be in range [0.0 ... 0.9999]
-    :param fx       : channel rgb layer offset default 0.02. Must be in range [0.0 ... 0.2]
-    :return         : a chromatic aberration effect
+        
+    :param fx: 
+        channel rgb layer offset default 0.02. Must be in range [0.0 ... 0.2]
+        
+    :return: 
+        a chromatic aberration effect
+        
     """
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
@@ -11677,7 +19442,7 @@ cpdef object chromatic(
 
 
     if w == 0 or h == 0:
-        raise ValueError("Surface width or height cannot be null!")
+        raise ValueError("Surface w or h cannot be null!")
 
     if delta_x < 0 or delta_y < 0:
         raise ValueError("Arguments delta_x and delta_y must be > 0")
@@ -11749,6 +19514,7 @@ cpdef object chromatic(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef object chromatic_inplace(
         surface_,
         unsigned int delta_x,
@@ -11757,19 +19523,35 @@ cpdef object chromatic_inplace(
         float fx=0.02
 ):
     """
-    CHROMATIC ABERRATION
+    Chromatic aberration (inplace)
 
     Create a chromatic aberration with an amplitude proportional to the
     distance from the centre of the effect
+    
+    e.g:
+    surf = chromatic_inplace(background, MOUSE_POS.x, MOUSE_POS.y, 0.999, fx=0.04)
 
-    :param surface_ : pygame.Surface
-    :param delta_x  : int; chromatic centre effect coordinate X, must be in range [0 ... w]
-    :param delta_y  : int; chromatic centre effect coordinate Y, must be in range [0 ... h]
-    :param zoom     : float; zoom factor 0.9999 (no zoom, full image), < 1.0 zoom-in. Must
+    :param surface_:
+        pygame.Surface 24, 32-bit compatible
+        
+    :param delta_x: 
+        int; chromatic centre effect coordinate X, must be in range [0 ... w]
+        
+    :param delta_y: 
+        int; chromatic centre effect coordinate Y, must be in range [0 ... h]
+        
+    :param zoom: 
+        float; zoom factor 0.9999 (no zoom, full image), < 1.0 zoom-in. Must
         be in range [0.0 ... 0.9999]
-    :param fx       : channel rgb layer offset default 0.02. Must be in range [0.0 ... 0.2]
-    :return         : a chromatic aberration effect
+        
+    :param fx: 
+        channel rgb layer offset default 0.02. Must be in range [0.0 ... 0.2]
+        
+    :return: 
+        a chromatic aberration effect
+        
     """
+
     assert PyObject_IsInstance(surface_, pygame.Surface), \
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
@@ -11778,7 +19560,7 @@ cpdef object chromatic_inplace(
 
 
     if w == 0 or h == 0:
-        raise ValueError("Surface width or height cannot be null!")
+        raise ValueError("Surface w or h cannot be null!")
 
     if delta_x < 0 or delta_y < 0:
         raise ValueError("Arguments delta_x and delta_y must be > 0")
@@ -11795,8 +19577,8 @@ cpdef object chromatic_inplace(
     cdef unsigned char [:, :, :] rgb_array
 
     try:
-        # rgb_array = numpy.array(pixels3d(surface_), copy=True, dtype=uint8)
-        rgb_array = numpy.array(surface_.get_view('3'), copy=False, dtype=uint8, order='F')
+        # bgr_array = numpy.array(pixels3d(surface_), copy=True, dtype=uint8)
+        rgb_array = numpy.asarray(surface_.get_view('3'), dtype=uint8, order='F')
     except Exception as e:
         raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
@@ -11840,6 +19622,120 @@ cpdef object chromatic_inplace(
 
 
 
+@cython.binding(False)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+@cython.nonecheck(False)
+@cython.cdivision(True)
+@cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
+cpdef object zoom(surface_, unsigned int delta_x, unsigned int delta_y, float zx=0.9999):
+    """
+    Zoom within an image (return a copy)
+
+    Zoom-in or zoom-out (factor zx) toward a given centre point (delta_x, delta_y)
+    Compatible 24, 32-bit image format.
+    The final output image will be same than input format.  
+    This algorithm will have slightly better performances with 24-bit image
+    
+    e.g:
+    surf = zoom(background, MOUSE_POS.x, MOUSE_POS.y, z)
+    
+    :param surface_ : 
+        pygame.Surface
+        
+    :param delta_x  : 
+        int; Zoom centre x coordinate must be in range [0 ... w]
+        
+    :param delta_y  : 
+        int; Zoom centre y coordinate must be in range [0 ... h]
+        
+    :param zx       : 
+        float; Zoom factor must be in range ]0.0 ... 1.0[, zoom intensity will be 
+        attenuated around 1.0 and maximum around 0.0
+         
+    :return         : 
+        Returns a zoomed image.
+        the output image is same format than input image.  
+        
+    """
+
+    cdef int w, h
+    w, h = surface_.get_size()
+
+    cdef short int byte_size
+
+    byte_size = surface_.get_bytesize()
+
+
+    assert PyObject_IsInstance(surface_, pygame.Surface), \
+        "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
+
+    if w == 0 or h == 0:
+        raise ValueError("Surface w or h cannot be null!")
+
+    if delta_x < 0 or delta_y < 0:
+        raise ValueError("Arguments delta_x and delta_y must be > 0")
+
+    delta_x %= w
+    delta_y %= h
+
+    if zx <= 0.0 or zx >= 1.0:
+        raise ValueError('Argument zx must be in range ]0.0 ... 1.0[')
+
+
+    cdef unsigned char [:, :, :] rgb_array
+
+    try:
+        rgb_array = surface_.get_view('3') if byte_size == 3 else \
+        numpy.asarray(surface_.get_view('0'), dtype = numpy.uint8).reshape(h, w, byte_size)
+
+    except Exception as e:
+        raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
+
+    cdef:
+        unsigned char [:, :, :] new_array = \
+            empty((h, w, 4), dtype=numpy.uint8) if byte_size == 4 else \
+                empty((h, w, 3), dtype = numpy.uint8)
+
+        int i = 0, j = 0
+        float dw = delta_y / <float>w
+        float dh = delta_x / <float>h
+        float nx, ny, theta, new_dist
+        unsigned int new_j, new_i
+
+    with nogil:
+        for j in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
+
+            ny = <float> (<float> j / <float> w) - dw
+
+            for i in range(w):
+
+                nx = <float>(<float>i / <float>h) - dh
+
+                theta = <float>atan2 (ny,nx)
+
+                new_dist = <float>sqrt(nx * nx + ny * ny) * zx
+
+                new_j = <unsigned int> ((<float> sin(<float> theta) * new_dist + dw) * <float> w)
+                new_i = <unsigned int> ((<float> cos(<float> theta) * new_dist + dh) * <float> h)
+
+                if byte_size == 3:
+
+                    new_array[ j, i, 0 ] = rgb_array[ new_i, new_j, 0 ]
+                    new_array[ j, i, 1 ] = rgb_array[ new_i, new_j, 1 ]
+                    new_array[ j, i, 2 ] = rgb_array[ new_i, new_j, 2 ]
+
+                else:
+                    new_array[ j, i, 0 ] = rgb_array[ new_j, new_i, 0 ]
+                    new_array[ j, i, 1 ] = rgb_array[ new_j, new_i, 1 ]
+                    new_array[ j, i, 2 ] = rgb_array[ new_j, new_i, 2 ]
+                    new_array[ j, i, 3 ] = rgb_array[ new_j, new_i, 3 ]
+
+    return frombuffer(new_array, (w, h), 'RGB' if byte_size == 3 else 'BGRA')
+
+
 
 
 @cython.binding(False)
@@ -11849,17 +19745,40 @@ cpdef object chromatic_inplace(
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cpdef object zoom(surface_, unsigned int delta_x, unsigned int delta_y, float zx=0.9999):
+@cython.exceptval(check=False)
+cpdef inline void zoom_inplace(
+        surface_,
+        unsigned int delta_x,
+        unsigned int delta_y,
+        float zx=0.9999
+):
     """
-    ZOOM WITHIN AN IMAGE
+    Zoom within an image (inplace)
 
     Zoom-in or zoom-out (factor zx) toward a given centre point (delta_x, delta_y)
+    Compatible with 24, 32-bit image format. 
+    The input image format is unchanged during the process.
+    
+    
+    e.g:
+    surf = zoom(background, MOUSE_POS.x, MOUSE_POS.y, z)
 
-    :param surface_ : pygame.Surface
-    :param delta_x  : int; Zoom centre x coordinate must be in range [0 ... w]
-    :param delta_y  : int; Zoom centre y coordinate must be in range [0 ... h]
-    :param zx       : float; Zoom factor (0.9999 no zoom) must be in range [0.0 ... 0.9999]
-    :return         : Returns an image with a zoom effect
+    :param surface_ : 
+        pygame.Surface compatible 24, 32-bit 
+        
+    :param delta_x  : 
+        int; Zoom centre x coordinate must be in range [0 ... w]
+        
+    :param delta_y  : 
+        int; Zoom centre y coordinate must be in range [0 ... h]
+        
+    :param zx       : 
+        float; Zoom factor must be in range ]0.0 ... 1.0[
+        The zoom effect will be attenuated close to 1.0 and max around 0.0 
+        default is 0.9999 
+        
+    :return         : 
+        void
     """
 
     cdef int w, h
@@ -11869,7 +19788,7 @@ cpdef object zoom(surface_, unsigned int delta_x, unsigned int delta_y, float zx
         "\nArgument surface_ must be a pygame.Surface type, got %s " % type(surface_)
 
     if w == 0 or h == 0:
-        raise ValueError("Surface width or height cannot be null!")
+        raise ValueError("Surface w or h cannot be null!")
 
     if delta_x < 0 or delta_y < 0:
         raise ValueError("Arguments delta_x and delta_y must be > 0")
@@ -11877,11 +19796,11 @@ cpdef object zoom(surface_, unsigned int delta_x, unsigned int delta_y, float zx
     delta_x %= w
     delta_y %= h
 
-    if zx < 0 or <float>floor(zx) > <float>0.99999999:
-        raise ValueError("Argument zx must be in range [0.0 ... 0.999]")
+    if zx <=0.0 or zx >= 1.0:
+         raise ValueError('Argument zx must be in range ]0.0 ... 1.0[')
 
-
-    cdef unsigned char [:, :, :] rgb_array
+    cdef:
+        unsigned char [:, :, :] rgb_array
 
     try:
         rgb_array = surface_.get_view('3')
@@ -11889,21 +19808,22 @@ cpdef object zoom(surface_, unsigned int delta_x, unsigned int delta_y, float zx
     except Exception as e:
         raise ValueError("\nCannot reference source pixels into a 3d array.\n %s " % e)
 
+    cdef unsigned char [::1, :, :] rgb_array_cp = numpy.asarray(rgb_array, order='F')
+
     cdef:
-        # unsigned char [:, :, ::1] new_array = \
-        #     numpy.ascontiguousarray(empty((h, w, 3), dtype=numpy.uint8))
-        unsigned char [:, :, ::1] new_array = \
-                    numpy.ascontiguousarray(empty((h, w, 3), dtype=numpy.uint8))
         int i = 0, j = 0
         float dw = delta_y / <float>w
         float dh = delta_x / <float>h
-        float nx, ny, theta, nx2, ny2, dist, new_dist
-        unsigned int new_j, new_i, r, g, b
+        float nx, ny, theta, new_dist
+        unsigned int new_j, new_i
 
     with nogil:
         for j in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):
+
             ny = <float> (<float> j / <float> w) - dw
+
             for i in range(w):
+
                 nx = <float>(<float>i / <float>h) - dh
 
                 theta = <float>atan2 (ny,nx)
@@ -11913,12 +19833,9 @@ cpdef object zoom(surface_, unsigned int delta_x, unsigned int delta_y, float zx
                 new_j = <unsigned int>((<float>sin(<float>theta) * new_dist + dw) * <float>w)
                 new_i = <unsigned int>((<float>cos(<float>theta) * new_dist + dh) * <float>h)
 
-                new_array[j, i, 0] = rgb_array[new_i, new_j, 0]
-                new_array[j, i, 1] = rgb_array[new_i, new_j, 1]
-                new_array[j, i, 2] = rgb_array[new_i, new_j, 2]
-
-
-    return frombuffer(new_array, (w, h), 'RGB')
+                rgb_array[i, j, 0] = rgb_array_cp[new_i, new_j, 0]
+                rgb_array[i, j, 1] = rgb_array_cp[new_i, new_j, 1]
+                rgb_array[i, j, 2] = rgb_array_cp[new_i, new_j, 2]
 
 
 
@@ -11929,83 +19846,29 @@ cpdef object zoom(surface_, unsigned int delta_x, unsigned int delta_y, float zx
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cpdef void Luma_GreyScale(object surface_):
     """
-    CONVERT IMAGE INTO GREYSCALE USING YIQ (LUMA INFORMATION)
-
-    :param surface_: pygame.Surface;
-    :return: void
+    Convert image into greyscale using yiq (luma information)
+    
+    e.g:
+    Luma_GreyScale(image)
+    
+    :param surface_: 
+        pygame.Surface;
+        
+    :return: 
+        void
+        
     """
     cdef unsigned char [:,:,:] arr = surface_.get_view('3')
     Luma_GreyScale_c(arr)
 
 
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef void RGB_TO_YIQ_Q0_inplace(object surface_):
-    """
-    CONVERT IMAGE INTO YIQ MODEL (REPRESENT IN-PHASE VALUE)
-    Final YIQ model without the quadrature value Q = 0
-
-    In YIQ the Y component represents the luma information,
-    I and Q represent the chrominance information.
-    I stands for in-phase, while Q stands for quadrature, referring to the components
-    used in quadrature amplitude modulation.
-
-    :param surface_: pygame.Surface;
-    :return: void
-    """
-    cdef unsigned char [:,:,:] arr = surface_.get_view('3')
-    RGB_TO_YIQ_Q0_inplace_c(arr)
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef void RGB_TO_YIQ_I0_inplace(object surface_):
-    """
-    CONVERT IMAGE INTO YIQ MODEL
-    Final YIQ model without the in phase value I = 0
-
-    :param surface_: pygame.Surface;
-    :return: void
-    """
-    cdef unsigned char [:,:,:] arr = surface_.get_view('3')
-    RGB_TO_YIQ_I0_inplace_c(arr)
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cpdef void RGB_TO_YIQ_Y0_inplace(object surface_):
-    """
-    CONVERT IMAGE INTO YIQ MODEL
-    Final YIQ model without the luma value Y = 0
-
-    :param surface_: pygame.Surface;
-    :return: void
-    """
-    cdef unsigned char [:,:,:] arr = surface_.get_view('3')
-    RGB_TO_YIQ_Y0_inplace_c(arr)
-
 # -------------------------------------------------------------------------------------------------------------------
 
 
-
-
 @cython.binding(False)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -12013,28 +19876,56 @@ cpdef void RGB_TO_YIQ_Y0_inplace(object surface_):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef heatwave_array24_horiz_c(unsigned char [:, :, :] rgb_array,
-                            unsigned char [:, :] mask_array,
-                            float frequency, float amplitude, float attenuation=0.10,
-                            unsigned char threshold=64):
+@cython.exceptval(check=False)
+cdef heatwave_array24_horiz_c(
+            unsigned char [:, :, :] rgb_array,
+            unsigned char [:, :] mask_array,
+            float frequency, float amplitude, float attenuation=0.10,
+            unsigned char threshold=64
+):
     """
     HORIZONTAL HEATWAVE 
 
     DISTORTION EQUATION: 
-    distortion = sin(x * attenuation + frequency) * amplitude * mask_array[x, y]
+    distortion = sin(x * attenuation + frequency) * amplitude * mask[x, y]
     Amplitude is equivalent to ((frequency % 2) / 1000.0) and will define the maximum pixel displacement.
     The highest the frequency the lowest the heat wave  
+    
+    e.g
+    new_array = \
+            heatwave_array24_horiz_c(
+                numpy.asarray(new_array).transpose(1, 0, 2),
+                alpha,
+                frequency,
+                (frequency % <unsigned short int>8) / <float>1000.0,
+                attenuation=100,
+                threshold=<unsigned short int>10
+            )
 
 
-    :param rgb_array: numpy.ndarray or MemoryViewSlice, array shape (w, h, 3) containing RGB values
-    :param mask_array: numpy.ndarray or  MemoryViewSlice shape (w, h) containing alpha values
-    :param frequency: float; increment value. The highest the frequency the lowest the heat wave  
-    :param amplitude: float; variable amplitude. Max amplitude is 10e-3 * 255 = 2.55 
-    when alpha is 255 otherwise 10e-3 * alpha.
-    :param attenuation: float; default 0.10
-    :param threshold: unsigned char; Compare the alpha value with the threshold.
-     if alpha value > threshold, apply the displacement to the texture otherwise no change
-    :return: Return a pygame.Surface 24 bit format 
+    :param rgb_array: 
+        numpy.ndarray or MemoryViewSlice, array shape (w, h, 3) containing RGB values
+        
+    :param mask_array: 
+        numpy.ndarray or  MemoryViewSlice shape (w, h) containing alpha values
+        
+    :param frequency: 
+        float; increment value. The highest the frequency the lowest the heat wave
+          
+    :param amplitude: 
+        float; variable amplitude. Max amplitude is 10e-3 * 255 = 2.55 
+        when alpha is 255 otherwise 10e-3 * alpha.
+        
+    :param attenuation: 
+        float; default 0.10
+        
+    :param threshold: 
+        unsigned char; Compare the alpha value with the threshold.
+        if alpha value > threshold, apply the displacement to the texture otherwise no change
+        
+    :return: 
+        Return a pygame.Surface 24 bit format
+         
     """
 
 
@@ -12079,288 +19970,41 @@ cdef heatwave_array24_horiz_c(unsigned char [:, :, :] rgb_array,
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
-cdef inline saturation_array_mask(
-        unsigned char [:, :, :] array_,
-        float shift_,
-        unsigned char [:, :] mask_array,
-        bint swap_row_column
-):
-    """
-    CHANGE THE SATURATION LEVEL OF A PYGAME.SURFACE (COMPATIBLE WITH 24BIT ONLY).
-
-    Transform RGB model into HSL model and <shift_> saturation value.
-    Optional mask_array to determine area to be modified.
-    The mask should be a 2d array filled with float values
-
-    :param array_: 3d numpy.ndarray shapes (w, h, 3) representing a 24bit format pygame.Surface.
-    :param shift_: Value must be in range [-1.0 ... 1.0],
-                   between [-1.0 ... 0.0] decrease saturation.
-                   between [0.0  ... 1.0] increase saturation.
-    :param mask_array: unsigned char numpy.ndarray shape (width, height) 
-    :param swap_row_column: swap row and column values (only apply to array_) 
-    :return: a pygame.Surface 24-bit without per-pixel information 
-
-    """
-
-    assert -1.0 <= shift_ <= 1.0, 'Argument shift_ must be in range [-1.0 .. 1.0].'
-
-    cdef int width, height
-    try:
-        if swap_row_column:
-            height, width = array_.shape[:2]
-        else:
-            width, height = array_.shape[:2]
-    except (ValueError, pygame.error):
-        raise ValueError(
-            '\nArray type not compatible, expecting MemoryViewSlice got %s ' % type(array_))
-
-    cdef:
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
-        float s
-        hsl hsl_
-        rgb rgb_
-        int i, j
-
-    with nogil:
-        for i in prange(width, schedule=SCHEDULE, num_threads=THREADS):
-            for j in range(height):
-
-                if mask_array[i, j] == 0:
-                    continue
-
-                # load pixel RGB values
-                r = &array_[j, i, 0]
-                g = &array_[j, i, 1]
-                b = &array_[j, i, 2]
-
-                hsl_ = struct_rgb_to_hsl(
-                    r[0] * <float>ONE_255,
-                    g[0] * <float>ONE_255,
-                    b[0] * <float>ONE_255
-                )
-                s = min((hsl_.s + shift_), <float>1.0)
-                s = max(s, <float>0.0)
-
-                rgb_ = struct_hsl_to_rgb(hsl_.h, s, hsl_.l)
-
-                r[0] = <unsigned char> (rgb_.r * <float>255.0)
-                g[0] = <unsigned char> (rgb_.g * <float>255.0)
-                b[0] = <unsigned char> (rgb_.b * <float>255.0)
-
-    return frombuffer(array_, (width, height), 'RGB')
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void saturation_array_mask_inplace(
-        unsigned char [:, :, :] array_,
-        float shift_,
-        unsigned char [:, :] mask_array,
-        bint swap_row_column
-):
-    """
-    CHANGE THE SATURATION LEVEL OF A PYGAME.SURFACE (COMPATIBLE WITH 24BIT ONLY).
-
-    Transform RGB model into HSL model and <shift_> saturation value.
-    Optional mask_array to determine area to be modified.
-    The mask should be a 2d array filled with float values
-
-    :param array_: 3d numpy.ndarray shapes (w, h, 3) representing a 24bit format pygame.Surface.
-    :param shift_: Value must be in range [-1.0 ... 1.0],
-                   between [-1.0 ... 0.0] decrease saturation.
-                   between [0.0  ... 1.0] increase saturation.
-    :param mask_array: unsigned char numpy.ndarray shape (width, height) 
-    :param swap_row_column: swap row and column values (only apply to array_) 
-    :return: a pygame.Surface 24-bit without per-pixel information 
-
-    """
-
-    assert -1.0 <= shift_ <= 1.0, 'Argument shift_ must be in range [-1.0 .. 1.0].'
-
-    cdef int w, h
-    try:
-        if swap_row_column:
-            h, w = array_.shape[:2]
-        else:
-            w, h = array_.shape[:2]
-    except (ValueError, pygame.error):
-        raise ValueError(
-            '\nArray type not compatible, '
-            'expecting MemoryViewSlice got %s ' % type(array_))
-
-    cdef:
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
-        float s
-        hsl hsl_
-        rgb rgb_
-        int i, j
-
-    with nogil:
-        for i in prange(w, schedule=SCHEDULE, num_threads=THREADS):
-            for j in range(h):
-
-                if mask_array[i, j] == 0:
-                     continue
-
-                r, g, b = \
-                    &array_[ j, i, 0 ], \
-                    &array_[ j, i, 1 ], \
-                    &array_[ j, i, 2 ]
-
-                hsl_ = struct_rgb_to_hsl(
-                    <float> r[ 0 ] * <float> ONE_255,
-                    <float> g[ 0 ] * <float> ONE_255,
-                    <float> b[ 0 ] * <float> ONE_255
-                )
-
-                s = min((hsl_.s + shift_), <float> 1.0)
-                s = max(s, <float> 0.0)
-
-                rgb_ = struct_hsl_to_rgb(hsl_.h, s, hsl_.l)
-
-                r[ 0 ] = <unsigned char> (rgb_.r * <float> 255.0)
-                g[ 0 ] = <unsigned char> (rgb_.g * <float> 255.0)
-                b[ 0 ] = <unsigned char> (rgb_.b * <float> 255.0)
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline unsigned char [:, :, ::1] blur5x5_array24_c2(
-        unsigned char [:, :, :] rgb_array_, mask=None):
-    """
-    # Gaussian kernel 5x5
-        # |1   4   6   4  1|
-        # |4  16  24  16  4|
-        # |6  24  36  24  6|  x 1/256
-        # |4  16  24  16  4|
-        # |1  4    6   4  1|
-
-    This method is using convolution property and process the image in two passes,
-    first the horizontal convolution and last the vertical convolution
-    pixels convoluted outside image edges will be set to adjacent edge value
-
-    :param mask: default None
-    :param rgb_array_: numpy.ndarray type (w, h, 3) uint8 
-    :return: Return 24-bit a numpy.ndarray type (w, h, 3) uint8
-    """
-
-
-    cdef int w, h, dim
-    try:
-        w, h, dim = (<object>rgb_array_).shape[:3]
-
-    except (ValueError, pygame.error) as e:
-        raise ValueError('\nArray shape not understood.')
-
-    cdef:
-        # float [::1] kernel = kernel_
-        # float[5] kernel = [1.0/16.0, 4.0/16.0, 6.0/16.0, 4.0/16.0, 1.0/16.0]
-        short int kernel_half = 2
-        unsigned char [:, :, ::1] convolve = numpy.empty((w, h, 3), dtype=uint8)
-        unsigned char [:, :, ::1] convolved = numpy.empty((w, h, 3), dtype=uint8)
-        short int kernel_length = <int>len(GAUSS_KERNEL)
-        int x, y, xx, yy
-        float k, r, g, b, s
-        char kernel_offset
-        unsigned char red, green, blue
-
-    with nogil:
-        # horizontal convolution
-        for y in prange(0, h, schedule=SCHEDULE, num_threads=THREADS):  # range [0..h-1)
-
-            for x in range(0, w):  # range [0..w-1]
-
-                r, g, b = 0, 0, 0
-
-                for kernel_offset in range(-kernel_half, kernel_half + 1):
-
-                    k = GAUSS_KERNEL[kernel_offset + kernel_half]
-
-                    xx = x + kernel_offset
-
-                    # check boundaries.
-                    # Fetch the edge pixel for the convolution
-                    if xx < 0:
-                        red, green, blue = rgb_array_[0, y, 0],\
-                        rgb_array_[0, y, 1], rgb_array_[0, y, 2]
-                    elif xx > (w - 1):
-                        red, green, blue = rgb_array_[w-1, y, 0],\
-                        rgb_array_[w-1, y, 1], rgb_array_[w-1, y, 2]
-                    else:
-                        red, green, blue = rgb_array_[xx, y, 0],\
-                            rgb_array_[xx, y, 1], rgb_array_[xx, y, 2]
-
-                    r = r + red * k
-                    g = g + green * k
-                    b = b + blue * k
-
-                convolve[x, y, 0], convolve[x, y, 1], convolve[x, y, 2] = <unsigned char>r,\
-                    <unsigned char>g, <unsigned char>b
-
-        # Vertical convolution
-        for x in prange(0,  w, schedule=SCHEDULE, num_threads=THREADS):
-
-            for y in range(0, h):
-                r, g, b = 0, 0, 0
-
-                for kernel_offset in range(-kernel_half, kernel_half + 1):
-
-                    k = GAUSS_KERNEL[kernel_offset + kernel_half]
-                    yy = y + kernel_offset
-
-                    if yy < 0:
-                        red, green, blue = convolve[x, 0, 0],\
-                        convolve[x, 0, 1], convolve[x, 0, 2]
-                    elif yy > (h -1):
-                        red, green, blue = convolve[x, h-1, 0],\
-                        convolve[x, h-1, 1], convolve[x, h-1, 2]
-                    else:
-                        red, green, blue = convolve[x, yy, 0],\
-                            convolve[x, yy, 1], convolve[x, yy, 2]
-
-                    r = r + red * k
-                    g = g + green * k
-                    b = b + blue * k
-
-                convolved[x, y, 0], convolved[x, y, 1], convolved[x, y, 2] = \
-                    <unsigned char>r, <unsigned char>g, <unsigned char>b
-
-    return convolved
-
-
-
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline void Luma_GreyScale_c(unsigned char [:, :, :] rgb_array):
+    """
+    Convert an RGB image to grayscale using the YIQ color model (luma information).
 
+    The YIQ color space separates the brightness (luma) and color (chroma) components of an image.
+    This function uses only the luma component (Y) from the YIQ model to convert an image to grayscale,
+    preserving brightness but discarding the color information. The conversion results in a grayscale 
+    image based on the luminance (brightness) of the original image.
+
+    Example Usage:
+    --------------
+    # Convert an image to grayscale based on luminance (Y channel)
+    Luma_GreyScale(image)
+
+    Parameters
+    ----------
+    rgb_array : numpy.ndarray
+        A 3D NumPy array of type uint8 representing an RGB image with shape (width, height, 3).
+        The image is converted to grayscale in-place, modifying the original `rgb_array`.
+        Any changes to this array will affect the original surface that the array references.
+
+    Returns
+    -------
+    void
+        This function modifies the `rgb_array` in place and does not return any value.
+    """
+    
+    # Get the width (w) and height (h) of the image
     cdef Py_ssize_t w, h
     w, h = rgb_array.shape[:2]
 
+    # Declare loop variables and temporary structures for color conversion
     cdef:
-        int i=0, j=0
+        int i = 0, j = 0
         yiq yiq_
         rgb rgb_
         float h_
@@ -12368,121 +20012,30 @@ cdef inline void Luma_GreyScale_c(unsigned char [:, :, :] rgb_array):
         unsigned char *g
         unsigned char *b
 
+    # Perform the grayscale conversion in parallel (using OpenMP parallelization)
     with nogil:
+        # Iterate through each row of the image
         for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
+            # Iterate through each column of the current row
             for i in range(w):
+                # Access the RGB values of the current pixel
                 r = &rgb_array[i, j, 0]
                 g = &rgb_array[i, j, 1]
                 b = &rgb_array[i, j, 2]
+                
+                # Convert the RGB values to YIQ color space (luma information)
                 yiq_ = rgb_to_yiq(r[0] * <float>ONE_255, g[0] * <float>ONE_255, b[0] * <float>ONE_255)
 
+                # Replace the RGB values with the Y (luma) value from YIQ, turning it into grayscale
+                # The grayscale value is derived from the Y component of the YIQ model
                 r[0] = <unsigned char>min(<unsigned char>(yiq_.y * <float>255.0), <unsigned char>255)
                 g[0] = <unsigned char>min(<unsigned char>(yiq_.y * <float>255.0), <unsigned char>255)
                 b[0] = <unsigned char>min(<unsigned char>(yiq_.y * <float>255.0), <unsigned char>255)
 
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void RGB_TO_YIQ_Q0_inplace_c(unsigned char [:, :, :] rgb_array):
-
-    cdef Py_ssize_t w, h
-    w, h = rgb_array.shape[:2]
-
-    cdef:
-        int i=0, j=0
-        yiq yiq_
-        rgb rgb_
-        float h_
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
-
-    with nogil:
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
-            for i in range(w):
-                r = &rgb_array[i, j, 0]
-                g = &rgb_array[i, j, 1]
-                b = &rgb_array[i, j, 2]
-                yiq_ = rgb_to_yiq(r[0] * <float>ONE_255, g[0] * <float>ONE_255, b[0] * <float>ONE_255)
-                rgb_ = yiq_to_rgb(yiq_.y, yiq_.i, 0)
-                r[0] = <unsigned char>(rgb_.r * <float>255.0)
-                g[0] = <unsigned char>(rgb_.g * <float>255.0)
-                b[0] = <unsigned char>(rgb_.b * <float>255.0)
 
 
 
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void RGB_TO_YIQ_I0_inplace_c(unsigned char [:, :, :] rgb_array):
-
-    cdef Py_ssize_t w, h
-    w, h = rgb_array.shape[:2]
-
-    cdef:
-        int i=0, j=0
-        yiq yiq_
-        rgb rgb_
-        float h_
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
 
 
-    with nogil:
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
-            for i in range(w):
-                r = &rgb_array[i, j, 0]
-                g = &rgb_array[i, j, 1]
-                b = &rgb_array[i, j, 2]
-                yiq_ = rgb_to_yiq(r[0] * <float>ONE_255, g[0] * <float>ONE_255, b[0] * <float>ONE_255)
-                rgb_ = yiq_to_rgb(yiq_.y, 0, yiq_.q)
-                r[0] = <unsigned char>(rgb_.r * <float>255.0)
-                g[0] = <unsigned char>(rgb_.g * <float>255.0)
-                b[0] = <unsigned char>(rgb_.b * <float>255.0)
-
-
-
-@cython.binding(False)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
-@cython.cdivision(True)
-@cython.profile(False)
-@cython.initializedcheck(False)
-cdef inline void RGB_TO_YIQ_Y0_inplace_c(unsigned char [:, :, :] rgb_array):
-
-    cdef Py_ssize_t w, h
-    w, h = rgb_array.shape[:2]
-
-    cdef:
-        int i=0, j=0
-        yiq yiq_
-        rgb rgb_
-        float h_
-        unsigned char *r
-        unsigned char *g
-        unsigned char *b
-
-
-    with nogil:
-        for j in prange(h, schedule=SCHEDULE, num_threads=THREADS):
-            for i in range(w):
-                r = &rgb_array[i, j, 0]
-                g = &rgb_array[i, j, 1]
-                b = &rgb_array[i, j, 2]
-                yiq_ = rgb_to_yiq(r[0] * <float>ONE_255, g[0] * <float>ONE_255, b[0] * <float>ONE_255)
-                rgb_ = yiq_to_rgb(0, yiq_.i, yiq_.q)
-                r[0] = <unsigned char>(rgb_.r * <float>255.0)
-                g[0] = <unsigned char>(rgb_.g * <float>255.0)
-                b[0] = <unsigned char>(rgb_.b * <float>255.0)
 

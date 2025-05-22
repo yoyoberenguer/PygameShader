@@ -1,5 +1,173 @@
-# cython: boundscheck=False, wraparound=False, nonecheck=False, cdivision=True, optimize.use_switch=True, profile=False, initializedcheck=False
+# cython: binding=False, boundscheck=False, wraparound=False, nonecheck=False, cdivision=True,
+# profile=False, initializedcheck=False, exceptval(check=False)
+# cython: optimize.use_switch=True
+# cython: warn.maybe_uninitialized=False
+# cython: warn.unused=False
+# cython: warn.unused_result=False
+# cython: warn.unused_arg=False
+# cython: language_level=3
+# cython: write_stub_file = True
 # encoding: utf-8
+
+"""
+=============================
+Sprite and Group Management
+=============================
+
+This library provides an efficient Cython implementation of **sprite management, collision detection, and rendering**
+similar to `pygame.sprite`, but optimized for performance. This functionality already exists in the **Pygame project**,
+but has been **Cythonized** to significantly improve performance by using C-level optimizations for common operations.
+It includes:
+
+- **Sprite Objects** (`Sprite` class)
+- **Group Handling** (`AbstractGroup`, `GroupSingle`, `LayeredUpdates`)
+- **Collision Detection** (`collide_rect`, `collide_circle`, `collide_mask`)
+- **Layered Sprite Management** (`LayeredUpdates`, `LayeredUpdatesModified`)
+
+**Purpose**
+-----------
+This module enhances **Pygame's sprite system** by providing:
+- Faster **group operations** with optimized internal structures.
+- Efficient **collision detection** using various methods (rectangles, circles, masks).
+- Advanced **layer-based rendering** for handling depth ordering.
+- Support for **single-object sprite groups** (e.g., `GroupSingle`).
+- **In-place updates** to minimize memory allocations.
+
+The core functionality is inspired by the **Pygame sprite module** but is **Cythonized** for better performance. It takes advantage of
+Cython's ability to compile code into C to achieve faster execution and reduced memory usage, making it suitable for performance-critical games.
+
+---
+
+Sprite Class
+------------
+**`Sprite`** represents an individual game object that can belong to multiple groups.
+
+.. code-block:: python
+
+    sprite = Sprite()
+    group = AbstractGroup()
+    sprite.add_internal(group)
+
+**Methods**
+- `add_internal(group)`: Adds the sprite to a group.
+- `remove_internal(group)`: Removes the sprite from a group.
+- `update(args=*)`: Updates the sprite state.
+- `kill()`: Removes the sprite from all groups.
+- `groups() -> list`: Returns all groups containing this sprite.
+- `alive() -> bool`: Checks if the sprite is still in any group.
+
+---
+
+AbstractGroup
+-------------
+**`AbstractGroup`** is the base class for managing sprite groups.
+
+**Attributes**
+- `_spritegroup (bool)`: Indicates whether this is a sprite group.
+- `spritedict (dict)`: Stores sprites and their data.
+- `lostsprites (list)`: Tracks removed sprites.
+
+**Methods**
+- `sprites() -> list`: Returns a list of all sprites in the group.
+- `add_internal(sprite)`: Adds a sprite to the group.
+- `remove_internal(sprite)`: Removes a sprite from the group.
+- `has_internal(sprite) -> bool`: Checks if a sprite is in the group.
+- `copy()`: Creates a copy of the group.
+- `update(args=*)`: Calls the `update()` method on all sprites.
+- `draw(surface)`: Draws all sprites onto the given surface.
+- `clear(surface, bgd)`: Clears the group from the screen.
+- `empty()`: Removes all sprites from the group.
+
+---
+
+GroupSingle
+-----------
+**`GroupSingle`** is a specialized group that holds only a **single sprite**.
+
+**Methods**
+- `sprites() -> list`: Returns a list containing the single sprite.
+- `add_internal(sprite)`: Sets the sprite for this group.
+- `remove_internal(sprite)`: Removes the sprite.
+- `has_internal(sprite) -> bool`: Checks if a sprite exists in the group.
+
+---
+
+Collision Detection
+-------------------
+**Collision functions** allow efficient detection between sprites and groups.
+
+- `collide_rect(left, right)`: Rectangular collision detection.
+- `collide_circle(left, right)`: Circular collision detection.
+- `collide_mask(left, right)`: Pixel-perfect collision detection.
+- `groupcollide(groupa, groupb, dokilla, dokillb, collided=*) -> dict`:
+  - Checks collisions between two groups, optionally removing colliding sprites.
+- `spritecollideany(sprite, group, collided=*)`:
+  - Checks if a sprite collides with any sprite in a group.
+- `spritecollide(sprite, group, dokill, collided=*) -> list`:
+  - Returns a list of sprites that collide with `sprite`.
+
+---
+
+Layered Sprite Management
+-------------------------
+**`LayeredUpdates`** extends `AbstractGroup` to support **layer-based rendering**.
+
+**Attributes**
+- `_spritelayers (dict)`: Stores sprite-layer mappings.
+- `_spritelist (list)`: Ordered list of sprites.
+- `_default_layer (int)`: Default layer for new sprites.
+
+**Methods**
+- `add_internal(sprite, layer=*)`: Adds a sprite to a specified layer.
+- `remove_internal(sprite)`: Removes a sprite.
+- `sprites() -> list`: Returns all sprites.
+- `get_sprites_at(pos)`: Retrieves sprites at a given position.
+- `get_sprite(idx)`: Returns a sprite by index.
+- `remove_sprites_of_layer(layer)`: Removes all sprites from a specific layer.
+- `layers()`: Returns a list of all layers.
+- `change_layer(sprite, new_layer)`: Moves a sprite to a new layer.
+- `get_layer_of_sprite(sprite)`: Returns the layer of a given sprite.
+- `get_top_layer() / get_bottom_layer()`: Returns the highest or lowest layer.
+- `move_to_front(sprite) / move_to_back(sprite)`: Changes sprite depth ordering.
+- `get_top_sprite()`: Retrieves the topmost sprite.
+- `get_sprites_from_layer(layer)`: Returns all sprites in a given layer.
+- `switch_layer(layer1, layer2)`: Swaps two layers.
+
+---
+
+LayeredUpdatesModified
+----------------------
+Extends `LayeredUpdates` with additional drawing and update functionality.
+
+- `update(args=*)`: Updates all sprites.
+- `draw(surface)`: Draws sprites onto a surface.
+
+---
+
+Helper Functions
+----------------
+- `int_min(a, b) -> int`: Returns the smaller of two integers.
+- `truth(a) -> bool`: Converts a value to boolean.
+
+---
+
+**Summary**
+-----------
+This library optimizes **sprite handling** in Pygame by:
+- **Enhancing performance** with Cython memoryviews.
+- **Supporting efficient collision detection** (rect, circle, mask).
+- **Managing layered rendering** with advanced depth ordering.
+- **Providing various group structures** (standard, single, layered).
+
+Although this functionality is available in the **Pygame project**, this library has been **Cythonized** to provide **significant performance improvements**, making it ideal for **performance-critical games**.
+
+**Ideal for Pygame developers needing fast and efficient sprite management.** 🚀
+
+
+
+"""
+
+
 """
 def draw(self, surface):
 
@@ -7,6 +175,11 @@ def draw(self, surface):
         dict spritedict = self.spritedict
         dict dirty = self.lostsprites --> CHANGED for list dirty = ...
 """
+
+
+
+
+# TODO CHECK NEW SPRITE MODULE FROM PYGAME FOR CYNTHONIZING NEW VERSION
 
 from pygame.time import get_ticks
 
@@ -49,6 +222,8 @@ if 'callable' not in dir(__builtins__):
 @cython.nonecheck(False)
 @cython.cdivision(True)
 @cython.profile(False)
+@cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef inline int int_min(int a, int b):
     return b if b < a else a
 
@@ -59,6 +234,7 @@ cdef inline int int_min(int a, int b):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+
 cdef inline truth(bint a):
     return True if a else False
 
@@ -340,7 +516,7 @@ cdef class AbstractGroup(object):
         # This function behaves essentially the same as Group.add. It first
         # tries to handle each argument as an instance of the Sprite class. If
         # that failes, then it tries to handle the argument as an iterable
-        # obj. If that failes, then it tries to handle the argument as an
+        # obj. If that fails, then it tries to handle the argument as an
         # old-style sprite group. Lastly, if that fails, it assumes that the
         # normal Sprite methods should be used.
         for sprite in sprites:
@@ -891,7 +1067,7 @@ cdef class LayeredUpdates(AbstractGroup):
         """move the sprite to the bottom layer
         LayeredUpdates.move_to_back(sprite): return None
         Moves the sprite to the bottom layer by moving it to a new layer below
-        the current bottom layer.
+        the current_ bottom layer.
         """
         self.change_layer(sprite, self.get_bottom_layer() - 1)
 
@@ -953,8 +1129,8 @@ cdef class LayeredDirty(LayeredUpdates):
         _use_update: True/False   (default is False)
         _default_layer: default layer where the sprites without a layer are
             added
-        _time_threshold: threshold time for switching between dirty rect mode
-            and fullscreen mode; defaults to updating at 80 frames per second,
+        _time_threshold: threshold time for switching between dirty rect modes
+            and fullscreen modes; defaults to updating at 80 frames per second,
             which is equal to 1000.0 / 80.0
     New in pygame 1.8.0
     """
@@ -971,7 +1147,7 @@ cdef class LayeredDirty(LayeredUpdates):
             _default_layer: default layer where the sprites without a layer are
                 added
             _time_threshold: treshold time for switching between dirty rect
-                mode and fullscreen mode; defaults to updating at 80 frames per
+                modes and fullscreen modes; defaults to updating at 80 frames per
                 second, which is equal to 1000.0 / 80.0
         """
         LayeredUpdates.__init__(self, *sprites, **kwargs)
@@ -1035,7 +1211,7 @@ cdef class LayeredDirty(LayeredUpdates):
         # -------
         # 0. decide whether to render with update or flip
         cdef int start_time = get_ticks()
-        if self._use_update:  # dirty rects mode
+        if self._use_update:  # dirty rects modes
             # 1. find dirty area on SCREEN and put the rects into _update
             # still not happy with that part
             for spr in _sprites:
@@ -1112,7 +1288,7 @@ cdef class LayeredDirty(LayeredUpdates):
                     if spr.dirty == 1:
                         spr.dirty = 0
             _ret = list(_update)
-        else:  # flip, full SCREEN mode
+        else:  # flip, full SCREEN modes
             if _bgd is not None:
                 _surf_blit(_bgd, (0, 0))
             for spr in _sprites:
@@ -1288,6 +1464,7 @@ cdef class GroupSingle(AbstractGroup):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef collide_rect(left, right):
     """collision detection between two sprites, using rects.
     pygame.sprite.collide_rect(left, right): return bool
@@ -1343,15 +1520,15 @@ cdef class collide_rect_ratio(object):
 
         leftrect = left.rect
         cdef:
-            int lw = leftrect.width
-            int lh = leftrect.height
+            int lw = leftrect.w
+            int lh = leftrect.h
         leftrect = leftrect.inflate(lw * ratio - lw,
                                     lh * ratio - lh)
 
         rightrect = right.rect
         cdef:
-            int rw = rightrect.width
-            int rh = rightrect.height
+            int rw = rightrect.w
+            int rh = rightrect.h
         rightrect = rightrect.inflate(rw * ratio - rw,
                                       rh * ratio - rh)
 
@@ -1364,6 +1541,7 @@ cdef class collide_rect_ratio(object):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef collide_circle(left, right):
     """detect collision between two sprites using circles
     pygame.sprite.collide_circle(left, right): return bool
@@ -1381,10 +1559,10 @@ cdef collide_circle(left, right):
     """
     cdef:
         object leftrect = left.rect, rightrect = right.rect
-        int lw = leftrect.width
-        int lh = leftrect.height
-        int rw = rightrect.width
-        int rh = rightrect.height
+        int lw = leftrect.w
+        int lh = leftrect.h
+        int rw = rightrect.w
+        int rh = rightrect.h
         int xdistance = leftrect.centerx - rightrect.centerx
         int ydistance = leftrect.centery - rightrect.centery
         int distancesquared = xdistance * xdistance + ydistance * ydistance
@@ -1459,10 +1637,10 @@ cdef class collide_circle_ratio(object):
             int xdistance = leftrect.centerx - rightrect.centerx
             int ydistance = leftrect.centery - rightrect.centery
             int distancesquared = xdistance * xdistance + ydistance * ydistance
-            int lw = leftrect.width
-            int lh = leftrect.height
-            int rw = rightrect.width
-            int rh = rightrect.height
+            int lw = leftrect.w
+            int lh = leftrect.h
+            int rw = rightrect.w
+            int rh = rightrect.h
             float r = ratio * <float>0.5, sum
 
         if PyObject_HasAttr(left, "radius"):
@@ -1488,6 +1666,7 @@ cdef class collide_circle_ratio(object):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef bint collide_mask(left, right):
     """collision detection between two sprites, using masks.
     pygame.sprite.collide_mask(SpriteLeft, SpriteRight): bool
@@ -1500,7 +1679,7 @@ cdef bint collide_mask(left, right):
 
     :param left: sprite; must have attribute rect
     :param right: sprite; must have attribute rect
-    :return: bool; 
+    :return: bool;
     """
 
     cdef:
@@ -1523,6 +1702,7 @@ cdef bint collide_mask(left, right):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef list spritecollide(sprite, group, bint dokill, collided=None):
     """find Sprites in a Group that intersect another Sprite
     pygame.sprite.spritecollide(sprite, group, dokill, collided=None):
@@ -1569,6 +1749,7 @@ cdef list spritecollide(sprite, group, bint dokill, collided=None):
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef dict groupcollide(groupa, groupb, bint dokilla, bint dokillb, collided=None):
     """detect collision between a group and another group
     pygame.sprite.groupcollide(groupa, groupb, dokilla, dokillb):
@@ -1606,6 +1787,7 @@ cdef dict groupcollide(groupa, groupb, bint dokilla, bint dokillb, collided=None
 @cython.cdivision(True)
 @cython.profile(False)
 @cython.initializedcheck(False)
+@cython.exceptval(check=False)
 cdef spritecollideany(sprite, group, collided=None):
     """finds any sprites in a group that collide with the given sprite
     spritecollideany(sprite, group): return sprite
@@ -1644,7 +1826,7 @@ cdef class LayeredUpdatesModified(LayeredUpdates):
     Pygame Class LayerUpdates modified
     This class introduce the pygame flag RGB_BLEND_ADD.
     When instantiating a pygame sprites, use the class attribute _blend to use
-    the sprite additive mode.
+    the sprite additive modes.
     e.g
     s = sprite()
     s._blend = pygame.BLEND_RGB_ADD
@@ -1659,13 +1841,13 @@ cdef class LayeredUpdatesModified(LayeredUpdates):
         """
         call the update method on contained Sprites
         update(*args, **kwargs) -> None
-        Calls the update() method on all Sprites in the Group. 
-        The base Sprite class has an update method that takes 
-        any number of arguments and does nothing. The arguments 
+        Calls the update() method on all Sprites in the Group.
+        The base Sprite class has an update method that takes
+        any number of arguments and does nothing. The arguments
         passed to Group.update() will be passed to each Sprite.
         There is no way to get the return value from the Sprite.update() methods.
-        :param args: 
-        :return: 
+        :param args:
+        :return:
         """
         # method update is supposed to be override by user's class.
         for s in self.sprites():

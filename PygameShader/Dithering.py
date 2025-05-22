@@ -2,7 +2,7 @@ import numpy
 import pygame
 import numba
 import timeit
-
+import functools
 
 @numba.jit("f4[:, :, :](f4[:,:,:])", nopython=True, nogil=True)
 def atkinson(array_):
@@ -68,9 +68,9 @@ if __name__ == '__main__':
         array_ = atkinson((pygame.surfarray.pixels3d(image) / float(255.0)).astype(numpy.float32))
         surf = pygame.surfarray.make_surface(array_ * 255.0)
 
-        #array_ = pygame.surfarray.array3d(image)
-        #array_ = gray(array_)
-        #surf = pygame.surfarray.make_surface(array_)
+        #bgr_array = pygame.surfarray.array3d(image)
+        #bgr_array = gray(bgr_array)
+        #surf = pygame.surfarray.make_surface(bgr_array)
 
         screen.blit(surf, (0, 0))
         pygame.display.flip()
