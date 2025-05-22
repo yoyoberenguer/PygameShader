@@ -37,7 +37,7 @@ font = pygame.font.SysFont("Arial", 15)
 
 sprites = []
 
-from PygameShader.shader import flip_array_vertically
+from PygameShader.gaussianBlur5x5 import blur
 
 
 def show_fps(render_, fps_, avg_) -> list:
@@ -67,7 +67,6 @@ class water_droplet(object):
             size_y + dy,
             int(size_x + dx) >> 1,
             int(size_y + dy) >> 1)
-        # self.model = flip_array_vertically(self.model)
         self.surf = pygame.Surface((size_x + dx, size_y + dy))
         self.pos = pygame.Vector2(x, y)
         self.dv = pygame.Vector2(0, randint(5, 50))

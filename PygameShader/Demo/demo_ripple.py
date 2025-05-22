@@ -6,8 +6,10 @@ from pygame.surfarray import make_surface, pixels3d, array3d
 from pygame.transform import smoothscale, scale2x
 from pygame.image import frombuffer
 
-from PygameShader.shader import ripple, _randi, _randf, \
-    blur5x5_array24_inplace, bloom_array24, bloom, shader_bloom_fast1
+from PygameShader.shader import ripple
+# shader_bloom_fast1
+from PygameShader.misc import _randi, _randf
+
 
 try:
     import numpy
@@ -74,6 +76,8 @@ texture.set_alpha(None)
 current = numpy.zeros((width, height), dtype=numpy.float32).copy('C')
 previous = numpy.zeros((width, height), dtype=numpy.float32).copy('C')
 back_array = array3d(texture)
+
+
 
 # TWEAKS
 cget_fps = clock.get_fps
@@ -149,7 +153,7 @@ while STOP_GAME:
     pygame.surfarray.array_to_surface(surf, back_array)
 
     # --- Increase the surface ripple wave effect brightness/luminescence
-    # shader_bloom_fast1(surf, smooth_=4, threshold_=0, flag_=pygame.BLEND_RGB_ADD,
+    # shader_bloom_fast1(surf, smooth_=4, threshold_=0, flag=pygame.BLEND_RGB_ADD,
     #                  saturation_=False)
 
     SCREEN.blit(surf, (0, 0), special_flags=pygame.BLEND_RGB_ADD)

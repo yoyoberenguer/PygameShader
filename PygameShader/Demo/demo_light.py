@@ -8,7 +8,7 @@ import pygame
 import numpy
 from pygame.surfarray import pixels3d, array3d
 
-from PygameShader import area24_cc, area24_c, BLEND_RGB_ADD
+from PygameShader import area24_cc, render_light_effect24, BLEND_RGB_ADD
 from PygameShader.shader import blend_add_array
 
 pygame.font.init()
@@ -107,7 +107,7 @@ while STOP_GAME:
 
     lit_surface, sw, sh = area24_cc(
         MOUSE_POS[0], MOUSE_POS[1], background_rgb, lalpha, intensity=5, color=c,
-        smooth=False, saturation=False, sat_value=0.2, bloom=False, bloom_threshold=0
+        smooth=False, saturation=False, sat_value=0.2, bloom=True, bloom_threshold=0
     )
 
     if sw < lw and MOUSE_POS[0] <= lw - lw2:

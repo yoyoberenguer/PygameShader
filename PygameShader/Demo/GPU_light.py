@@ -38,7 +38,7 @@ font = pygame.font.SysFont("Arial", 15)
 
 
 def show_fps(screen_, fps_, avg_) -> list:
-    """ Show framerate in upper left corner """
+    """ Show frame rate in upper left corner """
 
     fps = str(f"Move your mouse - fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
@@ -94,7 +94,7 @@ lw, lh = light.get_size()
 lw2, lh2 = lw >> 1, lh >> 1
 
 c = cupy.array([128.0 / 255.0, 128.0 / 255.0, 200.0 / 255.0], numpy.float32, copy=False)
-MOUSE_POS = [0, 0]
+MOUSE_POS = [200, 200]
 FRAME = 0
 clock = pygame.time.Clock()
 avg = []
@@ -158,7 +158,7 @@ while STOP_GAME:
 
     # pygame.display.set_caption(
     #     "Demo light GPU %s fps"
-    #     "(%sx%s)" % (round(clock.get_fps(), 2), width, height))
+    #     "(%sx%s)" % (round(clock.get_fps(), 2), w, h))
     flip()
 
 pygame.quit()

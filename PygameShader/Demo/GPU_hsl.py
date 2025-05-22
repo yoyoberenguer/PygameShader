@@ -120,7 +120,7 @@ while STOP_GAME:
 
     # pygame.display.set_caption(
     #     "Demo HSL GPU %s fps"
-    #     "(%sx%s)" % (round(clock.get_fps(), 2), width, height))
+    #     "(%sx%s)" % (round(clock.get_fps(), 2), w, h))
 
     hsl += v
     if hsl > 1.0:

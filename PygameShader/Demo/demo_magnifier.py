@@ -110,12 +110,16 @@ while STOP_GAME:
 
         elif keys[pygame.K_KP_MINUS]:
             xr -= 0.01
+
         elif keys[pygame.K_q]:
             xz -= 0.01
+
         elif keys[pygame.K_a]:
             xz += 0.01
+
         elif keys[pygame.K_w]:
             centre_x -= 1
+
         elif keys[pygame.K_e]:
             centre_x += 1
 

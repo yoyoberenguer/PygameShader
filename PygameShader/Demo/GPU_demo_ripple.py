@@ -3,7 +3,6 @@ PygameShader RIPPLE DEMO
 """
 from random import randint, uniform, randrange
 
-from PygameShader import shader_bloom_fast1
 
 try:
     import numpy
@@ -177,7 +176,7 @@ while STOP_GAME:
     avg = show_fps(SCREEN, t, avg)
     FRAME += 1
 
-    # capture_video(SCREEN, width, height, compression_=False)
+    # capture_video(SCREEN, w, h, compression_=False)
 
     flip()
 

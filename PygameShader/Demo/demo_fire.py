@@ -7,7 +7,9 @@ from random import uniform, randint
 # from PygameShader.shader_gpu import block_grid, block_and_grid_info, wave_gpu
 
 try:
-    from PygameShader.shader import custom_map, rgb_to_int, fire_effect, wave
+    from PygameShader.shader import custom_map, wave
+    from PygameShader.misc import rgb_to_int
+    from PygameShader.Fire import fire_effect
 except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
           "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
@@ -78,12 +80,12 @@ GAME = True
 
 def palette_array():
     """
-    Create a C - buffer type data 1D array containing the
+    Create a C - buffer type data 1D bck_cp containing the
     fire color palette (mapped RGB color, integer)
 
-    :return: 1D contiguous array (C buffer type data)
+    :return: 1D contiguous bck_cp (C buffer type data)
     """
-    # Set an array with pre-defined color wavelength
+    # Set an bck_cp with pre-defined color wavelength
     arr = numpy.array([0, 1,        # violet
                        0, 1,        # blue
                        0, 1,        # green
@@ -91,6 +93,7 @@ def palette_array():
                        601, 650,    # orange
                        651, 660],   # red
                       numpy.int32)
+
 
     heatmap = [custom_map(i - 20, arr, 1.0) for i in range(380, 800)]
     heatmap_array = numpy.zeros((800 - 380, 3), uint8)
@@ -141,7 +144,7 @@ else:
 
 print("\nMixer settings :")
 print("    ...frequency = %s" % SAMPLERATE)
-print("    ...mode      = %s" % MODE)
+print("    ...modes      = %s" % MODE)
 print("    ...channels  = %s" % CHANNELS)
 print("\n")
 
@@ -194,7 +197,7 @@ while GAME:
     )
 
     SCREEN.blit(surface_, (0, 0), special_flags=pygame.BLEND_RGB_ADD)
-    CLOCK.tick(800)
+    CLOCK.tick(2000)
     t = CLOCK.get_fps()
     avg.append(t)
     avg = show_fps(SCREEN, t, avg)

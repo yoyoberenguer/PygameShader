@@ -119,7 +119,7 @@ while STOP_GAME:
             MOUSE_POS = event.pos
 
     # transition = blend(
-    #     source_=background, destination_=city, percentage_=VALUE)
+    #     source=background, destination=city, percentage=VALUE)
 
     image = fisheye_gpu(background, VALUE/49.0, 0.35, grid, block)
     SCREEN.blit(image, (0, 0))

@@ -1,11 +1,12 @@
 """
-PygameShader SCROLL DEMO
+PygameShader SCROLL DEMO 32-bit image
 """
 
 import pygame
 from pygame import RLEACCEL
 import PygameShader
-from PygameShader.misc import scroll_surface_24bit
+from PygameShader.misc import scroll32_inplace
+
 
 WIDTH = 800
 HEIGHT = 800
@@ -14,7 +15,7 @@ SCREEN.convert(32, RLEACCEL)
 SCREEN.set_alpha(None)
 
 try:
-    BACKGROUND = pygame.image.load("../Assets/space1.jpg").convert(24)
+    BACKGROUND = pygame.image.load("../Assets/px.png").convert_alpha()
 except FileNotFoundError:
     raise FileNotFoundError(
         '\nImage file space1.jpg is missing from the Assets directory.')
@@ -37,6 +38,7 @@ GAME = True
 
 SCREEN.blit(BACKGROUND, (0, 0))
 
+
 x = -1
 y = 1
 v = pygame.math.Vector2(x, y)
@@ -57,7 +59,8 @@ while GAME:
 
     t = CLOCK.get_fps()
     SCREEN.fill((10, 10, 10))
-    BACKGROUND = scroll_surface_24bit(BACKGROUND, v.x, v.y)
+
+    scroll32_inplace(BACKGROUND, v.x, v.y)
 
     SCREEN.blit(BACKGROUND, (0, 0))
     SCREEN.blit(FILM, (0, 0))

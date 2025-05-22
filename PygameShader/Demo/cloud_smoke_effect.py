@@ -7,8 +7,9 @@ This demo use the CPU power only to generate a cloud effect
 from random import uniform, randint
 
 try:
-    from PygameShader.shader import custom_map, rgb_to_int, cloud_effect
-    from PygameShader.misc import create_horizontal_gradient_1d
+    from PygameShader.Fire import cloud_effect
+    from PygameShader.misc import create_line_gradient_rgb, rgb_to_int
+
 except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
           "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
@@ -63,7 +64,7 @@ pygame.init()
 # Load the background image
 
 try:
-    BACKGROUND = pygame.image.load("../Assets/img.png").convert()
+    BACKGROUND = pygame.image.load("../Assets/img.jpg").convert()
 except FileNotFoundError:
     raise FileNotFoundError(
         '\nImage file img.png is missing from the Assets directory.')
@@ -82,8 +83,8 @@ CLOUD_ARRAY = numpy.zeros((HEIGHT, WIDTH), dtype=numpy.float32)
 
 heatmap_rescale = numpy.zeros(256 * 2 * 3, numpy.uint32)
 
-arr1 = create_horizontal_gradient_1d(255, (0, 0, 0), (150, 150, 150))
-arr2 = create_horizontal_gradient_1d(255, (255, 255, 255), (0, 0, 0))
+arr1 = create_line_gradient_rgb(255, (0, 0, 0), (150, 150, 150))
+arr2 = create_line_gradient_rgb(255, (255, 255, 255), (0, 0, 0))
 arr3 = numpy.concatenate((arr1, arr2), axis=None)
 i = 0
 for r in range(0, 1530, 3):

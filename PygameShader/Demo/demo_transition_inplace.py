@@ -45,15 +45,14 @@ except FileNotFoundError:
 BACKGROUND = pygame.transform.smoothscale(BACKGROUND, (WIDTH, HEIGHT))
 
 try:
-    DESTINATION = pygame.image.load("../Assets/Aliens.jpg").convert()
+    SOURCE = pygame.image.load("../Assets/Aliens.jpg").convert()
 except FileNotFoundError:
     raise FileNotFoundError(
         '\nImage file Aliens.jpg is missing from the Assets directory.')
 
-DESTINATION = pygame.transform.smoothscale(DESTINATION, (WIDTH, HEIGHT))
-DEST_ARRAY  = pygame.surfarray.pixels3d(DESTINATION)
-
-assert BACKGROUND.get_size() == DESTINATION.get_size()
+SOURCE = pygame.transform.smoothscale(SOURCE, (WIDTH, HEIGHT))
+SOURCE_CP = SOURCE.copy()
+assert BACKGROUND.get_size() == SOURCE.get_size()
 
 pygame.display.set_caption("demo transition/blend effect")
 
@@ -99,9 +98,9 @@ while GAME:
             break
 
     SCREEN.blit(BACKGROUND, (0, 0))
-    blend_inplace(source_=SCREEN, destination_=DEST_ARRAY, percentage_=VALUE)
+    blend_inplace(source =SOURCE, destination =SCREEN, percentage =VALUE)
 
-    clock.tick(500)
+    clock.tick(2000)
     t = clock.get_fps()
     FRAME += 1
 
@@ -123,5 +122,6 @@ while GAME:
         VALUE = 0
         V = 0.2
 
+    #SOURCE = SOURCE_CP.copy()
 
 pygame.quit()

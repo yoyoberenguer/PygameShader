@@ -6,8 +6,8 @@ from pygame.surfarray import make_surface, pixels3d, array3d
 from pygame.transform import smoothscale, scale2x
 from pygame.image import frombuffer
 
-from PygameShader.shader import ripple, _randi, _randf, \
-    blur5x5_array24_inplace, bloom_array24, bloom, shader_bloom_fast1, ripple_seabed
+from PygameShader.shader import ripple, ripple_seabed
+from PygameShader.misc import _randi, _randf
 
 
 try:

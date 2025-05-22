@@ -1,5 +1,7 @@
 """
-PygameShader CARTOON DEMO
+PygameShader CPU HSL
+
+
 """
 
 try:
@@ -19,57 +21,52 @@ except ImportError:
           "\nTry: \n   C:\\pip install pygame on a window command prompt.")
 
 try:
-    import cupy
+    from PygameShader.shader import hsl_effect
 except ImportError:
-    raise ImportError("\n<Pygame> library is missing on your system."
-                      "\nTry: \n   C:\\pip install cupy on a window command prompt.")
-
-try:
-    import PygameShader
-    from PygameShader.shader_gpu import block_grid, cartoon_gpu, \
-        get_gpu_info, block_and_grid_info
-except ImportError:
-    raise ImportError("\n<PygameShader> library is missing on your system."
-                      "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")
+    raise ImportError("\n<misc> library is missing on your system.")
 
 
-def show_fps(screen_, fps_, avg_) -> None:
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 15)
+
+
+def show_fps(screen_, fps_, avg_) -> list:
+
     """ Show framerate in upper left corner """
-    font = pygame.font.SysFont("Arial", 15)
+
     fps = str(f"fps:{fps_:.3f}")
     av = sum(avg_)/len(avg_) if len(avg_) > 0 else 0
-
-    fps_text = font.render(fps, 1, pygame.Color("coral"))
+    fps_text = font.render(fps, True, pygame.Color("coral"))
     screen_.blit(fps_text, (10, 0))
     if av != 0:
         av = str(f"avg:{av:.3f}")
-        avg_text = font.render(av, 1, pygame.Color("coral"))
-        screen_.blit(avg_text, (90, 0))
+        avg_text = font.render(av, True, pygame.Color("coral"))
+        screen_.blit(avg_text, (100, 0))
     if len(avg_) > 200:
         avg_ = avg_[200:]
+    return avg_
 
-
-get_gpu_info()
 
 width = 800
 height = 600
 
-
 SCREENRECT = pygame.Rect(0, 0, width, height)
-pygame.display.init()
 SCREEN = pygame.display.set_mode(SCREENRECT.size)
 
 pygame.init()
 
-background = pygame.image.load('..//Assets//city.jpg').convert(24)
-background = pygame.transform.smoothscale(background, (800, 600))
-background_copy = background.copy()
+background = pygame.image.load('..//Assets//Parrot.jpg')
+background = pygame.transform.smoothscale(background, (width, height))
+background.convert(32, RLEACCEL)
+background.set_alpha(None)
 
-MOUSE_POS = [0, 0]
+bck_copy = background.copy()
+
 FRAME = 0
 clock = pygame.time.Clock()
 avg = []
-
+v = 0.001
+hsl = 0
 # TWEAKS
 cget_fps = clock.get_fps
 event_pump = pygame.event.pump
@@ -79,9 +76,6 @@ get_pos = pygame.mouse.get_pos
 flip = pygame.display.flip
 
 STOP_GAME = True
-
-grid, block = block_grid(width, height)
-block_and_grid_info(width, height)
 
 while STOP_GAME:
 
@@ -97,28 +91,28 @@ while STOP_GAME:
         if event.type == pygame.MOUSEMOTION:
             MOUSE_POS = event.pos
 
-    image = cartoon_gpu(
-        background,
-        sobel_threshold_ = 128,
-        median_kernel_   = 2,
-        color_           = 4,
-        contour_         = False,
-        flag_            = pygame.BLEND_RGB_MAX
-    )
+    hsl_effect(background, hsl)
 
-    SCREEN.blit(image, (0, 0))
-
+    SCREEN.blit(background, (0, 0))
     t = clock.get_fps()
     avg.append(t)
     show_fps(SCREEN, t, avg)
-    clock.tick(2000)
+    pygame.display.flip()
+    clock.tick()
     FRAME += 1
 
+    hsl += v
+    if hsl > 1.0:
+        hsl = 0.99
+        v *= -1
+    if hsl < 0.0:
+        hsl = 0.01
+        v *= -1
+
     pygame.display.set_caption(
-        "Cartoon GPU %s fps"
-        "(%sx%s)" % (round(clock.get_fps(), 2), width, height))
+        "Test hsl %s fps, value %s (%sx%s)" %
+        (round(clock.get_fps(), 2), round(hsl, 2), width, height))
 
-    flip()
-
+    background = bck_copy.copy()
 
 pygame.quit()

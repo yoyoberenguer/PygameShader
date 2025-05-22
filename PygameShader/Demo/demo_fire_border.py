@@ -5,7 +5,9 @@ PygameShader FIRE DEMO
 from random import uniform, randint
 
 try:
-    from PygameShader.shader import custom_map, rgb_to_int, fire_effect, wave
+    from PygameShader.shader import custom_map, wave
+    from PygameShader.misc import rgb_to_int
+    from PygameShader.Fire import fire_effect
 except ImportError:
     raise ImportError("\n<PygameShader> library is missing on your system."
           "\nTry: \n   C:\\pip install PygameShader on a window command prompt.")

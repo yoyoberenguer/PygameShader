@@ -116,7 +116,7 @@ else:
 
 print("\nMixer settings :")
 print("    ...frequency = %s" % SAMPLERATE)
-print("    ...mode      = %s" % MODE)
+print("    ...modes      = %s" % MODE)
 print("    ...channels  = %s" % CHANNELS)
 print("\n")
 
@@ -153,9 +153,9 @@ while GAME:
     SCREEN.blit(surf, (0, 0), special_flags=pygame.BLEND_RGB_ADD)
 
     blend_inplace(
-        source_=SCREEN,
-        destination_=pixels3d(BCK3),
-        percentage_=(1 - zx) * 60
+        source =SCREEN,
+        destination =BCK3,
+        percentage = (1 - zx) * 60
     )
 
     surface_ = tunnel_render24(

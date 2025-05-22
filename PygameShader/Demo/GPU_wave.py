@@ -73,8 +73,9 @@ except FileNotFoundError:
         '\nImage file city.jpg is missing from the Assets directory.')
 
 background = pygame.transform.smoothscale(background, (width, height))
-background.convert(32, RLEACCEL)
-background.set_alpha(None)
+background = background.convert(32, RLEACCEL)
+# background.set_alpha(None)
+# background = background.convert(24)
 
 FRAME = 0
 clock = pygame.time.Clock()

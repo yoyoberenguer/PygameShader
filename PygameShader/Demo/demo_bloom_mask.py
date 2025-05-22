@@ -1,16 +1,13 @@
 """
-PygameShader shader_bloom_fast1 DEMO
+PygameShader bloom DEMO
 
 This demo use the CPU power only to generate a bloom effect
-This Python code demonstrates a simple Pygame application that uses a bloom effect
-shader (shader_bloom_fast1) to create a glow or bloom effect on an image, using only CPU power.
- It is a demo that demonstrates real-time graphical effects with framerate monitoring.
 """
 
 
 import pygame
 from pygame import RLEACCEL
-from PygameShader import shader_bloom_fast1
+from PygameShader import bloom
 import numpy
 
 pygame.font.init()
@@ -59,7 +56,9 @@ avg = []
 
 from pygame.surfarray import pixels_alpha
 from pygame.transform import smoothscale
-mask = pixels_alpha(smoothscale(pygame.image.load('../Assets/radial4.png'), (WIDTH, HEIGHT)).convert_alpha())/255.0
+# mask = pixels_alpha(smoothscale(pygame.image.load('../Assets/radial4.png'), (WIDTH, HEIGHT)).convert_alpha())/255.0
+mask = smoothscale(pygame.image.load('../Assets/radial4.png'),(WIDTH, HEIGHT)).convert_alpha()
+mask = pygame.surfarray.pixels_alpha(mask)
 
 while GAME:
 
@@ -73,8 +72,8 @@ while GAME:
             break
 
     SCREEN.blit(image, (0, 0))
-
-    shader_bloom_fast1(SCREEN, threshold_=BPF, smooth_=1)
+    #mask = None
+    bloom(SCREEN, threshold_ = BPF, fast_=True, mask_ = mask)
 
     t = CLOCK.get_fps()
     avg.append(t)
@@ -100,7 +99,7 @@ while GAME:
         BPF = 0
 
     pygame.display.set_caption(
-        "Demo shader_bloom_fast1 effect %s fps "
+        "Demo bloom effect %s fps "
         "(%sx%s)" % (round(t, 2), WIDTH, HEIGHT))
 
 pygame.quit()

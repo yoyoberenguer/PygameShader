@@ -52,7 +52,7 @@ except FileNotFoundError:
         '\nImage file Aliens.jpg is missing from the Assets directory.')
 
 DESTINATION = pygame.transform.smoothscale(DESTINATION, (WIDTH, HEIGHT))
-DEST_ARRAY  = pygame.surfarray.pixels3d(DESTINATION)
+# DEST_ARRAY  = pygame.surfarray.pixels3d(DESTINATION)
 
 assert BACKGROUND.get_size() == DESTINATION.get_size()
 
@@ -100,7 +100,7 @@ while GAME:
             break
 
     transition = blend(
-        source_=BACKGROUND, destination_=DEST_ARRAY, percentage_=VALUE)
+        source =BACKGROUND, destination =DESTINATION, percentage =VALUE)
 
     SCREEN.blit(transition, (0, 0))
 
