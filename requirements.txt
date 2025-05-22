@@ -1,6 +1,24 @@
+# Numpy > 2.0 cause the following error with cupy version 9.6.0 at compilation time
+# AttributeError: `np.float_` was removed in the NumPy 2.0 release. Use `np.float64` instead.
+
+# Numpy == 1.25.0 cause error with cupy 9.6.0 during testing
+# File "C:\Users\yoyob\PycharmProjects\PygameShader\venv\Lib\site-packages\cupy\__init__.py", line 394, in <module>
+#    from numpy import MachAr  # NOQA
+#    ^^^^^^^^^^^^^^^^^^^^^^^^
+# ImportError: cannot import name 'MachAr' from 'numpy'
+# (C:\Users\yoyob\PycharmProjects\PygameShader\venv\Lib\site-packages\numpy\__init__.py)
+
 numpy >= 1.19.5
-pygame ==2.5.2
-cython ==3.0.2
+
+pygame >=2.5.2
+
+# Cython < 3.0 cause the following error msg
+# from libc.math cimport sqrtf as sqrt, atan2f as atan2, sinf as sin,\
+# ------------------------------------------------------------
+# PygameShader\BlendFlags.pyx:120:0: 'libc\math\sqrtf.pxd' not found
+cython >=3.0.2
+
 setuptools~=54.1.1
+
 cupy >=9.6.0
 

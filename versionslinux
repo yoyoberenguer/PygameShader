@@ -1,56 +1,164 @@
 #!/bin/bash
 
-echo Deleting cpp and pyd files in Pygameshader directory prior installation
-cd PygameShader
-rm *.cpp
-rm *.pyd
-rm *.so
+auditwheel=`locate auditwheel | grep bin/auditwheel | head -n 1`
+if [ -f "$auditwheel" ];
+    then
+        echo "Auditwheel package is already installed."
+    else
+        echo "Auditwheel package is missing.";
+        echo "pip install auditwheel"
+        exit 1;
+fi
+
+# Version to use for building the project
+versions=("3.6" "3.7" "3.8" "3.9" "3.10" "3.11" "3.12" "3.13")
+
+echo
+echo "*********************************************"
+echo "+Building PygameShader for Python versions:  "
+# shellcheck disable=SC2068
+echo ${versions[@]}
+echo "*********************************************"
+echo
+
+echo "+Checking installed python versions"
+for ver in "${versions[@]}"; do
+    python_path=$(locate "python$ver" | grep "/bin/python$ver" | head -n 1)
+
+    if [ -z "$python_path" ]; then
+        echo "python$ver is not found on your system"
+    fi
+done
+
+echo
+echo "+Updating PIP, pygame and cython libraries"
+
+
+for ver in "${versions[@]}"; do
+    pip_path=$(locate "pip$ver" | grep "/bin/pip$ver" | head -n 1)
+
+    if [ -z "$pip_path" ]; then
+        echo "pip$ver is not found on your system"
+    else
+        echo "Updating PIP for python version $ver"
+        "$pip_path" install --upgrade pip
+        echo "Using $pip_path to install packages for Python $ver"
+        "$pip_path" install --upgrade pygame cython
+    fi
+done
+
+echo
+echo "+Cleaning previous build artifacts from PygameShader..."
+
+if [ -d "PygameShader" ]; then
+    echo "PygameShader directory exists"
+else
+    echo "PygameShader directory does not exist"
+fi
+
+
+cd PygameShader || { echo "PygameShader directory not found!"; exit 1; }
+rm -f *.cpp *.pyd *.so
 cd ..
 
-python3.6 setup.py build_ext --inplace && python3.6 setup.py bdist_wheel
+echo
+echo "+Build wheels"
+for ver in "${versions[@]}"; do
+    python_bin="python$ver"
 
-cd PygameShader
-rm *.cpp
-rm *.so
-cd ..
+    echo "Building wheel for Python $ver using $python_bin..."
 
-python3.7 setup.py build_ext --inplace && python3.7 setup.py bdist_wheel
+if [ "$ver" = "3.13" ];
+	then
+	   "$python_bin" setup.py build_ext --inplace && "$python_bin" setup.py sdist bdist_wheel
+	else
+           "$python_bin" setup.py build_ext --inplace && "$python_bin" setup.py bdist_wheel
+    fi
+    # Clean up intermediate files again
+    cd PygameShader
+    rm -f *.cpp *.so
+    cd ..
 
+done
 
-cd PygameShader
-rm *.cpp
-rm *.so
-cd ..
+echo
+echo "+Repairing wheel with auditwheel package"
 
-python3.8 setup.py build_ext --inplace && python3.8 setup.py bdist_wheel
-
-
-cd PygameShader
-rm *.cpp
-rm *.so
-cd ..
-
-python3.9 setup.py build_ext --inplace && python3.9 setup.py bdist_wheel
-
-
-cd PygameShader
-rm *.cpp
-rm *.so
-cd ..
-
-python3.10 setup.py build_ext --inplace && python3.10 setup.py bdist_wheel
+if [ -d "dist" ]; then
+    echo "dist directory exists"
+else
+    echo "dist directory does not exist"
+fi
 
 
-cd PygameShader
-rm *.cpp
-rm *.so
-cd ..
+for file in dist/*.whl; do
+    if [ -f "$file" ]; then
+	echo
+        echo "Building anywheel for wheel file : $file"
+	auditwheel repair $file || { echo "Cannot repair wheel for $file"; }
+    fi
+done
 
-python3.11 setup.py build_ext --inplace && python3.11 setup.py sdist bdist_wheel
 
-cd PygameShader
-rm *.cpp
-rm *.so
-cd ..
+#
+#echo Deleting cpp and pyd files in Pygameshader directory prior installation
+#cd PygameShader
+#rm *.cpp
+#rm *.pyd
+#rm *.so
+#cd ..
+#
+#python3.6 setup.py build_ext --inplace && python3.6 setup.py bdist_wheel
+#
+#cd PygameShader
+#rm *.cpp
+#rm *.so
+#cd ..
+#
+#python3.7 setup.py build_ext --inplace && python3.7 setup.py bdist_wheel
+#
+#
+#cd PygameShader
+#rm *.cpp
+#rm *.so
+#cd ..
+#
+#python3.8 setup.py build_ext --inplace && python3.8 setup.py bdist_wheel
+#
+#
+#cd PygameShader
+#rm *.cpp
+#rm *.so
+#cd ..
+#
+#python3.9 setup.py build_ext --inplace && python3.9 setup.py bdist_wheel
+#
+#
+#cd PygameShader
+#rm *.cpp
+#rm *.so
+#cd ..
+#
+#python3.10 setup.py build_ext --inplace && python3.10 setup.py bdist_wheel
+#
+#
+#cd PygameShader
+#rm *.cpp
+#rm *.so
+#cd ..
+#
+#python3.11 setup.py build_ext --inplace && python3.11 setup.py sdist bdist_wheel
+#
+#cd PygameShader
+#rm *.cpp
+#rm *.so
+#cd ..
+#
+#python3.12 setup.py build_ext --inplace && python3.12 setup.py sdist bdist_wheel
+#
+#cd PygameShader
+#rm *.cpp
+#rm *.so
+#cd ..
 
 

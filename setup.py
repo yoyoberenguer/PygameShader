@@ -15,6 +15,7 @@ repository = https://test.pypi.org/
 repository = https://upload.pypi.org/legacy/
 """
 # twine upload --repository testpypi dist/*
+# twine upload --repository pypi dist/pygameshader-1.0.11* --verbose
 
 import setuptools
 try:
@@ -29,7 +30,8 @@ except ImportError:
     raise ImportError("\n<numpy> library is missing on your system."
           "\nTry: \n   C:\\pip install numpy")
 
-
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 try:
     import pygame
 except ImportError:
@@ -48,7 +50,7 @@ from setuptools import Extension
 import platform
 import warnings
 import sys
-from config import THREAD_NUMBER, OPENMP, OPENMP_PROC, LANGUAGE, __VERSION__
+from config import THREAD_NUMBER, OPENMP, OPENMP_PROC, LANGUAGE, __VERSION__, TEST_VERSION
 
 print("\n---PYTHON COPYRIGHT---\n")
 print(sys.copyright)
@@ -73,13 +75,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 # pypitest latest version 1.0.29
 
 ext_link_args = ""
-
-py_requires = "PygameShader requires python3 version 3.6 or above."
+PythonVerMax = 14
+py_requires = "PygameShader requires python3 version 3.6 - %s" % ("3." + str(PythonVerMax - 1))
 # If you are building the project from source with a python version
 # > python 3.11 you can extend the range to force the build process
 # e.g py_minor_versions = [x for x in range(6, 15)] ** compatible until
 # python 3.14
-py_minor_versions = [x for x in range(6, 12)]
+py_minor_versions = [x for x in range(6, PythonVerMax)]
 
 if hasattr(sys, 'version_info'):
     try:
@@ -95,19 +97,20 @@ else:
 
 if py_major_ver != 3 or py_minor_ver not in py_minor_versions:
     raise SystemExit(
-        "PygameShader support python3 versions 3.6 or above got version %s"
-        % str(py_major_ver)+"."+str(py_minor_ver))
+        "PygameShader support python3 versions 3.6 - %s got version %s"
+        % (("3." + str(PythonVerMax - 1)), str(py_major_ver)+"."+str(py_minor_ver)))
 
 if hasattr(platform, "architecture"):
     arch = platform.architecture()
     if isinstance(arch, tuple):
-        proc_arch_bits = arch[0].upper()
-        proc_arch_type = arch[1].upper()
+        proc_arch_bits = arch[ 0 ].upper()
+        proc_arch_type = arch[ 1 ].upper()
     else:
         raise AttributeError("Platform library is not install correctly")
 else:
     raise AttributeError("Platform library is missing attribute <architecture>")
 
+machine_type, plat, system = None, None, None
 
 if hasattr(platform, "machine"):
     machine_type = platform.machine().upper()
@@ -120,36 +123,84 @@ if hasattr(platform, "platform"):
 else:
     raise AttributeError("Platform library is missing attribute <platform>")
 
+if hasattr(platform, "system"):
+    system = platform.system()
+
+release, versioninfo, machine = None, None, None
 
 if plat.startswith("WINDOWS"):
-    ext_compile_args = ["/openmp" if OPENMP else "", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot"]
+
+    if hasattr(platform, "win32_ver"):
+        if len(platform.win32_ver()) == 3:
+            release, versioninfo, machine = platform.win32_ver()
+
+    ext_compile_args = [ "/openmp" if OPENMP else "", "/Qpar", "/fp:fast", "/O2", "/Oy", "/Ot", "/W3" ]
+
 
 
 elif plat.startswith("LINUX"):
+
+    if hasattr(platform, "libc_ver"):
+        if len(platform.libc_ver()) == 3:
+            release, versioninfo, machine = platform.libc_ver()
+
     if OPENMP:
         ext_compile_args = \
-            ["-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
-             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "ffast-math", "--param=max-vartrack-size=1500000",
-             "-Wall", OPENMP_PROC, "-static"]
-        ext_link_args = [OPENMP_PROC]
+            [ "-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
+              "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-ffast-math",
+              "--param=max-vartrack-size=1500000",
+              "-Wall", OPENMP_PROC, "-static" ]
+        ext_link_args = [ OPENMP_PROC ]
     else:
         ext_compile_args = \
-            ["-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
-             "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "ffast-math", "-Wall", "-static", 
-	     "--param=max-vartrack-size=1500000"]
+            [ "-DPLATFORM=linux", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
+              "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-ffast-math", "-Wall", "-static",
+              "--param=max-vartrack-size=1500000" ]
         ext_link_args = ""
+
+elif plat.startswith("MACOS") or plat.startswith("DARWIN"):
+
+    if hasattr(platform, "mac_ver"):
+        if len(platform.mac_ver()) == 3:
+            release, versioninfo, machine = platform.mac_ver()
+
+    if OPENMP:
+        ext_compile_args = \
+            [ "-DPLATFORM=Darwin", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
+              "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-ffast-math",
+              "-Wall", OPENMP_PROC ]
+        ext_link_args = [ OPENMP_PROC ]
+
+    else:
+        ext_compile_args = \
+            [ "-DPLATFORM=Darwin", "-march=i686" if proc_arch_bits == "32BIT" else "-march=x86-64",
+              "-m32" if proc_arch_bits == "32BIT" else "-m64", "-O3", "-ffast-math", "-Wall"
+              ]
+        ext_link_args = ""
+
 else:
-    raise ValueError("PygameShader can be build on Windows and Linux systems only.")
+    print("\n---SYSTEM IDENTIFICATION---\n")
+    print("SYSTEM                : %s " % system)
+    print("SYSTEM VERBOSE        : %s " % plat)
+    print("SYS VERSION           : %s " % release if release is not None
+          else "SYS VERSION           : undetermined")
+    print("BUILD                 : %s " % proc_arch_bits)
+    raise ValueError("PygameShader can be build on Windows, Linux and Mac systems only.")
 
 
 print("\n---COMPILATION---\n")
-print("SYSTEM                : %s " % plat)
+print("SYSTEM                : %s " % system)
+print("SYSTEM VERBOSE        : %s " % plat)
+print("SYS VERSION           : %s " % release if release is not None
+      else "SYS VERSION           : undetermined")
 print("BUILD                 : %s " % proc_arch_bits)
 print("FLAGS                 : %s " % ext_compile_args)
-print("EXTRA LINK FLAGS      : %s " % ext_link_args)
+print("EXTRA LINK FLAGS      : %s " % ext_link_args if ext_link_args != ""
+      else "EXTRA LINK FLAGS      : None")
 print("LANGUAGE              : %s " % LANGUAGE)
 print("MULTITPROCESSING      : %s " % OPENMP)
-print("MULTITPROCESSING FLAG : %s " % OPENMP_PROC)
+print("MULTITPROCESSING FLAG : %s " % OPENMP_PROC if OPENMP is True else
+      "MULTITPROCESSING FLAG : %s " % OPENMP_PROC + " ignored")
 if OPENMP:
     print("MAX THREADS           : %s " % THREAD_NUMBER)
 
@@ -165,12 +216,16 @@ else:
     print("CUPY IS NOT INSTALL")
 
 
+
 try:
     print("SDL VERSION           : %s.%s.%s " % pygame.version.SDL)
 except:
     pass  # ignore SDL versioning issue
 
-print("\n*** BUILDING PYGAMESHADER VERSION ***  : %s \n" % __VERSION__)
+if TEST_VERSION:
+    print("\n*** BUILDING PYGAMESHADER TESTING VERSION ***  : %s \n" % __VERSION__)
+else:
+    print("\n*** BUILDING PYGAMESHADER VERSION ***  : %s \n" % __VERSION__)
 
 print(
     "GPU SHADERS INFO"
@@ -183,7 +238,7 @@ print(
 
 # define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
 setuptools.setup(
-    name="PygameShader",
+    name="pygameshader",
     version= __VERSION__,       # testing version "1.0.27",
     author="Yoann Berenguer",
     author_email="yoyoberenguer@hotmail.com",
@@ -196,55 +251,81 @@ setuptools.setup(
     ext_modules=cythonize(module_list=[
         Extension("PygameShader.shader", ["PygameShader/shader.pyx"],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
-                  language=LANGUAGE),
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
         Extension("PygameShader.misc", ["PygameShader/misc.pyx"],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
-                  language=LANGUAGE),
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
         Extension("PygameShader.gaussianBlur5x5", ["PygameShader/gaussianBlur5x5.pyx"],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
-                  language=LANGUAGE),
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
         Extension("PygameShader.Palette", ["PygameShader/Palette.pyx"],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
-                  language=LANGUAGE),
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
         Extension("PygameShader.shader_gpu", ["PygameShader/shader_gpu.pyx"],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
-                  language=LANGUAGE),
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
         Extension("PygameShader.BurstSurface", ["PygameShader/BurstSurface.pyx"],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
-                  language=LANGUAGE),
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
         Extension("PygameShader.BlendFlags", ["PygameShader/BlendFlags.pyx"],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
-                  language=LANGUAGE),
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
         Extension("PygameShader.Sprites", ["PygameShader/Sprites.pyx"],
                   extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
-                  language=LANGUAGE)
-    ]),
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
+        Extension("PygameShader.PygameTools", ["PygameShader/PygameTools.pyx"],
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
+        Extension("PygameShader.RGBConvert", ["PygameShader/RGBConvert.pyx"],
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]),
+        Extension("PygameShader.Fire", ["PygameShader/Fire.pyx"],
+                  extra_compile_args=ext_compile_args, extra_link_args=ext_link_args,
+                  language=LANGUAGE,
+                  define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")])
+    ], quiet=True),
 
     include_dirs=[numpy.get_include()],
     license='GNU General Public License v3.0',
 
     classifiers=[
         'Development Status :: 4 - Beta',
-
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
+        "Intended Audience :: End Users/Desktop",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX :: Linux",
+        "Operating System :: POSIX",
+        "Operating System :: MacOS",
         "Programming Language :: Cython",
-
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-
+        "Programming Language :: C",
+        "Programming Language :: C++",
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
-        'Topic :: Software Development :: Libraries :: pygame'
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Topic :: Software Development :: Libraries :: pygame',
+        'Topic :: Software Development :: Build Tools',
     ],
 
     install_requires=[
-        'setuptools>=49.2.1',
+        'setuptools>=39.2.1',
         'Cython>=0.28',
         'numpy>=1.18',
         'pygame>=2.0'
@@ -260,6 +341,7 @@ setuptools.setup(
           'MANIFEST.in',
           'pyproject.toml',
           'README.md',
+          'Compilation tips.txt',
           'requirements.txt',
           'PygameShader/__init__.py',
           'PygameShader/__init__.pxd',
@@ -275,13 +357,19 @@ setuptools.setup(
           'PygameShader/gaussianBlur5x5.pxd',
           'PygameShader/Palette.pyx',
           'PygameShader/Palette.pxd',
+          'PygameShader/PygameTools.pyx',
+          'PygameShader/PygameTools.pxd',
           'PygameShader/shader_gpu.pyx',
           'PygameShader/shader_gpu.pxd',
           'PygameShader/config.py',
           'PygameShader/BurstSurface.pxd',
           'PygameShader/BurstSurface.pyx',
           'PygameShader/Sprites.pxd',
-          'PygameShader/Sprites.pyx'
+          'PygameShader/Sprites.pyx',
+          'PygameShader/RGBConvert.pyx',
+          'PygameShader/RGBConvert.pxd',
+          'PygameShader/Fire.pyx',
+          'PygameShader/Fire.pxd'
           ]),
         ('./lib/site-packages/PygameShader/Include',
          ['PygameShader/Include/Shaderlib.c'
@@ -293,6 +381,7 @@ setuptools.setup(
           ]),
         ('./lib/site-packages/PygameShader/Assets',
          [
+             'PygameShader/Assets/px.png',
              'PygameShader/Assets/Aliens.jpg',
              'PygameShader/Assets/AliensLuma.png',
              'PygameShader/Assets/background.jpg',
@@ -324,7 +413,9 @@ setuptools.setup(
              'PygameShader/Assets/space2_seamless.jpg',
              'PygameShader/Assets/space3.jpg',
              'PygameShader/Assets/space5.jpg',
-             'PygameShader/Assets/space7.jpg'
+             'PygameShader/Assets/space7.jpg',
+             'PygameShader/Assets/teslaColor03_m.png',
+             'PygameShader/Assets/alpha.png',
 
          ]),
         ('./lib/site-packages/PygameShader/Demo',
@@ -332,6 +423,7 @@ setuptools.setup(
              'PygameShader/Demo/__init__.py',
              'PygameShader/Demo/cloud_smoke_effect.py',
              'PygameShader/Demo/demo_bloom.py',
+             'PygameShader/Demo/demo_bloom_mask.py',
              'PygameShader/Demo/demo_burst.py',
              'PygameShader/Demo/demo_burst_exp.py',
              'PygameShader/Demo/demo_chromatic.py',
@@ -339,6 +431,8 @@ setuptools.setup(
              'PygameShader/Demo/demo_fire_border.py',
              'PygameShader/Demo/demo_fisheye.py',
              'PygameShader/Demo/demo_glitch.py',
+             'PygameShader/Demo/demo_hsl.py',
+             'PygameShader/Demo/demo_hsv.py',
              'PygameShader/Demo/demo_light.py',
              'PygameShader/Demo/demo_magnifier.py',
              'PygameShader/Demo/demo_predator.py',
@@ -347,13 +441,14 @@ setuptools.setup(
              'PygameShader/Demo/demo_ripple1.py',
              'PygameShader/Demo/demo_ripple_seabed.py',
              'PygameShader/Demo/demo_scroll.py',
+             'PygameShader/Demo/demo_scroll_32bit.py',
              'PygameShader/Demo/demo_transition.py',
              'PygameShader/Demo/demo_transition_inplace.py',
              'PygameShader/Demo/demo_tunnel.py',
              'PygameShader/Demo/demo_wave.py',
              'PygameShader/Demo/demo_wave_static.py',
              'PygameShader/Demo/demo_zoom.py',
-
+             'PygameShader/Demo/GPU_cartoon.py',
              'PygameShader/Demo/GPU_chromatic.py',
              'PygameShader/Demo/GPU_demo_ripple.py',
              'PygameShader/Demo/GPU_fisheye.py',

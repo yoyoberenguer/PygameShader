@@ -1,0 +1,99 @@
+** FOR MACOS **
+in the config.py file set variable OPENMP: bool = True to compile successfully
+In ShaderLib.c comment the line:
+ #include <omp.h>
+
+echo Building PygameShader with python ver %python3_6%
+call %python3_6% setup.py build_ext --inplace
+call %python3_6% setup.py bdist_wheel
+
+
+If you have the following error msg when compiling the Cython files
+
+python setup.py build_ext --inplace
+
+from libc.math cimport sqrtf as sqrt, atan2f as atan2, sinf as sin,\
+
+------------------------------------------------------------
+
+PygameShader\BlendFlags.pyx:120:0: 'libc\math\sqrtf.pxd' not found
+
+Error compiling Cython file:
+------------------------------------------------------------
+...
+          "\nTry: \n   C:\\pip install cython on a window command prompt.")
+
+This mean that you are using cython library version < 3.0 
+Use Cython version 3.0 or above
+
+------------------------------------------------------------
+
+# Numpy > 2.0 cause the following error with cupy version 9.6.0 at compilation time
+# AttributeError: `np.float_` was removed in the NumPy 2.0 release. Use `np.float64` instead.
+
+
+------------------------------------------------------------
+
+# Numpy == 1.25.0 cause error with cupy 9.6.0 during testing
+# File "C:\Users\yoyob\PycharmProjects\PygameShader\venv\Lib\site-packages\cupy\__init__.py", line 394, in <module>
+#    from numpy import MachAr  # NOQA
+#    ^^^^^^^^^^^^^^^^^^^^^^^^
+# ImportError: cannot import name 'MachAr' from 'numpy'
+# (C:\Users\yoyob\PycharmProjects\PygameShader\venv\Lib\site-packages\numpy\__init__.py)
+
+
+------------------------------------------------------------
+# To build Cupy==9.6.0 across all the version
+# use the following packages
+install wheel==0.37.1 six==1.16.0 setuptools==54.1.3 pyparsing==3.0.8 psutil==6.1.0 packaging==21.3 numpy==1.19.5 llvmlite==0.38.0 fastrlock==0.8 cython==0.29.25 cycler==0.11.0
+or
+install wheel==0.37.1 six==1.16.0 setuptools==54.1.3 pyparsing==3.0.8 psutil==6.1.0 packaging==21.3 numpy==1.19.5 llvmlite fastrlock==0.8 cython==0.29.25 cycler==0.11.0
+
+# Cupy compilation of Cupy 9.6.0 is failing from python 3.10.0, prefers installing packages cupy-cuda10.2
+
+
+
+-------------------------------------------------------------
+
+# Step 1: Create a Sphinx project
+tree sphinx-multilang
+
+sphinx-multilang/
+├── source/
+│   ├── conf.py
+│   ├── index.rst
+│   ├── _build/ (Generated)
+│   ├── _static/
+│   ├── _templates/
+├── locale/
+│   ├── fr/  # French translations
+│   │   ├── LC_MESSAGES/
+│   │   │   ├── index.po
+│   ├── es/  # Spanish translations
+│   │   ├── LC_MESSAGES/
+│   │   │   ├── index.po
+
+# Step 2: Install dependencies
+pip install sphinx sphinx-intl
+
+# Step 3: Initialize Sphinx
+sphinx-quickstart --sep --project "PygameShader" --author "Your Name" --language en --extensions sphinx.ext.autodoc
+
+# Step 4: Enable gettext support in conf.py
+echo "locale_dirs = ['locale/']" >> source/conf.py
+echo "gettext_compact = False" >> source/conf.py
+
+# Step 5: Extract translatable text
+sphinx-build -b gettext source/ locale/
+
+# Step 6: Create translation files
+sphinx-intl update -p locale/ -l fr -l es
+
+# Step 7: Manually translate locale/fr/LC_MESSAGES/index.po and locale/es/LC_MESSAGES/index.po
+
+# Step 8: Compile translations
+sphinx-intl build
+
+# Step 9: Build documentation for French and Spanish
+sphinx-build -b html -D language='fr' source/ _build/html/fr
+sphinx-build -b html -D language='es' source/ _build/html/es

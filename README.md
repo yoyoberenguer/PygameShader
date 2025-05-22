@@ -1,11 +1,27 @@
 # Pygame Shaders Library 
 
 
-*New Version 1.0.10
+*New Version 1.0.11
+This version introduces several renamed functions to enhance code clarity, readability, and long-term maintainability.
+Alongside these structural improvements, all function docstrings have been updated with detailed explanations, providing clearer guidance on usage, parameters, and expected outputs.
 
+While these changes improve the developer experience and codebase consistency, they also introduce breaking changes that users need to be aware of.
+
+⚠️ Consequences of Function Renaming:
+1. Breaking Backward Compatibility
+
+    Code that references the previous function names will no longer work, typically resulting in runtime errors (e.g., AttributeError in Python).
+
+    Applications or tools relying on the library may crash or behave unexpectedly unless updated to use the new function names.
+
+2. Required Code Refactoring
+
+    Developers must update their code to match the new naming conventions.
+
+    This refactoring can be time-consuming, particularly in larger projects or those where the library is deeply integrated.
 
 ```
-pip install PygameShader==1.0.10
+pip install PygameShader==1.0.11
 ```
 
 <p align="left">
@@ -28,184 +44,117 @@ pip install PygameShader==1.0.10
     <img src="https://github.com/yoyoberenguer/PygameShader/blob/main/swirl.gif?raw=true">
 </p>
 
-## Version 1.0.10 is out 
-Fastest and improved version of **PygameShader**, 15-20% faster CPU algorithms
+# Pygame Shader Project
 
-**New CPU demonstrations available:** 
-- demo_burst
-- demo_burst_exp (experimental)
-- demo_fire_border
-- demo_predator
-- demo_magnifier
-- demo_rain 
-- demo_ripple
-- demo_transition_inplace
-- demo_tunnel
-- demo_wave_static
+**PygameShader** is a **wrapper around the Pygame library**, written in **Python** and **Cython**, 
+designed to add **advanced visual effects** to multimedia applications, including **2D games, arcade games, 
+and real-time image processing** for video and camera feeds.  
 
-Added following Cython flags to all libraries and methods
-```
-@cython.profile(False)
-@cython.initializedcheck(False)
-```
-Fast math operations by using C float precision e.g cosf, sinf, atanf etc.<br>
-This changes apply only for windows version AMD64 and Win32 (all libraries using libc.math).<br>
-Linux versions is still using double precision<br>
-
-Added Fast RGB to HSL color conversion model for a given color
-```
-cpdef inline hsl _rgb_to_hsl(unsigned char r, unsigned char g, unsigned char b)nogil
-cpdef inline rgb _hsl_to_rgb(float h, float s, float l)nogil
-```
-Added fast RGB to HSV color conversion model for a given color
-```
-cpdef inline hsv _rgb_to_hsv(unsigned char r, unsigned char g, unsigned char b)nogil
-cpdef inline rgb _hsv_to_rgb(float h, float s, float v)nogil
-```
-
-## What's changed
-Renamed various Cython methods (cdef & cpdef methods) to simplify
-
-Improved and simplified many CPU algorithms. 
-Version 1.0.10 is 10-20% faster than 1.0.9
-
-### New BlendFlags library. 
-This library is similar to Pygame special flags attribute.<br>
-Unlike Pygame, where only surface can be blend together, this library allow you to blend directly 3d arrays(w, h, 3) 
-and 2d arrays shape (w, h) together (texture vs texture or alpha channels vs alpha). <br>
-Blending array together is much faster than converting both surfaces into equivalent arrays or converting 
-arrays into Surfaces to blend pixels together. <br>
-Removing unnecessary steps improved the performances and can make your game or code run much faster when you
-need to apply transformation to the array level.<br>
-```
-Added blit_s function (blend a sprite to an image or surface)
-Added blend_add_surface (blend surfaces, equivalent to BLEND_RGB_ADD)
-Added blend_add_array (blend two 3d arrays together, equivalent to BLEND_RGB_ADD for arrays)
-Added blend_add_alpha (blend two 2d arrays together, equivalent to BLEND_RGB_ADD  for alpha channels)
-Added blend_sub_surface (blend surfaces, equivalent to BLEND_RGB_SUB)
-Added blend_sub_array (same for arrays)
-Added blend_min_surface (blend surfaces, equ to BLEND_ADD_MIN)
-Added blend_min_array (same for arrays)
-Added blend_max_surface (blend surface with BLEND_RGB_MAX flag)
-Added blend_max_array (same for arrays)
-```
-### New BurstSurface library
-This library provides new tools to transform PNG & JPG images into multiple sub-surfaces or pixels block.<br>
-It contains tools to produce images explosion/burst into pixels or pixel's block, check the demo `demo_burst` and <br>
-`demo_burt_exp` (experimental version with _sdl library).<br>
-Tools for disassembling or reassembling images from exploded pixels<br>
-```
-Added pixel_block_rgb (extract sprites from a sprite-sheet) 
-Added surface_split used by burst method to decompose an image into pixel blocks)
-Added burst (explode a Pygame surface into multiple sub-surface )
-Added display_burst (Display an exploded image on the Pygame display)
-Added rebuild_from_frame (Rebuild an exploded image)
-Added burst_into_memory (Burst image in memory)
-Added rebuild_from_memory (Rebuild image from memory)
-
--- experimental with _sdl library--
-Added burst_experimental (explode a surface into multiple sub-surfaces)
-Added db_experimental (display burst)
-Added rff_experimental (rebuild from a specific frame number)
-Added rfm_experimental (rebuild from memory)
-Added build_surface_inplace (build a surface from a sprite group inplace)
-Added build_surface_inplace_fast (build surface from a sprite group, same than above but faster)
-```
-### New library Sprites
-This is the Pygame sprite module Cythonized 
-
-### Library misc
-New algorithm for scrolling surfaces or arrays, check demo `demo_scroll` 
-```
-Added scroll24 (scroll surface horizontally / vertically)
-Added scroll24_inplace (same but inplace)
-Added scroll24_arr_inplace (same but for 3d arrays)
-Added surface_copy (equivalent tp pygame surface copy)
-```
-### Library Palette
-Changed the palettes arrays to with dataset float32 types<br>
-Changed C file Shaderlib.c to perform fast math operations instead of double <br>
+This library extends **Pygame** by enabling developers to apply **shaders** to **sprite textures, surfaces, 
+and the entire game display**, significantly enhancing the visual experience with minimal performance overhead.  
 
 
+## Internal Documentation
+**PygameShader** does not include internal Sphinx documentation by default.
+However, you can access comprehensive documentation in **English**, **French**, and **Spanish** on the project's GitHub page.
+Detailed documentation can be found within the `sphinx` directory of the repository.
+
+The HTML versions of the documentation are located in the following folders:
+- French: `Sphinx/_build/html/fr`
+- Spanish: `Sphinx/_build/html/es`
+- English (default): `Sphinx/_build/html`
+
+
+Supported Image Formats
+-----------------------
+
+PygameShader supports multiple image formats, including **BMP, GIF (non-animated), JPEG, and PNG**. 
+However, Pygame may not always be built with support for all formats. At a minimum, **BMP** is always available.  
+
+To check if additional image formats are supported, run:
+
+```python
+import pygame
+print(pygame.image.get_extended())  
+```
+If it returns ``True``, then **PNG, JPG, and GIF** formats are also supported.  
+
+## Performance & Optimization
+
+Pygame Shader is optimized for real-time rendering at **60 FPS**, 
+particularly for games running at **medium resolutions (1024x768)**.
+However, performance may vary depending on the complexity of the shader.
+Certain effects, like **median filtering and predator vision**, require
+multiple shaders to create composite effects, making them more 
+computationally demanding. While most shaders will maintain smooth 
+performance at medium resolutions, higher resolutions may impact frame
+rates—experimenting with different settings is recommended.
+
+If you are using shaders primarily for sprite texturing and special effects,
+performance should remain **extremely fast** due to **Cython-based 
+optimizations**. To maintain a high frame rate, it is advisable to keep
+sprite texture sizes within reasonable limits, such as **200x200 pixels**,
+to avoid unnecessary processing overhead.
+
+## Features
+
+- **Shader Effects**: Enhance your game's visual appeal with advanced shading techniques.
+- **Real-time Rendering**: Apply effects to the entire game display at high frame rates.
+- **Optimized for Speed**: Efficient Cython implementation ensures smooth performance.
+- **Sprite & Surface Customization**: Modify textures and surfaces dynamically.
+
+Pygame Shader provides powerful tools to improve the overall look and feel 
+of your game, whether by enhancing sprite textures or applying full-screen visual effects.
+
+## License
+
+The project is released under the **GNU General Public License Version 3 (GPLv3)**.
 
 ---
 
-Some scripts have been ported to GPU using CUPY and CUDA raw Kernels for running 
-on NVIDIA graphics cards (NVIDIA CUDA GPU with the compute Capability 3.0 or larger.). 
-These shaders are only compatible with NVIDIA chipset.
+# GPU Shaders with CUPY & CUDA
 
-In order to use the GPU shaders the library `CUPY` has to be 
-installed on your system in addition to CUDA Toolkit: 
-v10.2 / v11.0 / v11.1 / v11.2 / v11.3 / v11.4 / v11.5 / v11.6. 
-Please refer to the below link for the full installation 
-https://docs.cupy.dev/en/stable/install.html
+Some scripts have been ported to the GPU using **CUPY** and CUDA raw kernels, allowing them to run on NVIDIA graphics cards with a compute capability of **3.0 or higher**. Note that these shaders are compatible **only with NVIDIA chipsets**.
 
-The GPU shaders are still experimental, and the performances are restricted
-by the pci-express bandwidth due to the amount of data sent from the CPU to 
-the GPU, especially when the shaders are use for real time rendering.
+## Requirements
 
-Check the Shader GPU_demo_ripple.py in the `Demo folder` for an example of real time 
-rendering of a pygame.Surface.
+To use the GPU shaders, you must have:
+- The `CUPY` library installed on your system.
+- The CUDA Toolkit installed. Supported versions include: `v10.2`, `v11.0`, `v11.1`, `v11.2`, `v11.3`, `v11.4`, `v11.5`, and `v11.6`.
 
-How this shaders compare to GLSL (GL shading language): 
-You may ask yourself how fast these shaders perform against the shading language GLSL,
-well without any doubt GLSL outperform CUPY & CUDA for graphics performance. 
-However, CUDA is taking advantage of its highly parallelized architecture and will improve 
-the speed of pygame, python & cython algorithms designed for CPU architecture only.
+For full installation instructions, please refer to the [CUPY installation guide](https://docs.cupy.dev/en/stable/install.html).
 
-Difference between shading language and CUDA:
-CUDA is essentially just a way to run compute shaders without the graphics API and
-without requiring a particular language. CUDA programs are compiled into PTX (NVIDIA's
-analoque to x86 assembly for the GPU.
+## Experimental Status and Performance Considerations
 
-For the curious, please check this excellent post :
+The GPU shaders are still experimental. Their performance is constrained by PCI Express bandwidth due to the volume of data transferred from the CPU to the GPU, especially during real-time rendering.
 
-https://carpentries-incubator.github.io/lesson-gpu-programming/aio/index.html 
+For an example of real-time rendering of a `pygame.Surface`, check out the `GPU_demo_ripple.py` script in the `Demo` folder.
 
-*In python*
-```
+## Comparison with GLSL
+
+You may wonder how these shaders compare to GLSL (GL Shading Language). While **GLSL** undeniably outperforms CUPY and CUDA in raw graphics performance, CUDA leverages its highly parallelized architecture to accelerate algorithms originally designed for CPU architectures (in Python and Cython).
+
+### Shading Language vs. CUDA
+
+- **GLSL (Shading Language):** Primarily used for graphics rendering.
+- **CUDA:** Allows you to run compute shaders without relying on a graphics API and without being tied to a specific language. CUDA programs are compiled into PTX, NVIDIA's equivalent of x86 assembly for the GPU.
+
+For further insights, check out this [excellent post on GPU programming](https://carpentries-incubator.github.io/lesson-gpu-programming/aio/index.html).
+
+## Usage in Python
+
+To import the GPU shaders in your Python code, use:
+
+```python
 from PygameShader.shader_gpu import *
 ```
 
----
-
-
-Pygame shader project is a `2D game library` written in Python and Cython containing
-`special effects` for development of multimedia applications like video games, arcade game, 
-video and camera image processing or to customize your sprites textures/surfaces.
-
-This library is compatible with BMP, GIF (non - animated), JPEG, PNG image format.
-```
-pygame may not always be built to support all image formats. At minimum it will support 
-uncompressed BMP. If pygame.image.get_extended() returns 'True', you should be able to
-load most images (including PNG, JPG and GIF).
-```
-
-The shaders can be applied to the `entire game display` for a real time rendering @ 60 fps
-for games running in medium resolution such as `1024 x 768`. 
-Some algorithms are more demanding than others in terms of processing power 
-ex : median filtering and predator vision (due to the fact that it is built with more
-than one shader to provide a composite effect). Consequently, not all shader will run at
-the same speed at medium resolutions. Feel free to experiment with higher display resolutions
-while the shader provides 60 fps or above.
-
-If you are using the shader library for sprites texturing and special effects
-then the overall processing time should be extremely fast due to code optimization with
-cython. Nevertheless, to keep a good frame rate, it is advised to keep the sprites below
-the screen display resolution e,g 200x200 texture size.
-
-PygameShader provide tools to improve your overall game appearance by changing 
-Sprites texture/surface and or by using great special effects that will affect 
-the entire screen. 
-
-The project is under the `GNU GENERAL PUBLIC LICENSE Version 3`
-
----
 ## Demo
 
 In the PygameShader `Demo` directory 
 
 (press ESC to quit the demo)
+`Some demos may require you to move the mouse in order to generate the effects.`
 
 ```bash
 C:\>python demo_fire.py
@@ -240,7 +189,7 @@ pip install PygameShader
 ## Installation from source code
 
 *Download the source code and decompress the Tar or zip file*
-* ### Linux
+* Linux
 ```bash
 tar -xvf source-1.0.8.tar.gz
 cd PygameShader-1.0.8
@@ -248,7 +197,7 @@ python3 setup.py bdist_wheel
 cd dist 
 pip3 install PygameShader-xxxxxx 
 ```
-* ### Windows 
+* Windows 
 
 *Decompress the archive and enter PygameShader directory* 
 ```bash
@@ -347,6 +296,7 @@ Yoann Berenguer
 
 ## Dependencies :
 ```
+Python > 3.6
 numpy >= 1.18
 pygame >=2.4.0
 cython >=3.0.2
