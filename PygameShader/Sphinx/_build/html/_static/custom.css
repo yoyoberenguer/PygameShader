@@ -1,0 +1,24 @@
+body {
+    background-color: #f4f4f4; /* Light gray background */
+    color: #333; /* Dark gray text */
+}
+
+h1, h2, h3 {
+    color: #0077cc; /* Blue headings */
+}
+
+a {
+    color: #d9534f; /* Red links */
+}
+
+a:hover {
+    color: #c9302c; /* Darker red on hover */
+}
+
+.red-text {
+    color: red;
+}
+
+.blue-text {
+    color: blue;
+}
