@@ -1,0 +1,214 @@
+
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Sprites &#8212; documentación de PygameShader - 1.0.11</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=28946ee5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Paleta" href="Palette.html" />
+    <link rel="prev" title="RGBConvert" href="RGBConvert.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="Palette.html" title="Paleta"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="RGBConvert.html" title="RGBConvert"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de PygameShader - 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Sprites</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="sprites">
+<h1>Sprites<a class="headerlink" href="#sprites" title="Link to this heading">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">Sprites.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="sprite-and-group-management">
+<h2>1. Gestión de Sprites y Grupos<a class="headerlink" href="#sprite-and-group-management" title="Link to this heading">¶</a></h2>
+<p>Esta biblioteca proporciona una implementación eficiente en Cython de la <strong>gestión de sprites, detección de colisiones y renderizado</strong>, similar a <cite>pygame.sprite</cite>, pero optimizada para el rendimiento. Esta funcionalidad ya existe en el <strong>proyecto Pygame</strong>, pero ha sido <strong>Cythonizada</strong> para mejorar significativamente el rendimiento mediante el uso de optimizaciones a nivel de C para operaciones comunes. Incluye:</p>
+<ul class="simple">
+<li><p><strong>Objetos Sprite</strong> (clase <cite>Sprite</cite>)</p></li>
+<li><p><strong>Manejo de Grupos</strong> (<cite>AbstractGroup</cite>, <cite>GroupSingle</cite>, <cite>LayeredUpdates</cite>)</p></li>
+<li><p><strong>Detección de Colisiones</strong> (<cite>collide_rect</cite>, <cite>collide_circle</cite>, <cite>collide_mask</cite>)</p></li>
+<li><p><strong>Gestión de Sprites por Capas</strong> (<cite>LayeredUpdates</cite>, <cite>LayeredUpdatesModified</cite>)</p></li>
+</ul>
+</section>
+<section id="purpose">
+<h2>2. Propósito<a class="headerlink" href="#purpose" title="Link to this heading">¶</a></h2>
+<p>Este módulo mejora el <strong>sistema de sprites de Pygame</strong> al proporcionar: - Operaciones de <strong>grupo más rápidas</strong> con estructuras internas optimizadas. - <strong>Detección de colisiones eficiente</strong> utilizando varios métodos (rectángulos, círculos, máscaras). - <strong>Renderizado basado en capas avanzado</strong> para manejar el orden de profundidad. - Soporte para <strong>grupos de sprites de un solo objeto</strong> (por ejemplo, <cite>GroupSingle</cite>). - <strong>Actualizaciones in situ</strong> para minimizar las asignaciones de memoria.</p>
+<p>La funcionalidad central está inspirada en el <strong>módulo de sprites de Pygame</strong>, pero ha sido <strong>Cythonizada</strong> para un mejor rendimiento. Aprovecha la capacidad de Cython para compilar código en C y lograr una ejecución más rápida y un uso reducido de memoria, lo que la hace adecuada para juegos con requisitos críticos de rendimiento.</p>
+</section>
+<section id="sprite-class">
+<h2>3. Clase Sprite<a class="headerlink" href="#sprite-class" title="Link to this heading">¶</a></h2>
+<p><strong>`Sprite`</strong> representa un objeto de juego individual que puede pertenecer a múltiples grupos.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sprite</span> <span class="o">=</span> <span class="n">Sprite</span><span class="p">()</span>
+<span class="n">group</span> <span class="o">=</span> <span class="n">AbstractGroup</span><span class="p">()</span>
+<span class="n">sprite</span><span class="o">.</span><span class="n">add_internal</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Métodos</strong> - <cite>add_internal(group)</cite>: Añade el sprite a un grupo. - <cite>remove_internal(group)</cite>: Elimina el sprite de un grupo. - <cite>update(args=*)</cite>: Actualiza el estado del sprite. - <cite>kill()</cite>: Elimina el sprite de todos los grupos. - <cite>groups() -&gt; list</cite>: Devuelve todos los grupos que contienen este sprite. - <cite>alive() -&gt; bool</cite>: Comprueba si el sprite todavía está en algún grupo.</p>
+<p><strong>AbstractGroup</strong></p>
+<p><strong>`AbstractGroup`</strong> es la clase base para gestionar grupos de sprites.</p>
+<p><strong>Atributos</strong> - <cite>_spritegroup (bool)</cite>: Indica si se trata de un grupo de sprites. - <cite>spritedict (dict)</cite>: Almacena los sprites y sus datos. - <cite>lostsprites (list)</cite>: Rastrea los sprites eliminados.</p>
+<p><strong>Métodos</strong> - <cite>sprites() -&gt; list</cite>: Devuelve una lista de todos los sprites en el grupo. - <cite>add_internal(sprite)</cite>: Añade un sprite al grupo. - <cite>remove_internal(sprite)</cite>: Elimina un sprite del grupo. - <cite>has_internal(sprite) -&gt; bool</cite>: Comprueba si un sprite está en el grupo. - <cite>copy()</cite>: Crea una copia del grupo. - <cite>update(args=*)</cite>: Llama al método <cite>update()</cite> en todos los sprites. - <cite>draw(surface)</cite>: Dibuja todos los sprites en la superficie dada. - <cite>clear(surface, bgd)</cite>: Limpia el grupo de la pantalla. - <cite>empty()</cite>: Elimina todos los sprites del grupo.</p>
+<p><strong>GroupSingle</strong></p>
+<p><strong>`GroupSingle`</strong> es un grupo especializado que contiene solo <strong>un sprite</strong>.</p>
+<p><strong>Métodos</strong> - <cite>sprites() -&gt; list</cite>: Devuelve una lista que contiene el único sprite. - <cite>add_internal(sprite)</cite>: Establece el sprite para este grupo. - <cite>remove_internal(sprite)</cite>: Elimina el sprite. - <cite>has_internal(sprite) -&gt; bool</cite>: Comprueba si un sprite existe en el grupo.</p>
+<p><strong>Detección de Colisiones</strong></p>
+<p>Las <strong>funciones de colisión</strong> permiten una detección eficiente entre sprites y grupos.</p>
+<ul class="simple">
+<li><p><cite>collide_rect(left, right)</cite>: Detección de colisiones rectangulares.</p></li>
+<li><p><cite>collide_circle(left, right)</cite>: Detección de colisiones circulares.</p></li>
+<li><p><cite>collide_mask(left, right)</cite>: Detección de colisiones perfecta a nivel de píxel.</p></li>
+<li><p><cite>groupcollide(groupa, groupb, dokilla, dokillb, collided=*) -&gt; dict</cite>: - Comprueba colisiones entre dos grupos, eliminando opcionalmente los sprites que colisionan.</p></li>
+<li><p><cite>spritecollideany(sprite, group, collided=*)</cite>: - Comprueba si un sprite colisiona con cualquier sprite en un grupo.</p></li>
+<li><p><cite>spritecollide(sprite, group, dokill, collided=*) -&gt; list</cite>: - Devuelve una lista de sprites que colisionan con <cite>sprite</cite>.</p></li>
+</ul>
+<p><strong>Gestión de Sprites por Capas</strong></p>
+<p><strong>`LayeredUpdates`</strong> extiende <cite>AbstractGroup</cite> para soportar <strong>renderizado basado en capas</strong>.</p>
+<p><strong>Atributos</strong></p>
+<ul class="simple">
+<li><p><cite>_spritelayers (dict)</cite>: Almacena las asignaciones de sprites a capas.</p></li>
+<li><p><cite>_spritelist (list)</cite>: Lista ordenada de sprites.</p></li>
+<li><p><cite>_default_layer (int)</cite>: Capa predeterminada para nuevos sprites.</p></li>
+</ul>
+<p><strong>Métodos</strong></p>
+<ul class="simple">
+<li><p><cite>add_internal(sprite, layer=*)</cite>: Añade un sprite a una capa específica.</p></li>
+<li><p><cite>remove_internal(sprite)</cite>: Elimina un sprite.</p></li>
+<li><p><cite>sprites() -&gt; list</cite>: Devuelve todos los sprites.</p></li>
+<li><p><cite>get_sprites_at(pos)</cite>: Recupera los sprites en una posición dada.</p></li>
+<li><p><cite>get_sprite(idx)</cite>: Devuelve un sprite por índice.</p></li>
+<li><p><cite>remove_sprites_of_layer(layer)</cite>: Elimina todos los sprites de una capa específica.</p></li>
+<li><p><cite>layers()</cite>: Devuelve una lista de todas las capas.</p></li>
+<li><p><cite>change_layer(sprite, new_layer)</cite>: Mueve un sprite a una nueva capa.</p></li>
+<li><p><cite>get_layer_of_sprite(sprite)</cite>: Devuelve la capa de un sprite dado.</p></li>
+<li><p><cite>get_top_layer() / get_bottom_layer()</cite>: Devuelve la capa más alta o más baja.</p></li>
+<li><p><cite>move_to_front(sprite) / move_to_back(sprite)</cite>: Cambia el orden de profundidad del sprite.</p></li>
+<li><p><cite>get_top_sprite()</cite>: Recupera el sprite más superior.</p></li>
+<li><p><cite>get_sprites_from_layer(layer)</cite>: Devuelve todos los sprites en una capa dada.</p></li>
+<li><p><cite>switch_layer(layer1, layer2)</cite>: Intercambia dos capas.</p></li>
+</ul>
+<p><strong>LayeredUpdatesModified</strong></p>
+<p>Extiende <cite>LayeredUpdates</cite> con funcionalidad adicional de dibujo y actualización.</p>
+<ul class="simple">
+<li><p><cite>update(args=*)</cite>: Actualiza todos los sprites.</p></li>
+<li><p><cite>draw(surface)</cite>: Dibuja los sprites en una superficie.</p></li>
+</ul>
+<p><strong>Funciones Auxiliares</strong></p>
+<ul class="simple">
+<li><p><cite>int_min(a, b) -&gt; int</cite>: Devuelve el menor de dos enteros.</p></li>
+<li><p><cite>truth(a) -&gt; bool</cite>: Convierte un valor a booleano.</p></li>
+</ul>
+</section>
+<section id="summary">
+<h2>4. Resumen<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>Esta biblioteca optimiza el <strong>manejo de sprites</strong> en Pygame mediante: - <strong>Mejora del rendimiento</strong> con memoryviews de Cython. - <strong>Soporte de detección de colisiones eficiente</strong> (rectángulo, círculo, máscara). - <strong>Gestión de renderizado por capas</strong> con ordenación avanzada de profundidad. - <strong>Provisión de varias estructuras de grupo</strong> (estándar, único, por capas).</p>
+<p>Aunque esta funcionalidad está disponible en el <strong>proyecto Pygame</strong>, esta biblioteca ha sido <strong>Cythonizada</strong> para proporcionar <strong>mejoras significativas en el rendimiento</strong>, lo que la hace ideal para <strong>juegos con requisitos críticos de rendimiento</strong>.</p>
+<p><strong>Ideal para desarrolladores de Pygame que necesitan una gestión de sprites rápida y eficiente.</strong> 🚀</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Sprites</a><ul>
+<li><a class="reference internal" href="#sprite-and-group-management">1. Gestión de Sprites y Grupos</a></li>
+<li><a class="reference internal" href="#purpose">2. Propósito</a></li>
+<li><a class="reference internal" href="#sprite-class">3. Clase Sprite</a></li>
+<li><a class="reference internal" href="#summary">4. Resumen</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="RGBConvert.html"
+                          title="capítulo anterior">RGBConvert</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="Palette.html"
+                          title="próximo capítulo">Paleta</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Sprites.rst.txt"
+            rel="nofollow">Mostrar el código</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Búsqueda rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             >índice</a></li>
+        <li class="right" >
+          <a href="Palette.html" title="Paleta"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="RGBConvert.html" title="RGBConvert"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de PygameShader - 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Sprites</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Creado usando <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

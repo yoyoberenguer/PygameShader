@@ -1,0 +1,302 @@
+
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Palette &#8212; documentación de PygameShader - 1.0.11</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=28946ee5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Misc" href="Misc.html" />
+    <link rel="prev" title="Sprites" href="Sprites.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="Misc.html" title="Misc"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="Sprites.html" title="Sprites"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de PygameShader - 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Palette</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="palette">
+<h1>Palette<a class="headerlink" href="#palette" title="Link to this heading">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">Palette.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="library-overview">
+<h2>1. Resumen de la Biblioteca<a class="headerlink" href="#library-overview" title="Link to this heading">¶</a></h2>
+<p>Las funciones de esta biblioteca están diseñadas para la <strong>manipulación de imágenes</strong> y la <strong>gestión de paletas</strong>, lo que la hace adecuada para aplicaciones como <strong>renderizado gráfico</strong>, <strong>procesamiento de imágenes</strong> y <strong>creación de paletas de colores personalizadas</strong>. La biblioteca es ideal para su uso en <strong>software gráfico</strong> o <strong>aplicaciones visuales</strong> donde las imágenes necesitan ser renderizadas con paletas de colores específicas o donde las imágenes deben modificarse dinámicamente en función de los datos de la paleta.</p>
+</section>
+<section id="key-concepts">
+<h2>2. Conceptos Clave<a class="headerlink" href="#key-concepts" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Superficie de Imagen</strong>: Representa un objeto correspondiente a una imagen, donde se pueden acceder y manipular píxeles individuales. Este objeto proporciona una abstracción para trabajar con datos de píxeles en diversas tareas de procesamiento de imágenes.</p></li>
+<li><p><strong>Paleta</strong>: Una colección de colores que se pueden aplicar a una imagen. Las paletas se utilizan comúnmente en <strong>diseño visual</strong>, <strong>arte digital</strong> y <strong>simulaciones</strong> para garantizar la consistencia en el uso del color en toda una imagen o gráfico.</p></li>
+<li><p><strong>Búfer Temporal</strong>: Un área de almacenamiento utilizada para guardar resultados intermedios durante los cálculos. El búfer temporal ayuda a reducir la necesidad de realizar operaciones costosas varias veces, mejorando el rendimiento al trabajar con manipulaciones de imágenes complejas.</p></li>
+</ul>
+</section>
+<section id="purpose-of-the-library">
+<h2>3. Propósito de la Biblioteca<a class="headerlink" href="#purpose-of-the-library" title="Link to this heading">¶</a></h2>
+<p>El propósito principal de esta biblioteca es proporcionar herramientas eficientes para manipular imágenes a nivel de <strong>color</strong>. Permite a los usuarios modificar o generar <strong>paletas de colores personalizadas</strong>, ofreciendo una mayor flexibilidad en tareas de renderizado y procesamiento de imágenes. Al optimizar el manejo de imágenes, la biblioteca admite una variedad de aplicaciones gráficas, incluyendo modificaciones dinámicas de imágenes basadas en paletas de colores.</p>
+</section>
+<section id="use-cases">
+<h2>4. Casos de Uso<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Software Gráfico</strong>: La biblioteca puede usarse en aplicaciones que necesitan renderizar imágenes con paletas específicas, como editores de imágenes, herramientas de animación o aplicaciones de diseño gráfico.</p></li>
+<li><p><strong>Procesamiento de Imágenes</strong>: Modificar o analizar imágenes ajustando dinámicamente sus paletas de colores, lo que puede ser útil en tareas como corrección de color o filtrado.</p></li>
+<li><p><strong>Arte Digital</strong>: Los artistas pueden usar la biblioteca para crear y manipular paletas personalizadas, permitiendo esquemas de color únicos y controlados en sus obras de arte digital.</p></li>
+<li><p><strong>Simulaciones</strong>: En simulaciones, esta biblioteca puede usarse para generar o modificar paletas de colores para efectos visuales o visualización de datos, asegurando que los entornos simulados mantengan esquemas de color consistentes y visualmente atractivos.</p></li>
+</ul>
+</section>
+<section id="conclusion">
+<h2>5. Conclusión<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
+<p>Esta biblioteca ofrece herramientas poderosas para gestionar y manipular imágenes a nivel de color, lo que la hace invaluable para cualquier persona que trabaje con paletas de colores personalizadas en aplicaciones gráficas y de procesamiento de imágenes.</p>
+</section>
+<section id="cython-list-methods">
+<h2>6. Métodos de listas en Cython<a class="headerlink" href="#cython-list-methods" title="Link to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Palette.palette_change">
+<span class="sig-prename descclassname"><span class="pre">Palette.</span></span><span class="sig-name descname"><span class="pre">palette_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_surface</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_palette</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp_buffer</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palette.palette_change" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Resumen:</strong> Aplica una transformación de paleta de colores a una imagen in situ. La función modifica los colores de la imagen de entrada (una superficie de Pygame) utilizando la paleta de colores especificada. La transformación se realiza directamente en la superficie sin crear una nueva imagen, optimizando el uso de memoria.</p>
+<p><strong>Ejemplo de Uso:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Apply a color palette from IRIDESCENTCRYSTAL to the surface</span>
+<span class="n">palette_change</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">IRIDESCENTCRYSTAL</span><span class="p">,</span> <span class="n">temp_buffer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parámetros:</strong></p>
+<ul>
+<li><p><strong>image_surface</strong> (pygame.Surface): La superficie de Pygame que representa la imagen a modificar. Esta es la imagen de entrada en la que se aplicará la paleta de colores.</p></li>
+<li><p><strong>color_palette</strong> (numpy.ndarray): Un array de NumPy que contiene la paleta de colores a aplicar. El array debe tener una forma de (w, 3), donde <cite>w</cite> es el número de colores, y el dtype debe ser <cite>float32</cite> con valores en el rango [0.0, 255.0].</p>
+<p><strong>Ejemplo:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">PygameShader</span><span class="w"> </span><span class="kn">import</span> <span class="n">IRIDESCENTCRYSTAL</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>temp_buffer</strong> (numpy.ndarray): Un array temporal de NumPy utilizado para optimización. Debe ser un array contiguo (C_CONTIGUOUS) y tener la forma <cite>(image_surface.get_width() * image_surface.get_height(), len(color_palette))</cite>. Este array ayuda a evitar la reasignación de memoria durante la llamada a la función, mejorando el rendimiento.</p>
+<p>Ejemplo de declaración de búfer temporal:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">temp_buffer</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">SURFACE</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">*</span> <span class="n">SURFACE</span><span class="o">.</span><span class="n">get_height</span><span class="p">(),</span> <span class="n">IRIDESCENTCRYSTAL</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span>
+<span class="p">))</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p><strong>Devuelve:</strong></p>
+<ul class="simple">
+<li><p><strong>None</strong>: Esta función modifica <cite>image_surface</cite> in situ sin devolver un nuevo objeto.</p></li>
+</ul>
+<p><strong>Lanza:</strong></p>
+<ul class="simple">
+<li><p><strong>ValueError</strong>: Si la superficie de entrada no es compatible o si se proporciona una paleta no válida.</p></li>
+<li><p><strong>TypeError</strong>: Si alguno de los argumentos de entrada es de un tipo incorrecto (por ejemplo, la superficie no es un <cite>pygame.Surface</cite>, la paleta no es un <cite>numpy.ndarray</cite> o el búfer no es un array contiguo).</p></li>
+<li><p><strong>ValueError</strong>: Si hay una discrepancia en las dimensiones de <cite>image_surface</cite> y <cite>temp_buffer</cite>.</p></li>
+</ul>
+<p><strong>Notas:</strong></p>
+<ul class="simple">
+<li><p>Esta función depende del manejo eficiente de arrays grandes para la transformación de colores. Asegúrate de preasignar <cite>temp_buffer</cite> antes de llamar a la función para evitar asignaciones de memoria innecesarias durante cada fotograma.</p></li>
+</ul>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Palette.make_palette">
+<span class="sig-prename descclassname"><span class="pre">Palette.</span></span><span class="sig-name descname"><span class="pre">make_palette</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palette.make_palette" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Resumen:</strong> Genera una paleta de colores RGB mapeando valores HSL. La función escala el tono, recorta la saturación y ajusta la luminosidad en función de los parámetros dados, devolviendo un array de NumPy de valores RGB.</p>
+<p><strong>Ejemplo de Uso:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a palette of 256 colors where:</span>
+<span class="c1"># - Hue is scaled by a factor of 6</span>
+<span class="c1"># - Saturation is fixed at 255</span>
+<span class="c1"># - Lightness is scaled by a factor of 2</span>
+<span class="n">palette</span> <span class="o">=</span> <span class="n">make_palette</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Another palette with different settings:</span>
+<span class="n">palette</span> <span class="o">=</span> <span class="n">make_palette</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parámetros:</strong></p>
+<ul class="simple">
+<li><p><strong>width</strong> (<em>int</em>): El número de colores (tamaño de la paleta) a generar.</p></li>
+<li><p><strong>fh</strong> (<em>float</em>): Un factor por el cual escalar el valor de tono para cada color.</p></li>
+<li><p><strong>fs</strong> (<em>float</em>): El valor de saturación, que debe estar en el rango (0.0 … 255.0). Esto limita la intensidad de la saturación.</p></li>
+<li><p><strong>fl</strong> (<em>float</em>): Un factor por el cual escalar el valor de luminosidad para cada color.</p></li>
+</ul>
+<p><strong>Devuelve:</strong></p>
+<ul class="simple">
+<li><p>(<em>numpy.ndarray</em>): Un array 1D de NumPy de valores de color RGB correspondientes a la paleta generada.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>La función se basa en la conversión de HSL a RGB, aplicando los factores y valores de recorte especificados. La salida es un array de NumPy, que puede usarse directamente para visualización o procesamiento adicional.</p>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Palette.create_surface_from_palette">
+<span class="sig-prename descclassname"><span class="pre">Palette.</span></span><span class="sig-name descname"><span class="pre">create_surface_from_palette</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">palette_c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Palette.create_surface_from_palette" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Resumen:</strong> Convierte un array 1D de colores de paleta RGB en una superficie de Pygame (línea). La función procesa un array 1D de enteros sin signo de 32 bits (que representan colores en formato ARGB) y lo convierte en un objeto <cite>Surface</cite> de Pygame. El resultado es una superficie que puede usarse para renderizado o visualización.</p>
+<p><strong>Ejemplo de Uso:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assuming &#39;palette&#39; is a palette generated with make_palette:</span>
+<span class="n">surface</span> <span class="o">=</span> <span class="n">create_surface_from_palette</span><span class="p">(</span><span class="n">palette</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parámetros:</strong></p>
+<ul>
+<li><p><strong>palette_c</strong> (numpy.ndarray o memoryview): Un array 1D (o memoryview) que contiene la paleta de colores. Cada color debe representarse como un entero sin signo de 32 bits (en formato ARGB). El array debe tener un dtype <cite>numpy.uint32</cite> y ser contiguo en memoria.</p>
+<p>Ejemplo:</p>
+</li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">PygameShader</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_palette</span>
+
+<span class="c1"># Create a palette of 256 colors</span>
+<span class="n">palette</span> <span class="o">=</span> <span class="n">make_palette</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Devuelve:</strong></p>
+<ul class="simple">
+<li><p><strong>object</strong>: Un objeto <cite>Surface</cite> de Pygame creado a partir de la paleta.</p></li>
+</ul>
+<p><strong>Lanza:</strong></p>
+<ul class="simple">
+<li><p><strong>TypeError</strong>: Si <cite>palette_c</cite> no es un <cite>numpy.ndarray</cite> o memoryview, o si tiene un dtype incorrecto.</p></li>
+<li><p><strong>ValueError</strong>: Si <cite>palette_c</cite> está vacío, no es contiguo o tiene un tamaño no válido.</p></li>
+<li><p><strong>RuntimeError</strong>: Si ocurre un error durante la creación de la superficie de Pygame.</p></li>
+</ul>
+<p><strong>Notas:</strong></p>
+<ul class="simple">
+<li><p>La paleta de entrada debe contener valores RGB empaquetados en enteros de 32 bits (formato ARGB).</p></li>
+<li><p>La función procesa el array de la paleta en paralelo para optimizar el rendimiento.</p></li>
+<li><p>La salida es un objeto <cite>Surface</cite> de Pygame, que puede usarse directamente para visualización o renderizado.</p></li>
+</ul>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Palette</a><ul>
+<li><a class="reference internal" href="#library-overview">1. Resumen de la Biblioteca</a></li>
+<li><a class="reference internal" href="#key-concepts">2. Conceptos Clave</a></li>
+<li><a class="reference internal" href="#purpose-of-the-library">3. Propósito de la Biblioteca</a></li>
+<li><a class="reference internal" href="#use-cases">4. Casos de Uso</a></li>
+<li><a class="reference internal" href="#conclusion">5. Conclusión</a></li>
+<li><a class="reference internal" href="#cython-list-methods">6. Métodos de listas en Cython</a><ul>
+<li><a class="reference internal" href="#Palette.palette_change"><code class="docutils literal notranslate"><span class="pre">palette_change()</span></code></a></li>
+<li><a class="reference internal" href="#Palette.make_palette"><code class="docutils literal notranslate"><span class="pre">make_palette()</span></code></a></li>
+<li><a class="reference internal" href="#Palette.create_surface_from_palette"><code class="docutils literal notranslate"><span class="pre">create_surface_from_palette()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="Sprites.html"
+                          title="capítulo anterior">Sprites</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="Misc.html"
+                          title="próximo capítulo">Misc</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Palette.rst.txt"
+            rel="nofollow">Mostrar el código</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Búsqueda rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             >índice</a></li>
+        <li class="right" >
+          <a href="Misc.html" title="Misc"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="Sprites.html" title="Sprites"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de PygameShader - 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Palette</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Creado usando <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

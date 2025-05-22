@@ -1,0 +1,600 @@
+
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>BurstSurface &#8212; documentación de PygameShader - 1.0.11</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=28946ee5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="BlendFlags" href="BlendFlags.html" />
+    <link rel="prev" title="GaussianBlur5x5" href="GaussianBlur5x5.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="BlendFlags.html" title="BlendFlags"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="GaussianBlur5x5.html" title="GaussianBlur5x5"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de PygameShader - 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">BurstSurface</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="burstsurface">
+<h1>BurstSurface<a class="headerlink" href="#burstsurface" title="Link to this heading">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">BurstSurface.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="cython-burst-surface-library">
+<h2>1. Biblioteca de Superficie de Explosión en Cython<a class="headerlink" href="#cython-burst-surface-library" title="Link to this heading">¶</a></h2>
+</section>
+<section id="key-features">
+<h2>2. Características Clave<a class="headerlink" href="#key-features" title="Link to this heading">¶</a></h2>
+<p>Esta biblioteca proporciona herramientas avanzadas para la manipulación y renderizado de imágenes en aplicaciones gráficas. Construida sobre pygame y otras técnicas de renderizado de bajo nivel, permite un manejo eficiente de superficies, sprites y efectos basados en píxeles. Las características clave incluyen:</p>
+<ul class="simple">
+<li><p>Dividir imágenes en bloques más pequeños para hojas de sprites y mapas de mosaicos.</p></li>
+<li><p>Aplicar efectos dinámicos como explosiones y reconstrucción controlada de imágenes.</p></li>
+<li><p>Almacenar y manipular elementos gráficos en memoria para un renderizado optimizado.</p></li>
+<li><p>Mejorar el rendimiento en aplicaciones en tiempo real mediante funciones optimizadas.</p></li>
+<li><p>Soporte para funciones experimentales para efectos gráficos avanzados y depuración.</p></li>
+</ul>
+</section>
+<section id="library-functional-overview">
+<h2>3. Resumen Funcional de la Biblioteca<a class="headerlink" href="#library-functional-overview" title="Link to this heading">¶</a></h2>
+<p>La biblioteca consta de un conjunto de funciones que facilitan diversas transformaciones y efectos gráficos. Se centra en el manejo eficiente de superficies basadas en píxeles, permitiendo a los desarrolladores crear efectos visuales complejos como explosiones, reconstrucción dinámica de superficies y manipulaciones optimizadas de sprites.</p>
+</section>
+<section id="target-applications">
+<h2>4. Aplicaciones Objetivo<a class="headerlink" href="#target-applications" title="Link to this heading">¶</a></h2>
+<p>Esta biblioteca es particularmente útil para:</p>
+<ul class="simple">
+<li><p>Desarrollo de juegos: Habilitar efectos en tiempo real como explosiones, animaciones y transformaciones de sprites.</p></li>
+<li><p>Simulaciones gráficas: Crear efectos visuales dinámicos que requieren manipulación de imágenes.</p></li>
+<li><p>Procesamiento de imágenes: Dividir, reconstruir y modificar imágenes con fines artísticos o técnicos.</p></li>
+<li><p>Investigación y experimentación: Probar nuevas técnicas de renderizado gráfico y estrategias de optimización.</p></li>
+</ul>
+</section>
+<section id="cython-functions">
+<h2>5. Funciones de Cython<a class="headerlink" href="#cython-functions" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">pixel_block_rgb_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts a block of RGB pixels from a surface.</span>
+<span class="sd">    Efficiently retrieves a section of an image as a contiguous memory view.</span>
+<span class="sd">    Useful for sprite sheets and image manipulation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">surface_split_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splits a surface into multiple subsurfaces.</span>
+<span class="sd">    Used for working with sprite sheets or dividing an image for animation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">burst_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates an explosion effect by splitting a surface into blocks and moving them randomly.</span>
+<span class="sd">    Ideal for animations where objects break apart dynamically.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">display_burst_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Renders the exploded effect created by `burst_c` onto the screen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">rebuild_from_frame_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reassembles an exploded surface back to its original form over a sequence of frames.</span>
+<span class="sd">    Useful for animation effects where an object reconstructs over time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">burst_into_memory_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores the burst effect in memory for later use.</span>
+<span class="sd">    Helps in precomputing effects for better performance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">rebuild_from_memory_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rebuilds a surface from previously stored exploded pieces.</span>
+<span class="sd">    Useful for reusing precomputed effects efficiently.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">burst_experimental_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A variant of `burst_c` with additional or alternative rendering techniques.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">db_experimental_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An experimental function that likely applies blending or cleaning effects to a surface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">rff_experimental_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rebuilds an exploded surface from a specific frame with potential experimental logic.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">rfm_experimental_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Another experimental function focusing on surface restoration and rendering techniques.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">build_surface_inplace</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splits a surface into smaller blocks within a sprite group.</span>
+<span class="sd">    Used for managing sprites at a granular level.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">build_surface_inplace_fast</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An optimized version of `build_surface_inplace` with improved performance.</span>
+<span class="sd">    Suitable for real-time applications requiring minimal processing time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="summary">
+<h2>6. Resumen<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>Esta biblioteca está diseñada para mejorar las capacidades de las aplicaciones gráficas, particularmente en el desarrollo de juegos y la manipulación avanzada de imágenes. Al ofrecer funciones optimizadas para manejar superficies, dividir imágenes, aplicar efectos de explosión y reconstruir imágenes, proporciona un conjunto de herramientas flexible y eficiente para los desarrolladores. Las funciones experimentales añaden más posibilidades para explorar técnicas de renderizado novedosas. La biblioteca es un recurso valioso para aquellos que buscan implementar transformaciones gráficas complejas de manera eficiente.</p>
+</section>
+<section id="cython-method-list">
+<h2>7. Lista de métodos de Cython<a class="headerlink" href="#cython-method-list" title="Link to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="BurstSurface.pixel_block_rgb">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">pixel_block_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.pixel_block_rgb" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Extraer un bloque de píxeles de un arreglo 2D más grande que representa una imagen.</strong></p>
+<p>Esta función recupera un bloque rectangular de píxeles de una imagen más grande (o hoja de sprites) y lo almacena en un arreglo de bloques más pequeño. La función delega la extracción real de píxeles a la función auxiliar <cite>pixel_block_rgb_c</cite> para optimizar el rendimiento.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>array_</strong></dt><dd><p>unsigned char; Un arreglo 3D que representa la imagen completa (altura x ancho x 3). Esta es la fuente de la cual se extraerá el bloque de píxeles.</p>
+</dd>
+<dt><strong>start_x</strong></dt><dd><p>int; La coordenada x de la esquina superior izquierda del bloque a extraer. Esto define dónde comienza el bloque en la imagen de origen.</p>
+</dd>
+<dt><strong>start_y</strong></dt><dd><p>int; La coordenada y de la esquina superior izquierda del bloque a extraer. Esto define dónde comienza el bloque en la imagen de origen.</p>
+</dd>
+<dt><strong>w</strong></dt><dd><p>int; El ancho del bloque a extraer. El bloque tendrá <cite>w</cite> píxeles de ancho.</p>
+</dd>
+<dt><strong>h</strong></dt><dd><p>int; La altura del bloque a extraer. El bloque tendrá <cite>h</cite> píxeles de alto.</p>
+</dd>
+<dt><strong>block</strong></dt><dd><p>unsigned char; Un bloque vacío preasignado de tamaño <cite>w x h x 3</cite>. Este arreglo se llenará con los datos de píxeles de la imagen de origen.</p>
+</dd>
+</dl>
+<p><strong>Devuelve</strong></p>
+<dl class="simple">
+<dt><strong>unsigned char[:, :, :]</strong></dt><dd><p>Un arreglo 3D (altura x ancho x 3) que representa el bloque de píxeles extraído. El bloque se almacena en el parámetro <cite>block</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="BurstSurface.surface_split">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">surface_split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.surface_split" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Dividir una superficie de pygame en subsuperficies más pequeñas.</strong></p>
+<p>Esta función divide una superficie más grande en subsuperficies más pequeñas (bloques) según el tamaño, número de filas y columnas especificados. Delega la división real a la función auxiliar <cite>surface_split_c</cite> para un procesamiento eficiente.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>surface_</strong></dt><dd><p>pygame.Surface; La superficie que se dividirá en subsuperficies más pequeñas.</p>
+</dd>
+<dt><strong>size_</strong></dt><dd><p>int; El tamaño (ancho y alto) de cada subsuperficie. Las subsuperficies resultantes serán cuadradas con dimensiones <cite>size_ x size_</cite>.</p>
+</dd>
+<dt><strong>rows_</strong></dt><dd><p>int; El número de filas de subsuperficies a crear. Esto determina cuántos bloques horizontales se extraerán de la superficie original.</p>
+</dd>
+<dt><strong>columns_</strong></dt><dd><p>int; El número de columnas de subsuperficies a crear. Esto determina cuántos bloques verticales se extraerán de la superficie original.</p>
+</dd>
+</dl>
+<p><strong>Devuelve</strong></p>
+<dl class="simple">
+<dt><strong>list</strong></dt><dd><p>Una lista de objetos pygame.Surface, cada uno representando un bloque más pequeño de la superficie original.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="BurstSurface.burst">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">burst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_angle_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.burst" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Simular un efecto de explosión en una superficie dividiéndola en subsuperficies o píxeles más pequeños.</strong></p>
+<p>Esta función divide una superficie dada en múltiples bloques o píxeles más pequeños y aplica un efecto de explosión, proyectándolos en direcciones aleatorias. Las subsuperficies o píxeles se colocan en posiciones especificadas y pueden proyectarse en diferentes ángulos.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>image_</strong></dt><dd><p>pygame.Surface; La superficie que se dividirá en subsuperficies o píxeles más pequeños.</p>
+</dd>
+<dt><strong>vertex_array_</strong></dt><dd><p>list; Una lista que se llenará con los sprites creados, cada uno representando una subsuperficie o píxel más pequeño. Estos sprites tendrán atributos como posición, velocidad (vector) y otros estados relacionados con la explosión.</p>
+</dd>
+<dt><strong>block_size_</strong></dt><dd><p>int; El tamaño de cada bloque (subsuperficie). Si se establece en 1, cada bloque será un solo píxel.</p>
+</dd>
+<dt><strong>rows_</strong></dt><dd><p>int; El número de filas de subsuperficies o píxeles a crear. Determina cuántos bloques horizontales se crearán.</p>
+</dd>
+<dt><strong>columns_</strong></dt><dd><p>int; El número de columnas de subsuperficies o píxeles a crear. Determina cuántos bloques verticales se crearán.</p>
+</dd>
+<dt><strong>x_</strong></dt><dd><p>int; La coordenada x de la esquina superior izquierda de la superficie antes del efecto de explosión.</p>
+</dd>
+<dt><strong>y_</strong></dt><dd><p>int; La coordenada y de la esquina superior izquierda de la superficie antes del efecto de explosión.</p>
+</dd>
+<dt><strong>max_angle_</strong></dt><dd><p>int, opcional; El ángulo máximo (en grados) en el que cada subsuperficie/píxel será proyectado. Si no se proporciona, el valor predeterminado es 0 (sin ángulo aplicado).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.display_burst">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">display_burst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screen_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">vertex_array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_=0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.display_burst" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Mostrar un efecto de explosión en la pantalla renderizando la explosión de sprites.</p>
+<p>Esta función itera a través de la lista de sprites (creados por el efecto de explosión), renderizando cada sprite sobre la superficie de la pantalla proporcionada. Los sprites se dibujan con efectos de mezcla opcionales para transiciones más suaves, como la mezcla aditiva.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>pantalla_</strong>:</dt><dd><p>pygame.Surface; La pantalla (o superficie de renderizado) donde el efecto de explosión (explosión de sprites) será dibujado.</p>
+</dd>
+<dt><strong>array_de_vertices_</strong>:</dt><dd><p>lista; Una lista de objetos sprite que representan las subsuperficies o píxeles creados durante el efecto de explosión. Estos sprites serán renderizados en la pantalla.</p>
+</dd>
+<dt><strong>mezcla_</strong>:</dt><dd><p>unsigned char, opcional; El modo de mezcla a aplicar al dibujar los sprites. El valor predeterminado es 0 (sin mezcla). Un valor distinto de cero puede especificar un modo de mezcla aditiva u otro, dependiendo de cómo se defina.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong> void; La función dibuja cada sprite de <cite>array_de_vertices_</cite> a la superficie <cite>pantalla_</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.rebuild_from_frame">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">rebuild_from_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screen_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">current_frame_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">start_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">vertex_array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.rebuild_from_frame" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Reconstruir y renderizar un efecto de explosión desde un fotograma específico.</p>
+<p>Esta función reconstruye y renderiza un efecto de explosión (creado a partir de sprites) en la pantalla comenzando desde un número de fotograma especificado. Los sprites se vuelven a renderizar progresivamente desde sus posiciones originales y se actualizan en función de <cite>current_frame_</cite>. La función también admite mezcla para transiciones visuales más suaves durante el efecto.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>pantalla_</strong>:</dt><dd><p>pygame.Surface; La superficie (o pantalla) donde se dibujará el efecto de explosión reconstruido.</p>
+</dd>
+<dt><strong>frame_actual_</strong>:</dt><dd><p>unsigned int; El número del fotograma actual, utilizado para controlar el tiempo y la progresión del efecto de explosión.</p>
+</dd>
+<dt><strong>frame_inicial</strong>:</dt><dd><p>unsigned int; El número de fotograma en el que comenzar a reconstruir el efecto de explosión. El proceso solo comenzará después de que <cite>frame_actual_</cite> supere este valor.</p>
+</dd>
+<dt><strong>array_de_vertices_</strong>:</dt><dd><p>lista; Una lista de objetos sprite que representan las subsuperficies o píxeles de la explosión. Estos sprites serán renderizados en la pantalla.</p>
+</dd>
+<dt><strong>mezcla_</strong>:</dt><dd><p>unsigned char, opcional; El modo de mezcla a usar al renderizar los sprites. El valor predeterminado es 0 (sin mezcla). Un valor distinto de cero aplicará el modo de mezcla especificado (por ejemplo, mezcla aditiva).</p>
+</dd>
+</dl>
+<p><strong>Returns</strong> void; Esta función actualiza la pantalla renderizando los sprites según el fotograma y los ajustes de mezcla especificados.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.burst_into_memory">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">burst_into_memory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">n_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">sg_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screenrect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bint</span> <span class="pre">warn_</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bint</span> <span class="pre">auto_n_</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.burst_into_memory" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Explosión de un grupo de sprites en memoria, creando un efecto de explosión.</p>
+<p>Esta función procesa un grupo de sprites (<cite>sg_</cite>) y genera un efecto de explosión al descomponerlo en memoria. La función crea un conjunto de sprites o subsuperficies que se distribuyen a través de una región especificada de la pantalla definida por <cite>screenrect</cite>. El número de sprites (<cite>n_</cite>) determina cuántas partes se dividirá el grupo de sprites. También admite advertencias y configuración automática para el número de elementos a procesar.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>n_</strong>:</dt><dd><p>unsigned int; El número de elementos a descomponer en memoria. Esto controla cuántas partes se dividirá el grupo de sprites para el efecto de explosión.</p>
+</dd>
+<dt><strong>sg_</strong>:</dt><dd><p>objeto; Un pygame.sprite.Group que contiene los sprites que se procesarán y se descompondrán en memoria.</p>
+</dd>
+<dt><strong>rectángulo_pantalla</strong>:</dt><dd><p>objeto; El objeto pygame.Rect que define el área de la pantalla donde se mostrará el efecto de explosión. Esto ayuda a controlar el posicionamiento de los sprites dentro del área de la pantalla.</p>
+</dd>
+<dt><strong>advertencia_</strong>:</dt><dd><p>bint, opcional; Una bandera para activar advertencias si se cumplen ciertas condiciones (por ejemplo, si el grupo de sprites es demasiado grande para procesarse de manera eficiente). El valor predeterminado es False.</p>
+</dd>
+<dt><strong>auto_n_</strong>:</dt><dd><p>bint, opcional; Una bandera que, si se establece en True, determina automáticamente el número de elementos a descomponer según el tamaño del grupo de sprites. El valor predeterminado es False.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong> void; Esta función modifica la memoria creando y almacenando el efecto de explosión, que luego puede ser mostrado en la pantalla.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.rebuild_from_memory">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">rebuild_from_memory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screen_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">vertex_array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.rebuild_from_memory" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Reconstruir y renderizar una imagen a partir de los datos de memoria almacenados.</p>
+<p>Esta función toma una lista de datos de vértices (<cite>array_de_vertices_</cite>) y reconstruye una imagen o animación al renderizar la información de memoria almacenada en la pantalla proporcionada. La imagen se renderiza utilizando el modo de mezcla especificado (<cite>mezcla_</cite>). Esto puede usarse para reconstruir efectos visuales explotados o fragmentados a partir de la memoria almacenada previamente.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>pantalla_</strong>:</dt><dd><p>objeto; La superficie o pantalla donde se renderizará la imagen reconstruida. Típicamente, esto sería un pygame.Surface que representa la ventana de visualización.</p>
+</dd>
+<dt><strong>array_de_vertices_</strong>:</dt><dd><p>lista; Una lista que contiene los datos de vértices (por ejemplo, píxeles, bloques de sprites o partes de imágenes fragmentadas) usados para reconstruir la imagen. Estos datos se utilizan para renderizar la salida visual final en la pantalla.</p>
+</dd>
+<dt><strong>mezcla_</strong>:</dt><dd><p>unsigned char, opcional; El modo de mezcla que se usará al renderizar la imagen. Un modo de mezcla de 0 normalmente representa sin mezcla (modo normal), mientras que otros valores pueden representar diferentes efectos de mezcla aditiva o sustractiva. El valor predeterminado es 0 (sin mezcla).</p>
+</dd>
+</dl>
+<p><strong>Returns</strong> void; Esta función modifica el objeto de pantalla al renderizar la imagen reconstruida a partir de los datos de vértices proporcionados sin devolver un valor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.burst_experimental">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">burst_experimental</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">render_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">image_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">block_size_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">rows_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">columns_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">x_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">y_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">max_angle_</span> <span class="pre">=</span> <span class="pre">359</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.burst_experimental" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Explotar una superficie en múltiples subsuperficies o píxeles y aplicar proyecciones aleatorias.</p>
+<p>Esta función toma una única superficie (<cite>imagen_</cite>) y la divide en múltiples bloques o píxeles individuales, según el tamaño del bloque especificado, el número de filas y columnas. A cada bloque o píxel resultante se le asigna un ángulo aleatorio de proyección, dando el efecto de que la superficie se está “explotando” en piezas separadas. Las piezas se agregan al grupo de sprites especificado (<cite>grupo_</cite>) para su posterior manipulación o renderizado.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>renderizado_</strong>:</dt><dd><p>objeto; El contexto de renderizado 2D utilizado para renderizar las piezas explotadas. Típicamente un pygame.Surface o un contexto de renderizado similar.</p>
+</dd>
+<dt><strong>imagen_</strong>:</dt><dd><p>objeto; El pygame.Surface que se dividirá en bloques o píxeles más pequeños. Esta imagen será “explotada” en múltiples partes según el tamaño del bloque.</p>
+</dd>
+<dt><strong>grupo_</strong>:</dt><dd><p>objeto; Un pygame.sprite.Group que contendrá las piezas resultantes (subsuperficies o píxeles) después de la explosión. Cada parte de la imagen explotada se agregará como un sprite a este grupo.</p>
+</dd>
+<dt><strong>tamaño_bloque_</strong>:</dt><dd><p>int; El tamaño de cada bloque o píxel en la explosión. Esto define el ancho y alto de cada subsuperficie o entidad de píxel. Un tamaño de bloque de 1 resultará en la creación de píxeles individuales.</p>
+</dd>
+<dt><strong>rows_</strong>:</dt><dd><p>int; El número de filas en las que se dividirá la superficie. Esto, combinado con el tamaño del bloque, determina cuántos bloques se crean a lo largo del eje vertical.</p>
+</dd>
+<dt><strong>columnas_</strong>:</dt><dd><p>int; El número de columnas en las que se dividirá la superficie. Esto, combinado con el tamaño del bloque, determina cuántos bloques se crean a lo largo del eje horizontal.</p>
+</dd>
+<dt><strong>x_</strong>:</dt><dd><p>int; La coordenada x inicial de la superficie, que representa la esquina superior izquierda antes de la explosión.</p>
+</dd>
+<dt><strong>y_</strong>:</dt><dd><p>int; La coordenada y inicial de la superficie, que representa la esquina superior izquierda antes de la explosión.</p>
+</dd>
+<dt><strong>max_angle_</strong>:</dt><dd><p>int, opcional; El ángulo máximo (en grados) para la proyección de cada pieza explotada. Cada pieza será proyectada a un ángulo aleatorio entre 0 y <cite>max_angle_</cite>. El valor predeterminado es 359 grados (círculo completo).</p>
+</dd>
+</dl>
+<p><strong>Returns</strong> void; Esta función modifica el objeto <cite>group_</cite> añadiendo las piezas explotadas como sprites, pero no devuelve ningún valor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.db_experimental">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">db_experimental</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screenrect_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">render_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bint</span> <span class="pre">clean_</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.db_experimental" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Realiza un efecto experimental de base de datos con un grupo de sprites y opcionalmente mezclando.</p>
+<p>Esta función aplica un efecto experimental a un grupo de sprites (<cite>group_</cite>), representándolo dentro de una región de pantalla especificada (<cite>screenrect_</cite>). El efecto se mezcla opcionalmente según el valor de <cite>blend_</cite>. La función también puede limpiar el grupo (<cite>clean_</cite>), eliminando o restableciendo elementos según sea necesario.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>screenrect_</strong>:</dt><dd><p>objeto; Un pygame.Rect que define la región de la pantalla para renderizar el efecto.</p>
+</dd>
+<dt><strong>renderizado_</strong>:</dt><dd><p>objeto; El contexto de renderizado 2D (normalmente un pygame.Surface) donde se renderizará el efecto.</p>
+</dd>
+<dt><strong>grupo_</strong>:</dt><dd><p>objeto; Un pygame.sprite.Group que contiene los sprites que serán afectados por el efecto experimental.</p>
+</dd>
+<dt><strong>clean_</strong>:</dt><dd><p>bint, opcional; Una bandera que determina si el grupo será limpiado (restablecido o borrado) antes de renderizar. El valor predeterminado es False.</p>
+</dd>
+<dt><strong>mezcla_</strong>:</dt><dd><p>unsigned char, opcional; El modo de mezcla que se usará al renderizar el efecto. Un modo de mezcla de 0 típicamente representa sin mezcla (modo normal). El valor predeterminado es 0.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong> void; Esta función modifica el objeto <cite>group_</cite> renderizando o limpiando los sprites, pero no devuelve ningún valor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.rff_experimental">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">rff_experimental</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">render_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screenrect_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">current_frame_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">start_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.rff_experimental" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Reconstruir una imagen explotada a partir de un número de fotograma específico.</p>
+<p>Esta función comienza a reconstruir una imagen explotada desde un número de fotograma inicial y continúa modificando la imagen hasta que llega al fotograma actual. Delegará la lógica principal a la función <cite>rff_experimental_c</cite> para mejorar el rendimiento.</p>
+<p>El proceso de reconstrucción consiste en invertir la dirección de cada vector de píxel o bloque de píxeles y dibujarlos en la superficie de renderizado, respetando los límites de la pantalla.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>renderizado_</strong>:</dt><dd><p>Pygame.Surface; La superficie donde se renderizará la imagen. Normalmente es la pantalla del juego o la superficie de renderizado objetivo.</p>
+</dd>
+<dt><strong>screenrect_</strong>:</dt><dd><p>Pygame.Rect; El rectángulo que define el área de la pantalla. Se usa para determinar si un sprite está dentro del área visible de la pantalla.</p>
+</dd>
+<dt><strong>frame_actual_</strong>:</dt><dd><p>unsigned int; El número del fotograma actual. La imagen comenzará a reconstruirse desde el <cite>start_frame</cite> especificado hasta que se alcance el <cite>current_frame</cite>.</p>
+</dd>
+<dt><strong>frame_inicial</strong>:</dt><dd><p>unsigned int; El número de fotograma en el que comienza el proceso de reconstrucción. La imagen no se modificará antes de este fotograma.</p>
+</dd>
+<dt><strong>grupo_</strong>:</dt><dd><p>Pygame.sprite.Group; Un grupo de sprites que representa los bloques o píxeles de la imagen que se reconstruirá. Cada sprite es manipulado y renderizado durante el proceso de reconstrucción.</p>
+</dd>
+<dt><strong>mezcla_</strong>:</dt><dd><p>unsigned char, opcional; El modo de mezcla que se usará al renderizar los sprites. Los modos de mezcla controlan cómo se combinan los colores de los sprites con la superficie existente. El valor predeterminado es 0 (sin mezcla).</p>
+</dd>
+</dl>
+<p><strong>Returns</strong> None; Esta función modifica directamente los sprites de <cite>group_</cite> y la superficie. No se devuelve ningún valor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.rfm_experimental">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">rfm_experimental</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screenrect_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">render_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.rfm_experimental" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Reconstruir una imagen explotada con píxeles o bloques de píxeles fuera de los límites de la pantalla.</p>
+<p>Esta función aplica un proceso experimental para reconstruir una imagen usando píxeles o bloques de píxeles que están fuera de los límites de la pantalla. Delegada la lógica principal a la función <cite>rfm_experimental_c</cite> para mejorar el rendimiento. Este proceso se usa comúnmente para crear efectos donde la imagen «explota» o piezas de ella se mueven fuera del área de la pantalla.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>screenrect_</strong>:</dt><dd><p>Pygame.Rect; El rectángulo que representa los límites de la pantalla o la pantalla del juego. Se usa para verificar si un sprite está dentro del área de la pantalla.</p>
+</dd>
+<dt><strong>renderizado_</strong>:</dt><dd><p>Pygame.Surface; La superficie donde se renderizará la imagen reconstruida. Normalmente es la pantalla del juego o el objetivo de renderizado.</p>
+</dd>
+<dt><strong>grupo_</strong>:</dt><dd><p>Pygame.sprite.Group; Un grupo de sprites que representan los píxeles o bloques utilizados para reconstruir la imagen. Cada sprite en el grupo será procesado y transferido a la superficie.</p>
+</dd>
+<dt><strong>mezcla_</strong>:</dt><dd><p>unsigned char, opcional; Un modo de fusión que se usará al renderizar los sprites. Los modos de fusión controlan cómo se combinan los colores de los sprites con los colores existentes en la superficie. El valor predeterminado es 0 (sin fusión).</p>
+</dd>
+</dl>
+<p><strong>Returns</strong> Ninguno; Esta función modifica directamente la superficie y no devuelve ningún valor. También modifica el grupo de sprites en su lugar.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.build_surface_inplace">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">build_surface_inplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">surface_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">block_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">block_height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.build_surface_inplace" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Reconstruir una superficie de Pygame a partir de un grupo de sprites (en su lugar).</p>
+<p>Esta función toma un grupo de sprites y transfiere sus imágenes a la superficie especificada en sus respectivas posiciones, actualizando la superficie en su lugar. El proceso modifica directamente la superficie sin crear una nueva.</p>
+<p>Delegada la tarea a la función <cite>build_surface_inplace_c</cite>, que está escrita en C para mejorar el rendimiento.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>surface_</strong>:</dt><dd><p>Pygame.Surface; La superficie que será actualizada al transferir los sprites a ella. La superficie original se modifica directamente, y no se crea una superficie nueva.</p>
+</dd>
+<dt><strong>grupo_</strong>:</dt><dd><p>Pygame.sprite.Group; Un grupo de sprites que serán transferidos a la superficie. La posición de cada sprite está determinada por su atributo <cite>rect</cite>.</p>
+</dd>
+<dt><strong>block_width</strong>:</dt><dd><p>unsigned int; El ancho del bloque utilizado para el proceso de mosaico o reconstrucción. Puede influir en cómo se reconstruye la superficie.</p>
+</dd>
+<dt><strong>block_height</strong>:</dt><dd><p>unsigned int; La altura del bloque utilizado para el proceso de mosaico o reconstrucción. Trabaja junto con <cite>block_width</cite> para determinar la disposición de la superficie.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong> Ninguno; Esta función modifica directamente la superficie y no devuelve ningún valor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.build_surface_inplace_fast">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">build_surface_inplace_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">surface_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">block_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">block_height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.build_surface_inplace_fast" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Reconstruir eficientemente una superficie de Pygame a partir de un grupo de sprites (en su lugar).</p>
+<p>Esta función construye rápidamente una superficie al transferir las imágenes de los sprites individuales a la superficie dada en sus respectivas posiciones. El proceso se realiza en su lugar, lo que significa que la superficie se actualiza directamente sin crear una nueva superficie.</p>
+<p>Delegada la tarea real a la función optimizada <cite>build_surface_inplace_fast_c</cite> para mejorar el rendimiento.</p>
+<p><strong>Parámetros</strong></p>
+<dl class="simple">
+<dt><strong>surface_</strong>:</dt><dd><p>Pygame.Surface; La superficie a la que se transferirán los sprites. Esta superficie se modifica directamente.</p>
+</dd>
+<dt><strong>grupo_</strong>:</dt><dd><p>Pygame.sprite.Group; El grupo de sprites cuyas imágenes serán transferidas a la superficie. La posición de cada sprite se toma de su atributo <cite>rect</cite>.</p>
+</dd>
+<dt><strong>block_width</strong>:</dt><dd><p>unsigned int; El ancho de los bloques que se utilizarán para construir la superficie. Esto es importante para cualquier lógica de mosaico y podría afectar el rendimiento dependiendo del tamaño del bloque.</p>
+</dd>
+<dt><strong>block_height</strong>:</dt><dd><p>unsigned int; La altura de los bloques que se utilizarán para construir la superficie. Similar a <cite>block_width</cite>, afecta cómo se reconstruye la superficie.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong> Ninguno; La superficie se modifica directamente, por lo que no hay valor de retorno.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">BurstSurface</a><ul>
+<li><a class="reference internal" href="#cython-burst-surface-library">1. Biblioteca de Superficie de Explosión en Cython</a></li>
+<li><a class="reference internal" href="#key-features">2. Características Clave</a></li>
+<li><a class="reference internal" href="#library-functional-overview">3. Resumen Funcional de la Biblioteca</a></li>
+<li><a class="reference internal" href="#target-applications">4. Aplicaciones Objetivo</a></li>
+<li><a class="reference internal" href="#cython-functions">5. Funciones de Cython</a></li>
+<li><a class="reference internal" href="#summary">6. Resumen</a></li>
+<li><a class="reference internal" href="#cython-method-list">7. Lista de métodos de Cython</a><ul>
+<li><a class="reference internal" href="#BurstSurface.pixel_block_rgb"><code class="docutils literal notranslate"><span class="pre">pixel_block_rgb()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.surface_split"><code class="docutils literal notranslate"><span class="pre">surface_split()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.burst"><code class="docutils literal notranslate"><span class="pre">burst()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.display_burst"><code class="docutils literal notranslate"><span class="pre">display_burst()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.rebuild_from_frame"><code class="docutils literal notranslate"><span class="pre">rebuild_from_frame()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.burst_into_memory"><code class="docutils literal notranslate"><span class="pre">burst_into_memory()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.rebuild_from_memory"><code class="docutils literal notranslate"><span class="pre">rebuild_from_memory()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.burst_experimental"><code class="docutils literal notranslate"><span class="pre">burst_experimental()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.db_experimental"><code class="docutils literal notranslate"><span class="pre">db_experimental()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.rff_experimental"><code class="docutils literal notranslate"><span class="pre">rff_experimental()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.rfm_experimental"><code class="docutils literal notranslate"><span class="pre">rfm_experimental()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.build_surface_inplace"><code class="docutils literal notranslate"><span class="pre">build_surface_inplace()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.build_surface_inplace_fast"><code class="docutils literal notranslate"><span class="pre">build_surface_inplace_fast()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="GaussianBlur5x5.html"
+                          title="capítulo anterior">GaussianBlur5x5</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="BlendFlags.html"
+                          title="próximo capítulo">BlendFlags</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/BurstSurface.rst.txt"
+            rel="nofollow">Mostrar el código</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Búsqueda rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             >índice</a></li>
+        <li class="right" >
+          <a href="BlendFlags.html" title="BlendFlags"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="GaussianBlur5x5.html" title="GaussianBlur5x5"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de PygameShader - 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">BurstSurface</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Creado usando <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

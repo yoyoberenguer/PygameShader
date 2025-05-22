@@ -1,0 +1,662 @@
+
+<!DOCTYPE html>
+
+<html lang="es" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GaussianBlur5x5 &#8212; documentación de PygameShader - 1.0.11</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=28946ee5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=f85f4cfb"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="SuperficieExplosión" href="BurstSurface.html" />
+    <link rel="prev" title="Misceláneo" href="Misc.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             accesskey="I">índice</a></li>
+        <li class="right" >
+          <a href="BurstSurface.html" title="SuperficieExplosión"
+             accesskey="N">siguiente</a> |</li>
+        <li class="right" >
+          <a href="Misc.html" title="Misceláneo"
+             accesskey="P">anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de PygameShader - 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">GaussianBlur5x5</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="gaussianblur5x5">
+<h1>GaussianBlur5x5<a class="headerlink" href="#gaussianblur5x5" title="Link to this heading">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">GaussianBlur5x5.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="summary-of-the-library">
+<h2>1. Resumen de la Biblioteca<a class="headerlink" href="#summary-of-the-library" title="Link to this heading">¶</a></h2>
+<p>Esta biblioteca de Python proporciona funciones rápidas y eficientes de <strong>procesamiento de imágenes</strong>, centrándose en <strong>desenfoque</strong>, <strong>filtrado Gaussiano</strong> y <strong>detección de bordes</strong>. Está implementada en <strong>Cython</strong> para un alto rendimiento, lo que la hace ideal para aplicaciones en <strong>visión por computadora</strong>, <strong>gráficos</strong> y <strong>preprocesamiento de imágenes</strong>.</p>
+</section>
+<section id="purpose">
+<h2>2. Propósito<a class="headerlink" href="#purpose" title="Link to this heading">¶</a></h2>
+<p>La biblioteca está diseñada para realizar desenfoque y detección de bordes rápidos, que son esenciales para:</p>
+<ul class="simple">
+<li><p><strong>Reducción de ruido</strong> (suavizado de imágenes).</p></li>
+<li><p><strong>Detección de bordes</strong> (para reconocimiento de objetos y extracción de características).</p></li>
+<li><p><strong>Efectos gráficos</strong> (desenfoque de movimiento, efectos de bloom).</p></li>
+<li><p><strong>Preprocesamiento para tareas de visión por computadora</strong> (segmentación de imágenes, filtrado).</p></li>
+</ul>
+</section>
+<section id="main-features">
+<h2>3. Características Principales<a class="headerlink" href="#main-features" title="Link to this heading">¶</a></h2>
+<p><strong>Funciones de Desenfoque</strong></p>
+<p>Estas funciones aplican varios tipos de desenfoque para suavizar imágenes:</p>
+<ul class="simple">
+<li><p><strong>`blur(surface_, npass)`</strong>:</p></li>
+</ul>
+<p>Desenfoca una superficie de imagen, donde <cite>npass</cite> controla la intensidad.</p>
+<ul class="simple">
+<li><p><strong>`blur3d(rgb_array, npass)`</strong>:</p></li>
+</ul>
+<p>Desenfoca un array de imagen 3D (RGB).</p>
+<ul class="simple">
+<li><p><strong>`blur1d(bgr_array, width, height, npass, format_32)`</strong>:</p></li>
+</ul>
+<p>Desenfoque 1D optimizado para eficiencia.</p>
+<ul class="simple">
+<li><p><strong>`blur1d_cp(bgr_array, width, height, npass, format_32)`</strong>:</p></li>
+</ul>
+<p>Devuelve un nuevo array desenfocado en lugar de modificarlo en el lugar.</p>
+<ul class="simple">
+<li><p><strong>`blur4bloom_c(surface_, npass, tmp_array)`</strong>:</p></li>
+</ul>
+<p>Probablemente utilizado para efectos de bloom, mejorando las áreas brillantes.</p>
+<p>Varias versiones internas <strong>optimizadas con Cython</strong> (<cite>blur3d_c</cite>, <cite>blur1d_c</cite>, etc.) se ejecutan sin el <strong>Global Interpreter Lock (GIL)</strong> para soportar multi-hilos.</p>
+<p><strong>Filtrado Gaussiano</strong></p>
+<ul class="simple">
+<li><p><strong>`gauss_filter24(surface_)`</strong>:</p></li>
+</ul>
+<p>Aplica un desenfoque Gaussiano a una imagen de 24 bits.</p>
+<ul class="simple">
+<li><p><strong>`gauss_filter32(surface_)`</strong>:</p></li>
+</ul>
+<p>Aplica un desenfoque Gaussiano a una imagen de 32 bits.</p>
+<p>📌 <strong>¿Por qué Desenfoque Gaussiano?</strong></p>
+<p>Ayuda a suavizar las imágenes antes de la detección de bordes, reduciendo los bordes falsos causados por el ruido.</p>
+<p><strong>Detección de Bordes (Algoritmo de Canny)</strong></p>
+<p>El <strong>algoritmo de Canny</strong> es ampliamente utilizado en visión por computadora para detectar límites de objetos.</p>
+<ul class="simple">
+<li><p><strong>`canny3d(rgb_array, threshold, low, high)`</strong>:</p></li>
+</ul>
+<p>Detecta bordes en una imagen RGB.</p>
+<ul class="simple">
+<li><p><strong>`canny1d(bgr_array, width, height, format_32, threshold)`</strong>:</p></li>
+</ul>
+<p>Detecta bordes en una representación lineal 1D de la imagen para mayor eficiencia.</p>
+<p>También hay versiones <strong>optimizadas con Cython</strong> (<cite>canny3d_c</cite>, <cite>canny1d_c</cite>) que mejoran el rendimiento utilizando multi-hilos.</p>
+<p><strong>Características de Optimización</strong></p>
+<ul class="simple">
+<li><p><strong>Basado en Cython</strong> (<cite>cdef</cite>, <cite>cpdef</cite>, <cite>nogil</cite>) → Rendimiento directo a nivel C.</p></li>
+<li><p><strong>Operaciones in-place</strong> (<cite>blur1d</cite>, <cite>blur3d</cite>) → Ahorra memoria.</p></li>
+<li><p><strong>Multi-hilos</strong> (<cite>nogil</cite>) → Ejecución más rápida en procesadores multi-núcleo.</p></li>
+<li><p><strong>Manejo optimizado de memoria</strong> (<cite>[::1]</cite> vistas de memoria) → Reduce la sobrecarga de Python.</p></li>
+</ul>
+</section>
+<section id="use-cases">
+<h2>4. Casos de Uso<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Visión por Computadora</strong> → Reconocimiento de objetos, extracción de características.</p></li>
+<li><p><strong>Gráficos y Juegos</strong> → Desenfoque de movimiento, efectos de bloom.</p></li>
+<li><p><strong>Procesamiento de Imágenes</strong> → Preprocesamiento antes de modelos de aprendizaje automático.</p></li>
+<li><p><strong>Imágenes Médicas</strong> → Mejora y detección de características en escaneos.</p></li>
+</ul>
+</section>
+<section id="conclusion">
+<h2>5. Conclusión<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
+<p>Esta biblioteca está altamente optimizada para desenfoque rápido, filtrado Gaussiano y detección de bordes, lo que la convierte en una excelente opción para <strong>visión por computadora</strong>, <strong>gráficos</strong> y <strong>aplicaciones de aprendizaje automático</strong> donde la velocidad es crítica.</p>
+</section>
+<section id="cython-list-methods">
+<h2>6. Métodos de listas en Cython<a class="headerlink" href="#cython-list-methods" title="Link to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Parámetros</strong>: - <cite>surface_</cite> (<em>pygame.Surface</em>): Un objeto de superficie de Pygame (24 bits o 32 bits). - <cite>npass</cite> (<em>int</em>, opcional): El número de pasadas de desenfoque a aplicar (por defecto es 1). Debe ser un entero positivo.</p>
+<p><strong>Devuelve</strong>: Ninguno</p>
+<p><strong>Descripción</strong>: Aplica un efecto de desenfoque Gaussiano in-place a una superficie de Pygame.</p>
+<p>Esta función realiza una <strong>convolución de dos pasadas</strong> utilizando un <strong>kernel Gaussiano de 5x5</strong> para desenfocar la superficie de entrada. La primera pasada aplica el desenfoque horizontalmente, y la segunda pasada lo aplica verticalmente. Para los píxeles fuera de los límites de la imagen, la función asigna el valor del borde más cercano para reducir artefactos visuales.</p>
+<div class="math notranslate nohighlight">
+\[\text{Pasada horizontal: }
+\begin{bmatrix}
+\frac{1}{16} &amp; \frac{4}{16} &amp; \frac{6}{16} &amp; \frac{4}{16} &amp; \frac{1}{16}
+\end{bmatrix}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{Pasada vertical: }
+\begin{bmatrix}
+\frac{1}{16} \\ \frac{4}{16} \\ \frac{6}{16} \\ \frac{4}{16} \\ \frac{1}{16}
+\end{bmatrix}\end{split}\]</div>
+<p><strong>Características</strong></p>
+<ul class="simple">
+<li><p>Soporta superficies de Pygame de <strong>24 bits (RGB)</strong> y <strong>32 bits (RGBA)</strong>.</p></li>
+<li><p>Utiliza un <strong>kernel Gaussiano de 5x5</strong> para suavizar la imagen.</p></li>
+<li><p>Permite <strong>múltiples pasadas</strong> (<cite>npass &gt; 1</cite>) para una intensidad de desenfoque mejorada.</p></li>
+<li><p>Ignora el <strong>canal alfa</strong> durante el procesamiento para evitar alterar la transparencia.</p></li>
+</ul>
+<p><strong>Parámetros</strong></p>
+<ul class="simple">
+<li><p><strong>surface_</strong> (<em>pygame.Surface</em>): Un objeto de superficie de Pygame al que se aplicará el efecto de desenfoque. Debe ser de <strong>24 bits RGB</strong> o <strong>32 bits RGBA</strong>. La función modifica la superficie in-place.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, opcional): El número de pasadas de desenfoque a aplicar. Por defecto es <strong>1</strong>. Debe ser un <strong>entero positivo</strong> (<cite>npass &gt; 0</cite>). Múltiples pasadas resultan en un efecto de desenfoque más fuerte, pero pueden aumentar el tiempo de procesamiento.</p></li>
+</ul>
+<p><strong>Devuelve</strong></p>
+<ul class="simple">
+<li><p><strong>Ninguno</strong> – La función modifica <cite>surface_</cite> in-place, sin devolver ningún valor.</p></li>
+</ul>
+<p><strong>Lanza</strong></p>
+<ul class="simple">
+<li><p><strong>TypeError</strong>: Si <cite>surface_</cite> no es un objeto válido de <cite>pygame.Surface</cite>.</p></li>
+<li><p><strong>ValueError</strong>: Si el formato de la superficie es incompatible (por ejemplo, no es de 24 bits o 32 bits) o no puede ser procesado.</p></li>
+<li><p><strong>ValueError</strong>: Si <cite>npass</cite> no es un entero positivo (<cite>npass &lt;= 0</cite>).</p></li>
+</ul>
+<p><strong>Detalles de Implementación</strong></p>
+<ul class="simple">
+<li><p>La función accede directamente al búfer de píxeles de la superficie utilizando <cite>get_view(“3”)</cite>, lo que le permite procesar <strong>solo los canales RGB</strong>, ignorando el canal alfa.</p></li>
+<li><p>Llama a una función optimizada de Cython, <cite>blur3d_c()</cite>, para realizar el desenfoque in-place con un mínimo de sobrecarga.</p></li>
+<li><p>Si <cite>npass &gt; 1</cite>, se aplican múltiples pasadas de desenfoque para un efecto más fuerte, pero esto aumenta el tiempo de procesamiento.</p></li>
+</ul>
+<p><strong>Eficiencia de Memoria</strong></p>
+<ul class="simple">
+<li><p>Esta función es <strong>eficiente en memoria</strong>, ya que opera directamente en el búfer de la superficie sin crear copias adicionales de los datos de la imagen.</p></li>
+<li><p>Si la superficie tiene un <strong>canal alfa</strong>, este es <strong>ignorado</strong> durante el procesamiento, lo que significa que cualquier información de transparencia permanecerá sin cambios.</p></li>
+</ul>
+<p><strong>Consideraciones de Rendimiento</strong></p>
+<ul class="simple">
+<li><p>La función está optimizada utilizando Cython para minimizar la sobrecarga y mejorar el rendimiento.</p></li>
+<li><p>Soporta <strong>multi-hilos</strong> cuando se utiliza la función <cite>nogil</cite> de Cython para una velocidad de ejecución mejorada en sistemas multi-núcleo.</p></li>
+</ul>
+<p><strong>Ejemplo de Uso</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pygame</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">your_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">blur</span>
+
+<span class="c1"># Create a 24-bit Pygame surface</span>
+<span class="n">surface</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+<span class="c1"># Apply a single blur pass (default)</span>
+<span class="n">blur</span><span class="p">(</span><span class="n">surface</span><span class="p">)</span>
+
+<span class="c1"># Apply three blur passes for a stronger blur effect</span>
+<span class="n">blur</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">npass</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Ver También</strong></p>
+<ul class="simple">
+<li><p><cite>blur3d_c</cite>: Función optimizada de Cython para desenfoque de imágenes 3D.</p></li>
+<li><p><cite>gaussian_filter</cite>: Aplica un desenfoque Gaussiano con más control sobre el tamaño del kernel.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur3d">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur3d" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Parámetros</strong>: - <cite>rgb_array</cite> (<em>numpy.ndarray</em> o <em>memoryview slice</em>): Un array 3D de forma <cite>(w, h, n)</cite>, que representa una imagen en formato RGB(A). - <cite>npass</cite> (<em>int</em>, opcional): El número de pasadas de desenfoque a aplicar (<strong>por defecto es `1`</strong>). Más pasadas resultan en un desenfoque más fuerte.</p>
+<p><strong>Devuelve</strong>: Ninguno</p>
+<p><strong>Descripción</strong></p>
+<p>Aplica un desenfoque Gaussiano in-place a un <strong>array 3D de imagen o un segmento de memoryview</strong>.</p>
+<p>Esta función realiza un <strong>desenfoque Gaussiano</strong> en una imagen representada como un array 3D de forma <cite>(w, h, n)</cite>, donde <cite>w</cite> y <cite>h</cite> son el ancho y el alto, y <cite>n</cite> es el número de canales de color (típicamente <strong>3 para RGB</strong> o <strong>4 para RGBA</strong>). Utiliza un <strong>kernel Gaussiano de 5x5</strong> para suavizar, aplicado mediante <strong>convolución de dos pasadas</strong> (horizontal + vertical). La función modifica el array de entrada in-place, evitando asignaciones de memoria innecesarias.</p>
+<p><strong>Características</strong></p>
+<ul class="simple">
+<li><p>Soporta <strong>datos de imagen RGB(A)</strong> con cualquier número de canales (<cite>n = 3</cite> para RGB, <cite>n = 4</cite> para RGBA).</p></li>
+<li><p>Realiza un <strong>desenfoque Gaussiano</strong> utilizando un <strong>kernel de convolución de 5x5</strong>.</p></li>
+<li><p>Utiliza <strong>convolución de dos pasadas</strong> (horizontal y vertical) para un desenfoque eficiente.</p></li>
+<li><p>Maneja los <strong>píxeles de borde</strong> asignándoles los valores del borde más cercano.</p></li>
+<li><p>Permite <strong>múltiples pasadas de desenfoque</strong> (<cite>npass &gt; 1</cite>) para un suavizado aumentado.</p></li>
+</ul>
+<p><strong>Parámetros</strong></p>
+<ul class="simple">
+<li><p><strong>rgb_array</strong> (<em>numpy.ndarray</em> o <em>memoryview slice</em>): Un <strong>array 3D</strong> de forma <cite>(w, h, n)</cite>, que contiene valores <strong>uint8</strong> que representan la imagen en <strong>formato RGB(A)</strong>. La función modifica este array in-place.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, opcional): El número de pasadas de desenfoque a aplicar. <strong>Por defecto es `1`</strong>. Valores más altos <strong>aumentarán la fuerza del desenfoque</strong>, pero requerirán más tiempo de procesamiento.</p></li>
+</ul>
+<p><strong>Devuelve</strong></p>
+<ul class="simple">
+<li><p><strong>Ninguno</strong> – La función modifica <cite>rgb_array</cite> in-place y no devuelve nada.</p></li>
+</ul>
+<p><strong>Detalles de Implementación</strong></p>
+<ul class="simple">
+<li><p>La función aplica un <strong>desenfoque Gaussiano de 5x5</strong> utilizando el kernel:</p></li>
+</ul>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\frac{1}{256}
+\begin{bmatrix}
+1  &amp;  4  &amp;  6  &amp;  4  &amp;  1  \\
+4  &amp; 16  &amp; 24  &amp; 16  &amp;  4  \\
+6  &amp; 24  &amp; 36  &amp; 24  &amp;  6  \\
+4  &amp; 16  &amp; 24  &amp; 16  &amp;  4  \\
+1  &amp;  4  &amp;  6  &amp;  4  &amp;  1
+\end{bmatrix}\end{split}\]</div>
+</div></blockquote>
+<ul class="simple">
+<li><p>Usa <strong>convolución en dos pasos</strong> (horizontal y vertical) para aplicar el desenfoque de manera eficiente.</p></li>
+<li><p>Maneja los <strong>píxeles en los bordes</strong> asignando los <strong>valores de borde más cercanos</strong> para prevenir artefactos.</p></li>
+<li><p>Optimizado para <strong>procesamiento de imágenes</strong>, <strong>renderizado en tiempo real</strong>, y <strong>efectos gráficos</strong>.</p></li>
+</ul>
+<p><strong>Eficiencia de Memoria</strong></p>
+<ul class="simple">
+<li><p>Opera <strong>directamente sobre el búfer de la imagen</strong>, evitando asignaciones adicionales de memoria.</p></li>
+<li><p>Puede usarse en imágenes grandes sin sobrecargar significativamente la memoria.</p></li>
+<li><p>Optimizado usando <strong>Cython</strong> para un alto rendimiento.</p></li>
+</ul>
+<p><strong>Ejemplo de Uso</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">your_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">blur3d</span>
+
+<span class="c1"># Create a sample 3D RGB image array (100x100 with 3 channels)</span>
+<span class="n">rgb_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+<span class="c1"># Apply a single blur pass</span>
+<span class="n">blur3d</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">)</span>
+
+<span class="c1"># Apply multiple blur passes for stronger blur effect</span>
+<span class="n">blur3d</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">,</span> <span class="n">npass</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Casos de uso</strong></p>
+<ul class="simple">
+<li><p><strong>Visión por Computadora</strong> → Preprocesamiento para segmentación de imágenes y detección de objetos.</p></li>
+<li><p><strong>Gráficos y Videojuegos</strong> → Desenfoque de movimiento, efectos de resplandor, y renderizado en tiempo real.</p></li>
+<li><p><strong>Pipelines de Procesamiento de Imágenes</strong> → Reducir el ruido y mejorar la calidad visual.</p></li>
+<li><p><strong>Imágenes Médicas</strong> → Suavizar los datos de imagen antes de la extracción de características.</p></li>
+</ul>
+<p><strong>Ver También</strong></p>
+<ul class="simple">
+<li><p><cite>blur</cite> → Desenfoca directamente una superficie de Pygame.</p></li>
+<li><p><cite>gauss_filter24</cite> → Aplica filtrado gaussiano a una imagen de 24 bits.</p></li>
+<li><p><cite>canny3d</cite> → Realiza detección de bordes en una imagen RGB.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Aplica un desenfoque gaussiano en el lugar a un arreglo 1D o una porción de memoria que representa los datos de los píxeles.</strong></p>
+<p>Esta función aplica un <strong>desenfoque gaussiano</strong> sobre un arreglo 1D (o una porción de memoria) con forma <cite>(w,)</cite>, donde <cite>w</cite> es el número de píxeles. El arreglo puede representar ya sea formatos de píxeles <strong>BGR</strong> (24 bits) o <strong>BGRA</strong> (32 bits) o cualquier otro formato compatible con el tipo de datos <cite>uint8</cite>. La operación de desenfoque se realiza <strong>en el lugar</strong> sobre el arreglo proporcionado.</p>
+<p>La función realiza <strong>npass</strong> pasadas de convolución utilizando un <strong>núcleo gaussiano de 5x5</strong>. Esto puede ser útil para tareas de procesamiento de imágenes donde necesitas aplicar un efecto de desenfoque, especialmente sobre datos de píxeles representados como un arreglo 1D (como cuando los datos de la imagen están aplanados).</p>
+<p><strong>Parámetros:</strong></p>
+<ul class="simple">
+<li><p><strong>bgr_array</strong> (<em>1D numpy.ndarray</em> o <em>porción de memoria</em>): Un arreglo 1D o una porción de memoria con forma <cite>(w,)</cite> que contiene los datos de los píxeles (por ejemplo, en <strong>BGR(A)</strong> o cualquier otro formato de píxeles). El arreglo debe ser de tipo <strong>uint8</strong>.</p></li>
+<li><p><strong>ancho</strong> (<em>int</em>): El ancho (<cite>w</cite>) de la imagen original. Se usa para un manejo correcto durante la operación de desenfoque.</p></li>
+<li><p><strong>altura</strong> (<em>int</em>): La altura (<cite>h</cite>) de la imagen original. Requerida para un procesamiento correcto de la imagen.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, opcional): El número de pasadas de desenfoque a aplicar. <strong>El valor predeterminado es 1 pasada</strong>. Más pasadas resultan en un desenfoque más fuerte.</p></li>
+<li><p><strong>format_32</strong> (<em>bool</em>): Un indicador de si el formato de píxeles es <strong>BGR (24 bits)</strong> o <strong>BGRA (32 bits)</strong>. <cite>False</cite> para <strong>BGR (24 bits)</strong> (3 canales) y <cite>True</cite> para <strong>BGRA (32 bits)</strong> (4 canales).</p></li>
+</ul>
+<p><strong>Retorna:</strong></p>
+<ul class="simple">
+<li><p><strong>Ninguno</strong>: La función realiza el desenfoque en el lugar sobre <cite>bgr_array</cite> y no retorna un valor.</p></li>
+</ul>
+<p><strong>Notas:</strong></p>
+<ul class="simple">
+<li><p>La función usa <strong>convolución gaussiana</strong> con un núcleo de 5x5 utilizado en dos pasadas.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\begin{split}\frac{1}{256} \begin{bmatrix}
+1 &amp; 4 &amp; 6 &amp; 4 &amp; 1 \\
+4 &amp; 16 &amp; 24 &amp; 16 &amp; 4 \\
+6 &amp; 24 &amp; 36 &amp; 24 &amp; 6 \\
+4 &amp; 16 &amp; 24 &amp; 16 &amp; 4 \\
+1 &amp; 4 &amp; 6 &amp; 4 &amp; 1
+\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>La imagen se procesa en dos pasadas (horizontal y vertical) para eficiencia.</p></li>
+<li><p><strong>Manejo de bordes</strong>: Los píxeles fuera de los límites de la imagen se reemplazan por los valores adyacentes de los bordes.</p></li>
+<li><p>La función opera <strong>in-place</strong>, lo que significa que el <cite>bgr_array</cite> original se modifica directamente.</p></li>
+<li><p>Esta función es compatible con los formatos de píxeles <strong>BGR</strong> y <strong>BGRA</strong> (o cualquier otro formato con la misma forma y tipo de datos).</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur1d_cp">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur1d_cp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_32</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur1d_cp" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Aplica un efecto de desenfoque a un búfer 1D (rebanada de memoria) y devuelve una copia.</p>
+<p>Esta función toma un <strong>búfer 1D o rebanada de memoria</strong> que contiene datos de píxeles en formato <strong>BGR(A)</strong> (o cualquier otro formato de píxeles compatible) y aplica un <strong>desenfoque Gaussiano</strong>. El resultado desenfocado se devuelve como una nueva matriz, dejando el búfer original sin modificar.</p>
+<p>La función es compatible con los formatos de píxeles <strong>24-bit (BGR)</strong> y <strong>32-bit (BGRA)</strong>. El indicador <cite>format_32</cite> debe configurarse de acuerdo con ello:</p>
+<ul class="simple">
+<li><p><strong>`format_32=False`</strong> → para formato <strong>BGR (24 bits)</strong>.</p></li>
+<li><p><strong>`format_32=True`</strong> → para formato <strong>BGRA (32 bits)</strong> (incluye un canal alfa).</p></li>
+</ul>
+<p><strong>Ejemplo de uso:</strong></p>
+<p><strong>Para una imagen de 24 bits (formato BGR):</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">blur1d_cp</span><span class="p">(</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">get_buffer</span><span class="p">(),</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="n">npass</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">format_32</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="s1">&#39;BGR&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Para una imagen de 32 bits (formato BGRA):</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">blur1d_cp</span><span class="p">(</span>
+    <span class="n">source</span><span class="o">.</span><span class="n">get_buffer</span><span class="p">(),</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="n">npass</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">format_32</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="s1">&#39;BGRA&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parámetros:</strong></p>
+<ul class="simple">
+<li><p><strong>bgr_array</strong> (<em>C-buffer, numpy.ndarray o rebanada de memoria</em>): Un <strong>array 1D</strong> con forma <cite>(w,)</cite> que contiene datos de píxeles <strong>BGR(A)</strong> (o cualquier formato compatible).</p></li>
+<li><p><strong>width</strong> (<em>int</em>): El ancho de la imagen original en píxeles.</p></li>
+<li><p><strong>height</strong> (<em>int</em>): La altura de la imagen original en píxeles.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, opcional): El número de pasadas de desenfoque a aplicar (<strong>el valor predeterminado es 1</strong>). Aumentar este valor intensifica el efecto de desenfoque.</p></li>
+<li><p><strong>format_32</strong> (<em>bool</em>): - <cite>True</cite> → formato <strong>BGRA (32 bits)</strong> (incluye un canal alfa). - <cite>False</cite> → formato <strong>BGR (24 bits)</strong>.</p></li>
+</ul>
+<p><strong>Retorna:</strong></p>
+<ul class="simple">
+<li><p><strong>numpy.ndarray</strong> o <strong>rebanada de memoria</strong> (<cite>shape (w,)</cite>, <cite>dtype=uint8</cite>): Una <strong>copia desenfocada</strong> del array de entrada, manteniendo el formato de píxeles original.</p></li>
+</ul>
+<p><strong>Notas:</strong></p>
+<ul class="simple">
+<li><p>Esta función <strong>no modifica el búfer de entrada</strong>; devuelve un <strong>nuevo</strong> array desenfocado.</p></li>
+<li><p>La operación de desenfoque utiliza <strong>convolución gaussiana</strong> en varias pasadas.</p></li>
+<li><p>El <strong>formato de píxeles del array de salida es idéntico</strong> al del búfer de entrada.</p></li>
+<li><p>Proporcionar un indicador <cite>format_32</cite> adecuado asegura el manejo correcto de la transparencia alfa.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.gauss_filter24">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">gauss_filter24</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.gauss_filter24" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Aplica un filtro Gaussiano de 5x5 para suavizar una imagen o superficie. Esta función realiza un desenfoque Gaussiano utilizando un núcleo de convolución 5x5, lo que ayuda a reducir el ruido y los detalles en una imagen. Es especialmente útil para el preprocesamiento de imágenes antes de la detección de bordes u otras tareas de visión por computadora.</p>
+<p><strong>Núcleo Gaussiano 5x5:</strong></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+5 &amp; 12 &amp; 15 &amp; 12 &amp; 5 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2
+\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>Los valores del núcleo se normalizan internamente para asegurar un suavizado adecuado.</p></li>
+<li><p>El proceso de filtrado preserva mejor los bordes que un desenfoque promedio simple.</p></li>
+</ul>
+<p><strong>Parámetros:</strong></p>
+<ul class="simple">
+<li><p><strong>surface_ (pygame.Surface, imagen de 24 o 32 bits):</strong></p></li>
+<li><p>La imagen o superficie de entrada a ser desenfocada.</p></li>
+<li><p>Si se proporciona una superficie de 32 bits (con un canal alfa), la capa alfa se ignora en la salida, resultando en una imagen de 24 bits.</p></li>
+</ul>
+<p><strong>Retorna:</strong></p>
+<ul class="simple">
+<li><p><strong>pygame.Surface (imagen filtrada de 24 bits):</strong> - Una nueva superficie desenfocada con ruido reducido y transiciones de píxeles suavizadas. - La imagen de salida es siempre de 24 bits, incluso si la entrada era de 32 bits.</p></li>
+</ul>
+<p><strong>Notas:</strong></p>
+<ul class="simple">
+<li><p>El desenfoque gaussiano se utiliza ampliamente en visión por computadora y gráficos para reducir el ruido de alta frecuencia.</p></li>
+<li><p>Este método está optimizado para el rendimiento y mantiene la integridad de la imagen.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.gauss_filter32">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">gauss_filter32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.gauss_filter32" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Aplica un filtro de desenfoque gaussiano 5x5 a una imagen o superficie de pygame. Esta función suaviza una imagen al convolucionarla con un núcleo gaussiano 5x5, reduciendo el ruido y los detalles finos mientras preserva las estructuras esenciales. Núcleo Gaussiano 5x5:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+5 &amp; 12 &amp; 15 &amp; 12 &amp; 5 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2
+\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>Los valores del núcleo se normalizan internamente para asegurar un suavizado adecuado.</p></li>
+<li><p>Este método ayuda a eliminar el ruido de alta frecuencia mientras retiene las estructuras importantes de la imagen.</p></li>
+</ul>
+<p><strong>Parámetros:</strong></p>
+<ul class="simple">
+<li><p><strong>superficie_ (pygame.Surface, imagen de 32 bits o 24 bits):</strong></p></li>
+<li><p>La imagen o superficie de entrada a ser desenfocada.</p></li>
+<li><p>Se admiten superficies de 24 bits (RGB) y de 32 bits (RGBA).</p></li>
+</ul>
+<p><strong>Retorna:</strong></p>
+<ul class="simple">
+<li><p>pygame.Surface (imagen filtrada de 32 bits):</p></li>
+<li><p>Una nueva superficie desenfocada donde las transiciones de píxeles están suavizadas.</p></li>
+<li><p>Si la superficie original incluye transparencia por píxel (canal alfa), se preserva en la salida.</p></li>
+</ul>
+<p><strong>Notas:</strong></p>
+<ul class="simple">
+<li><p>El desenfoque gaussiano se utiliza comúnmente en el preprocesamiento de imágenes, reducción de ruido, y efectos artísticos.</p></li>
+<li><p>El proceso de filtrado está optimizado para el rendimiento mientras mantiene una alta fidelidad de la imagen.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.canny3d">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">canny3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.canny3d" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Aplica la detección de bordes Canny a un arreglo 3D o una sección de memoryview. El algoritmo de detección de bordes Canny es un proceso multietapa que identifica los bordes en una imagen mediante la detección de áreas con cambios significativos en la intensidad. Fue desarrollado por John F. Canny (1986) y sigue siendo ampliamente utilizado en visión por computadora.</p>
+<p><strong>Pasos del Algoritmo Canny:</strong></p>
+<ol class="arabic simple">
+<li><p>Cálculo del gradiente – Detecta cambios de intensidad.</p></li>
+<li><p>Supresión no máxima – Elimina los píxeles no bordes.</p></li>
+<li><p>Umbralización doble – Filtra los bordes débiles.</p></li>
+<li><p>Seguimiento de bordes por histéresis – Retiene los bordes fuertes.</p></li>
+</ol>
+<p><strong>Parámetros:</strong></p>
+<ul class="simple">
+<li><p><strong>rgb_array</strong> (numpy.ndarray o memoryviewslice, forma (w, h, n), tipo de dato uint8): Imagen de entrada como un arreglo 3D con RGB(A), BGRA, u otros formatos de píxel.</p></li>
+<li><p><strong>umbral</strong> (carácter sin signo, por defecto = 50): Umbral inferior para sprimir los bordes débiles en la magnitud del gradiente.</p></li>
+<li><p><strong>bajo</strong> (carácter sin signo, por defecto = 0): Umbral inferior para el seguimiento de bordes de histéresis. Los bordes débiles por debajo de este valor se descartan.</p></li>
+<li><p><strong>alto</strong> (carácter sin signo, por defecto = 20): Umbral superior para el seguimiento de bordes por histéresis. Los bordes fuertes por encima de este valor se mantienen.</p></li>
+</ul>
+<p><strong>Retorna:</strong></p>
+<ul class="simple">
+<li><p>pygame.Surface – Una nueva superficie/imagen con bordes detectados.</p></li>
+</ul>
+<p><strong>Notas:</strong></p>
+<ul class="simple">
+<li><p>Valores más altos de <cite>umbral</cite> producen menos bordes (menos ruido).</p></li>
+<li><p>La histéresis (<cite>bajo</cite>, <cite>alto</cite>) asegura que solo se mantengan bordes significativos.</p></li>
+<li><p>Esta función admite varios formatos de píxel y opera directamente sobre arreglos 3D.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.canny1d">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">canny1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_32</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.canny1d" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Aplica la detección de bordes Canny a un búfer 1D, arreglo NumPy o sección de memoryview. Esta función procesa un búfer de imagen plano (1D) que representa una imagen en escala de grises o en color y aplica el algoritmo de detección de bordes Canny para resaltar los bordes.</p>
+<p><strong>Parámetros:</strong></p>
+<ul class="simple">
+<li><p><strong>bgr_array</strong> (numpy.ndarray o memoryviewslice, forma (w,), tipo de dato uint8): Búfer 1D que contiene datos de píxeles en BGR(A), BGR, u otros formatos.</p></li>
+<li><p><strong>ancho</strong> (int): Ancho de la imagen original en píxeles.</p></li>
+<li><p><strong>alto</strong> (int): Altura de la imagen original en píxeles.</p></li>
+<li><p><strong>format_32</strong> (bool): Verdadero para búferes de 32 bits (BGRA, BGRA). Falso para búferes de 24 bits (BGR, BGR).</p></li>
+<li><p><strong>umbral</strong> (int, por defecto = 70): Umbral de magnitud de gradiente para detección de bordes. Valores más altos suprimen los bordes más débiles y reducen el ruido.</p></li>
+</ul>
+<p><strong>Retorna:</strong></p>
+<ul class="simple">
+<li><p>pygame.Surface – Una nueva imagen con la detección de bordes Canny aplicada.</p></li>
+</ul>
+<p><strong>Notas:</strong></p>
+<ul class="simple">
+<li><p>Esta función admite varios formatos de píxel (por ejemplo, RGB, BGR, RGBA, BGRA).</p></li>
+<li><p>La umbralización afecta la intensidad de los bordes—ajústela para obtener los mejores resultados.</p></li>
+<li><p>Opera directamente sobre un búfer 1D, lo que lo hace eficiente en memoria.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur3d_cp">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur3d_cp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur3d_cp" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Aplica un efecto de desenfoque a un arreglo numpy 3D o una sección de memoryviewslice (devuelve una copia). Esta función realiza una operación de desenfoque en un arreglo 3D, como una imagen, y devuelve una copia desenfocada. Admite RGB(A) u otros formatos de píxel, manteniendo el formato original en el arreglo devuelto.</p>
+<p><strong>Parámetros:</strong></p>
+<ul class="simple">
+<li><p><strong>rgb_array</strong> (numpy.ndarray o memoryviewslice, forma (w, h, n), tipo de dato uint8): Arreglo 3D que contiene datos de píxeles en RGB(A) o cualquier formato compatible de píxeles (por ejemplo, BGRA). La forma debe ser (ancho, alto, canales) donde los canales generalmente representan componentes de color (3 para RGB, 4 para RGBA, etc.).</p></li>
+</ul>
+<p><strong>Retorna:</strong></p>
+<ul class="simple">
+<li><p>numpy.ndarray: Un nuevo arreglo (copia desenfocada) con la misma forma y formato de píxel que <cite>rgb_array</cite>. El arreglo devuelto tendrá el mismo ancho, alto y formato de píxel que la entrada, pero con el efecto de desenfoque aplicado.</p></li>
+</ul>
+<p><strong>Notas:</strong></p>
+<ul class="simple">
+<li><p>La función no modifica el arreglo de entrada en el lugar; devuelve un nuevo arreglo desenfocado.</p></li>
+<li><p>La salida preservará los mismos canales de color (por ejemplo, RGB o RGBA).</p></li>
+</ul>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Tabla de contenido</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">GaussianBlur5x5</a><ul>
+<li><a class="reference internal" href="#summary-of-the-library">1. Resumen de la Biblioteca</a></li>
+<li><a class="reference internal" href="#purpose">2. Propósito</a></li>
+<li><a class="reference internal" href="#main-features">3. Características Principales</a></li>
+<li><a class="reference internal" href="#use-cases">4. Casos de Uso</a></li>
+<li><a class="reference internal" href="#conclusion">5. Conclusión</a></li>
+<li><a class="reference internal" href="#cython-list-methods">6. Métodos de listas en Cython</a><ul>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur"><code class="docutils literal notranslate"><span class="pre">blur()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur3d"><code class="docutils literal notranslate"><span class="pre">blur3d()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur1d_cp"><code class="docutils literal notranslate"><span class="pre">blur1d_cp()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.gauss_filter24"><code class="docutils literal notranslate"><span class="pre">gauss_filter24()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.gauss_filter32"><code class="docutils literal notranslate"><span class="pre">gauss_filter32()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.canny3d"><code class="docutils literal notranslate"><span class="pre">canny3d()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.canny1d"><code class="docutils literal notranslate"><span class="pre">canny1d()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur3d_cp"><code class="docutils literal notranslate"><span class="pre">blur3d_cp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Tema anterior</h4>
+    <p class="topless"><a href="Misc.html"
+                          title="capítulo anterior">Misceláneo</a></p>
+  </div>
+  <div>
+    <h4>Próximo tema</h4>
+    <p class="topless"><a href="BurstSurface.html"
+                          title="próximo capítulo">SuperficieExplosión</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Esta página</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/GaussianBlur5x5.rst.txt"
+            rel="nofollow">Mostrar el código</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Búsqueda rápida</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Ir a" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navegación</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Índice General"
+             >índice</a></li>
+        <li class="right" >
+          <a href="BurstSurface.html" title="SuperficieExplosión"
+             >siguiente</a> |</li>
+        <li class="right" >
+          <a href="Misc.html" title="Misceláneo"
+             >anterior</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">documentación de PygameShader - 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">GaussianBlur5x5</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Creado usando <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
