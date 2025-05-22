@@ -1,0 +1,662 @@
+
+<!DOCTYPE html>
+
+<html lang="fr" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GaussianBlur5x5 &#8212; Documentation PygameShader 1.0.11</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=1b8a1eab"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=e6b791cb"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Recherche" href="search.html" />
+    <link rel="next" title="BurstSurface" href="BurstSurface.html" />
+    <link rel="prev" title="Misc" href="Misc.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Index général"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="BurstSurface.html" title="BurstSurface"
+             accesskey="N">suivant</a> |</li>
+        <li class="right" >
+          <a href="Misc.html" title="Misc"
+             accesskey="P">précédent</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Documentation PygameShader 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">GaussianBlur5x5</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="gaussianblur5x5">
+<h1>GaussianBlur5x5<a class="headerlink" href="#gaussianblur5x5" title="Lien vers cette rubrique">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">FlouGaussien5x5.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="summary-of-the-library">
+<h2>1. Résumé de la bibliothèque<a class="headerlink" href="#summary-of-the-library" title="Lien vers cette rubrique">¶</a></h2>
+<p>Cette bibliothèque Python fournit des fonctions de <strong>traitement d’images</strong> rapides et efficaces, se concentrant sur <strong>le flou</strong>, <strong>le filtrage gaussien</strong>, et <strong>la détection de bords</strong>. Elle est implémentée en <strong>Cython</strong> pour des performances élevées, ce qui la rend idéale pour les applications en <strong>vision par ordinateur</strong>, <strong>graphisme</strong>, et <strong>prétraitement d’images</strong>.</p>
+</section>
+<section id="purpose">
+<h2>2. Objectif<a class="headerlink" href="#purpose" title="Lien vers cette rubrique">¶</a></h2>
+<p>La bibliothèque est conçue pour effectuer des flous rapides et la détection de bords, ce qui est essentiel pour :</p>
+<ul class="simple">
+<li><p><strong>Réduction du bruit</strong> (lissage des images).</p></li>
+<li><p><strong>Détection de bords</strong> (pour la reconnaissance d’objets et l’extraction de caractéristiques).</p></li>
+<li><p><strong>Effets graphiques</strong> (flou de mouvement, effets de lueur).</p></li>
+<li><p><strong>Prétraitement pour les tâches de vision par ordinateur</strong> (segmentation d’images, filtrage).</p></li>
+</ul>
+</section>
+<section id="main-features">
+<h2>3. Fonctionnalités principales<a class="headerlink" href="#main-features" title="Lien vers cette rubrique">¶</a></h2>
+<p><strong>Fonctions de flou</strong></p>
+<p>Ces fonctions appliquent différents types de flou pour lisser les images :</p>
+<ul class="simple">
+<li><p><strong>`flou(surface_, npass)`</strong> :</p></li>
+</ul>
+<p>Applique un flou à une surface d’image, où <cite>npass</cite> contrôle l’intensité.</p>
+<ul class="simple">
+<li><p><strong>`flou3d(rgb_array, npass)`</strong> :</p></li>
+</ul>
+<p>Applique un flou à un tableau d’image 3D (RGB).</p>
+<ul class="simple">
+<li><p><strong>`flou1d(bgr_array, width, height, npass, format_32)`</strong> :</p></li>
+</ul>
+<p>Flou 1D optimisé pour l’efficacité.</p>
+<ul class="simple">
+<li><p><strong>`flou1d_cp(bgr_array, width, height, npass, format_32)`</strong> :</p></li>
+</ul>
+<p>Retourne un nouveau tableau flouté au lieu de modifier l’original.</p>
+<ul class="simple">
+<li><p><strong>`flou4bloom_c(surface_, npass, tmp_array)`</strong> :</p></li>
+</ul>
+<p>Probablement utilisé pour des effets de lueur, en renforçant les zones lumineuses.</p>
+<p>Plusieurs versions internes <strong>optimisées en Cython</strong> (<cite>blur3d_c</cite>, <cite>blur1d_c</cite>, etc.) fonctionnent sans le <strong>Global Interpreter Lock (GIL)</strong> pour le support du multithreading.</p>
+<p><strong>Filtrage Gaussien</strong></p>
+<ul class="simple">
+<li><p><strong>`filtre_gaussien24(surface_)`</strong> :</p></li>
+</ul>
+<p>Applique un flou gaussien à une image 24 bits.</p>
+<ul class="simple">
+<li><p><strong>`filtre_gaussien32(surface_)`</strong> :</p></li>
+</ul>
+<p>Applique un flou gaussien à une image 32 bits.</p>
+<p>📌 <strong>Pourquoi le flou gaussien ?</strong></p>
+<p>Il aide à lisser les images avant la détection des bords, réduisant les faux bords causés par le bruit.</p>
+<p><strong>Détection des bords (Algorithme de Canny)</strong></p>
+<p>L”<strong>algorithme de Canny</strong> est largement utilisé en vision par ordinateur pour détecter les contours des objets.</p>
+<ul class="simple">
+<li><p><strong>`canny3d(rgb_array, seuil, bas, haut)`</strong> :</p></li>
+</ul>
+<p>Détecte les bords dans une image RGB.</p>
+<ul class="simple">
+<li><p><strong>`canny1d(bgr_array, largeur, hauteur, format_32, seuil)`</strong> :</p></li>
+</ul>
+<p>Détecte les bords dans une représentation linéaire 1D de l’image pour plus d’efficacité.</p>
+<p>Il existe également des versions <strong>optimisées en Cython</strong> (<cite>canny3d_c</cite>, <cite>canny1d_c</cite>) qui améliorent les performances en utilisant le multi-threading.</p>
+<p><strong>Fonctionnalités d’optimisation</strong></p>
+<ul class="simple">
+<li><p><strong>Basé sur Cython</strong> (<cite>cdef</cite>, <cite>cpdef</cite>, <cite>nogil</cite>) → Performances au niveau C direct.</p></li>
+<li><p><strong>Opérations sur place</strong> (<cite>flou1d</cite>, <cite>flou3d</cite>) → Économise de la mémoire.</p></li>
+<li><p><strong>Multi-threading</strong> (<cite>nogil</cite>) → Exécution plus rapide sur des processeurs multicœurs.</p></li>
+<li><p><strong>Gestion optimisée de la mémoire</strong> (<cite>[::1]</cite> vues mémoire) → Réduit la surcharge Python.</p></li>
+</ul>
+</section>
+<section id="use-cases">
+<h2>4. Cas d’utilisation<a class="headerlink" href="#use-cases" title="Lien vers cette rubrique">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Vision par ordinateur</strong> → Reconnaissance d’objets, extraction de caractéristiques.</p></li>
+<li><p><strong>Graphismes et jeux</strong> → Flou de mouvement, effets de lueur.</p></li>
+<li><p><strong>Pipelines de traitement d’images</strong> → Prétraitement avant les modèles d’apprentissage automatique.</p></li>
+<li><p><strong>Imagerie médicale</strong> → Amélioration et détection de caractéristiques dans les scans.</p></li>
+</ul>
+</section>
+<section id="conclusion">
+<h2>5. Conclusion<a class="headerlink" href="#conclusion" title="Lien vers cette rubrique">¶</a></h2>
+<p>Cette bibliothèque est hautement optimisée pour un flou rapide, un filtrage gaussien et la détection de bords, ce qui en fait un excellent choix pour la <strong>vision par ordinateur</strong>, les <strong>graphismes</strong> et les <strong>applications d’apprentissage automatique</strong> où la vitesse est cruciale.</p>
+</section>
+<section id="cython-list-methods">
+<h2>6. Méthodes de liste Cython<a class="headerlink" href="#cython-list-methods" title="Lien vers cette rubrique">¶</a></h2>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Paramètres</strong> : - <cite>surface_</cite> (<em>pygame.Surface</em>): Un objet surface Pygame (24 bits ou 32 bits). - <cite>npass</cite> (<em>int</em>, optionnel): Le nombre de passes de flou à appliquer (la valeur par défaut est 1). Doit être un entier positif.</p>
+<p><strong>Retourne</strong> : Rien</p>
+<p><strong>Description</strong> : Applique un effet de flou gaussien sur place à une surface Pygame.</p>
+<p>Cette fonction effectue une <strong>convolution à deux passes</strong> en utilisant un <strong>noyau gaussien 5x5</strong> pour flouter la surface d’entrée. La première passe applique le flou horizontalement, et la deuxième passe applique le flou verticalement. Pour les pixels en dehors des limites de l’image, la fonction attribue la valeur du bord le plus proche pour réduire les artefacts visuels.</p>
+<div class="math notranslate nohighlight">
+\[\text{Horizontal pass: }
+\begin{bmatrix}
+\frac{1}{16} &amp; \frac{4}{16} &amp; \frac{6}{16} &amp; \frac{4}{16} &amp; \frac{1}{16}
+\end{bmatrix}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{Vertical pass: }
+\begin{bmatrix}
+\frac{1}{16} \\ \frac{4}{16} \\ \frac{6}{16} \\ \frac{4}{16} \\ \frac{1}{16}
+\end{bmatrix}\end{split}\]</div>
+<p><strong>Caractéristiques</strong></p>
+<ul class="simple">
+<li><p>Prend en charge les surfaces Pygame <strong>24 bits (RGB)</strong> et <strong>32 bits (RGBA)</strong>.</p></li>
+<li><p>Utilise un <strong>noyau gaussien 5x5</strong> pour lisser l’image.</p></li>
+<li><p>Permet <strong>plusieurs passes</strong> (<cite>npass &gt; 1</cite>) pour une intensité de flou améliorée.</p></li>
+<li><p>Ignore le <strong>canal alpha</strong> pendant le traitement afin d’éviter d’altérer la transparence.</p></li>
+</ul>
+<p><strong>Paramètres</strong></p>
+<ul class="simple">
+<li><p><strong>surface_</strong> (<em>pygame.Surface</em>): Un objet surface Pygame auquel l’effet de flou sera appliqué. Il doit être soit en <strong>RGB 24 bits</strong>, soit en <strong>RGBA 32 bits</strong>. La fonction modifie la surface sur place.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, optionnel) : Le nombre de passes de flou à appliquer. La valeur par défaut est <strong>1</strong>. Doit être un <strong>entier positif</strong> (<cite>npass &gt; 0</cite>). Plus de passes entraînent un effet de flou plus fort, mais peuvent augmenter le temps de traitement.</p></li>
+</ul>
+<p><strong>Retourne</strong></p>
+<ul class="simple">
+<li><p><strong>Rien</strong> – La fonction modifie <cite>surface_</cite> sur place, sans valeur de retour.</p></li>
+</ul>
+<p><strong>Lève</strong></p>
+<ul class="simple">
+<li><p><strong>TypeError</strong> : Si <cite>surface_</cite> n’est pas un objet <cite>pygame.Surface</cite> valide.</p></li>
+<li><p><strong>ValueError</strong> : Si le format de la surface est incompatible (par exemple, format non 24 bits ou non 32 bits) ou ne peut pas être traité.</p></li>
+<li><p><strong>ValueError</strong> : Si <cite>npass</cite> n’est pas un entier positif (<cite>npass &lt;= 0</cite>).</p></li>
+</ul>
+<p><strong>Détails de l’implémentation</strong></p>
+<ul class="simple">
+<li><p>La fonction accède directement au tampon des pixels de la surface en utilisant <cite>get_view(“3”)</cite>, ce qui lui permet de traiter <strong>uniquement les canaux RGB</strong>, en ignorant le canal alpha.</p></li>
+<li><p>Elle appelle une fonction Cython optimisée, <cite>blur3d_c()</cite>, pour effectuer le flou sur place avec un minimum de frais généraux.</p></li>
+<li><p>Si <cite>npass &gt; 1</cite>, plusieurs passes de flou sont appliquées pour un effet plus fort, mais cela augmente le temps de traitement.</p></li>
+</ul>
+<p><strong>Efficacité mémoire</strong></p>
+<ul class="simple">
+<li><p>Cette fonction est <strong>efficace en mémoire</strong>, car elle opère directement sur le tampon de la surface sans créer de copies supplémentaires des données de l’image.</p></li>
+<li><p>Si la surface possède un <strong>canal alpha</strong>, il est <strong>ignoré</strong> pendant le traitement, ce qui signifie que toute information de transparence restera inchangée.</p></li>
+</ul>
+<p><strong>Considérations sur les performances</strong></p>
+<ul class="simple">
+<li><p>La fonction est optimisée en utilisant Cython pour minimiser les frais généraux et améliorer les performances.</p></li>
+<li><p>Elle prend en charge le <strong>multi-threading</strong> lorsqu’elle utilise la fonctionnalité <cite>nogil</cite> de Cython pour améliorer la vitesse d’exécution sur des systèmes multi-cœurs.</p></li>
+</ul>
+<p><strong>Exemple d’utilisation</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pygame</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">your_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">blur</span>
+
+<span class="c1"># Create a 24-bit Pygame surface</span>
+<span class="n">surface</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+<span class="c1"># Apply a single blur pass (default)</span>
+<span class="n">blur</span><span class="p">(</span><span class="n">surface</span><span class="p">)</span>
+
+<span class="c1"># Apply three blur passes for a stronger blur effect</span>
+<span class="n">blur</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">npass</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Voir aussi</strong></p>
+<ul class="simple">
+<li><p><cite>blur3d_c</cite>: Fonction Cython optimisée pour le flou d’images 3D.</p></li>
+<li><p><cite>gaussian_filter</cite>: Applique un flou gaussien avec plus de contrôle sur la taille du noyau.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur3d">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur3d" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Paramètres</strong> : - <cite>rgb_array</cite> (<em>numpy.ndarray</em> ou <em>memoryview slice</em>): Un tableau 3D de forme <cite>(w, h, n)</cite>, représentant une image au format RGB(A). - <cite>npass</cite> (<em>int</em>, optionnel) : Le nombre de passes de flou à appliquer (<strong>la valeur par défaut est `1`</strong>). Plus de passes entraînent un flou plus fort.</p>
+<p><strong>Retourne</strong> : Rien</p>
+<p><strong>Description</strong></p>
+<p>Applique un flou gaussien sur place à un <strong>tableau d’image 3D ou un segment de mémoire</strong>.</p>
+<p>Cette fonction applique un <strong>flou gaussien</strong> sur une image représentée sous la forme d’un tableau 3D de forme <cite>(w, h, n)</cite>, où <cite>w</cite> et <cite>h</cite> sont la largeur et la hauteur, et <cite>n</cite> est le nombre de canaux de couleur (généralement <strong>3 pour RGB</strong> ou <strong>4 pour RGBA</strong>). Elle utilise un <strong>noyau gaussien 5x5</strong> pour le lissage, appliqué par <strong>convolution à deux passes</strong> (horizontale + verticale). La fonction modifie le tableau d’entrée sur place, évitant toute allocation mémoire inutile.</p>
+<p><strong>Caractéristiques</strong></p>
+<ul class="simple">
+<li><p>Prend en charge les <strong>données d’image RGB(A)</strong> avec n’importe quel nombre de canaux (<cite>n = 3</cite> pour RGB, <cite>n = 4</cite> pour RGBA).</p></li>
+<li><p>Effectue un <strong>flou gaussien</strong> en utilisant un <strong>noyau de convolution 5x5</strong>.</p></li>
+<li><p>Utilise une <strong>convolution à deux passes</strong> (horizontale et verticale) pour un flou efficace.</p></li>
+<li><p>Gère les <strong>pixels de bord</strong> en les définissant aux valeurs de bord les plus proches.</p></li>
+<li><p>Permet <strong>plusieurs passes de flou</strong> (<cite>npass &gt; 1</cite>) pour un lissage accru.</p></li>
+</ul>
+<p><strong>Paramètres</strong></p>
+<ul class="simple">
+<li><p><strong>rgb_array</strong> (<em>numpy.ndarray</em> ou <em>memoryview slice</em>): Un <strong>tableau 3D</strong> de forme <cite>(w, h, n)</cite>, contenant des valeurs <strong>uint8</strong> représentant l’image en <strong>format RGB(A)</strong>. La fonction modifie ce tableau sur place.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, optionnel) : Le nombre de passes de flou à appliquer. <strong>La valeur par défaut est `1`</strong>. Des valeurs plus élevées <strong>augmenteront la force du flou</strong> mais requerront plus de temps de traitement.</p></li>
+</ul>
+<p><strong>Retourne</strong></p>
+<ul class="simple">
+<li><p><strong>Aucun</strong> – La fonction modifie <cite>rgb_array</cite> en place et ne renvoie rien.</p></li>
+</ul>
+<p><strong>Détails de l’implémentation</strong></p>
+<ul class="simple">
+<li><p>La fonction applique un <strong>flou gaussien 5x5</strong> en utilisant le noyau :</p></li>
+</ul>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\frac{1}{256}
+\begin{bmatrix}
+1  &amp;  4  &amp;  6  &amp;  4  &amp;  1  \\
+4  &amp; 16  &amp; 24  &amp; 16  &amp;  4  \\
+6  &amp; 24  &amp; 36  &amp; 24  &amp;  6  \\
+4  &amp; 16  &amp; 24  &amp; 16  &amp;  4  \\
+1  &amp;  4  &amp;  6  &amp;  4  &amp;  1
+\end{bmatrix}\end{split}\]</div>
+</div></blockquote>
+<ul class="simple">
+<li><p>Utilise une <strong>convolution à deux passes</strong> (horizontale et verticale) pour appliquer le flou de manière efficace.</p></li>
+<li><p>Gère les <strong>pixels de bordure</strong> en assignant les <strong>valeurs de bordure les plus proches</strong> pour prévenir les artefacts.</p></li>
+<li><p>Optimisé pour le <strong>traitement d’images</strong>, le <strong>rendu en temps réel</strong> et les <strong>effets graphiques</strong>.</p></li>
+</ul>
+<p><strong>Efficacité mémoire</strong></p>
+<ul class="simple">
+<li><p>Fonctionne <strong>directement sur le tampon d’image</strong>, évitant ainsi des allocations de mémoire supplémentaires.</p></li>
+<li><p>Peut être utilisé sur de grandes images sans une surcharge mémoire significative.</p></li>
+<li><p>Optimisé avec <strong>Cython</strong> pour des performances élevées.</p></li>
+</ul>
+<p><strong>Exemple d’utilisation</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">your_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">blur3d</span>
+
+<span class="c1"># Create a sample 3D RGB image array (100x100 with 3 channels)</span>
+<span class="n">rgb_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+<span class="c1"># Apply a single blur pass</span>
+<span class="n">blur3d</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">)</span>
+
+<span class="c1"># Apply multiple blur passes for stronger blur effect</span>
+<span class="n">blur3d</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">,</span> <span class="n">npass</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Cas d’utilisation</strong></p>
+<ul class="simple">
+<li><p><strong>Vision par ordinateur</strong> → Prétraitement pour la segmentation d’images et la détection d’objets.</p></li>
+<li><p><strong>Graphismes et jeux</strong> → Flou de mouvement, effets de bloom et rendu en temps réel.</p></li>
+<li><p><strong>Pipelines de traitement d’images</strong> → Réduction du bruit et amélioration de la qualité visuelle.</p></li>
+<li><p><strong>Imagerie médicale</strong> → Lissage des données d’image avant l’extraction des caractéristiques.</p></li>
+</ul>
+<p><strong>Voir aussi</strong></p>
+<ul class="simple">
+<li><p><cite>flou</cite> → Floute directement une surface Pygame.</p></li>
+<li><p><cite>gauss_filter24</cite> → Applique un filtrage gaussien sur une image de 24 bits.</p></li>
+<li><p><cite>canny3d</cite> → Effectue une détection des bords sur une image RGB.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Applique un flou gaussien en place sur un tableau 1D ou un tranche de memoryview représentant les données des pixels.</strong></p>
+<p>Cette fonction applique un <strong>flou gaussien</strong> sur un tableau 1D (ou une tranche de memoryview) de forme <cite>(w,)</cite>, où <cite>w</cite> est le nombre de pixels. Le tableau peut représenter des formats de pixels <strong>BGR</strong> (24 bits) ou <strong>BGRA</strong> (32 bits) ou tout autre format compatible avec le type de données <cite>uint8</cite>. L’opération de flou est effectuée <strong>en place</strong> sur le tableau fourni.</p>
+<p>La fonction effectue <strong>npass</strong> passes de convolution en utilisant un <strong>noyau gaussien 5x5</strong>. Cela peut être utile pour les tâches de traitement d’images où vous devez appliquer un effet de flou, en particulier sur des données de pixels représentées sous forme de tableau 1D (comme lorsque les données de l’image sont aplaties).</p>
+<p><strong>Paramètres :</strong></p>
+<ul class="simple">
+<li><p><strong>bgr_array</strong> (<em>1D numpy.ndarray</em> ou <em>tranche memoryview</em>) : Un tableau 1D ou une tranche de memoryview de forme <cite>(w,)</cite> contenant les données des pixels (par exemple, en <strong>BGR(A)</strong> ou tout autre format de pixel). Le tableau doit être de type <strong>uint8</strong>.</p></li>
+<li><p><strong>largeur</strong> (<em>int</em>) : La largeur (<cite>w</cite>) de l’image originale. Utilisé pour un traitement correct lors de l’opération de flou.</p></li>
+<li><p><strong>hauteur</strong> (<em>int</em>) : La hauteur (<cite>h</cite>) de l’image originale. Nécessaire pour un traitement correct de l’image.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, optionnel) : Le nombre de passes de flou à appliquer. <strong>La valeur par défaut est 1 passe</strong>. Plus de passes donnent un flou plus fort.</p></li>
+<li><p><strong>format_32</strong> (<em>bool</em>) : Un indicateur pour savoir si le format des pixels est <strong>BGR (24 bits)</strong> ou <strong>BGRA (32 bits)</strong>. <cite>False</cite> pour <strong>BGR (24 bits)</strong> (3 canaux) et <cite>True</cite> pour <strong>BGRA (32 bits)</strong> (4 canaux).</p></li>
+</ul>
+<p><strong>Renvoie :</strong></p>
+<ul class="simple">
+<li><p><strong>Aucun</strong> : La fonction effectue le flou en place sur <cite>bgr_array</cite> et ne renvoie pas de valeur.</p></li>
+</ul>
+<p><strong>Notes :</strong></p>
+<ul class="simple">
+<li><p>La fonction utilise la <strong>convolution gaussienne</strong> avec un noyau 5x5 utilisé en deux passes.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\begin{split}\frac{1}{256} \begin{bmatrix}
+1 &amp; 4 &amp; 6 &amp; 4 &amp; 1 \\
+4 &amp; 16 &amp; 24 &amp; 16 &amp; 4 \\
+6 &amp; 24 &amp; 36 &amp; 24 &amp; 6 \\
+4 &amp; 16 &amp; 24 &amp; 16 &amp; 4 \\
+1 &amp; 4 &amp; 6 &amp; 4 &amp; 1
+\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>L’image est traitée en deux passes (horizontale et verticale) pour plus d’efficacité.</p></li>
+<li><p><strong>Gestion des bords</strong> : Les pixels en dehors des limites de l’image sont remplacés par les valeurs des bords adjacents.</p></li>
+<li><p>La fonction fonctionne <strong>en place</strong>, ce qui signifie que le tableau <cite>bgr_array</cite> original est directement modifié.</p></li>
+<li><p>Cette fonction est compatible avec les formats de pixels <strong>BGR</strong> et <strong>BGRA</strong> (ou d’autres formats ayant la même forme et le même type de données).</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur1d_cp">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur1d_cp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_32</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur1d_cp" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Applique un effet de flou à un tampon 1D (tranche de memoryview) et renvoie une copie.</p>
+<p>Cette fonction prend un <strong>tampon 1D ou une tranche de memoryview</strong> contenant les données des pixels au format <strong>BGR(A)</strong> (ou tout autre format de pixel compatible) et applique un <strong>flou gaussien</strong>. Le résultat flouté est renvoyé comme un nouveau tableau, laissant le tampon original inchangé.</p>
+<p>La fonction prend en charge les formats de pixels <strong>24 bits (BGR)</strong> et <strong>32 bits (BGRA)</strong>. Le paramètre <cite>format_32</cite> doit être défini en conséquence :</p>
+<ul class="simple">
+<li><p><strong>`format_32=False`</strong> → pour le format <strong>BGR (24 bits)</strong>.</p></li>
+<li><p><strong>`format_32=True`</strong> → pour le format <strong>BGRA (32 bits)</strong> (inclut un canal alpha).</p></li>
+</ul>
+<p><strong>Exemple d’utilisation :</strong></p>
+<p><strong>Pour une image 24 bits (format BGR) :</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">blur1d_cp</span><span class="p">(</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">get_buffer</span><span class="p">(),</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="n">npass</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">format_32</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="s1">&#39;BGR&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Pour une image 32 bits (format BGRA) :</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">blur1d_cp</span><span class="p">(</span>
+    <span class="n">source</span><span class="o">.</span><span class="n">get_buffer</span><span class="p">(),</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="n">npass</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">format_32</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="s1">&#39;BGRA&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Paramètres :</strong></p>
+<ul class="simple">
+<li><p><strong>bgr_array</strong> (<em>C-buffer, numpy.ndarray, ou tranche de memoryview</em>): Un <strong>tableau 1D</strong> de forme <cite>(w,)</cite> contenant des données de pixels <strong>BGR(A)</strong> (ou tout format compatible).</p></li>
+<li><p><strong>width</strong> (<em>int</em>): La largeur de l’image originale en pixels.</p></li>
+<li><p><strong>height</strong> (<em>int</em>): La hauteur de l’image originale en pixels.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, optionnel): Le nombre de passes de flou à appliquer (<strong>par défaut, 1</strong>). Augmenter cette valeur intensifie l’effet de flou.</p></li>
+<li><p><strong>format_32</strong> (<em>bool</em>): - <cite>True</cite> → format <strong>BGRA (32 bits)</strong> (inclut un canal alpha). - <cite>False</cite> → format <strong>BGR (24 bits)</strong>.</p></li>
+</ul>
+<p><strong>Renvoie :</strong></p>
+<ul class="simple">
+<li><p><strong>numpy.ndarray</strong> ou <strong>tranche de memoryview</strong> (<cite>shape (w,)</cite>, <cite>dtype=uint8</cite>): Une <strong>copie floutée</strong> du tableau d’entrée, maintenant le format de pixel original.</p></li>
+</ul>
+<p><strong>Notes :</strong></p>
+<ul class="simple">
+<li><p>Cette fonction <strong>ne modifie pas le tampon d’entrée</strong>; elle renvoie un <strong>nouveau</strong> tableau flouté.</p></li>
+<li><p>L’opération de flou utilise la <strong>convolution gaussienne</strong> en plusieurs passes.</p></li>
+<li><p>Le <strong>format de pixel du tableau de sortie est identique</strong> à celui du tampon d’entrée.</p></li>
+<li><p>Fournir un indicateur <cite>format_32</cite> approprié garantit une gestion correcte de la transparence alpha.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.gauss_filter24">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">gauss_filter24</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.gauss_filter24" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Appliquez un filtre gaussien 5x5 pour lisser une image ou une surface. Cette fonction effectue un flou gaussien à l’aide d’un noyau de convolution 5x5, ce qui aide à réduire le bruit et les détails dans une image. Il est particulièrement utile pour le prétraitement des images avant la détection des bords ou d’autres tâches de vision par ordinateur.</p>
+<p><strong>Noyau Gaussien 5x5 :</strong></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+5 &amp; 12 &amp; 15 &amp; 12 &amp; 5 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2
+\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>Les valeurs du noyau sont normalisées en interne pour garantir un lissage approprié.</p></li>
+<li><p>Le processus de filtrage préserve mieux les bords qu’un simple flou moyen.</p></li>
+</ul>
+<p><strong>Paramètres :</strong></p>
+<ul class="simple">
+<li><p><strong>surface_ (pygame.Surface, image 24 bits ou 32 bits) :</strong></p></li>
+<li><p>L’image ou la surface d’entrée à flouter.</p></li>
+<li><p>Si une surface 32 bits (avec un canal alpha) est fournie, le canal alpha est ignoré dans la sortie, ce qui donne une image 24 bits.</p></li>
+</ul>
+<p><strong>Renvoie :</strong></p>
+<ul class="simple">
+<li><p><strong>pygame.Surface (image filtrée 24 bits) :</strong> - Une nouvelle surface floutée avec moins de bruit et des transitions de pixels lissées. - L’image de sortie est toujours en 24 bits, même si l’entrée était en 32 bits.</p></li>
+</ul>
+<p><strong>Notes :</strong></p>
+<ul class="simple">
+<li><p>Le flou gaussien est largement utilisé en vision par ordinateur et en graphisme pour réduire le bruit haute fréquence.</p></li>
+<li><p>Cette méthode est optimisée pour la performance et préserve l’intégrité de l’image.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.gauss_filter32">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">gauss_filter32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.gauss_filter32" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Appliquez un filtre de flou gaussien 5x5 à une image ou une surface pygame. Cette fonction lisse une image en la convoluant avec un noyau gaussien 5x5, réduisant le bruit et les détails fins tout en préservant les structures essentielles. Noyau Gaussien 5x5 :</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+5 &amp; 12 &amp; 15 &amp; 12 &amp; 5 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2
+\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>Les valeurs du noyau sont normalisées en interne pour garantir un lissage approprié.</p></li>
+<li><p>Cette méthode aide à éliminer le bruit haute fréquence tout en conservant les structures importantes de l’image.</p></li>
+</ul>
+<p><strong>Paramètres :</strong></p>
+<ul class="simple">
+<li><p><strong>surface_ (pygame.Surface, image 32 bits ou 24 bits) :</strong></p></li>
+<li><p>L’image ou la surface d’entrée à flouter.</p></li>
+<li><p>Les surfaces 24 bits (RGB) et 32 bits (RGBA) sont toutes deux prises en charge.</p></li>
+</ul>
+<p><strong>Renvoie :</strong></p>
+<ul class="simple">
+<li><p>pygame.Surface (image filtrée 32 bits) :</p></li>
+<li><p>Une nouvelle surface floutée où les transitions de pixels sont lissées.</p></li>
+<li><p>Si la surface d’origine inclut une transparence par pixel (canal alpha), elle est préservée dans la sortie.</p></li>
+</ul>
+<p><strong>Notes :</strong></p>
+<ul class="simple">
+<li><p>Le flou gaussien est couramment utilisé dans le prétraitement d’images, la réduction du bruit, et les effets artistiques.</p></li>
+<li><p>Le processus de filtrage est optimisé pour la performance tout en maintenant une haute fidélité de l’image.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.canny3d">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">canny3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.canny3d" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Appliquez la détection de bords de Canny à un tableau 3D ou un tranche de mémoire. L’algorithme de détection de bords de Canny est un processus multi-étapes qui identifie les bords dans une image en détectant les zones avec des changements d’intensité significatifs. Il a été développé par John F. Canny (1986) et reste largement utilisé en vision par ordinateur.</p>
+<p><strong>Étapes de l’algorithme de Canny :</strong></p>
+<ol class="arabic simple">
+<li><p>Calcul du gradient – Détecte les changements d’intensité.</p></li>
+<li><p>Suppression non maximale – Supprime les pixels non-bords.</p></li>
+<li><p>Double seuillage – Filtre les bords faibles.</p></li>
+<li><p>Suivi des bords par hystérésis – Conserve les bords forts.</p></li>
+</ol>
+<p><strong>Paramètres :</strong></p>
+<ul class="simple">
+<li><p><strong>rgb_array</strong> (numpy.ndarray ou memoryviewslice, forme (w, h, n), dtype uint8) : Image d’entrée sous forme de tableau 3D avec RGB(A), BGRA ou d’autres formats de pixels.</p></li>
+<li><p><strong>seuil</strong> (char non signé, par défaut = 50) : Seuil inférieur pour supprimer les bords faibles dans la magnitude du gradient.</p></li>
+<li><p><strong>low</strong> (char non signé, par défaut = 0) : Seuil inférieur d’hystérésis pour le suivi des bords. Les bords faibles en dessous de cette valeur sont éliminés.</p></li>
+<li><p><strong>high</strong> (char non signé, par défaut = 20) : Seuil supérieur d’hystérésis pour le suivi des bords. Les bords forts au-dessus de cette valeur sont conservés.</p></li>
+</ul>
+<p><strong>Renvoie :</strong></p>
+<ul class="simple">
+<li><p>pygame.Surface – Une nouvelle surface/image avec les bords détectés.</p></li>
+</ul>
+<p><strong>Notes :</strong></p>
+<ul class="simple">
+<li><p>Des valeurs <cite>threshold</cite> plus élevées produisent moins de bords (moins de bruit).</p></li>
+<li><p>L’hystérésis (<cite>low</cite>, <cite>high</cite>) garantit que seuls les bords significatifs sont conservés.</p></li>
+<li><p>Cette fonction prend en charge plusieurs formats de pixels et fonctionne directement sur des tableaux 3D.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.canny1d">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">canny1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_32</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.canny1d" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Appliquez la détection de bords de Canny à un tampon 1D, un tableau NumPy, ou une tranche de mémoire. Cette fonction traite un tampon d’image plat (1D) représentant une image en niveaux de gris ou en couleur et applique l’algorithme de détection de bords de Canny pour mettre en évidence les bords.</p>
+<p><strong>Paramètres :</strong></p>
+<ul class="simple">
+<li><p><strong>bgr_array</strong> (numpy.ndarray ou memoryviewslice, forme (w,), dtype uint8) : Tampon 1D contenant des données de pixels en BGR(A), BGR ou d’autres formats.</p></li>
+<li><p><strong>largeur</strong> (int) : Largeur de l’image originale en pixels.</p></li>
+<li><p><strong>hauteur</strong> (int) : Hauteur de l’image originale en pixels.</p></li>
+<li><p><strong>format_32</strong> (bool) : True pour les tampons 32 bits (BGRA, BGRA). False pour les tampons 24 bits (BGR, BGR).</p></li>
+<li><p><strong>seuil</strong> (int, par défaut = 70) : Seuil de magnitude du gradient pour la détection des bords. Des valeurs plus élevées suppriment les bords plus faibles et réduisent le bruit.</p></li>
+</ul>
+<p><strong>Renvoie :</strong></p>
+<ul class="simple">
+<li><p>pygame.Surface – Une nouvelle image avec détection de bords de Canny appliquée.</p></li>
+</ul>
+<p><strong>Notes :</strong></p>
+<ul class="simple">
+<li><p>Cette fonction prend en charge divers formats de pixels (par exemple, RGB, BGR, RGBA, BGRA).</p></li>
+<li><p>Le seuillage affecte la force des bords — ajustez-le pour des résultats optimaux.</p></li>
+<li><p>Fonctionne directement sur un tampon 1D, ce qui le rend efficace en termes de mémoire.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur3d_cp">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur3d_cp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur3d_cp" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Appliquez un effet de flou à un tableau numpy 3D ou à une tranche de mémoire (renvoie une copie). Cette fonction effectue une opération de flou sur un tableau 3D, comme une image, et renvoie une copie floutée. Elle prend en charge les formats RGB(A) ou d’autres formats de pixels, tout en maintenant le format d’origine dans le tableau renvoyé.</p>
+<p><strong>Paramètres :</strong></p>
+<ul class="simple">
+<li><p><strong>rgb_array</strong> (numpy.ndarray ou memoryviewslice, forme (w, h, n), dtype uint8) : Tableau 3D contenant des données de pixels en RGB(A) ou tout format compatible (par exemple, BGRA). La forme doit être (largeur, hauteur, canaux) où les canaux représentent typiquement les composants de couleur (3 pour RGB, 4 pour RGBA, etc.).</p></li>
+</ul>
+<p><strong>Renvoie :</strong></p>
+<ul class="simple">
+<li><p>numpy.ndarray : Un nouveau tableau (copie floutée) avec la même forme et le même format de pixel que <cite>rgb_array</cite>. Le tableau renvoyé aura la même largeur, hauteur et format de pixel que l’entrée, mais avec l’effet de flou appliqué.</p></li>
+</ul>
+<p><strong>Notes :</strong></p>
+<ul class="simple">
+<li><p>La fonction ne modifie pas le tableau d’entrée sur place ; elle renvoie un nouveau tableau flouté.</p></li>
+<li><p>La sortie conservera les mêmes canaux de couleur (par exemple, RGB ou RGBA).</p></li>
+</ul>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table des matières</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">GaussianBlur5x5</a><ul>
+<li><a class="reference internal" href="#summary-of-the-library">1. Résumé de la bibliothèque</a></li>
+<li><a class="reference internal" href="#purpose">2. Objectif</a></li>
+<li><a class="reference internal" href="#main-features">3. Fonctionnalités principales</a></li>
+<li><a class="reference internal" href="#use-cases">4. Cas d’utilisation</a></li>
+<li><a class="reference internal" href="#conclusion">5. Conclusion</a></li>
+<li><a class="reference internal" href="#cython-list-methods">6. Méthodes de liste Cython</a><ul>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur"><code class="docutils literal notranslate"><span class="pre">blur()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur3d"><code class="docutils literal notranslate"><span class="pre">blur3d()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur1d_cp"><code class="docutils literal notranslate"><span class="pre">blur1d_cp()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.gauss_filter24"><code class="docutils literal notranslate"><span class="pre">gauss_filter24()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.gauss_filter32"><code class="docutils literal notranslate"><span class="pre">gauss_filter32()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.canny3d"><code class="docutils literal notranslate"><span class="pre">canny3d()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.canny1d"><code class="docutils literal notranslate"><span class="pre">canny1d()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur3d_cp"><code class="docutils literal notranslate"><span class="pre">blur3d_cp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Sujet précédent</h4>
+    <p class="topless"><a href="Misc.html"
+                          title="Chapitre précédent">Misc</a></p>
+  </div>
+  <div>
+    <h4>Sujet suivant</h4>
+    <p class="topless"><a href="BurstSurface.html"
+                          title="Chapitre suivant">BurstSurface</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Cette page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/GaussianBlur5x5.rst.txt"
+            rel="nofollow">Montrer le code source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Recherche rapide</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Index général"
+             >index</a></li>
+        <li class="right" >
+          <a href="BurstSurface.html" title="BurstSurface"
+             >suivant</a> |</li>
+        <li class="right" >
+          <a href="Misc.html" title="Misc"
+             >précédent</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Documentation PygameShader 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">GaussianBlur5x5</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Créé en utilisant <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

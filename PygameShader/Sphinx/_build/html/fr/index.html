@@ -1,0 +1,484 @@
+
+<!DOCTYPE html>
+
+<html lang="fr" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Bienvenue dans la documentation de PygameShader ! &#8212; Documentation PygameShader 1.0.11</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=1b8a1eab"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=e6b791cb"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Recherche" href="search.html" />
+    <link rel="next" title="Shader" href="Shader.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Index général"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Shader.html" title="Shader"
+             accesskey="N">suivant</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Documentation PygameShader 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Bienvenue dans la documentation de PygameShader !</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="welcome-to-pygameshader-s-documentation">
+<h1>Bienvenue dans la documentation de PygameShader !<a class="headerlink" href="#welcome-to-pygameshader-s-documentation" title="Lien vers cette rubrique">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">info.pyx</span></code></p>
+</section>
+<hr class="docutils" />
+<section id="pygame-shader-project">
+<h1>1. Projet Pygame Shader<a class="headerlink" href="#pygame-shader-project" title="Lien vers cette rubrique">¶</a></h1>
+<p><strong>PygameShader</strong> est un <strong>wrapper autour de la bibliothèque Pygame</strong>, écrit en <strong>Python</strong>, <strong>Cython</strong> et <strong>C</strong>, conçu pour ajouter des <strong>effets visuels avancés</strong> aux applications multimédias, y compris les <strong>jeux vidéo 2D indépendants, les jeux d’arcade et le traitement d’image en temps réel</strong> pour les flux vidéo et caméra.</p>
+<p>Cette bibliothèque étend <strong>Pygame</strong> en permettant aux développeurs d’appliquer des <strong>shaders</strong> ou des processeurs de texture aux <strong>textures des sprites</strong>, aux <strong>surfaces SDL</strong> et à l’ensemble de l’affichage du jeu, améliorant considérablement l’expérience visuelle avec une surcharge minimale en performances.</p>
+<p><strong>Formats d’image/surface pris en charge</strong></p>
+<p>PygameShader prend en charge plusieurs formats d’image, notamment <strong>BMP, GIF (non animé), JPEG et PNG</strong>. Cependant, Pygame peut ne pas toujours être compilé avec le support de tous ces formats. Au minimum, <strong>BMP</strong> est toujours disponible.</p>
+<p>Pour vérifier si des formats d’image supplémentaires sont pris en charge, exécutez :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pygame</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">get_extended</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Si la commande retourne <code class="docutils literal notranslate"><span class="pre">True</span></code>, alors les formats <strong>PNG, JPG et GIF</strong> sont également pris en charge.</p>
+<p><strong>Performances et optimisation</strong></p>
+<p>PygameShader est optimisé pour le <strong>rendu en temps réel à 60 FPS</strong>, en particulier pour les <strong>résolutions moyennes (1024x768)</strong>. Cependant, les performances dépendent de la complexité du shader.</p>
+<p>Certains effets, comme le <strong>filtrage médian, la vision de prédateur et l’effet cartoon</strong>, nécessitent plusieurs shaders pour créer des effets composites, ce qui les rend plus exigeants en calcul. La plupart des shaders maintiendront des <strong>performances fluides à des résolutions moyennes</strong>, mais les résolutions plus élevées peuvent affecter les taux d’images.</p>
+<p>Pour le <strong>texturage des sprites et les effets spéciaux</strong>, PygameShader reste <strong>extrêmement rapide</strong>, grâce aux <strong>optimisations basées sur Cython</strong>. Pour maintenir un taux d’images élevé, il est recommandé de conserver les tailles de texture des sprites SDL dans une limite de <strong>200x200 pixels</strong> afin d’éviter une surcharge inutile du traitement.</p>
+<p><strong>Caractéristiques</strong></p>
+<ul class="simple">
+<li><p><strong>Effets de shaders</strong> – Améliorez les visuels de votre jeu avec des techniques de shading avancées.</p></li>
+<li><p><strong>Rendu en temps réel</strong> – Appliquez des effets à l’ensemble de l’affichage du jeu à des fréquences d’images élevées.</p></li>
+<li><p><strong>Optimisé pour la vitesse</strong> – Une implémentation efficace en <strong>Cython</strong> garantit des performances fluides.</p></li>
+<li><p><strong>Personnalisation des sprites et des surfaces</strong> – Modifiez dynamiquement les textures et les surfaces.</p></li>
+</ul>
+<p>PygameShader propose des outils puissants pour <strong>améliorer l’esthétique visuelle</strong> de votre jeu, que ce soit en améliorant les textures des sprites ou en appliquant des effets visuels plein écran.</p>
+</section>
+<section id="gpu-shaders-with-cupy-cuda">
+<h1>2. Shaders GPU avec CuPy et CUDA<a class="headerlink" href="#gpu-shaders-with-cupy-cuda" title="Lien vers cette rubrique">¶</a></h1>
+<p>Certains scripts ont été portés sur le <strong>GPU</strong> en utilisant <strong>CuPy</strong> et les <strong>noyaux bruts CUDA</strong>, leur permettant de fonctionner sur des <strong>cartes graphiques NVIDIA (Compute Capability 3.0 ou supérieur)</strong>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Ces shaders sont compatibles <strong>uniquement avec les chipsets NVIDIA</strong>.</p>
+</div>
+<p><strong>Pré-requis</strong></p>
+<p>Pour utiliser les shaders GPU, vous devez avoir :</p>
+<ul class="simple">
+<li><p>La bibliothèque <strong>CuPy</strong> installée.</p></li>
+<li><p>Le <strong>CUDA Toolkit</strong> installé (versions supportées : <code class="docutils literal notranslate"><span class="pre">v10.2</span> <span class="pre">-</span> <span class="pre">v11.6</span></code>).</p></li>
+</ul>
+<p>Pour les instructions d’installation, consultez le <a class="reference external" href="https://docs.cupy.dev/en/stable/install.html">guide d’installation de CuPy</a>.</p>
+<p><strong>Statut expérimental et considérations de performance</strong></p>
+<p>Les <strong>shaders GPU sont expérimentaux</strong> et peuvent être <strong>limités par la bande passante PCI Express</strong>, en particulier pour le <strong>rendu en temps réel</strong>.</p>
+<p>Pour un exemple de rendu GPU en temps réel d’un <code class="docutils literal notranslate"><span class="pre">pygame.Surface</span></code>, consultez :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Demo/GPU_demo_ripple.py
+</pre></div>
+</div>
+<p><strong>Comparaison : GLSL vs. CUDA</strong></p>
+<p>Bien que <strong>GLSL</strong> surpasse CuPy/CUDA en termes de performances graphiques brutes, CUDA excelle dans <strong>l’accélération des calculs parallèles généraux</strong>, initialement conçus pour les <strong>architectures CPU</strong> (Python &amp; Cython).</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Caractéristique</p></th>
+<th class="head"><p>GLSL (Langage de shading)</p></th>
+<th class="head"><p>CUDA</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Utilisation principale</strong></p></td>
+<td><p>Rendu graphique</p></td>
+<td><p>Shaders de calcul</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Compilation</strong></p></td>
+<td><p>Code shader</p></td>
+<td><p>PTX (Assemblage NVIDIA)</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Flexibilité</strong></p></td>
+<td><p>Nécessite une API graphique</p></td>
+<td><p>Exécution indépendante</p></td>
+</tr>
+</tbody>
+</table>
+<p>Pour plus d’informations, consultez ce <a class="reference external" href="https://carpentries-incubator.github.io/lesson-gpu-programming/aio/index.html">guide de programmation GPU</a>.</p>
+<p><strong>Utilisation en Python</strong></p>
+<p>Pour importer des shaders GPU :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">PygameShader.shader_gpu</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+<p><strong>Démo</strong></p>
+<p>Pour exécuter les démos depuis le répertoire <code class="docutils literal notranslate"><span class="pre">Demo</span></code> (Appuyez sur <code class="docutils literal notranslate"><span class="pre">ESC</span></code> pour quitter) :</p>
+<p><strong>Démos de shaders CPU</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>demo_fire.py
+python<span class="w"> </span>demo_transition.py
+python<span class="w"> </span>demo_wave.py
+</pre></div>
+</div>
+<p><strong>Démos de shaders GPU (nécessite CuPy &amp; CUDA)</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>gpu_chromatic.py
+python<span class="w"> </span>gpu_zoom.py
+python<span class="w"> </span>gpu_wave.py
+</pre></div>
+</div>
+<p><strong>Intégration facile avec diverses bibliothèques telles que Pillow, OpenCV, Scikit-image</strong></p>
+<p><strong>Pygame</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">WIDTH</span> <span class="o">=</span> <span class="mi">1280</span>
+<span class="n">HEIGHT</span> <span class="o">=</span> <span class="mi">1024</span>
+<span class="n">SCREEN</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">set_mode</span><span class="p">((</span><span class="n">WIDTH</span><span class="p">,</span> <span class="n">HEIGHT</span><span class="p">))</span>
+<span class="c1"># load an image</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../Assets/Aliens.jpg&quot;</span><span class="p">)</span>
+<span class="hll"><span class="n">bgr</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>  <span class="c1"># use bgr(image, True) for 32-bit images</span>
+</span></pre></div>
+</div>
+<p><strong>Pillow</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">PIL</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="c1"># load 24-bit image</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../Assets/background.jpg&quot;</span><span class="p">)</span>
+<span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span>
+<span class="n">rgb_array_</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">rgb_array_</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="hll"><span class="n">bgr_1d</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+</span><span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">frombytes</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">arr</span><span class="p">)</span>
+<span class="n">image</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># load 32-bit image</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../Assets/px.png&quot;</span><span class="p">)</span>
+<span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span>
+<span class="n">rgb_array_</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">rgb_array_</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">bgr_1d</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">frombytes</span><span class="p">(</span><span class="s1">&#39;RGBA&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">arr</span><span class="p">)</span>
+<span class="n">image</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>OpenCV</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
+<span class="c1"># load 24-bit image</span>
+<span class="hll"><span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s2">&quot;../Assets/background.jpg&quot;</span><span class="p">)</span>
+</span><span class="n">bgr_1d</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+<span class="c1"># load 32-bit image</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s2">&quot;../Assets/px.png&quot;</span><span class="p">)</span>
+<span class="n">bgr_1d</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">cv2</span><span class="o">.</span><span class="n">destroyAllWindows</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Scikit-image</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">skimage</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ski</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;TkAgg&#39;</span><span class="p">)</span>
+<span class="c1"># load 24-bit image</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;../Assets/background.jpg&#39;</span>
+<span class="hll"><span class="n">rgb_array</span> <span class="o">=</span> <span class="n">ski</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</span><span class="n">bgr_1d</span><span class="p">(</span><span class="n">rgb_array</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rgb_array</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># load 32-bit image</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;../Assets/px.png&#39;</span>
+<span class="n">rgb_array</span> <span class="o">=</span> <span class="n">ski</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+<span class="n">bgr_1d</span><span class="p">(</span><span class="n">rgb_array</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rgb_array</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="installation">
+<h1>3. Installation<a class="headerlink" href="#installation" title="Lien vers cette rubrique">¶</a></h1>
+<p><strong>Installation via pip</strong></p>
+<p>Vérifiez la dernière version : <a class="reference external" href="https://pypi.org/project/PygameShader/">PygameShader sur PyPI</a></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>PygameShader
+</pre></div>
+</div>
+<p><strong>Versions Python prises en charge :</strong> <code class="docutils literal notranslate"><span class="pre">3.6</span> <span class="pre">-</span> <span class="pre">3.11</span></code> <strong>Plateformes :</strong> Windows &amp; Linux (<code class="docutils literal notranslate"><span class="pre">x86</span></code>, <code class="docutils literal notranslate"><span class="pre">x86_64</span></code>)</p>
+<p>Vérifiez la version installée :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">PygameShader.shader</span><span class="w"> </span><span class="kn">import</span> <span class="n">__VERSION__</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">__VERSION__</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Installer à partir du code source</strong></p>
+<section id="linux">
+<h2>Linux<a class="headerlink" href="#linux" title="Lien vers cette rubrique">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tar<span class="w"> </span>-xvf<span class="w"> </span>source-1.0.8.tar.gz
+<span class="nb">cd</span><span class="w"> </span>PygameShader-1.0.8
+python3<span class="w"> </span>setup.py<span class="w"> </span>bdist_wheel
+<span class="nb">cd</span><span class="w"> </span>dist
+pip3<span class="w"> </span>install<span class="w"> </span>PygameShader-xxxxxx
+</pre></div>
+</div>
+</section>
+<section id="windows">
+<h2>Windows<a class="headerlink" href="#windows" title="Lien vers cette rubrique">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup.py<span class="w"> </span>bdist_wheel
+<span class="nb">cd</span><span class="w"> </span>dist
+pip<span class="w"> </span>install<span class="w"> </span>PygameShader-xxxxxx
+</pre></div>
+</div>
+<p><strong>Compilation du code Cython &amp; C</strong></p>
+<p><strong>Quand devez-vous compiler le code Cython ?</strong></p>
+<p>Si vous modifiez des fichiers <code class="docutils literal notranslate"><span class="pre">.pyx</span></code> ou <code class="docutils literal notranslate"><span class="pre">.pxd</span></code> (par exemple, <code class="docutils literal notranslate"><span class="pre">shader.pyx</span></code>, <code class="docutils literal notranslate"><span class="pre">shader.pxd</span></code>, <code class="docutils literal notranslate"><span class="pre">__init__.pxd</span></code>), recompilez en utilisant :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup_shader.py<span class="w"> </span>build_ext<span class="w"> </span>--inplace<span class="w"> </span>--force
+</pre></div>
+</div>
+<p>Pour une version spécifique de Python, utilisez :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3.8<span class="w"> </span>setup_shader.py<span class="w"> </span>build_ext<span class="w"> </span>--inplace
+</pre></div>
+</div>
+<p>Si la compilation échoue, assurez-vous que :</p>
+<ul class="simple">
+<li><p><strong>Cython &amp; un compilateur C</strong> (MSVC, MinGW, GCC) sont installés.</p></li>
+<li><p><strong>Les en-têtes de développement Python</strong> sont disponibles.</p></li>
+</ul>
+<p>Pour les utilisateurs de Windows, consultez ce guide : <a class="reference external" href="https://devblogs.microsoft.com/python/unable-to-find-vcvarsall-bat/">Configuration du compilateur VC++</a>.</p>
+</section>
+</section>
+<section id="openmp-for-multi-threaded-processing">
+<h1>4. OpenMP pour le traitement multi-thread<a class="headerlink" href="#openmp-for-multi-threaded-processing" title="Lien vers cette rubrique">¶</a></h1>
+<p>Par défaut, PygameShader est compilé avec <strong>le support du traitement parallèle (OpenMP)</strong>.</p>
+<p>Pour <strong>désactiver OpenMP</strong>, mettez à jour <code class="docutils literal notranslate"><span class="pre">config.py</span></code> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Enable/disable multi-processing</span>
+<span class="n">OPENMP</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">OPENMP_PROC</span> <span class="o">=</span> <span class="s2">&quot;-fopenmp&quot;</span>
+</pre></div>
+</div>
+<p>Puis reconstruisez :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>setup.py<span class="w"> </span>bdist_wheel
+<span class="nb">cd</span><span class="w"> </span>dist
+pip<span class="w"> </span>install<span class="w"> </span>PygameShader-xxxxxx.whl
+</pre></div>
+</div>
+</section>
+<section id="credits">
+<h1>5. Crédits<a class="headerlink" href="#credits" title="Lien vers cette rubrique">¶</a></h1>
+<p><strong>Auteur :</strong> Yoann Berenguer</p>
+</section>
+<section id="dependencies">
+<h1>6. Dépendances<a class="headerlink" href="#dependencies" title="Lien vers cette rubrique">¶</a></h1>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>numpy<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">1</span>.18
+pygame<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">2</span>.4.0
+cython<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">3</span>.0.2
+setuptools<span class="w"> </span>~<span class="o">=</span><span class="w"> </span><span class="m">54</span>.1.1
+cupy<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">9</span>.6.0<span class="w">  </span><span class="c1"># (Optional, for GPU shaders)</span>
+</pre></div>
+</div>
+</section>
+<section id="license">
+<h1>7. Licence<a class="headerlink" href="#license" title="Lien vers cette rubrique">¶</a></h1>
+<p><strong>Licence publique générale GNU version 3 (GPLv3)</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>© 2019 Yoann Berenguer
+© 2007 Free Software Foundation, Inc. &lt;https://fsf.org/&gt;
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+</pre></div>
+</div>
+</section>
+<section id="running-tests">
+<h1>8. Exécution des tests<a class="headerlink" href="#running-tests" title="Lien vers cette rubrique">¶</a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">PygameShader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PygameShader.tests.test_shader</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_testsuite</span>
+<span class="n">run_testsuite</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="libraries">
+<h1>9. Bibliothèques<a class="headerlink" href="#libraries" title="Lien vers cette rubrique">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Shader.html">Shader</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Shader.html#high-performance-image-processing-library">1. Bibliothèque de traitement d’image haute performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Shader.html#key-features">2. Fonctionnalités principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Shader.html#library-functional-overview">3. Aperçu fonctionnel de la bibliothèque</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Shader.html#target-applications">4. Applications ciblées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Shader.html#summary">5. Résumé</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Shader.html#cython-list-methods">6. Méthodes de liste en Cython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Shader_gpu.html">Shader_gpu</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Shader_gpu.html#gpu-accelerated-image-processing-library">1. Bibliothèque de traitement d’images accélérée par GPU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Shader_gpu.html#key-features-use-cases">2. Principales fonctionnalités et cas d’utilisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Shader_gpu.html#use-case">3. Cas d’utilisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Shader_gpu.html#potential-applications">4. Applications potentielles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Shader_gpu.html#summary">5. Résumé</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Shader_gpu.html#cython-list-methods">6. Méthodes de liste en Cython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="PygameTools.html">PygameTools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="PygameTools.html#purpose-of-this-library">1. Objectif de cette bibliothèque</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PygameTools.html#key-features">2. Fonctionnalités principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PygameTools.html#library-functional-overview">3. Aperçu des fonctionnalités de la bibliothèque</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PygameTools.html#target-applications">4. Applications ciblées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PygameTools.html#summary">5. Résumé</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PygameTools.html#cython-list-methods">6. Liste des méthodes Cython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="RGBConvert.html">RGBConvert</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="RGBConvert.html#color-space-conversion-library">1. Bibliothèque de conversion de l’espace colorimétrique</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RGBConvert.html#purpose-of-the-library">2. Objectif de la bibliothèque</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RGBConvert.html#key-functions-and-their-roles">3. Fonctions principales et leurs rôles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RGBConvert.html#optimization-features">4. Fonctionnalités d’optimisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RGBConvert.html#use-cases">5. Cas d’utilisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RGBConvert.html#conclusion">6. Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="RGBConvert.html#cython-list-methods">7. Méthodes de liste Cython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Sprites.html">Sprites</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Sprites.html#sprite-and-group-management">1. Gestion des Sprites et des Groupes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Sprites.html#purpose">2. Objectif</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Sprites.html#sprite-class">3. Classe Sprite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Sprites.html#summary">4. Résumé</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Palette.html">Palette</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Palette.html#library-overview">1. Aperçu de la bibliothèque</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Palette.html#key-concepts">2. Concepts clés</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Palette.html#purpose-of-the-library">3. Objectif de la bibliothèque</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Palette.html#use-cases">4. Cas d’utilisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Palette.html#conclusion">5. Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Palette.html#cython-list-methods">6. Méthodes de liste Cython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Misc.html">Misc</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Misc.html#python-library-summary">1. Résumé de la bibliothèque Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Misc.html#overall-purpose-of-the-library">2. Objectif global de la bibliothèque</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Misc.html#use-cases">3. Cas d’utilisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Misc.html#conclusion">4. Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Misc.html#cython-list-methods">5. Méthodes de liste Cython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="GaussianBlur5x5.html">GaussianBlur5x5</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="GaussianBlur5x5.html#summary-of-the-library">1. Résumé de la bibliothèque</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GaussianBlur5x5.html#purpose">2. Objectif</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GaussianBlur5x5.html#main-features">3. Fonctionnalités principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GaussianBlur5x5.html#use-cases">4. Cas d’utilisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GaussianBlur5x5.html#conclusion">5. Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="GaussianBlur5x5.html#cython-list-methods">6. Méthodes de liste Cython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="BurstSurface.html">BurstSurface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="BurstSurface.html#cython-burst-surface-library">1. Bibliothèque Cython Burst Surface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BurstSurface.html#key-features">2. Caractéristiques principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BurstSurface.html#library-functional-overview">3. Aperçu fonctionnel de la bibliothèque</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BurstSurface.html#target-applications">4. Applications cibles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BurstSurface.html#cython-functions">5. Fonctions Cython</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BurstSurface.html#summary">6. Résumé</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BurstSurface.html#cython-method-list">7. Liste des méthodes Cython</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="BlendFlags.html">BlendFlags</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="BlendFlags.html#key-features-purpose">1. Caractéristiques principales et objectif</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BlendFlags.html#possible-use-cases">2. Cas d’utilisation possibles</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Fire.html">Procedural Fire and Cloud Effects Library</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="Fire.html#purpose-of-the-library">1. Objectif de la bibliothèque</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Fire.html#key-functions">2. Fonctions principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Fire.html#core-features">3. Fonctionnalités principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Fire.html#typical-workflow">Flux de travail typique</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Fire.html#example-use-cases">4. Cas d’utilisation exemples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Fire.html#summary">5. Résumé</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Fire.html#video-samples">6. Exemples vidéo</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="#">Table des matières</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Bienvenue dans la documentation de PygameShader !</a></li>
+<li><a class="reference internal" href="#pygame-shader-project">1. Projet Pygame Shader</a></li>
+<li><a class="reference internal" href="#gpu-shaders-with-cupy-cuda">2. Shaders GPU avec CuPy et CUDA</a></li>
+<li><a class="reference internal" href="#installation">3. Installation</a><ul>
+<li><a class="reference internal" href="#linux">Linux</a></li>
+<li><a class="reference internal" href="#windows">Windows</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#openmp-for-multi-threaded-processing">4. OpenMP pour le traitement multi-thread</a></li>
+<li><a class="reference internal" href="#credits">5. Crédits</a></li>
+<li><a class="reference internal" href="#dependencies">6. Dépendances</a></li>
+<li><a class="reference internal" href="#license">7. Licence</a></li>
+<li><a class="reference internal" href="#running-tests">8. Exécution des tests</a></li>
+<li><a class="reference internal" href="#libraries">9. Bibliothèques</a></li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Sujet suivant</h4>
+    <p class="topless"><a href="Shader.html"
+                          title="Chapitre suivant">Shader</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Cette page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Montrer le code source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Recherche rapide</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Index général"
+             >index</a></li>
+        <li class="right" >
+          <a href="Shader.html" title="Shader"
+             >suivant</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Documentation PygameShader 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Bienvenue dans la documentation de PygameShader !</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Créé en utilisant <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

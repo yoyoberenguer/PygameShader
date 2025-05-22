@@ -1,0 +1,1318 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PygameTools &#8212; PygameShader 1.0.11 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=9306f2a9"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RGBConvert" href="RGBConvert.html" />
+    <link rel="prev" title="Shader_gpu" href="Shader_gpu.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="RGBConvert.html" title="RGBConvert"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Shader_gpu.html" title="Shader_gpu"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PygameTools</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="pygametools">
+<h1>PygameTools<a class="headerlink" href="#pygametools" title="Link to this heading">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">PygameTools.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="purpose-of-this-library">
+<h2>1. Purpose of This Library<a class="headerlink" href="#purpose-of-this-library" title="Link to this heading">¶</a></h2>
+<p>This library is designed for <strong>high-performance image processing</strong> with a focus on <strong>efficiency and low-level memory management</strong>.
+It leverages <strong>Cython and NumPy</strong> to provide fast image operations, including <strong>resizing, format conversions, pixel manipulations, and color channel analysis</strong>.
+By using memory views and Cython optimizations, the library ensures minimal overhead when processing images in <strong>RGB and RGBA formats</strong>.</p>
+</section>
+<section id="key-features">
+<h2>2. Key Features<a class="headerlink" href="#key-features" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Efficient Image Manipulation</strong>: Functions to resize, transform, and reformat images with minimal processing overhead.</p></li>
+<li><p><strong>Memory-Efficient Buffer Handling</strong>: Converts images to and from compact buffer representations for efficient storage and processing.</p></li>
+<li><p><strong>Pixel-Level Operations</strong>: Supports pixel indexing, blending, and mapping/unmapping between color representations.</p></li>
+<li><p><strong>Alpha Channel Handling</strong>: Enables operations such as alpha removal, binary masking, and blending with transparency.</p></li>
+<li><p><strong>Performance Optimizations</strong>: Uses Cython’s <cite>nogil</cite> operations for multi-threading and fast execution.</p></li>
+<li><p><strong>Comparison and Analysis Tools</strong>: Functions for comparing PNG images and analyzing color channels.</p></li>
+</ul>
+</section>
+<section id="library-functional-overview">
+<h2>3. Library Functional Overview<a class="headerlink" href="#library-functional-overview" title="Link to this heading">¶</a></h2>
+<p>This library provides several core functionalities for working with images:</p>
+<p><strong>Image Resizing &amp; Buffer Manipulation</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">resize_array()</span></code>: Resize an RGB image efficiently.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bufferize()</span></code> / <code class="docutils literal notranslate"><span class="pre">unbufferize()</span></code>: Convert images to and from compact buffer formats.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flip_bgra_buffer()</span></code> / <code class="docutils literal notranslate"><span class="pre">bgr_buffer_transpose()</span></code>: Perform buffer-based transformations.</p></li>
+</ul>
+<p><strong>Pixel Mapping &amp; Indexing</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mapping_array()</span></code> / <code class="docutils literal notranslate"><span class="pre">unmapping_array()</span></code>: Convert RGB images to indexed formats and vice versa.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">index3d_to_1d()</span></code> / <code class="docutils literal notranslate"><span class="pre">index1d_to_3d()</span></code>: Handle pixel coordinate transformations.</p></li>
+</ul>
+<p><strong>Alpha Channel Processing</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RemoveAlpha()</span></code>: Strip the alpha channel from an RGBA image.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make_rgba_array()</span></code>: Combine an RGB image with an alpha mask.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">binary_mask()</span></code>: Generate binary masks from alpha values.</p></li>
+</ul>
+<p><strong>Image Blending &amp; Comparison</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">blend_pixel_mapped_arrays()</span></code>: Blend images using mapped pixel values.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">compare_png24bit()</span></code> / <code class="docutils literal notranslate"><span class="pre">compare_png32bit()</span></code>: Compare images for similarity.</p></li>
+</ul>
+<p><strong>Image Analysis</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_rgb_channel_means()</span></code>: Compute average color values per channel.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">analyze_image_channels()</span></code>: Extract statistical insights from an image.</p></li>
+</ul>
+</section>
+<section id="target-applications">
+<h2>4. Target Applications<a class="headerlink" href="#target-applications" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Game Development</strong>: Handling and processing game textures efficiently.</p></li>
+<li><p><strong>Computer Vision</strong>: Preprocessing images for machine learning models.</p></li>
+<li><p><strong>Graphics Software</strong>: Performing transformations, blending, and format conversions.</p></li>
+<li><p><strong>Embedded Systems</strong>: Optimized image handling in memory-constrained environments.</p></li>
+<li><p><strong>Scientific Image Analysis</strong>: Extracting statistics and performing pixel-level computations.</p></li>
+</ul>
+</section>
+<section id="summary">
+<h2>5. Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>This <strong>Cython-based image processing library</strong> provides <strong>high-performance image transformations, buffer manipulation, and alpha channel handling</strong>.
+With optimized <strong>resizing, mapping, blending, and analysis functions</strong>, it is designed for applications needing <strong>fast, memory-efficient image processing</strong>.
+Its <strong>low-level optimizations</strong> make it particularly well-suited for <strong>real-time graphics, computer vision, and game development</strong>.</p>
+</section>
+<section id="cython-list-methods">
+<h2>6. Cython list methods<a class="headerlink" href="#cython-list-methods" title="Link to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.RemoveAlpha">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">RemoveAlpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgba_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.RemoveAlpha" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Convert an RGBA or BGRA array to RGB by removing the alpha channel.</p>
+<p>This function is used to process images with an alpha transparency channel
+and convert them to a format with no alpha, reducing a 32-bit image to a 24-bit image.</p>
+<p>The function accepts a 3D numpy array or memoryview containing RGBA/BGRA data,
+and outputs a new 3D array with the alpha channel removed (RGB).</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rgb_array</span> <span class="o">=</span> <span class="n">RemoveAlpha</span><span class="p">(</span><span class="n">rgba_array</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>rgba_array<span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A numpy array or memoryviewslice with shape (w, h, 4) and dtype uint8.
+The array represents an image in RGBA or BGRA format (with alpha transparency).</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>numpy.ndarray</dt><dd><p>A new numpy array with shape (w, h, 3) and dtype uint8, containing the RGB
+values (with no alpha transparency).</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>ValueError</dt><dd><p>If the input array does not have the expected shape (w, h, 4).</p>
+</dd>
+<dt>TypeError</dt><dd><p>If the input array is not of type uint8.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.resize_array">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">resize_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.resize_array" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Rescale an array (returning a new array).</p>
+<p>This function rescales a 3D RGB or RGBA array (of type uint8)
+to a new width and height. The output will have the shape (w2, h2, 3|4),
+preserving the number of channels (3 for RGB or 4 for RGBA).</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">resize_array</span><span class="p">(</span><span class="n">rgb_array</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>rgb_array<span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A numpy array or memoryviewslice of shape (w, h, 3|4).
+Contains pixels in RGB or RGBA format (uint8).</p>
+</dd>
+<dt>w2<span class="classifier">int</span></dt><dd><p>The width of the output array.</p>
+</dd>
+<dt>h2<span class="classifier">int</span></dt><dd><p>The height of the output array.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>numpy.ndarray or memoryview</dt><dd><p>A new array with the shape (w2, h2, 3|4) and type uint8.
+The format of the pixel data (RGB or RGBA) is the same as the input.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>ValueError</dt><dd><p>If the input array does not have a valid shape (w, h, 3|4) or the <cite>bit_size</cite> is not supported.</p>
+</dd>
+<dt>TypeError</dt><dd><p>If the input array is not of type uint8.</p>
+</dd>
+<dt>TypeError</dt><dd><p>If the input is not a numpy array or memoryviewslice, or if the data type is not uint8.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.resize_array_c">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">resize_array_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.resize_array_c" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Array rescale (return a new array)</p>
+<p>This function rescales an image array in RGB or RGBA format (uint8) to a specified width (<cite>w2</cite>)
+and height (<cite>h2</cite>). The resulting array maintains the pixel format of the input and has a shape
+of (w2, h2, 3|4).</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new_array</span> <span class="o">=</span> <span class="n">resize_array_c</span><span class="p">(</span><span class="n">rgb_array</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>rgb_array<span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 3D array with a shape of (w, h, 3|4) representing the pixel data of the image.
+The array must be in RGB (3 channels) or RGBA (4 channels) format and have a dtype of uint8.</p>
+</dd>
+<dt>w2<span class="classifier">int</span></dt><dd><p>The width of the resized image. Must be a positive integer greater than 0.</p>
+</dd>
+<dt>h2<span class="classifier">int</span></dt><dd><p>The height of the resized image. Must be a positive integer greater than 0.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>memoryview</dt><dd><p>A resized image array with shape (w2, h2, 3|4), dtype uint8, and the same pixel format
+(RGB or RGBA) as the input.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>w2</cite> or <cite>h2</cite> is not greater than 0, or if the shape of <cite>rgb_array</cite> is not understood
+(must be (w, h, 3|4)).</p>
+</dd>
+<dt>TypeError</dt><dd><p>If <cite>rgb_array</cite> is not a numpy.ndarray or memoryviewslice, or if its dtype is not uint8.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.make_rgba_array">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">make_rgba_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.make_rgba_array" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Create RGBA array from RGB and Alpha arrays.</p>
+<p>This function generates a new RGBA memoryview array by combining an RGB array
+(shape (w, h, 3)) and an Alpha array (shape (w, h)). The resulting RGBA array has
+a shape of (w, h, 4) or (h, w, 4) if <cite>transpose_</cite> is set to <cite>True</cite>. The function
+is useful for creating images with transparency, such as 32-bit PNG images.</p>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">im</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../Assets/px.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+<span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">get_width</span><span class="p">(),</span> <span class="n">im</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span>
+<span class="n">rgb</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels3d</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels_alpha</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+<span class="n">rgba</span> <span class="o">=</span> <span class="n">make_rgba_array</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">transpose_</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">surf</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">rgba</span><span class="p">,</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span> <span class="s2">&quot;RGBA&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt><strong>rgb_</strong><span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 3D array with shape (w, h, 3) containing RGB pixel values (uint8). The dimensions
+must match the <cite>alpha_</cite> array.</p>
+</dd>
+<dt><strong>alpha_</strong><span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 2D array with shape (w, h) containing alpha (transparency) values (uint8). The
+dimensions must match the <cite>rgb_</cite> array.</p>
+</dd>
+<dt><strong>transpose_</strong><span class="classifier">bool</span></dt><dd><p>A flag to indicate if the output array should be transposed. If <cite>True</cite>, the shape
+of the output will be (h, w, 4) instead of (w, h, 4).</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>memoryview</dt><dd><p>A Cython memoryview with shape (w, h, 4) or (h, w, 4) containing RGBA pixel
+values (uint8). This array can be directly used for image processing or converted
+to a numpy.ndarray.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>TypeError</dt><dd><p>If <cite>rgb_</cite> or <cite>alpha_</cite> is not a numpy.ndarray or memoryviewslice, or if the data
+type is not uint8.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If the dimensions of <cite>rgb_</cite> and <cite>alpha_</cite> do not match.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Notes</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Both input arrays (<cite>rgb_</cite> and <cite>alpha_</cite>) must be of uint8 data type.</p></li>
+<li><p>The function is designed for high-performance processing using memoryviewslice.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.create_rgba_surface">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">create_rgba_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_array_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.create_rgba_surface" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Create a 32-bit image/surface from RGB and Alpha arrays.</p>
+<dl class="simple">
+<dt>This function generates a 32-bit image surface (with alpha transparency) by combining:</dt><dd><ul class="simple">
+<li><p>An RGB array with shape (w, h, 3) and dtype uint8.</p></li>
+<li><p>An Alpha array with shape (w, h) and dtype uint8.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Both input arrays must have the same width and height (w, h), and must be of type uint8.
+Optionally, a pre-allocated temporary array can be passed to optimize performance.</p>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">im</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../Assets/alpha.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+<span class="n">rgb</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels3d</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>          <span class="c1"># Extract the RGB pixel values.</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels_alpha</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>    <span class="c1"># Extract the Alpha (transparency) values.</span>
+
+<span class="c1"># Create the surface. Use convert_alpha() for optimal performance:</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">create_rgba_surface</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt><strong>rgb_</strong><span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 3D array with shape (w, h, 3) containing RGB pixel values (dtype=uint8).</p>
+</dd>
+<dt><strong>alpha_</strong><span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 2D array with shape (w, h) containing alpha (transparency) values (dtype=uint8).</p>
+</dd>
+<dt><strong>tmp_array_</strong><span class="classifier">numpy.ndarray or memoryview, optional</span></dt><dd><p>A 3D array with shape (w, h, 4) used as a temporary array for creating the RGBA surface.
+Passing this pre-allocated array can speed up the process by avoiding allocation overhead.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>pygame.Surface</dt><dd><p>A 32-bit pygame surface with RGBA values.
+Use <cite>convert_alpha()</cite> to enhance performance when rendering the surface.
+Note: <cite>convert_alpha()</cite> requires the video display to be initialized.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Notes</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The input arrays must have compatible shapes and types.</p></li>
+<li><dl class="simple">
+<dt>For optimal performance:</dt><dd><ul>
+<li><p>Use pygame’s <cite>convert_alpha()</cite> method.</p></li>
+<li><p>Ensure the video display is initialized before calling <cite>convert_alpha()</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.alpha_array_to_surface">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">alpha_array_to_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.alpha_array_to_surface" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Convert a 2D alpha array (shape w x h, type uint8) into a 24-bit Pygame surface (RGB).</p>
+<p>This function takes a 2D alpha array and creates a new 24-bit surface (RGB).
+Each pixel in the output surface has its R, G, and B channels set to the
+corresponding alpha value from the input array.</p>
+<p><strong>Example Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">im</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../Assets/alpha.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels_alpha</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">alpha_array_to_surface</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>array<span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 2D numpy array or memoryview with shape (w, h) and dtype uint8.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>pygame.Surface</dt><dd><p>A 24-bit Pygame surface (RGB).
+For better in-game performance, use <cite>pygame.Surface.convert()</cite> after creation.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.bufferize">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">bufferize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.bufferize" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Create a C-buffer from a 3D numpy array.</p>
+<p>This function takes a 3D numpy array representing an RGB or RGBA image and converts it into a
+1D C-style buffer. The numpy array should have a shape of (width, height, 3|4) with uint8 type.</p>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>rgb_array<span class="classifier">numpy.ndarray</span></dt><dd><p>A numpy array of shape (w, h, 3|4), representing an RGB or RGBA image.
+The last dimension (3 or 4) corresponds to the color channels (RGB or RGBA).</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>memoryview</dt><dd><p>A memoryview slice (C buffer) containing the RGB or RGBA pixel values.
+This is a 1D array that can be accessed directly in C.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.unbufferize">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">unbufferize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c_buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bit_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.unbufferize" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Convert a 1D array (buffer) of uint8 data type into a 3D numpy array (copy).</p>
+<p>This function takes a 1D buffer of image data (such as RGB or RGBA values) and reconstructs it into
+a 3D array (numpy array) of shape (width, height, bit_size), where bit_size can be 3 (RGB) or 4 (RGBA).</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">c_buffer</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">some_1d_buffer</span><span class="o">&gt;</span>
+<span class="n">width</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">height</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">bit_size</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># RGB</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">unbufferize</span><span class="p">(</span><span class="n">c_buffer</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">bit_size</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>c_buffer<span class="classifier">memoryview</span></dt><dd><p>The input 1D buffer array (as a memoryview) containing pixel values in uint8 format.</p>
+</dd>
+<dt>width<span class="classifier">int</span></dt><dd><p>The width of the resulting 3D array (image width in pixels).</p>
+</dd>
+<dt>height<span class="classifier">int</span></dt><dd><p>The height of the resulting 3D array (image height in pixels).</p>
+</dd>
+<dt>bit_size<span class="classifier">int</span></dt><dd><p>The number of channels in the image. Typically 3 (RGB) or 4 (RGBA).</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>memoryview</dt><dd><p>A memoryview slice (3D array) of shape (width, height, bit_size),
+containing the RGB or RGBA pixel values.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>bit_size == 0</cite>, as it’s an invalid value for image data.</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.bgr_buffer_transpose">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">bgr_buffer_transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transposed_buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.bgr_buffer_transpose" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Transpose rows &amp; columns of a BGR image buffer.</p>
+<p>This function transposes a BGR image by rearranging the pixel data from the
+input <cite>buffer</cite> into the <cite>transposed_buffer</cite>. It assumes the image is represented as
+a 1D array of BGR pixels in row-major order.</p>
+<p>This is equivalent to performing a transpose operation on the pixel data:
+transposing rows and columns of BGR blocks.</p>
+<p><strong>Example Input/Output:</strong></p>
+<p>BGR image’s pixels represented as:
+.. code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">BGR1</span><span class="p">,</span> <span class="n">BGR2</span><span class="p">,</span>  <span class="n">BGR3</span><span class="p">,</span>  <span class="n">BGR4</span><span class="p">]</span>
+<span class="p">[</span><span class="n">BGR5</span><span class="p">,</span> <span class="n">BGR6</span><span class="p">,</span>  <span class="n">BGR7</span><span class="p">,</span>  <span class="n">BGR8</span><span class="p">]</span>
+<span class="p">[</span><span class="n">BGR9</span><span class="p">,</span> <span class="n">BGR10</span><span class="p">,</span> <span class="n">BGR11</span><span class="p">,</span> <span class="n">BGR12</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>After transpose:</p>
+<p>output image’s pixels represented as:
+.. code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">BGR1</span><span class="p">,</span> <span class="n">BGR5</span><span class="p">,</span> <span class="n">BGR9</span><span class="p">]</span>
+<span class="p">[</span><span class="n">BGR2</span><span class="p">,</span> <span class="n">BGR6</span><span class="p">,</span> <span class="n">BGR10</span><span class="p">]</span>
+<span class="p">[</span><span class="n">BGR3</span><span class="p">,</span> <span class="n">BGR7</span><span class="p">,</span> <span class="n">BGR11</span><span class="p">]</span>
+<span class="p">[</span><span class="n">BGR4</span><span class="p">,</span> <span class="n">BGR8</span><span class="p">,</span> <span class="n">BGR12</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Example Usage</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;../Assets/px.png&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">smoothscale</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">800</span> <span class="o">*</span> <span class="mi">600</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">arr</span> <span class="o">=</span> <span class="n">bgr_buffer_transpose</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="n">source</span><span class="o">.</span><span class="n">get_buffer</span><span class="p">(),</span> <span class="n">arr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>width<span class="classifier">int</span></dt><dd><p>The width of the video frame. Must be greater than 0.</p>
+</dd>
+<dt>height<span class="classifier">int</span></dt><dd><p>The height of the video frame. Must be greater than 0.</p>
+</dd>
+<dt>buffer<span class="classifier">memoryview</span></dt><dd><p>A 1D memoryview containing the pixel data (typically in BGR format).</p>
+</dd>
+<dt>transposed_buffer<span class="classifier">memoryview, optional</span></dt><dd><p>An optional 1D memoryview to store the transposed pixel data. If not provided,
+a new buffer will be created.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>numpy.ndarray</dt><dd><p>A NumPy array containing the transposed pixel data.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>width</cite> or <cite>height</cite> is less than or equal to 0.
+If <cite>buffer</cite> is None or its size does not match <cite>width * height * 3</cite>.
+If <cite>transposed_buffer</cite> is provided but its size does not match <cite>width * height * 3</cite>.</p>
+</dd>
+<dt>TypeError</dt><dd><p>If <cite>buffer</cite> or <cite>transposed_buffer</cite> is not a memoryview or NumPy array.
+If <cite>buffer</cite> is a NumPy array and not contiguous.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Notes</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>This function assumes the buffer data is in BGR format and performs transpose.</p></li>
+<li><p>The operation is done in-place if a <cite>transposed_buffer</cite> is provided.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.flip_bgra_buffer">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">flip_bgra_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flipped_buffer</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.flip_bgra_buffer" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Perform flipping of a BGRA image buffer.</p>
+<p>This core function flips a BGRA image by rearranging the pixel data from the
+input <cite>buffer</cite> into the <cite>flipped_buffer</cite>. It assumes the image is represented as
+a 1D array of BGRA pixels in row-major order.</p>
+<p>This is equivalent to performing a transpose operation on the pixel data:
+flipping rows and columns of BGRA blocks.</p>
+<p><strong>Example Input/Output:</strong></p>
+<p>Input buffer:
+.. code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">buffer</span> <span class="o">=</span> <span class="p">[</span><span class="n">BGRA1</span><span class="p">,</span> <span class="n">BGRA2</span><span class="p">,</span> <span class="n">BGRA3</span><span class="p">,</span> <span class="n">BGRA4</span><span class="p">,</span> <span class="n">BGRA5</span><span class="p">,</span> <span class="n">BGRA6</span><span class="p">,</span> <span class="n">BGRA7</span><span class="p">,</span> <span class="n">BGRA8</span><span class="p">,</span> <span class="n">BGRA9</span><span class="p">]</span>
+<span class="n">Represented</span> <span class="k">as</span><span class="p">:</span>
+    <span class="p">[</span><span class="n">BGRA1</span><span class="p">,</span> <span class="n">BGRA2</span><span class="p">,</span> <span class="n">BGRA3</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">BGRA4</span><span class="p">,</span> <span class="n">BGRA5</span><span class="p">,</span> <span class="n">BGRA6</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">BGRA7</span><span class="p">,</span> <span class="n">BGRA8</span><span class="p">,</span> <span class="n">BGRA9</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>After flipping:</p>
+<p>output buffer:
+.. code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">BGRA1</span><span class="p">,</span> <span class="n">BGRA4</span><span class="p">,</span> <span class="n">BGRA9</span><span class="p">,</span> <span class="n">BGRA2</span><span class="p">,</span> <span class="n">BGRA5</span><span class="p">,</span> <span class="n">BGRA8</span><span class="p">,</span> <span class="n">BGRA3</span><span class="p">,</span> <span class="n">BGRA6</span><span class="p">,</span> <span class="n">BGRA9</span><span class="p">]</span>
+<span class="n">Represented</span> <span class="k">as</span><span class="p">:</span>
+    <span class="p">[</span><span class="n">BGRA1</span><span class="p">,</span> <span class="n">BGRA4</span><span class="p">,</span> <span class="n">BGRA9</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">BGRA2</span><span class="p">,</span> <span class="n">BGRA5</span><span class="p">,</span> <span class="n">BGRA8</span><span class="p">]</span>
+    <span class="p">[</span><span class="n">BGRA3</span><span class="p">,</span> <span class="n">BGRA6</span><span class="p">,</span> <span class="n">BGRA9</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>width<span class="classifier">int</span></dt><dd><p>The width of the image in pixels.</p>
+</dd>
+<dt>height<span class="classifier">int</span></dt><dd><p>The height of the image in pixels.</p>
+</dd>
+<dt>buffer<span class="classifier">memoryview</span></dt><dd><p>The input 1D buffer containing BGRA pixel data. The buffer size must be
+<cite>width * height * 4</cite> to accommodate all pixels in the image.</p>
+</dd>
+<dt>flipped_buffer<span class="classifier">memoryview</span></dt><dd><p>The output 1D buffer to store the flipped BGRA data. The size
+must also be <cite>width * height * 4</cite>.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>numpy.ndarray</dt><dd><p>A 1D NumPy array containing the flipped BGRA pixel data, stored in row-major order.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>width</cite> or <cite>height</cite> is less than or equal to 0.
+If <cite>buffer</cite> is not 1D or its size does not match <cite>width * height * 4</cite>.
+If <cite>flipped_buffer</cite> is not 1D or its size does not match <cite>width * height * 4</cite>.</p>
+</dd>
+<dt>TypeError</dt><dd><p>If <cite>buffer</cite> or <cite>flipped_buffer</cite> is not a memoryview or NumPy array.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Notes</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The flipping operation is performed in parallel using OpenMP’s <cite>prange</cite> for better
+performance on multi-threaded systems.</p></li>
+<li><p>If <cite>flipped_buffer</cite> is not provided, a new writable buffer is allocated and returned.</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt><strong>ChatGPT Collaboration:</strong></dt><dd><ul class="simple">
+<li><p>This code was enhanced with the assistance of <strong>ChatGPT</strong>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.binary_mask">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">binary_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask_alpha_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.binary_mask" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Convert a 2D memoryview or a numpy.array into a black-and-white mask alpha array.</p>
+<p>This function processes a 2D memoryview of type <cite>uint8</cite> (values ranging from 0 to 255)
+and converts it into a binary black-and-white mask. Pixels with a value of <cite>0</cite>
+are converted to <cite>0</cite> (black), while pixels with a value greater than <cite>0</cite> are
+converted to <cite>255</cite> (white). The function returns a memoryview, not a NumPy array.</p>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt><strong>mask_alpha_</strong><span class="classifier">memoryview</span></dt><dd><p>A 2D memoryview of shape (W, H) and type <cite>uint8</cite>. Each element represents
+an alpha value ranging from 0 (fully transparent) to 255 (fully opaque).</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>memoryview</dt><dd><p>A 2D memoryview of shape (W, H) and type <cite>uint8</cite>, where each element is either:
+- <cite>0</cite> (black): Corresponds to pixels with an original value of <cite>0</cite>.
+- <cite>255</cite> (white): Corresponds to pixels with an original value greater than <cite>0</cite>.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>TypeError</dt><dd><p>If the input <cite>mask_alpha_</cite> is not a <cite>numpy.ndarray</cite> or a memoryview slice.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If:
+- <cite>mask_alpha_</cite> is not of type <cite>uint8</cite>.
+- <cite>mask_alpha_</cite> does not have exactly 2 dimensions.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Example</strong></p>
+<p><strong>Loading and converting an image’s alpha channel to a binary mask:</strong>
+.. code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Load an image with alpha channel</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../Assets/alpha.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+<span class="c1"># Get the alpha channel as a NumPy array</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels_alpha</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+<span class="c1"># Convert the alpha channel to a black-and-white solid transparency mask</span>
+<span class="n">solid_transparency</span> <span class="o">=</span> <span class="n">binary_mask</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Notes</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>This function modifies the input memoryview <cite>mask_alpha_</cite> in place for performance reasons.</p></li>
+<li><p>It operates on Cython memoryviews directly, which are more efficient than NumPy arrays
+for this type of low-level operation.</p></li>
+<li><p>The operation is performed in parallel using OpenMP’s <cite>prange</cite> for improved performance.</p></li>
+<li><p>Ensure that <cite>mask_alpha_</cite> is writable before calling this function.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.mask32">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">mask32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_alpha_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.mask32" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Apply a mask to an image split into its respective RGB &amp; alpha values.</p>
+<p>This method creates a new alpha channel by combining the original alpha transparency
+with the mask alpha. It generates a 32-bit image with a new alpha channel for fast blitting.
+The new surface is already formatted for optimal performance, so there is no need to use
+the <cite>convert_alpha</cite> method from Pygame.</p>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt><strong>rgb_</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>A 3D array with shape (w, h, 3) and type <cite>uint8</cite>, representing the RGB values of the image.</p>
+</dd>
+<dt><strong>alpha_</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>A 2D array with shape (w, h) and type <cite>uint8</cite>, representing the alpha (transparency) values of the image.</p>
+</dd>
+<dt><strong>mask_alpha_</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>A 2D array with shape (w, h) and type <cite>uint8</cite>, representing the mask’s alpha values to apply.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>object</dt><dd><p>A 32-bit Pygame surface with a new alpha channel combining the original transparency and the mask alpha.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Example</strong></p>
+<p><strong>Applying a mask to an image and creating a new alpha channel:</strong>
+.. code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_image</span> <span class="o">=</span> <span class="n">mask32</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">mask_alpha</span><span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Notes</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The input arrays must have the same dimensions (w, h).</p></li>
+<li><p>The function assumes that all arrays are of type <cite>uint8</cite>.</p></li>
+<li><p>The resulting surface is already compatible for fast blitting and does not require further processing.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.channels_to_surface">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">channels_to_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">red_channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">green_channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blue_channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_rgba_buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.channels_to_surface" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Combine separate red, green, blue, and alpha channels into a single 32-bit Pygame surface.</p>
+<p>This function takes four 2D arrays representing the red, green, blue, and alpha channels of an image,
+and combines them into a single 32-bit RGBA surface. The result is a surface that supports transparency
+and is ready for rendering in Pygame.</p>
+<p>To ensure optimal performance and proper alpha transparency handling, use <cite>pygame.convert_alpha()</cite>
+after creating the surface.</p>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>red_channel<span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 2D array or memoryview with shape (w, h) and type <cite>uint8</cite>, representing the red channel values
+for each pixel. Values range from 0 to 255.</p>
+</dd>
+<dt>green_channel<span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 2D array or memoryview with shape (w, h) and type <cite>uint8</cite>, representing the green channel values
+for each pixel. Values range from 0 to 255.</p>
+</dd>
+<dt>blue_channel<span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 2D array or memoryview with shape (w, h) and type <cite>uint8</cite>, representing the blue channel values
+for each pixel. Values range from 0 to 255.</p>
+</dd>
+<dt>alpha_channel<span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 2D array or memoryview with shape (w, h) and type <cite>uint8</cite>, representing the alpha (transparency)
+channel values for each pixel. Values range from 0 to 255.</p>
+</dd>
+<dt>output_rgba_buffer<span class="classifier">numpy.ndarray, optional</span></dt><dd><p>A temporary 3D array or memoryview with shape (h, w, 4) and type <cite>uint8</cite> for storing intermediate
+RGBA data. If not provided, a new array will be allocated.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>pygame.Surface</dt><dd><p>A 32-bit Pygame surface in RGBA format, suitable for rendering and supporting alpha transparency.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>ValueError</dt><dd><ul class="simple">
+<li><p>If the input channel arrays or memoryviews do not have the same shape.</p></li>
+<li><p>If <cite>output_rgba_buffer</cite> has an incorrect shape.</p></li>
+</ul>
+</dd>
+<dt>TypeError</dt><dd><ul class="simple">
+<li><p>If any of the input arrays or memoryviews is not a 2D NumPy array of type <cite>uint8</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Example</strong></p>
+<blockquote>
+<div><p><strong>Creating a surface from RGBA channels:</strong>
+.. code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pygame</span>
+<span class="n">im</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;../Assets/rgba_image.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+<span class="n">red</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels_red</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+<span class="n">green</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels_green</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+<span class="n">blue</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels_blue</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels_alpha</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+
+<span class="n">surface</span> <span class="o">=</span> <span class="n">channels_to_surface</span><span class="p">(</span><span class="n">red</span><span class="p">,</span> <span class="n">green</span><span class="p">,</span> <span class="n">blue</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+<span class="n">surface</span> <span class="o">=</span> <span class="n">surface</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>  <span class="c1"># Optimize the surface for rendering</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p><strong>Notes</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>This function works with both NumPy arrays and memoryviews, offering efficient data processing.</p></li>
+<li><p>For proper transparency handling, use <cite>pygame.Surface.convert_alpha()</cite> on the returned surface.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.compare_png24bit">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">compare_png24bit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.compare_png24bit" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Compute the pixel-wise difference between two 24-bit Pygame surfaces.</p>
+<p>This function takes two Pygame surfaces in 24-bit format (PNG) and calculates the absolute
+difference between their RGB values. The output is a new 24-bit Pygame surface where each pixel
+represents the difference between the corresponding pixels in <cite>surface1</cite> and <cite>surface2</cite>.</p>
+<p><strong>Example Usage</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">im1</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;image1.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+<span class="n">im2</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;image2.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+
+<span class="n">diff_surface</span> <span class="o">=</span> <span class="n">compare_png24bit</span><span class="p">(</span><span class="n">im1</span><span class="p">,</span> <span class="n">im2</span><span class="p">)</span>
+<span class="n">diff_surface</span> <span class="o">=</span> <span class="n">diff_surface</span><span class="o">.</span><span class="n">convert</span><span class="p">()</span>  <span class="c1"># Optimize for rendering</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>surface1<span class="classifier">pygame.Surface</span></dt><dd><p>A 24-bit Pygame surface representing the first image.</p>
+</dd>
+<dt>surface2<span class="classifier">pygame.Surface</span></dt><dd><p>A 24-bit Pygame surface representing the second image.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>pygame.Surface</dt><dd><p>A new 24-bit Pygame surface where pixel values indicate the absolute difference
+between <cite>surface1</cite> and <cite>surface2</cite>.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>ValueError</dt><dd><p>If the input surfaces do not have the same size or are not in 24-bit format.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Notes</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Incompatible with JPEG images</strong>, as JPEG compression alters pixel values due to its
+lossy nature.</p></li>
+<li><p>Both input surfaces <strong>must</strong> have identical dimensions and be in 24-bit mode.</p></li>
+<li><p>The output surface does not include an alpha channel (transparency).</p></li>
+<li><p>For faster rendering, use <cite>pygame.Surface.convert()</cite> on the returned surface.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.compare_png32bit">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">compare_png32bit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surface2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.compare_png32bit" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Compute the pixel-wise difference between two 32-bit Pygame surfaces.</p>
+<p>This function compares two Pygame surfaces in 32-bit format (PNG with an alpha channel)
+and calculates the absolute difference between their RGBA values. The output is a new
+32-bit Pygame surface where each pixel represents the difference between the corresponding
+pixels in <cite>surface1</cite> and <cite>surface2</cite>.</p>
+<p><strong>Example Usage</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">im1</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;image1.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+<span class="n">im2</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;image2.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+
+<span class="n">diff_surface</span> <span class="o">=</span> <span class="n">compare_png32bit</span><span class="p">(</span><span class="n">im1</span><span class="p">,</span> <span class="n">im2</span><span class="p">)</span>
+<span class="n">diff_surface</span> <span class="o">=</span> <span class="n">diff_surface</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>  <span class="c1"># Optimize for rendering</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>surface1<span class="classifier">pygame.Surface</span></dt><dd><p>A 32-bit Pygame surface (RGBA) representing the first image.</p>
+</dd>
+<dt>surface2<span class="classifier">pygame.Surface</span></dt><dd><p>A 32-bit Pygame surface (RGBA) representing the second image.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>pygame.Surface</dt><dd><p>A new 32-bit Pygame surface where pixel values indicate the absolute difference
+between <cite>surface1</cite> and <cite>surface2</cite>, including differences in transparency.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>ValueError</dt><dd><p>If the input surfaces do not have the same size or are not in 32-bit format.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Notes</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Incompatible with JPEG images</strong>, as JPEG compression alters pixel values due to its
+lossy nature.</p></li>
+<li><p>Both input surfaces <strong>must</strong> have identical dimensions and be in 32-bit mode.</p></li>
+<li><p>The output surface includes an alpha channel, preserving transparency differences.</p></li>
+<li><p>For faster rendering, use <cite>pygame.Surface.convert_alpha()</cite> on the returned surface.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.unmapping_array">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">unmapping_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indexed_array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_array_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.unmapping_array" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><p>Convert a 2D indexed array (int32) into a 3D RGB array (uint8).</p>
+<p>This function transforms a 2D array where each element is a 32-bit integer
+representing an RGB pixel into a 3D NumPy array, where each pixel’s red,
+green, and blue channels are stored separately as uint8 values.</p>
+<p><strong>Purpose</strong></p>
+<p>This is the inverse of <cite>pygame.surfarray.map_array()</cite>, which converts a
+3D RGB array into a 2D int32 pixel map. It is useful for reconstructing RGB
+values from an indexed format.</p>
+<p><strong>Example Usage</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert a 2D indexed array into a 3D RGB array</span>
+<span class="n">indexed_array</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">map_array</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">pixels3d</span><span class="p">(</span><span class="n">surface</span><span class="p">))</span>
+<span class="n">rgb_array</span> <span class="o">=</span> <span class="n">unmapping_array</span><span class="p">(</span><span class="n">indexed_array</span><span class="p">)</span>
+
+<span class="c1"># Create a Pygame surface from the RGB array</span>
+<span class="n">new_surface</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+<span class="n">pygame</span><span class="o">.</span><span class="n">pixelcopy</span><span class="o">.</span><span class="n">array_to_surface</span><span class="p">(</span><span class="n">new_surface</span><span class="p">,</span> <span class="n">rgb_array</span><span class="p">)</span>
+
+<span class="c1"># Using a preallocated array for better performance</span>
+<span class="n">preallocated_array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">rgb_array</span> <span class="o">=</span> <span class="n">unmapping_array</span><span class="p">(</span><span class="n">indexed_array</span><span class="p">,</span> <span class="n">preallocated_array</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt><strong>indexed_array_</strong><span class="classifier">numpy.ndarray or memoryview</span></dt><dd><p>A 2D array of shape (w, h) with int32 values, where each element
+represents an RGB pixel encoded as a single integer.</p>
+</dd>
+<dt><strong>tmp_array_</strong><span class="classifier">numpy.ndarray, optional</span></dt><dd><p>A preallocated 3D array of shape (w, h, 3) and type uint8 to store
+the decomposed RGB values. If provided, this array is modified in place.</p>
+<ul class="simple">
+<li><p>Shape: (w, h, 3)</p></li>
+<li><p>Data type: uint8</p></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>numpy.ndarray[np.uint8_t, ndim=3]</dt><dd><p>A 3D NumPy array of shape (w, h, 3), where:
+- <cite>[…, 0]</cite> contains the red (R) channel values.
+- <cite>[…, 1]</cite> contains the green (G) channel values.
+- <cite>[…, 2]</cite> contains the blue (B) channel values.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<blockquote>
+<div><dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>indexed_array_</cite> is not of shape (w, h) or not of type int32.
+If <cite>tmp_array_</cite> is provided but has an incorrect shape or type.</p>
+</dd>
+<dt>TypeError</dt><dd><p>If inputs are not valid NumPy arrays or memoryviews.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><strong>Notes</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <cite>tmp_array_</cite> is not provided, a new array is allocated.</p></li>
+<li><p>Supplying a preallocated array is recommended for large datasets to
+improve performance.</p></li>
+<li><p>This function is optimized for speed and operates directly on memory views.</p></li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.mapping_array">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">mapping_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_array_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.mapping_array" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Convert a 3D RGB array (W, H, 3) into a 2D mapped integer array.</p>
+<p>This function transforms a 3D array of RGB values (uint8) into a 2D array where
+each RGB triplet is represented as a single int32 value. It is optimized as an
+equivalent to <cite>pygame.surfarray.map_array(Surface, array3d)</cite>, allowing efficient
+processing of NumPy arrays with shape (W, H, 3).</p>
+<p><strong>Parameters</strong></p>
+<p><strong>rgb_array</strong> : memoryview (unsigned char[:, :, :])</p>
+<blockquote>
+<div><p>A 3D array or memoryview of shape (W, H, 3), containing pixel data in <cite>uint8</cite> format.
+Each pixel is represented by three values: red, green, and blue.</p>
+</div></blockquote>
+<p><strong>tmp_array_</strong> : memoryview or numpy.ndarray, optional</p>
+<blockquote>
+<div><p>A preallocated 2D array of shape (W, H) with data type <cite>int32</cite>. If provided, the function
+modifies this array in place, avoiding additional memory allocation.</p>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<p>memoryview (int32[:, :])</p>
+<blockquote>
+<div><p>A 2D array of shape (W, H) with data type <cite>int32</cite>, where each element represents
+the mapped integer value of the corresponding RGB triplet.</p>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<p>ValueError</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <cite>rgb_array</cite> is <cite>None</cite>.</p></li>
+<li><p>If <cite>rgb_array</cite> does not have the required shape <cite>(W, H, 3)</cite>.</p></li>
+<li><p>If <cite>rgb_array</cite> has an invalid data type (not <cite>uint8</cite>).</p></li>
+<li><p>If <cite>tmp_array_</cite> has an incorrect shape, data type, or other inconsistencies.</p></li>
+</ul>
+</div></blockquote>
+<p>TypeError</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <cite>rgb_array</cite> or <cite>tmp_array_</cite> is not a NumPy array or memoryview slice.</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Notes</strong></p>
+<ul class="simple">
+<li><p>This function is optimized for processing large images efficiently.</p></li>
+<li><p>The input <cite>rgb_array</cite> must be compatible with <cite>pygame.surfarray.array3d</cite> output
+(an array of unsigned 8-bit integers).</p></li>
+<li><p>If <cite>tmp_array_</cite> is provided, it must be writable.</p></li>
+<li><p>If <cite>tmp_array_</cite> is not provided, a new 2D array is allocated internally.</p></li>
+</ul>
+<p><strong>Example Usage</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pygame</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># Load an image and extract RGB data</span>
+<span class="n">surface</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;image.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>  <span class="c1"># Ensure it&#39;s a 24-bit surface</span>
+<span class="n">rgb_array</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">array3d</span><span class="p">(</span><span class="n">surface</span><span class="p">)</span>
+
+<span class="c1"># Convert the RGB array into a 2D mapped integer array</span>
+<span class="n">mapped_array</span> <span class="o">=</span> <span class="n">mapping_array</span><span class="p">(</span><span class="n">rgb_array</span><span class="p">)</span>
+
+<span class="c1"># Create a new surface using the mapped array</span>
+<span class="n">new_surface</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Surface</span><span class="p">(</span><span class="n">surface</span><span class="o">.</span><span class="n">get_size</span><span class="p">())</span>
+<span class="n">pygame</span><span class="o">.</span><span class="n">surfarray</span><span class="o">.</span><span class="n">blit_array</span><span class="p">(</span><span class="n">new_surface</span><span class="p">,</span> <span class="n">mapped_array</span><span class="p">)</span>
+
+<span class="c1"># Using a preallocated array for efficiency</span>
+<span class="n">preallocated_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">rgb_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rgb_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="n">mapped_array</span> <span class="o">=</span> <span class="n">mapping_array</span><span class="p">(</span><span class="n">rgb_array</span><span class="p">,</span> <span class="n">preallocated_array</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="PygameTools.blend_pixel_mapped_arrays">
+<span class="sig-prename descclassname"><span class="pre">PygameTools.</span></span><span class="sig-name descname"><span class="pre">blend_pixel_mapped_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_pixels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blend_pixels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">special_flags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#PygameTools.blend_pixel_mapped_arrays" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Blend two 2D mapped pixel arrays together with optional special effects.</p>
+<p>This function blends <cite>target_pixels</cite> and <cite>blend_pixels</cite> using the specified <cite>special_flags</cite>.
+The operation is performed <strong>in-place</strong>, directly modifying <cite>target_pixels</cite>.</p>
+<p><strong>Parameters</strong></p>
+<p><strong>target_pixels</strong> : memoryview (unsigned int[:, :])</p>
+<blockquote>
+<div><p>A <strong>2D Cython memoryview</strong> (or a NumPy array converted via <cite>numpy.asarray()</cite>),
+where each element represents a pixel with mapped RGB values.
+The blend will be applied directly to this array (modifying it in-place).</p>
+</div></blockquote>
+<p><strong>blend_pixels</strong> : memoryview (unsigned int[:, :])</p>
+<blockquote>
+<div><p>A <strong>2D Cython memoryview</strong> (or a NumPy array converted via <cite>numpy.asarray()</cite>),
+containing the pixel data to blend into <cite>target_pixels</cite>.
+The shape must match <cite>target_pixels</cite>.</p>
+</div></blockquote>
+<p><strong>special_flags</strong> : unsigned char, optional (default=0)</p>
+<blockquote>
+<div><p>A blending mode flag that determines how <cite>target_pixels</cite> and <cite>blend_pixels</cite> are combined.
+The following <strong>Pygame-style BLEND modes</strong> are supported:</p>
+<ul class="simple">
+<li><p><strong>BLEND_RGB_ADD</strong> (1) → Additive blending</p></li>
+<li><p><strong>BLEND_RGB_SUB</strong> (2) → Subtractive blending</p></li>
+<li><p><strong>BLEND_RGB_MULT</strong> (3) → Multiplicative blending</p></li>
+<li><p><strong>BLEND_RGB_MIN</strong> (4) → Minimum value blending</p></li>
+<li><p><strong>BLEND_RGB_MAX</strong> (5) → Maximum value blending</p></li>
+</ul>
+<p>If <cite>special_flags = 0</cite>, no blending is applied (default behavior).</p>
+</div></blockquote>
+<p><strong>Returns</strong></p>
+<p>void</p>
+<blockquote>
+<div><p>The function modifies <cite>target_pixels</cite> <strong>in-place</strong>, so it does not return a new array.</p>
+</div></blockquote>
+<p><strong>Raises</strong></p>
+<p>ValueError</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <cite>target_pixels</cite> and <cite>blend_pixels</cite> have different shapes.</p></li>
+<li><p>If <cite>special_flags</cite> is not in the valid range <cite>[0-5]</cite>.</p></li>
+</ul>
+</div></blockquote>
+<p>TypeError</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If <cite>target_pixels</cite> or <cite>blend_pixels</cite> is not a <strong>Cython memoryview</strong> or <strong>NumPy array</strong>.</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Notes</strong></p>
+<ul class="simple">
+<li><p>This function is optimized for performance using <strong>Cython (`cpdef inline`)</strong>.</p></li>
+<li><p>The blending operation modifies <cite>target_pixels</cite> <strong>directly</strong>, so pass a copy if
+you need to retain the original data.</p></li>
+<li><p>Compatible with <strong>Pygame’s surface blending operations</strong>.</p></li>
+<li><p>Ensure both input arrays are of the same shape before calling this function.</p></li>
+</ul>
+<p><strong>Example Usage</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># Create two random mapped pixel arrays</span>
+<span class="n">target_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+<span class="n">blend_pixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+
+<span class="c1"># Apply additive blending (BLEND_RGB_ADD = 1)</span>
+<span class="n">blend_pixel_mapped_arrays</span><span class="p">(</span><span class="n">target_pixels</span><span class="p">,</span> <span class="n">blend_pixels</span><span class="p">,</span> <span class="n">special_flags</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># The `target_pixels` array is now modified with blended values.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">PygameTools</a><ul>
+<li><a class="reference internal" href="#purpose-of-this-library">1. Purpose of This Library</a></li>
+<li><a class="reference internal" href="#key-features">2. Key Features</a></li>
+<li><a class="reference internal" href="#library-functional-overview">3. Library Functional Overview</a></li>
+<li><a class="reference internal" href="#target-applications">4. Target Applications</a></li>
+<li><a class="reference internal" href="#summary">5. Summary</a></li>
+<li><a class="reference internal" href="#cython-list-methods">6. Cython list methods</a><ul>
+<li><a class="reference internal" href="#PygameTools.RemoveAlpha"><code class="docutils literal notranslate"><span class="pre">RemoveAlpha()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.resize_array"><code class="docutils literal notranslate"><span class="pre">resize_array()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.resize_array_c"><code class="docutils literal notranslate"><span class="pre">resize_array_c()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.make_rgba_array"><code class="docutils literal notranslate"><span class="pre">make_rgba_array()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.create_rgba_surface"><code class="docutils literal notranslate"><span class="pre">create_rgba_surface()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.alpha_array_to_surface"><code class="docutils literal notranslate"><span class="pre">alpha_array_to_surface()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.bufferize"><code class="docutils literal notranslate"><span class="pre">bufferize()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.unbufferize"><code class="docutils literal notranslate"><span class="pre">unbufferize()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.bgr_buffer_transpose"><code class="docutils literal notranslate"><span class="pre">bgr_buffer_transpose()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.flip_bgra_buffer"><code class="docutils literal notranslate"><span class="pre">flip_bgra_buffer()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.binary_mask"><code class="docutils literal notranslate"><span class="pre">binary_mask()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.mask32"><code class="docutils literal notranslate"><span class="pre">mask32()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.channels_to_surface"><code class="docutils literal notranslate"><span class="pre">channels_to_surface()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.compare_png24bit"><code class="docutils literal notranslate"><span class="pre">compare_png24bit()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.compare_png32bit"><code class="docutils literal notranslate"><span class="pre">compare_png32bit()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.unmapping_array"><code class="docutils literal notranslate"><span class="pre">unmapping_array()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.mapping_array"><code class="docutils literal notranslate"><span class="pre">mapping_array()</span></code></a></li>
+<li><a class="reference internal" href="#PygameTools.blend_pixel_mapped_arrays"><code class="docutils literal notranslate"><span class="pre">blend_pixel_mapped_arrays()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="Shader_gpu.html"
+                          title="previous chapter">Shader_gpu</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="RGBConvert.html"
+                          title="next chapter">RGBConvert</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/PygameTools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="RGBConvert.html" title="RGBConvert"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Shader_gpu.html" title="Shader_gpu"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">PygameTools</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

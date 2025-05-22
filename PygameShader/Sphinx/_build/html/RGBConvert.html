@@ -1,0 +1,523 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>RGBConvert &#8212; PygameShader 1.0.11 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=9306f2a9"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Sprites" href="Sprites.html" />
+    <link rel="prev" title="PygameTools" href="PygameTools.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Sprites.html" title="Sprites"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="PygameTools.html" title="PygameTools"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">RGBConvert</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="rgbconvert">
+<h1>RGBConvert<a class="headerlink" href="#rgbconvert" title="Link to this heading">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">RGBConvert.pyx</span></code></p>
+<hr class="docutils" />
+<section id="color-space-conversion-library">
+<h2>1. Color Space Conversion Library<a class="headerlink" href="#color-space-conversion-library" title="Link to this heading">¶</a></h2>
+<p>This Python library provides efficient color space conversion functions,
+primarily implemented using Cython for optimized performance. The library
+enables conversions between RGB and other color models like <strong>YIQ</strong>, <strong>HSL</strong>,
+and <strong>HSV</strong>, which are essential for various image processing and computer vision tasks.</p>
+</section>
+<section id="purpose-of-the-library">
+<h2>2. Purpose of the Library<a class="headerlink" href="#purpose-of-the-library" title="Link to this heading">¶</a></h2>
+<p>The primary goal of this library is to offer fast and efficient color space conversions.
+These conversions are commonly used in applications such as image processing, computer vision,
+color correction, and visual effects. The library leverages Cython to speed up computations
+and minimize memory overhead.</p>
+</section>
+<section id="key-functions-and-their-roles">
+<h2>3. Key Functions and Their Roles<a class="headerlink" href="#key-functions-and-their-roles" title="Link to this heading">¶</a></h2>
+<p><strong>YIQ ↔ RGB Conversions</strong></p>
+<p>The YIQ color model separates luma (brightness) from chroma (color),
+making it particularly useful for broadcast and image processing.</p>
+<ul class="simple">
+<li><p><strong>`yiq_2_rgb(y, i, q)` → (r, g, b)</strong>:
+Converts a pixel from YIQ (luma, in-phase, quadrature) to RGB color space.</p></li>
+<li><p><strong>`rgb_2_yiq(r, g, b)` → (y, i, q)</strong>:
+Converts a pixel from RGB to YIQ color space.</p></li>
+<li><p><strong>`RGB_TO_YIQ_inplace(image_surface, include_y, include_i, include_q)`</strong>:
+Converts an entire image from RGB to YIQ in-place, modifying the given image surface.</p></li>
+<li><p><strong>`RGB_TO_YIQ_inplace_c(w, h, rgb_array, luma, in_phase, quadrature)`</strong>:
+A Cython-optimized, low-level function for in-place RGB-to-YIQ conversion, minimizing Python overhead.</p></li>
+</ul>
+<p><strong>✅ Why YIQ?</strong></p>
+<p>YIQ is widely used in <strong>NTSC television broadcasting</strong> and in image processing applications where the separation of luma (brightness) and chroma (color) enhances processing and compression.</p>
+<p><strong>HSL ↔ RGB Conversions</strong></p>
+<p>HSL stands for <strong>Hue</strong>, <strong>Saturation</strong>, and <strong>Lightness</strong>. It’s commonly used for color adjustments, such as adjusting brightness or saturation.</p>
+<ul class="simple">
+<li><p><strong>`hsl_to_rgb_pixel(h, s, l)` → (r, g, b)</strong>:
+Converts a pixel from HSL (Hue, Saturation, Lightness) to RGB color space.</p></li>
+<li><p><strong>`rgb_pixel_to_hsl(r, g, b)` → (h, s, l)</strong>:
+Converts a pixel from RGB to HSL color space.</p></li>
+</ul>
+<p><strong>✅ Why HSL?</strong></p>
+<p>HSL is extremely useful for <strong>color adjustment</strong> in graphics applications. By working with the hue, saturation, and lightness, users can easily create effects like tints, shades, and saturation adjustments.</p>
+<p><strong>HSV ↔ RGB Conversions</strong></p>
+<p>HSV stands for <strong>Hue</strong>, <strong>Saturation</strong>, and <strong>Value</strong>, and it is widely used in color selection tools and image segmentation.</p>
+<ul class="simple">
+<li><p><strong>`hsv_to_rgb_pixel(h, s, v)` → (r, g, b)</strong>:
+Converts a pixel from HSV (Hue, Saturation, Value) to RGB color space.</p></li>
+<li><p><strong>`rgb_pixel_to_hsv(r, g, b)` → (h, s, v)</strong>:
+Converts a pixel from RGB to HSV color space.</p></li>
+</ul>
+<p><strong>✅ Why HSV?</strong></p>
+<p>HSV is frequently used in <strong>color selection tools</strong> and <strong>image segmentation</strong>, as it separates chromatic content from brightness, making it easier to manipulate colors based on their hue, saturation, or value.</p>
+</section>
+<section id="optimization-features">
+<h2>4. Optimization Features<a class="headerlink" href="#optimization-features" title="Link to this heading">¶</a></h2>
+<p>This library is designed with performance in mind. Here are the key optimization features:</p>
+<ul class="simple">
+<li><p><strong>Cython-based optimization</strong> (<cite>cdef</cite>, <cite>cpdef</cite>, <cite>nogil</cite>):
+Critical functions are compiled into C using Cython, significantly improving speed.</p></li>
+<li><p><strong>In-place operations</strong> (<cite>RGB_TO_YIQ_inplace</cite>):
+By modifying image arrays directly, the library reduces memory overhead and avoids unnecessary copies.</p></li>
+<li><p><strong>No GIL</strong> (<cite>nogil</cite>):
+The Cython implementation enables multi-threading, allowing for parallel execution and further performance improvements.</p></li>
+</ul>
+</section>
+<section id="use-cases">
+<h2>5. Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
+<p>This library is highly useful for various fields where color manipulation is essential. Some key use cases include:</p>
+<ul class="simple">
+<li><p><strong>Image Processing</strong>:
+Transform images into different color spaces for tasks such as filtering, thresholding, or general analysis.</p></li>
+<li><p><strong>Computer Vision</strong>:
+Utilize HSV or YIQ for <strong>color-based object detection</strong>, image segmentation, or feature extraction.</p></li>
+<li><p><strong>Graphics Applications</strong>:
+Adjust color properties like hue, saturation, lightness, and brightness to create visual effects and improve contrast.</p></li>
+<li><p><strong>Broadcasting &amp; Video Processing</strong>:
+Convert between RGB and YIQ color spaces for <strong>NTSC signals</strong> in television broadcasting or video processing applications.</p></li>
+</ul>
+</section>
+<section id="conclusion">
+<h2>6. Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
+<p>This library provides fast, efficient, and easy-to-use color space conversions, optimized for performance through Cython. Its versatility makes it invaluable for image processing, computer vision, graphics applications, and more.</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</section>
+<section id="cython-list-methods">
+<h2>7. Cython list methods<a class="headerlink" href="#cython-list-methods" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="RGBConvert.rgb_2_yiq">
+<span class="sig-prename descclassname"><span class="pre">RGBConvert.</span></span><span class="sig-name descname"><span class="pre">rgb_2_yiq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RGBConvert.rgb_2_yiq" title="Link to this definition">¶</a></dt>
+<dd><p>Summary:
+Converts RGB color values into the YIQ color model. The YIQ model was historically used in NTSC television broadcasting and separates the brightness (Y) from the chrominance components (I and Q). This function performs the conversion using normalized floating-point calculations.</p>
+<p>Example Usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert RGB values to YIQ</span>
+<span class="n">y</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">rgb_2_yiq</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Red color</span>
+</pre></div>
+</div>
+<p>Parameters:</p>
+<ul class="simple">
+<li><p><strong>r</strong> (unsigned char):
+An integer representing the red channel, in the range [0, 255].</p></li>
+<li><p><strong>g</strong> (unsigned char):
+An integer representing the green channel, in the range [0, 255].</p></li>
+<li><p><strong>b</strong> (unsigned char):
+An integer representing the blue channel, in the range [0, 255].</p></li>
+</ul>
+<p>Returns:</p>
+<ul class="simple">
+<li><p><strong>tuple</strong>:</p></li>
+</ul>
+<p>A tuple <cite>(Y, I, Q)</cite> where:
+- <strong>Y</strong> (float): The Luma component, representing brightness.
+- <strong>I</strong> (float): The In-phase chrominance, representing the orange-blue hue.
+- <strong>Q</strong> (float): The Quadrature chrominance, representing the purple-green hue.</p>
+<p>Raises:</p>
+<ul class="simple">
+<li><p><strong>ValueError</strong>:
+If any input value is outside the valid range [0, 255].</p></li>
+</ul>
+<p>Notes:</p>
+<ul class="simple">
+<li><p>The YIQ color model is used primarily in NTSC broadcasting and separates color information (chrominance) from brightness (luma).</p></li>
+<li><p>The conversion is done using normalized floating-point calculations for accurate representation in the YIQ color space.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="RGBConvert.yiq_2_rgb">
+<span class="sig-prename descclassname"><span class="pre">RGBConvert.</span></span><span class="sig-name descname"><span class="pre">yiq_2_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RGBConvert.yiq_2_rgb" title="Link to this definition">¶</a></dt>
+<dd><p><strong>Summary</strong>:
+Converts YIQ color model values into equivalent RGB values. The YIQ color model was historically used in NTSC television broadcasting and separates the brightness (Y) from the chrominance components (I and Q). This function converts the YIQ values back into RGB format, with the resulting values scaled to the [0, 255] range and rounded to the nearest integer.</p>
+<p><strong>Example Usage</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert YIQ values to RGB</span>
+<span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">yiq_2_rgb</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><strong>y</strong> (float):
+The Luma (brightness) component of the YIQ color model.</p></li>
+<li><p><strong>i</strong> (float):
+The In-phase chrominance, representing the orange-blue contrast.</p></li>
+<li><p><strong>q</strong> (float):
+The Quadrature chrominance, representing the purple-green contrast.</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p><strong>tuple</strong>:</p></li>
+</ul>
+<dl class="simple">
+<dt>A tuple <cite>(R, G, B)</cite> where:</dt><dd><ul class="simple">
+<li><p><strong>R</strong> (unsigned char): Red value in the range [0, 255].</p></li>
+<li><p><strong>G</strong> (unsigned char): Green value in the range [0, 255].</p></li>
+<li><p><strong>B</strong> (unsigned char): Blue value in the range [0, 255].</p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Raises</strong>:</p>
+<ul class="simple">
+<li><p><strong>ValueError</strong>:
+If the input values for <cite>y</cite>, <cite>i</cite>, or <cite>q</cite> are outside the expected range for the YIQ model.</p></li>
+</ul>
+<p><strong>Notes</strong>:</p>
+<ul class="simple">
+<li><p>The YIQ color model separates brightness (Y) from chrominance (I and Q), which allows black-and-white TVs to display just the Y component.</p></li>
+<li><p>The function scales and rounds the RGB values to fit within the [0, 255] range, making them suitable for display or further processing.</p></li>
+</ul>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="RGBConvert.RGB_TO_YIQ_inplace">
+<span class="sig-prename descclassname"><span class="pre">RGBConvert.</span></span><span class="sig-name descname"><span class="pre">RGB_TO_YIQ_inplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_surface</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RGBConvert.RGB_TO_YIQ_inplace" title="Link to this definition">¶</a></dt>
+<dd><p><strong>Summary</strong>:
+Converts a 24-bit or 32-bit RGB image into the YIQ color model in-place. The YIQ model separates brightness (luma) from color information (chroma), where Y represents brightness (luma), and I and Q represent chrominance (orange-blue and purple-green contrasts). This function modifies the pixel data of the given <cite>image_surface</cite> directly without creating a new image.</p>
+<p><strong>Example Usage</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert an image surface to YIQ with the default parameters</span>
+<span class="n">RGB_TO_YIQ_inplace</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><p><strong>image_surface</strong> (pygame.Surface):
+The input image surface (24-bit or 32-bit), which contains the RGB pixel data to be converted to YIQ.</p></li>
+<li><p><strong>include_y</strong> (bint, default=True):
+A flag indicating whether to include the Y (luma) component in the conversion. If <cite>True</cite>, the Y component will be included; otherwise, it will be omitted.</p></li>
+<li><p><strong>include_i</strong> (bint, default=False):
+A flag indicating whether to include the I (orange-blue contrast) component in the conversion. If <cite>True</cite>, the I component will be included.</p></li>
+<li><p><strong>include_q</strong> (bint, default=False):
+A flag indicating whether to include the Q (purple-green contrast) component in the conversion. If <cite>True</cite>, the Q component will be included.</p></li>
+</ul>
+<p><strong>Returns</strong>:</p>
+<ul class="simple">
+<li><p><strong>None</strong>:
+This function modifies the <cite>image_surface</cite> in-place and does not return any value.</p></li>
+</ul>
+<p><strong>Raises</strong>:</p>
+<ul class="simple">
+<li><p><strong>TypeError</strong>:
+If <cite>image_surface</cite> is not a valid <cite>pygame.Surface</cite> object.</p></li>
+<li><p><strong>ValueError</strong>:
+If the input image surface is not compatible with the conversion (e.g., if the surface does not support 24-bit or 32-bit color formats).</p></li>
+</ul>
+<p><strong>Notes</strong>:</p>
+<ul class="simple">
+<li><p>The function processes the pixel data in-place, meaning the original image surface is directly modified.</p></li>
+<li><p>You can choose to include any combination of the Y, I, and Q components based on the flags <cite>include_y</cite>, <cite>include_i</cite>, and <cite>include_q</cite>.</p></li>
+<li><p>The conversion will be done to all pixels in the surface, and the color channels will be replaced by their respective YIQ values.</p></li>
+</ul>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Function</strong>:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="RGBConvert.rgb_pixel_to_hsl">
+<span class="sig-prename descclassname"><span class="pre">RGBConvert.</span></span><span class="sig-name descname"><span class="pre">rgb_pixel_to_hsl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RGBConvert.rgb_pixel_to_hsl" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><strong>Summary</strong>:
+Converts RGB color components (uint8) to the HSL color model (float tuple). This function converts RGB values in the range [0, 255] to the equivalent HSL (Hue, Saturation, Lightness) model, rescaling the values as follows:
+- Hue (H) in the range [0, 360] degrees.
+- Saturation (S) in the range [0, 100].
+- Lightness (L) in the range [0, 100].</p>
+<p><strong>Example Usage</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+<span class="n">h</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">l</span> <span class="o">=</span> <span class="n">rgb_pixel_to_hsl</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>  <span class="c1"># Output will be (0.0, 100.0, 50.0) for pure red</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>r</strong> (unsigned char):</dt><dd><p>The red component of the pixel, an integer (uint8) in the range [0, 255].</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>g</strong> (unsigned char):</dt><dd><p>The green component of the pixel, an integer (uint8) in the range [0, 255].</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>b</strong> (unsigned char):</dt><dd><p>The blue component of the pixel, an integer (uint8) in the range [0, 255].</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Returns</strong>:
+A tuple of three float values representing the HSL components:
+- <strong>h</strong> (float): Hue, in the range [0, 360] degrees.
+- <strong>s</strong> (float): Saturation, in the range [0, 100].
+- <strong>l</strong> (float): Lightness, in the range [0, 100].</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Function</strong>:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="RGBConvert.hsl_to_rgb_pixel">
+<span class="sig-prename descclassname"><span class="pre">RGBConvert.</span></span><span class="sig-name descname"><span class="pre">hsl_to_rgb_pixel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RGBConvert.hsl_to_rgb_pixel" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><strong>Summary</strong>:
+Converts HSL (Hue, Saturation, Lightness) values to RGB pixel components. The input HSL values should be normalized as follows:
+- Hue (h) should be in the range [0, 1] (i.e., h/360.0).
+- Saturation (s) and Lightness (l) should be in the range [0, 1] (i.e., s/100.0 and l/100.0).</p>
+<p>The function converts the normalized HSL values to RGB, rounding the output to the nearest integer and ensuring that the resulting RGB values fall within the range [0, 255].</p>
+<p><strong>Example Usage</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">h</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">l</span> <span class="o">=</span> <span class="n">rgb_pixel_to_hsl</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">hsl_to_rgb_pixel</span><span class="p">(</span><span class="n">h</span><span class="o">/</span><span class="mf">360.0</span><span class="p">,</span> <span class="n">s</span><span class="o">/</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">l</span><span class="o">/</span><span class="mf">100.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>h</strong> (float):</dt><dd><p>Normalized hue value in the range [0.0, 1.0], where 0.0 corresponds to 0° and 1.0 corresponds to 360°.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>s</strong> (float):</dt><dd><p>Normalized saturation value in the range [0.0, 1.0], where 0.0 represents no saturation and 1.0 represents full saturation.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>l</strong> (float):</dt><dd><p>Normalized lightness value in the range [0.0, 1.0], where 0.0 represents black, 1.0 represents white, and 0.5 represents the pure color.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Returns</strong>:
+A tuple of three unsigned char values (r, g, b) representing the RGB pixel color equivalent to the input HSL values. The RGB values are rounded and fall within the range [0, 255].</p>
+<p><strong>Raises</strong>:
+- <strong>ValueError</strong>: If any of the input values (h, s, or l) are outside the valid normalized range [0.0, 1.0].</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Function</strong>:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="RGBConvert.rgb_pixel_to_hsv">
+<span class="sig-prename descclassname"><span class="pre">RGBConvert.</span></span><span class="sig-name descname"><span class="pre">rgb_pixel_to_hsv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RGBConvert.rgb_pixel_to_hsv" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><strong>Summary</strong>:
+Converts RGB pixel color components to the equivalent HSV model. The input RGB values are expected to be in the range [0, 255]. The function converts the RGB values into the HSV (Hue, Saturation, Value) model, and the output HSV values are rescaled as follows:
+- Hue (H) is scaled to [0, 360] degrees.
+- Saturation (S) is scaled to [0, 100].
+- Value (V) is scaled to [0, 100].</p>
+<p><strong>Example Usage</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+<span class="n">h</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">rgb_pixel_to_hsv</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>r</strong> (uint8):</dt><dd><p>The red component of the pixel, in the range [0, 255].</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>g</strong> (uint8):</dt><dd><p>The green component of the pixel, in the range [0, 255].</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>b</strong> (uint8):</dt><dd><p>The blue component of the pixel, in the range [0, 255].</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Returns</strong>:
+A tuple of float values representing the HSV equivalent of the given RGB components:
+- <strong>h</strong> (Hue): in the range [0, 360].
+- <strong>s</strong> (Saturation): in the range [0, 100].
+- <strong>v</strong> (Value): in the range [0, 100].</p>
+<p><strong>Raises</strong>:
+- <strong>ValueError</strong>: If any of the input values (r, g, or b) are outside the valid range [0, 255].</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Function</strong>:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="RGBConvert.hsv_to_rgb_pixel">
+<span class="sig-prename descclassname"><span class="pre">RGBConvert.</span></span><span class="sig-name descname"><span class="pre">hsv_to_rgb_pixel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#RGBConvert.hsv_to_rgb_pixel" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><strong>Summary</strong>:
+Converts HSV (Hue, Saturation, Value) values to RGB pixel components (uint8). The input HSV values are expected to be normalized as follows:
+- Hue (h) should be in the range [0, 1] (i.e., h/360.0).
+- Saturation (s) and Value (v) should be in the range [0, 1] (i.e., s/100.0 and v/100.0).</p>
+<p>The function converts the normalized HSV values to RGB, rounding the output RGB values to the nearest integer, and the resulting RGB values are in the range [0, 255], which is typical for pixel color values.</p>
+<p><strong>Example Usage</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">h</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span>
+<span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">hsv_to_rgb_pixel</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>  <span class="c1"># Returns (255, 0, 0) for pure red.</span>
+</pre></div>
+</div>
+<p><strong>Parameters</strong>:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>h</strong> (float):</dt><dd><p>Normalized hue value in the range [0.0, 1.0], where 0.0 corresponds to 0° and 1.0 corresponds to 360°.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>s</strong> (float):</dt><dd><p>Normalized saturation value in the range [0.0, 1.0], where 0.0 represents no saturation and 1.0 represents full saturation.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>v</strong> (float):</dt><dd><p>Normalized value (brightness) in the range [0.0, 1.0], where 0.0 represents black and 1.0 represents full brightness.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Returns</strong>:
+A tuple of three unsigned char values (r, g, b) representing the equivalent RGB pixel color. The RGB values are rounded to the nearest integer and fall within the range [0, 255].</p>
+<p><strong>Raises</strong>:
+- <strong>ValueError</strong>: If any of the input values (h, s, or v) are outside the valid normalized range [0.0, 1.0].</p>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">RGBConvert</a><ul>
+<li><a class="reference internal" href="#color-space-conversion-library">1. Color Space Conversion Library</a></li>
+<li><a class="reference internal" href="#purpose-of-the-library">2. Purpose of the Library</a></li>
+<li><a class="reference internal" href="#key-functions-and-their-roles">3. Key Functions and Their Roles</a></li>
+<li><a class="reference internal" href="#optimization-features">4. Optimization Features</a></li>
+<li><a class="reference internal" href="#use-cases">5. Use Cases</a></li>
+<li><a class="reference internal" href="#conclusion">6. Conclusion</a></li>
+<li><a class="reference internal" href="#cython-list-methods">7. Cython list methods</a><ul>
+<li><a class="reference internal" href="#RGBConvert.rgb_2_yiq"><code class="docutils literal notranslate"><span class="pre">rgb_2_yiq()</span></code></a></li>
+<li><a class="reference internal" href="#RGBConvert.yiq_2_rgb"><code class="docutils literal notranslate"><span class="pre">yiq_2_rgb()</span></code></a></li>
+<li><a class="reference internal" href="#RGBConvert.RGB_TO_YIQ_inplace"><code class="docutils literal notranslate"><span class="pre">RGB_TO_YIQ_inplace()</span></code></a></li>
+<li><a class="reference internal" href="#RGBConvert.rgb_pixel_to_hsl"><code class="docutils literal notranslate"><span class="pre">rgb_pixel_to_hsl()</span></code></a></li>
+<li><a class="reference internal" href="#RGBConvert.hsl_to_rgb_pixel"><code class="docutils literal notranslate"><span class="pre">hsl_to_rgb_pixel()</span></code></a></li>
+<li><a class="reference internal" href="#RGBConvert.rgb_pixel_to_hsv"><code class="docutils literal notranslate"><span class="pre">rgb_pixel_to_hsv()</span></code></a></li>
+<li><a class="reference internal" href="#RGBConvert.hsv_to_rgb_pixel"><code class="docutils literal notranslate"><span class="pre">hsv_to_rgb_pixel()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="PygameTools.html"
+                          title="previous chapter">PygameTools</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="Sprites.html"
+                          title="next chapter">Sprites</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/RGBConvert.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Sprites.html" title="Sprites"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="PygameTools.html" title="PygameTools"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">RGBConvert</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

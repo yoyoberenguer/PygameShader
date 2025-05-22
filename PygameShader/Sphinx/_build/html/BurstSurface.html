@@ -1,0 +1,737 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>BurstSurface &#8212; PygameShader 1.0.11 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=9306f2a9"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="BlendFlags" href="BlendFlags.html" />
+    <link rel="prev" title="GaussianBlur5x5" href="GaussianBlur5x5.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="BlendFlags.html" title="BlendFlags"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="GaussianBlur5x5.html" title="GaussianBlur5x5"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">BurstSurface</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="burstsurface">
+<h1>BurstSurface<a class="headerlink" href="#burstsurface" title="Link to this heading">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">BurstSurface.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="cython-burst-surface-library">
+<h2>1. Cython Burst Surface Library<a class="headerlink" href="#cython-burst-surface-library" title="Link to this heading">¶</a></h2>
+</section>
+<section id="key-features">
+<h2>2. Key Features<a class="headerlink" href="#key-features" title="Link to this heading">¶</a></h2>
+<p>This library provides advanced tools for image manipulation and rendering in graphical applications.
+Built on pygame and other low-level rendering techniques, it enables efficient handling of surfaces,
+sprites, and pixel-based effects. The key features include:</p>
+<ul class="simple">
+<li><p>Splitting images into smaller blocks for sprite sheets and tile maps.</p></li>
+<li><p>Applying dynamic effects like bursts and controlled rebuilding of images.</p></li>
+<li><p>Storing and manipulating graphical elements in memory for optimized rendering.</p></li>
+<li><p>Enhancing performance in real-time applications through optimized functions.</p></li>
+<li><p>Supporting experimental features for advanced graphical effects and debugging.</p></li>
+</ul>
+</section>
+<section id="library-functional-overview">
+<h2>3. Library Functional Overview<a class="headerlink" href="#library-functional-overview" title="Link to this heading">¶</a></h2>
+<p>The library consists of a set of functions that facilitate various graphical transformations
+and effects. It focuses on the efficient handling of pixel-based surfaces, allowing developers
+to create complex visual effects such as explosions, dynamic surface reconstruction, and optimized
+sprite manipulations.</p>
+</section>
+<section id="target-applications">
+<h2>4. Target Applications<a class="headerlink" href="#target-applications" title="Link to this heading">¶</a></h2>
+<p>This library is particularly useful for:</p>
+<ul class="simple">
+<li><p>Game development: Enabling real-time effects like explosions, animations, and sprite transformations.</p></li>
+<li><p>Graphics simulations: Creating dynamic visual effects that require image manipulation.</p></li>
+<li><p>Image processing: Splitting, reconstructing, and modifying images for artistic or technical purposes.</p></li>
+<li><p>Research and experimentation: Testing new graphical rendering techniques and optimization strategies.</p></li>
+</ul>
+</section>
+<section id="cython-functions">
+<h2>5. Cython Functions<a class="headerlink" href="#cython-functions" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">pixel_block_rgb_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts a block of RGB pixels from a surface.</span>
+<span class="sd">    Efficiently retrieves a section of an image as a contiguous memory view.</span>
+<span class="sd">    Useful for sprite sheets and image manipulation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">surface_split_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splits a surface into multiple subsurfaces.</span>
+<span class="sd">    Used for working with sprite sheets or dividing an image for animation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">burst_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates an explosion effect by splitting a surface into blocks and moving them randomly.</span>
+<span class="sd">    Ideal for animations where objects break apart dynamically.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">display_burst_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Renders the exploded effect created by `burst_c` onto the screen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">rebuild_from_frame_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reassembles an exploded surface back to its original form over a sequence of frames.</span>
+<span class="sd">    Useful for animation effects where an object reconstructs over time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">burst_into_memory_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores the burst effect in memory for later use.</span>
+<span class="sd">    Helps in precomputing effects for better performance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">rebuild_from_memory_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rebuilds a surface from previously stored exploded pieces.</span>
+<span class="sd">    Useful for reusing precomputed effects efficiently.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">burst_experimental_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A variant of `burst_c` with additional or alternative rendering techniques.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">db_experimental_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An experimental function that likely applies blending or cleaning effects to a surface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">rff_experimental_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rebuilds an exploded surface from a specific frame with potential experimental logic.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">rfm_experimental_c</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Another experimental function focusing on surface restoration and rendering techniques.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">build_surface_inplace</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Splits a surface into smaller blocks within a sprite group.</span>
+<span class="sd">    Used for managing sprites at a granular level.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cpdef</span> <span class="n">build_surface_inplace_fast</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An optimized version of `build_surface_inplace` with improved performance.</span>
+<span class="sd">    Suitable for real-time applications requiring minimal processing time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="summary">
+<h2>6. Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>This library is designed to enhance the capabilities of graphical applications, particularly
+in game development and advanced image manipulation. By offering optimized functions for handling
+surfaces, splitting images, applying burst effects, and rebuilding images, it provides a flexible
+and efficient toolset for developers. Experimental functions add further possibilities for exploring
+novel rendering techniques. The library is a valuable resource for those looking to implement complex
+graphical transformations efficiently.</p>
+</section>
+<section id="cython-method-list">
+<h2>7. Cython method list<a class="headerlink" href="#cython-method-list" title="Link to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="BurstSurface.pixel_block_rgb">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">pixel_block_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.pixel_block_rgb" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Extract a block of pixels from a larger 2D array representing an image.</strong></p>
+<p>This function retrieves a rectangular block of pixels from a larger image
+(or sprite sheet) and stores it into a smaller block array. The function
+delegates the actual pixel extraction to the <cite>pixel_block_rgb_c</cite> helper
+function for performance optimization.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>array_</strong></dt><dd><p>unsigned char; A 3D array representing the full image (height x width x 3).
+This is the source from which the pixel block will be extracted.</p>
+</dd>
+<dt><strong>start_x</strong></dt><dd><p>int; The x-coordinate of the top-left corner of the block to extract.
+This defines where the block starts in the source image.</p>
+</dd>
+<dt><strong>start_y</strong></dt><dd><p>int; The y-coordinate of the top-left corner of the block to extract.
+This defines where the block starts in the source image.</p>
+</dd>
+<dt><strong>w</strong></dt><dd><p>int; The width of the block to extract. The block will be <cite>w</cite> pixels wide.</p>
+</dd>
+<dt><strong>h</strong></dt><dd><p>int; The height of the block to extract. The block will be <cite>h</cite> pixels tall.</p>
+</dd>
+<dt><strong>block</strong></dt><dd><p>unsigned char; A pre-allocated empty block of size <cite>w x h x 3</cite>.
+This array will be filled with the pixel data from the source image.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong></p>
+<dl class="simple">
+<dt><strong>unsigned char[:, :, :]</strong></dt><dd><p>A 3D array (height x width x 3) representing the extracted pixel block.
+The block is stored in the <cite>block</cite> parameter.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="BurstSurface.surface_split">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">surface_split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.surface_split" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Split a pygame.Surface into smaller subsurfaces.</strong></p>
+<p>This function divides a larger surface into smaller subsurfaces (blocks)
+based on the specified size, number of rows, and columns. It delegates
+the actual splitting to the <cite>surface_split_c</cite> helper function for efficient processing.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>surface_</strong></dt><dd><p>pygame.Surface; The surface to be split into smaller subsurfaces.</p>
+</dd>
+<dt><strong>size_</strong></dt><dd><p>int; The size (width and height) of each subsurface. The resulting
+subsurfaces will be square with dimensions <cite>size_ x size_</cite>.</p>
+</dd>
+<dt><strong>rows_</strong></dt><dd><p>int; The number of rows of subsurfaces to create. This determines
+how many horizontal blocks will be extracted from the original surface.</p>
+</dd>
+<dt><strong>columns_</strong></dt><dd><p>int; The number of columns of subsurfaces to create. This determines
+how many vertical blocks will be extracted from the original surface.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong></p>
+<dl class="simple">
+<dt><strong>list</strong></dt><dd><p>A list of pygame.Surface objects, each representing a smaller
+block of the original surface.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="BurstSurface.burst">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">burst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block_size_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rows_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_angle_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.burst" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Simulate an explosion effect on a surface by splitting it into smaller subsurfaces or pixels.</strong></p>
+<p>This function breaks a given surface into multiple smaller blocks or pixels and applies
+an explosion effect, projecting them in random directions. The subsurfaces or pixels
+are placed at specified positions and can be projected at different angles.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>image_</strong></dt><dd><p>pygame.Surface; The surface to be split into smaller subsurfaces or pixels.</p>
+</dd>
+<dt><strong>vertex_array_</strong></dt><dd><p>list; A list that will be populated with the created sprites, each representing a
+smaller subsurface or pixel. These sprites will have attributes like position,
+velocity (vector), and other states related to the explosion.</p>
+</dd>
+<dt><strong>block_size_</strong></dt><dd><p>int; The size of each block (subsurface). If set to 1, each block will be a single pixel.</p>
+</dd>
+<dt><strong>rows_</strong></dt><dd><p>int; The number of rows of subsurfaces or pixels to create. Determines how many
+horizontal blocks will be created.</p>
+</dd>
+<dt><strong>columns_</strong></dt><dd><p>int; The number of columns of subsurfaces or pixels to create. Determines how many
+vertical blocks will be created.</p>
+</dd>
+<dt><strong>x_</strong></dt><dd><p>int; The x-coordinate of the top-left corner of the surface before the explosion effect.</p>
+</dd>
+<dt><strong>y_</strong></dt><dd><p>int; The y-coordinate of the top-left corner of the surface before the explosion effect.</p>
+</dd>
+<dt><strong>max_angle_</strong></dt><dd><p>int, optional; The maximum angle (in degrees) at which each subsurface/pixel will be
+projected. If not provided, defaults to 0 (no angle applied)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.display_burst">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">display_burst</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screen_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">vertex_array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_=0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.display_burst" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Display an explosion effect on the screen by rendering the burst of sprites.</p>
+<p>This function iterates through the list of sprites (created by the burst effect),
+rendering each sprite onto the provided screen surface. The sprites are drawn
+with optional blending effects for smoother transitions, such as additive blending.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>screen_</strong>:</dt><dd><p>pygame.Surface; The screen (or rendering surface) where the explosion effect
+(burst of sprites) will be drawn.</p>
+</dd>
+<dt><strong>vertex_array_</strong>:</dt><dd><p>list; A list of sprite objects that represent the subsurfaces or pixels created
+during the explosion effect. These sprites will be rendered on the screen.</p>
+</dd>
+<dt><strong>blend_</strong>:</dt><dd><p>unsigned char, optional; The blending mode to apply when drawing the sprites.
+Default is 0 (no blending). A non-zero value may specify an additive or
+other blending mode depending on how it’s defined.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong>
+void; The function draws each sprite from <cite>vertex_array_</cite> to the <cite>screen_</cite> surface.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.rebuild_from_frame">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">rebuild_from_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screen_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">current_frame_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">start_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">vertex_array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.rebuild_from_frame" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Rebuild and render an explosion effect from a specific frame.</p>
+<p>This function rebuilds and renders an explosion effect (created from sprites) on the
+screen starting from a specified frame number. The sprites are progressively
+re-rendered from their original positions and updated based on the <cite>current_frame_</cite>.
+The function also supports blending for smoother visual transitions during the effect.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>screen_</strong>:</dt><dd><p>pygame.Surface; The surface (or screen) where the rebuilt explosion effect will
+be drawn.</p>
+</dd>
+<dt><strong>current_frame_</strong>:</dt><dd><p>unsigned int; The current frame number, used to control the timing and progression
+of the explosion effect.</p>
+</dd>
+<dt><strong>start_frame</strong>:</dt><dd><p>unsigned int; The frame number at which to start rebuilding the explosion effect.
+The process will only begin after the <cite>current_frame_</cite> exceeds this value.</p>
+</dd>
+<dt><strong>vertex_array_</strong>:</dt><dd><p>list; A list of sprite objects representing the subsurfaces or pixels of the
+explosion. These sprites will be rendered onto the screen.</p>
+</dd>
+<dt><strong>blend_</strong>:</dt><dd><p>unsigned char, optional; The blending mode to use when rendering the sprites.
+The default is 0 (no blending). A non-zero value will apply the specified blend mode
+(e.g., additive blending).</p>
+</dd>
+</dl>
+<p><strong>Returns</strong>
+void; This function updates the screen by rendering the sprites based on the
+specified frame and blending settings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.burst_into_memory">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">burst_into_memory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">n_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">sg_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screenrect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bint</span> <span class="pre">warn_</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bint</span> <span class="pre">auto_n_</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.burst_into_memory" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Burst a sprite group into memory, creating an explosion effect.</p>
+<p>This function processes a sprite group (<cite>sg_</cite>) and generates an explosion effect by
+bursting it into memory. The function creates a set of sprites or subsurfaces that
+are distributed across a specified region of the screen defined by <cite>screenrect</cite>.
+The number of sprites (<cite>n_</cite>) determines how many parts the sprite group will be
+divided into. It also supports warnings and automatic configuration for the number
+of elements to process.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>n_</strong>:</dt><dd><p>unsigned int; The number of elements to burst into memory. This controls
+how many parts the sprite group will be split into for the explosion effect.</p>
+</dd>
+<dt><strong>sg_</strong>:</dt><dd><p>object; A pygame.sprite.Group containing the sprites to be processed and
+exploded into memory.</p>
+</dd>
+<dt><strong>screenrect</strong>:</dt><dd><p>object; The pygame.Rect object that defines the area of the screen where
+the explosion effect will be displayed. This helps control the positioning
+of the sprites within the screen area.</p>
+</dd>
+<dt><strong>warn_</strong>:</dt><dd><p>bint, optional; A flag to trigger warnings if certain conditions are met
+(e.g., if the sprite group is too large to process efficiently). Defaults to False.</p>
+</dd>
+<dt><strong>auto_n_</strong>:</dt><dd><p>bint, optional; A flag that, if set to True, automatically determines the
+number of elements to burst based on the sprite group’s size. Defaults to False.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong>
+void; This function modifies the memory by creating and storing the explosion
+effect, which can then be displayed on the screen.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.rebuild_from_memory">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">rebuild_from_memory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screen_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list</span> <span class="pre">vertex_array_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.rebuild_from_memory" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Rebuild and render an image from stored memory data.</p>
+<p>This function takes a list of vertex data (<cite>vertex_array_</cite>) and reconstructs
+an image or animation by rendering the stored memory information onto the
+provided screen. The image is rendered using the specified blending mode
+(<cite>blend_</cite>). This can be used for reconstructing exploded or fragmented
+visual effects from previously stored memory.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>screen_</strong>:</dt><dd><p>object; The surface or screen where the rebuilt image will be rendered.
+Typically, this would be a pygame.Surface representing the display window.</p>
+</dd>
+<dt><strong>vertex_array_</strong>:</dt><dd><p>list; A list containing the vertex data (e.g., pixels, sprite blocks,
+or fragmented image parts) used to reconstruct the image. This data
+is used to render the final visual output on the screen.</p>
+</dd>
+<dt><strong>blend_</strong>:</dt><dd><p>unsigned char, optional; The blend mode to be used when rendering the
+image. A blend mode of 0 typically represents no blending (normal mode),
+while other values may represent different additive or subtractive blending
+effects. Defaults to 0 (no blending).</p>
+</dd>
+</dl>
+<p><strong>Returns</strong>
+void; This function modifies the screen object by rendering the rebuilt
+image from the provided vertex data without returning a value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.burst_experimental">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">burst_experimental</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">render_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">image_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">block_size_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">rows_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">columns_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">x_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">y_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">int</span> <span class="pre">max_angle_</span> <span class="pre">=</span> <span class="pre">359</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.burst_experimental" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Explode a surface into multiple subsurfaces or pixels and apply random projections.</p>
+<p>This function takes a single surface (<cite>image_</cite>) and splits it into multiple blocks
+or individual pixels, based on the specified block size, number of rows, and columns.
+Each resulting block or pixel is assigned a random angle of projection, giving the effect
+of the surface being ‘exploded’ into separate pieces. The pieces are added to the specified
+sprite group (<cite>group_</cite>) for further manipulation or rendering.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>render_</strong>:</dt><dd><p>object; The 2D rendering context used for rendering the exploded pieces.
+Typically a pygame.Surface or similar rendering context.</p>
+</dd>
+<dt><strong>image_</strong>:</dt><dd><p>object; The pygame.Surface to be split into smaller blocks or pixels.
+This image will be ‘exploded’ into multiple parts based on the block size.</p>
+</dd>
+<dt><strong>group_</strong>:</dt><dd><p>object; A pygame.sprite.Group that will contain the resulting pieces
+(subsurfaces or pixels) after the explosion. Each part of the exploded image
+will be added as a sprite to this group.</p>
+</dd>
+<dt><strong>block_size_</strong>:</dt><dd><p>int; The size of each block or pixel in the explosion. This defines
+the width and height of each subsurface or pixel entity. A block size of 1
+will result in individual pixels being created.</p>
+</dd>
+<dt><strong>rows_</strong>:</dt><dd><p>int; The number of rows into which the surface will be divided. This, combined
+with the block size, determines how many blocks are created along the vertical axis.</p>
+</dd>
+<dt><strong>columns_</strong>:</dt><dd><p>int; The number of columns into which the surface will be divided. This, combined
+with the block size, determines how many blocks are created along the horizontal axis.</p>
+</dd>
+<dt><strong>x_</strong>:</dt><dd><p>int; The starting x-coordinate of the surface, representing the top-left corner
+before the explosion.</p>
+</dd>
+<dt><strong>y_</strong>:</dt><dd><p>int; The starting y-coordinate of the surface, representing the top-left corner
+before the explosion.</p>
+</dd>
+<dt><strong>max_angle_</strong>:</dt><dd><p>int, optional; The maximum angle (in degrees) for the projection of each exploded
+piece. Each piece will be projected at a random angle between 0 and <cite>max_angle_</cite>.
+Defaults to 359 degrees (full circle).</p>
+</dd>
+</dl>
+<p><strong>Returns</strong>
+void; This function modifies the <cite>group_</cite> object by adding the exploded pieces as
+sprites, but does not return any value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.db_experimental">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">db_experimental</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screenrect_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">render_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bint</span> <span class="pre">clean_</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.db_experimental" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Perform an experimental database effect with a sprite group and optional blending.</p>
+<p>This function applies an experimental effect to a sprite group (<cite>group_</cite>), rendering
+it within a specified screen region (<cite>screenrect_</cite>). The effect is optionally blended
+based on the <cite>blend_</cite> value. The function can also optionally clean up the group (<cite>clean_</cite>),
+removing or resetting elements as necessary.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>screenrect_</strong>:</dt><dd><p>object; A pygame.Rect that defines the region of the screen to render the effect.</p>
+</dd>
+<dt><strong>render_</strong>:</dt><dd><p>object; The 2D rendering context (usually a pygame.Surface) where the effect will be rendered.</p>
+</dd>
+<dt><strong>group_</strong>:</dt><dd><p>object; A pygame.sprite.Group that contains the sprites to be affected by the experimental effect.</p>
+</dd>
+<dt><strong>clean_</strong>:</dt><dd><p>bint, optional; A flag that determines whether the group will be cleaned (reset or cleared) before rendering. Defaults to False.</p>
+</dd>
+<dt><strong>blend_</strong>:</dt><dd><p>unsigned char, optional; The blending mode to be used when rendering the effect. A blend mode of 0 typically represents no blending (normal mode). Defaults to 0.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong>
+void; This function modifies the <cite>group_</cite> object by rendering or cleaning the sprites, but does not return any value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.rff_experimental">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">rff_experimental</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">render_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screenrect_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">current_frame_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">start_frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.rff_experimental" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Rebuild an exploded image from a specific frame number.</p>
+<p>This function starts rebuilding an exploded image from a given start frame
+number and continues to modify the image until it reaches the current frame.
+It delegates the core logic to the <cite>rff_experimental_c</cite> function for performance.</p>
+<p>The rebuild process involves inverting the direction of each pixel or pixel block’s
+vector and drawing them to the render surface, while respecting the screen boundaries.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>render_</strong>:</dt><dd><p>Pygame.Surface; The surface where the image will be rendered. This is usually
+the game screen or the target rendering surface.</p>
+</dd>
+<dt><strong>screenrect_</strong>:</dt><dd><p>Pygame.Rect; The rectangle defining the screen’s area. Used to determine
+if a sprite is within the visible area of the screen.</p>
+</dd>
+<dt><strong>current_frame_</strong>:</dt><dd><p>unsigned int; The current frame number. The image will start rebuilding
+from the specified <cite>start_frame</cite> until the <cite>current_frame</cite> is reached.</p>
+</dd>
+<dt><strong>start_frame</strong>:</dt><dd><p>unsigned int; The frame number at which the rebuild process starts.
+The image will not be modified before this frame.</p>
+</dd>
+<dt><strong>group_</strong>:</dt><dd><p>Pygame.sprite.Group; A group of sprites representing the blocks or
+pixels of the image to be rebuilt. Each sprite is manipulated and
+rendered during the rebuild process.</p>
+</dd>
+<dt><strong>blend_</strong>:</dt><dd><p>unsigned char, optional; The blend mode to use when rendering
+the sprites. Blend modes control how the sprite colors are combined
+with the existing surface. Defaults to 0 (no blending).</p>
+</dd>
+</dl>
+<p><strong>Returns</strong>
+None; This function modifies the <cite>group_</cite> sprites and the surface
+directly. No value is returned.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.rfm_experimental">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">rfm_experimental</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">screenrect_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">render_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">char</span> <span class="pre">blend_</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.rfm_experimental" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Rebuild an exploded image with pixels or pixel blocks outside the screen boundaries.</p>
+<p>This function applies an experimental process to rebuild an image using pixels or
+pixel blocks that are outside the boundaries of the screen. It delegates the core
+logic to the <cite>rfm_experimental_c</cite> function for better performance. This process
+is often used for creating effects where the image “explodes” or pieces of it move
+outside the screen area.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>screenrect_</strong>:</dt><dd><p>Pygame.Rect; The rectangle representing the boundaries of the screen or
+the game display. Used to check if a sprite is within the screen’s area.</p>
+</dd>
+<dt><strong>render_</strong>:</dt><dd><p>Pygame.Surface; The surface where the rebuilt image will be rendered. This is
+typically the game display or render target.</p>
+</dd>
+<dt><strong>group_</strong>:</dt><dd><p>Pygame.sprite.Group; A group of sprites that represent the pixels or blocks
+being used to rebuild the image. Each sprite in the group will be processed
+and blitted onto the surface.</p>
+</dd>
+<dt><strong>blend_</strong>:</dt><dd><p>unsigned char, optional; A blend mode to be used when rendering
+the sprites. Blend modes control how the colors of the sprites are combined
+with the existing colors on the surface. Defaults to 0 (no blending).</p>
+</dd>
+</dl>
+<p><strong>Returns</strong>
+None; This function modifies the surface directly and does not return any
+value. It also modifies the group of sprites in place.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.build_surface_inplace">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">build_surface_inplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">surface_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">block_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">block_height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.build_surface_inplace" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Rebuild a Pygame surface from a group of sprites (inplace).</p>
+<p>This function takes a group of sprites and blits their images onto the specified
+surface at their respective positions, updating the surface in place. The process
+modifies the surface directly without creating a new one.</p>
+<p>It delegates the task to the <cite>build_surface_inplace_c</cite> function, which is written
+in C for improved performance.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>surface_</strong>:</dt><dd><p>Pygame.Surface; The surface that will be updated by blitting the sprites onto it.
+The original surface is modified directly, and no new surface is created.</p>
+</dd>
+<dt><strong>group_</strong>:</dt><dd><p>Pygame.sprite.Group; A group of sprites to be blitted onto the surface. Each sprite’s
+position is determined by its <cite>rect</cite> attribute.</p>
+</dd>
+<dt><strong>block_width</strong>:</dt><dd><p>unsigned int; The width of the block used for the tiling or reconstruction process.
+It can influence how the surface is rebuilt.</p>
+</dd>
+<dt><strong>block_height</strong>:</dt><dd><p>unsigned int; The height of the block used for the tiling or reconstruction process.
+It works in conjunction with <cite>block_width</cite> to determine the surface layout.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong>
+None; This function modifies the surface directly and does not return any value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BurstSurface.build_surface_inplace_fast">
+<span class="sig-prename descclassname"><span class="pre">BurstSurface.</span></span><span class="sig-name descname"><span class="pre">build_surface_inplace_fast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">surface_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object</span> <span class="pre">group_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">block_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unsigned</span> <span class="pre">int</span> <span class="pre">block_height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#BurstSurface.build_surface_inplace_fast" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Efficiently rebuild a Pygame surface from a group of sprites (inplace).</p>
+<p>This function rapidly constructs a surface by blitting individual sprite images
+onto the given surface at their respective positions. The process is performed
+in place, meaning the surface is directly updated without creating a new surface.</p>
+<p>It delegates the actual work to the optimized <cite>build_surface_inplace_fast_c</cite>
+function for performance.</p>
+<p><strong>Parameters</strong></p>
+<dl class="simple">
+<dt><strong>surface_</strong>:</dt><dd><p>Pygame.Surface; The surface to which the sprites will be blitted.
+This surface is modified directly.</p>
+</dd>
+<dt><strong>group_</strong>:</dt><dd><p>Pygame.sprite.Group; The group of sprites whose images will be blitted onto
+the surface. Each sprite’s position is taken from its <cite>rect</cite> attribute.</p>
+</dd>
+<dt><strong>block_width</strong>:</dt><dd><p>unsigned int; The width of the blocks that will be used to build the surface.
+This is important for any tiling logic and might impact performance depending
+on the block size.</p>
+</dd>
+<dt><strong>block_height</strong>:</dt><dd><p>unsigned int; The height of the blocks that will be used to build the surface.
+Similar to <cite>block_width</cite>, it affects how the surface is reconstructed.</p>
+</dd>
+</dl>
+<p><strong>Returns</strong>
+None; The surface is modified directly, so there is no return value.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">BurstSurface</a><ul>
+<li><a class="reference internal" href="#cython-burst-surface-library">1. Cython Burst Surface Library</a></li>
+<li><a class="reference internal" href="#key-features">2. Key Features</a></li>
+<li><a class="reference internal" href="#library-functional-overview">3. Library Functional Overview</a></li>
+<li><a class="reference internal" href="#target-applications">4. Target Applications</a></li>
+<li><a class="reference internal" href="#cython-functions">5. Cython Functions</a></li>
+<li><a class="reference internal" href="#summary">6. Summary</a></li>
+<li><a class="reference internal" href="#cython-method-list">7. Cython method list</a><ul>
+<li><a class="reference internal" href="#BurstSurface.pixel_block_rgb"><code class="docutils literal notranslate"><span class="pre">pixel_block_rgb()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.surface_split"><code class="docutils literal notranslate"><span class="pre">surface_split()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.burst"><code class="docutils literal notranslate"><span class="pre">burst()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.display_burst"><code class="docutils literal notranslate"><span class="pre">display_burst()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.rebuild_from_frame"><code class="docutils literal notranslate"><span class="pre">rebuild_from_frame()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.burst_into_memory"><code class="docutils literal notranslate"><span class="pre">burst_into_memory()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.rebuild_from_memory"><code class="docutils literal notranslate"><span class="pre">rebuild_from_memory()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.burst_experimental"><code class="docutils literal notranslate"><span class="pre">burst_experimental()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.db_experimental"><code class="docutils literal notranslate"><span class="pre">db_experimental()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.rff_experimental"><code class="docutils literal notranslate"><span class="pre">rff_experimental()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.rfm_experimental"><code class="docutils literal notranslate"><span class="pre">rfm_experimental()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.build_surface_inplace"><code class="docutils literal notranslate"><span class="pre">build_surface_inplace()</span></code></a></li>
+<li><a class="reference internal" href="#BurstSurface.build_surface_inplace_fast"><code class="docutils literal notranslate"><span class="pre">build_surface_inplace_fast()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="GaussianBlur5x5.html"
+                          title="previous chapter">GaussianBlur5x5</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="BlendFlags.html"
+                          title="next chapter">BlendFlags</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/BurstSurface.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="BlendFlags.html" title="BlendFlags"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="GaussianBlur5x5.html" title="GaussianBlur5x5"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">BurstSurface</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

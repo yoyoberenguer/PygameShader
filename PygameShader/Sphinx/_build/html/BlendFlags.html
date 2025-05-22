@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>BlendFlags &#8212; PygameShader 1.0.11 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=9306f2a9"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Procedural Fire and Cloud Effects Library" href="Fire.html" />
+    <link rel="prev" title="BurstSurface" href="BurstSurface.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Fire.html" title="Procedural Fire and Cloud Effects Library"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="BurstSurface.html" title="BurstSurface"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">BlendFlags</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="blendflags">
+<h1>BlendFlags<a class="headerlink" href="#blendflags" title="Link to this heading">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">BlendFlags.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>This library is focusing on <strong>image blending operations</strong>,
+particularly for <strong>BGRA/BGR and alpha channel manipulations</strong>.
+The functions are optimized for <strong>fast, parallelized image processing</strong>
+using <strong>Cython</strong> and <strong>OpenMP</strong>.</p>
+<section id="key-features-purpose">
+<h2>1. Key Features &amp; Purpose<a class="headerlink" href="#key-features-purpose" title="Link to this heading">¶</a></h2>
+<p><strong>Image Blitting (``blit_s``)</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Handles copying an image (<code class="docutils literal notranslate"><span class="pre">image</span></code>) onto a destination surface (<code class="docutils literal notranslate"><span class="pre">destination</span></code>)
+at a specified position.</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Blending Operations</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Functions with names like <code class="docutils literal notranslate"><span class="pre">blend_add_*</span></code>, <code class="docutils literal notranslate"><span class="pre">blend_sub_*</span></code>, <code class="docutils literal notranslate"><span class="pre">blend_min_*</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">blend_max_*</span></code> indicate support for <strong>various blending modes</strong>:</p>
+<ul>
+<li><p>Additive blending → Increases pixel brightness.</p></li>
+<li><p>Subtractive blending → Decreases pixel brightness.</p></li>
+<li><p>Minimum blending → Keeps the darkest pixels.</p></li>
+<li><p>Maximum blending → Keeps the brightest pixels.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p><strong>Support for Different Data Representations</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Surface-based functions (``blend_*_surface``)</strong>: Operate on whole images
+(wrapper for SDL surfaces or similar structures).</p></li>
+<li><p><strong>Array-based functions (``blend_*_array``)</strong>: Operate on NumPy-style 3D arrays
+(<code class="docutils literal notranslate"><span class="pre">[height,</span> <span class="pre">width,</span> <span class="pre">channels]</span></code>).</p></li>
+<li><p><strong>In-place operations (``blend_*_bgra_inplace``)</strong>: Modify a 1D BGRA/BGR array
+directly, avoiding extra memory allocation.</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Alpha Channel Operations</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Functions like <code class="docutils literal notranslate"><span class="pre">blend_add_alpha</span></code>, <code class="docutils literal notranslate"><span class="pre">blend_max_alpha</span></code>, and <code class="docutils literal notranslate"><span class="pre">blend_min_alpha</span></code>
+specifically target <strong>alpha blending</strong>, which is crucial for transparency effects.</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Parallelization &amp; Optimization</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Use of <strong>Cython</strong> (<code class="docutils literal notranslate"><span class="pre">cdef</span></code> functions) and <strong>parallelization</strong> (<code class="docutils literal notranslate"><span class="pre">prange</span></code> from OpenMP)
+suggests that the library is designed for <strong>high-performance image processing</strong>,
+likely intended for real-time applications.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="possible-use-cases">
+<h2>2. Possible Use Cases<a class="headerlink" href="#possible-use-cases" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Game development &amp; rendering</strong> (e.g., blending sprites, effects)</p></li>
+<li><p><strong>Image processing applications</strong> (e.g., compositing, transparency adjustments)</p></li>
+<li><p><strong>Graphics frameworks</strong> needing fast pixel operations (e.g., custom shaders, filters)</p></li>
+</ul>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">BlendFlags</a><ul>
+<li><a class="reference internal" href="#key-features-purpose">1. Key Features &amp; Purpose</a></li>
+<li><a class="reference internal" href="#possible-use-cases">2. Possible Use Cases</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="BurstSurface.html"
+                          title="previous chapter">BurstSurface</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="Fire.html"
+                          title="next chapter">Procedural Fire and Cloud Effects Library</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/BlendFlags.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Fire.html" title="Procedural Fire and Cloud Effects Library"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="BurstSurface.html" title="BurstSurface"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">BlendFlags</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

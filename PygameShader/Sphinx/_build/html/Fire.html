@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Procedural Fire and Cloud Effects Library &#8212; PygameShader 1.0.11 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=9306f2a9"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="BlendFlags" href="BlendFlags.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="BlendFlags.html" title="BlendFlags"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Procedural Fire and Cloud Effects Library</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="procedural-fire-and-cloud-effects-library">
+<h1>Procedural Fire and Cloud Effects Library<a class="headerlink" href="#procedural-fire-and-cloud-effects-library" title="Link to this heading">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">Fire.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="purpose-of-the-library">
+<h2>1. Purpose of the Library<a class="headerlink" href="#purpose-of-the-library" title="Link to this heading">¶</a></h2>
+<p>The library provides tools to generate dynamic fire and cloud effects that can be rendered
+in real-time. These effects are highly customizable, allowing developers to control aspects such as:</p>
+<ul class="simple">
+<li><p><strong>Size and shape</strong> of the effect (e.g., width, height, intensity).</p></li>
+<li><p><strong>Color palettes</strong> for the fire or cloud.</p></li>
+<li><p><strong>Post-processing effects</strong> like bloom, blur, brightness adjustment, and smoothing.</p></li>
+<li><p><strong>Performance optimization</strong> through texture resolution reduction and fast algorithms.</p></li>
+</ul>
+<p>The library is optimized for performance, making it suitable for real-time applications like games.
+It uses <strong>Cython</strong> for speed and integrates with <strong>Pygame</strong> for rendering.</p>
+</section>
+<section id="key-functions">
+<h2>2. Key Functions<a class="headerlink" href="#key-functions" title="Link to this heading">¶</a></h2>
+<section id="fire-effect-functions">
+<h3>Fire Effect Functions<a class="headerlink" href="#fire-effect-functions" title="Link to this heading">¶</a></h3>
+<p>These functions generate procedural fire effects.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="Fire.fire_surface24_c_border">
+<span class="sig-prename descclassname"><span class="pre">Fire.</span></span><span class="sig-name descname"><span class="pre">fire_surface24_c_border</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">palette</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fire.fire_surface24_c_border" title="Link to this definition">¶</a></dt>
+<dd><p>Generates a fire effect with an optional border.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Fire.fire_sub">
+<span class="sig-prename descclassname"><span class="pre">Fire.</span></span><span class="sig-name descname"><span class="pre">fire_sub</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fire.fire_sub" title="Link to this definition">¶</a></dt>
+<dd><p>A helper function for generating fire effects. It processes the fire intensity array and applies the color palette.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Fire.fire_surface24_c">
+<span class="sig-prename descclassname"><span class="pre">Fire.</span></span><span class="sig-name descname"><span class="pre">fire_surface24_c</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fire.fire_surface24_c" title="Link to this definition">¶</a></dt>
+<dd><p>Similar to <code class="docutils literal notranslate"><span class="pre">fire_surface24_c_border</span></code> but without the border option. It generates a fire effect with
+customizable intensity and horizontal limits.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Fire.fire_effect">
+<span class="sig-prename descclassname"><span class="pre">Fire.</span></span><span class="sig-name descname"><span class="pre">fire_effect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fire.fire_effect" title="Link to this definition">¶</a></dt>
+<dd><p>The main Python-callable function for generating fire effects.</p>
+<p>Includes options for post-processing (bloom, blur, brightness adjustment) and
+performance optimization (<code class="docutils literal notranslate"><span class="pre">reduce_factor_</span></code>).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Fire.fire_effect_c">
+<span class="sig-prename descclassname"><span class="pre">Fire.</span></span><span class="sig-name descname"><span class="pre">fire_effect_c</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fire.fire_effect_c" title="Link to this definition">¶</a></dt>
+<dd><p>The Cython-optimized core function for generating fire effects. It is called internally by <code class="docutils literal notranslate"><span class="pre">fire_effect</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="cloud-effect-functions">
+<h3>Cloud Effect Functions<a class="headerlink" href="#cloud-effect-functions" title="Link to this heading">¶</a></h3>
+<p>These functions generate procedural cloud or smoke effects.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="Fire.cloud_surface24_c">
+<span class="sig-prename descclassname"><span class="pre">Fire.</span></span><span class="sig-name descname"><span class="pre">cloud_surface24_c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">palette</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cloud_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Fire.cloud_surface24_c" title="Link to this definition">¶</a></dt>
+<dd><p>Generates a cloud effect as a 24-bit RGB pixel array.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Fire.cloud_effect">
+<span class="sig-prename descclassname"><span class="pre">Fire.</span></span><span class="sig-name descname"><span class="pre">cloud_effect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fire.cloud_effect" title="Link to this definition">¶</a></dt>
+<dd><p>The main Python-callable function for generating cloud effects.</p>
+<p>Includes options for post-processing (bloom, blur, brightness adjustment) and
+performance optimization (<code class="docutils literal notranslate"><span class="pre">reduce_factor_</span></code>).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="Fire.cloud_effect_c">
+<span class="sig-prename descclassname"><span class="pre">Fire.</span></span><span class="sig-name descname"><span class="pre">cloud_effect_c</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#Fire.cloud_effect_c" title="Link to this definition">¶</a></dt>
+<dd><p>The Cython-optimized core function for generating cloud effects. It is called internally by <code class="docutils literal notranslate"><span class="pre">cloud_effect</span></code>.</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="core-features">
+<h2>3. Core Features<a class="headerlink" href="#core-features" title="Link to this heading">¶</a></h2>
+<section id="customizable-effects">
+<h3>Customizable Effects<a class="headerlink" href="#customizable-effects" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Control the size, intensity, and shape of fire and cloud effects using parameters
+like <code class="docutils literal notranslate"><span class="pre">factor</span></code>, <code class="docutils literal notranslate"><span class="pre">intensity</span></code>, <code class="docutils literal notranslate"><span class="pre">low</span></code>, and <code class="docutils literal notranslate"><span class="pre">high</span></code>.</p></li>
+</ul>
+</section>
+<section id="color-palettes">
+<h3>Color Palettes<a class="headerlink" href="#color-palettes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Use custom color palettes (<code class="docutils literal notranslate"><span class="pre">palette_</span></code>) to define the colors of the fire or cloud.</p></li>
+</ul>
+</section>
+<section id="post-processing">
+<h3>Post-Processing<a class="headerlink" href="#post-processing" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Bloom</strong>: Adds a glowing effect to bright areas.</p></li>
+<li><p><strong>Blur</strong>: Softens the edges of the effect for a more realistic appearance.</p></li>
+<li><p><strong>Brightness Adjustment</strong>: Increases or decreases the brightness of the effect.</p></li>
+<li><p><strong>Smoothing</strong>: Applies bi-linear filtering for smoother textures.</p></li>
+</ul>
+</section>
+<section id="performance-optimization">
+<h3>Performance Optimization<a class="headerlink" href="#performance-optimization" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Reduce Factor</strong>: Reduces the resolution of the texture for faster processing.</p></li>
+<li><p><strong>Fast Algorithms</strong>: Options like <code class="docutils literal notranslate"><span class="pre">fast_bloom_</span></code> provide a balance between performance and visual quality.</p></li>
+</ul>
+</section>
+<section id="flexible-rendering">
+<h3>Flexible Rendering<a class="headerlink" href="#flexible-rendering" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Supports optional Pygame surfaces (<code class="docutils literal notranslate"><span class="pre">surface_</span></code>) for reusing textures and improving performance.</p></li>
+<li><p>Allows transposing the effect (<code class="docutils literal notranslate"><span class="pre">transpose_</span></code>) to change its orientation.</p></li>
+</ul>
+</section>
+</section>
+<section id="typical-workflow">
+<h2>Typical Workflow<a class="headerlink" href="#typical-workflow" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Initialize Parameters</strong>:
+- Set the dimensions (<code class="docutils literal notranslate"><span class="pre">width_</span></code>, <code class="docutils literal notranslate"><span class="pre">height_</span></code>), intensity, and other parameters for the effect.
+- Define a color palette (<code class="docutils literal notranslate"><span class="pre">palette_</span></code>) and intensity array (<code class="docutils literal notranslate"><span class="pre">fire_</span></code> or <code class="docutils literal notranslate"><span class="pre">cloud_</span></code>).</p></li>
+<li><p><strong>Generate the Effect</strong>:
+- Call the main functions (<code class="docutils literal notranslate"><span class="pre">fire_effect</span></code> or <code class="docutils literal notranslate"><span class="pre">cloud_effect</span></code>) to generate the effect.
+- Use optional parameters to customize the appearance and performance.</p></li>
+<li><p><strong>Render the Effect</strong>:
+- The function returns a Pygame surface that can be blitted directly to the game display.</p></li>
+</ol>
+</section>
+<section id="example-use-cases">
+<h2>4. Example Use Cases<a class="headerlink" href="#example-use-cases" title="Link to this heading">¶</a></h2>
+<section id="game-effects">
+<h3>Game Effects<a class="headerlink" href="#game-effects" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Create realistic fire effects for torches, explosions, or burning objects.</p></li>
+<li><p>Generate dynamic cloud or smoke effects for weather, magic spells, or environmental ambiance.</p></li>
+</ul>
+</section>
+<section id="simulations">
+<h3>Simulations<a class="headerlink" href="#simulations" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Use the library to simulate fire and smoke in scientific or educational applications.</p></li>
+</ul>
+</section>
+<section id="art-and-animation">
+<h3>Art and Animation<a class="headerlink" href="#art-and-animation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Generate procedural fire and cloud textures for use in animations or digital art.</p></li>
+</ul>
+</section>
+</section>
+<section id="summary">
+<h2>5. Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h2>
+<p>This library is a powerful tool for generating procedural fire and cloud effects
+in real-time applications. It combines flexibility, performance, and ease of use,
+making it suitable for game development, simulations, and artistic projects.
+The functions are highly customizable, allowing developers to fine-tune the appearance
+and behavior of the effects while maintaining optimal performance.</p>
+</section>
+<section id="video-samples">
+<h2>6. Video samples<a class="headerlink" href="#video-samples" title="Link to this heading">¶</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" height="315" preload="auto" width="560"><source src="_images/Demo.mp4" type="video/mp4"></video></div></section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Procedural Fire and Cloud Effects Library</a><ul>
+<li><a class="reference internal" href="#purpose-of-the-library">1. Purpose of the Library</a></li>
+<li><a class="reference internal" href="#key-functions">2. Key Functions</a><ul>
+<li><a class="reference internal" href="#fire-effect-functions">Fire Effect Functions</a><ul>
+<li><a class="reference internal" href="#Fire.fire_surface24_c_border"><code class="docutils literal notranslate"><span class="pre">fire_surface24_c_border()</span></code></a></li>
+<li><a class="reference internal" href="#Fire.fire_sub"><code class="docutils literal notranslate"><span class="pre">fire_sub()</span></code></a></li>
+<li><a class="reference internal" href="#Fire.fire_surface24_c"><code class="docutils literal notranslate"><span class="pre">fire_surface24_c()</span></code></a></li>
+<li><a class="reference internal" href="#Fire.fire_effect"><code class="docutils literal notranslate"><span class="pre">fire_effect()</span></code></a></li>
+<li><a class="reference internal" href="#Fire.fire_effect_c"><code class="docutils literal notranslate"><span class="pre">fire_effect_c()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cloud-effect-functions">Cloud Effect Functions</a><ul>
+<li><a class="reference internal" href="#Fire.cloud_surface24_c"><code class="docutils literal notranslate"><span class="pre">cloud_surface24_c()</span></code></a></li>
+<li><a class="reference internal" href="#Fire.cloud_effect"><code class="docutils literal notranslate"><span class="pre">cloud_effect()</span></code></a></li>
+<li><a class="reference internal" href="#Fire.cloud_effect_c"><code class="docutils literal notranslate"><span class="pre">cloud_effect_c()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#core-features">3. Core Features</a><ul>
+<li><a class="reference internal" href="#customizable-effects">Customizable Effects</a></li>
+<li><a class="reference internal" href="#color-palettes">Color Palettes</a></li>
+<li><a class="reference internal" href="#post-processing">Post-Processing</a></li>
+<li><a class="reference internal" href="#performance-optimization">Performance Optimization</a></li>
+<li><a class="reference internal" href="#flexible-rendering">Flexible Rendering</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#typical-workflow">Typical Workflow</a></li>
+<li><a class="reference internal" href="#example-use-cases">4. Example Use Cases</a><ul>
+<li><a class="reference internal" href="#game-effects">Game Effects</a></li>
+<li><a class="reference internal" href="#simulations">Simulations</a></li>
+<li><a class="reference internal" href="#art-and-animation">Art and Animation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#summary">5. Summary</a></li>
+<li><a class="reference internal" href="#video-samples">6. Video samples</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="BlendFlags.html"
+                          title="previous chapter">BlendFlags</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Fire.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="BlendFlags.html" title="BlendFlags"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Procedural Fire and Cloud Effects Library</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1246 @@
+
+<!DOCTYPE html>
+
+<html lang="fr" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Misc &#8212; Documentation PygameShader 1.0.11</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=1b8a1eab"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=e6b791cb"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Recherche" href="search.html" />
+    <link rel="next" title="GaussianBlur5x5" href="GaussianBlur5x5.html" />
+    <link rel="prev" title="Palette" href="Palette.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Index général"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="GaussianBlur5x5.html" title="GaussianBlur5x5"
+             accesskey="N">suivant</a> |</li>
+        <li class="right" >
+          <a href="Palette.html" title="Palette"
+             accesskey="P">précédent</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Documentation PygameShader 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Misc</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="misc">
+<h1>Misc<a class="headerlink" href="#misc" title="Lien vers cette rubrique">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">Misc.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="python-library-summary">
+<h2>1. Résumé de la bibliothèque Python<a class="headerlink" href="#python-library-summary" title="Lien vers cette rubrique">¶</a></h2>
+<p>Cette bibliothèque fait partie d’un module Python pour la manipulation et le traitement d’images, axé sur la <strong>génération de gradients</strong>, la <strong>manipulation des canaux d’images</strong>, les <strong>calculs de l’espace colorimétrique</strong>, et les <strong>algorithmes de tri</strong>. Voici un aperçu des principales fonctionnalités et objectifs des différentes fonctions et méthodes du module :</p>
+<p><strong>Fonctions de génération de gradients</strong></p>
+<p>Ces fonctions créent divers types de gradients, souvent utilisés dans les applications graphiques pour créer des transitions douces entre les couleurs.</p>
+<ul class="simple">
+<li><p><strong>`create_line_gradient_rgb`</strong> : Génère un gradient linéaire de valeurs RGB entre deux couleurs spécifiées (<cite>start_rgb</cite> et <cite>end_rgb</cite>).</p></li>
+<li><p><strong>`create_line_gradient_rgba`</strong> : Similaire à la précédente, mais pour les couleurs RGBA (ajoute un canal alpha pour la transparence).</p></li>
+<li><p><strong>`horizontal_rgb_gradient`</strong> : Crée un gradient horizontal dans l’espace colorimétrique RGB.</p></li>
+<li><p><strong>`horizontal_rgba_gradient`</strong> : Crée un gradient horizontal dans l’espace colorimétrique RGBA.</p></li>
+<li><p><strong>`create_radial_gradient`</strong> : Crée un gradient radial qui rayonne à partir d’un point, avec des couleurs de début et de fin personnalisables et des décalages. Un gradient pré-calculé peut être fourni pour optimiser les performances.</p></li>
+<li><p><strong>`create_radial_gradient_alpha`</strong> : Similaire à <cite>create_radial_gradient</cite>, mais spécifiquement pour gérer les RGBA avec transparence.</p></li>
+<li><p><strong>`create_quarter_radial_gradient`</strong> et <strong>`create_quarter_radial_gradient_alpha`</strong> : Ces fonctions créent des gradients pour un quart de cercle (gradients sectoriels), utiles pour des effets visuels spécialisés.</p></li>
+</ul>
+<p><strong>Fonctions de manipulation d’espace colorimétrique et d’appariement de couleurs</strong></p>
+<p>Ces fonctions sont utilisées pour travailler avec différents espaces colorimétriques (HSV, HSL, RGB) et trouver les couleurs les plus proches, ce qui est utile pour le traitement d’images basé sur les couleurs ou la génération de palettes.</p>
+<ul class="simple">
+<li><p><strong>`color_dist_hsv`</strong> : Calcule la distance entre deux couleurs dans l’espace colorimétrique HSV.</p></li>
+<li><p><strong>`color_dist_hsl`</strong> : Calcule la distance entre deux couleurs dans l’espace colorimétrique HSL.</p></li>
+<li><p><strong>`closest_hsv_color`</strong> et <strong>`closest_hsl_color`</strong> : Trouve la couleur la plus proche dans une palette donnée par rapport à une couleur cible, en utilisant respectivement les espaces colorimétriques HSV ou HSL.</p></li>
+<li><p><strong>`close_color`</strong> : Trouve une couleur dans une palette proche d’une couleur donnée (probablement en utilisant l’espace RGB).</p></li>
+<li><p><strong>`use_palette`</strong> : Similaire à <cite>close_color</cite>, mais sélectionne des couleurs dans une palette basée sur un critère de sélection défini.</p></li>
+</ul>
+<p><strong>Fonctions de manipulation d’image</strong></p>
+<p>Ces fonctions se concentrent sur la manipulation d’images ou de tampons, en particulier pour le défilement, le mélange et la combinaison des canaux.</p>
+<ul class="simple">
+<li><p><strong>`swap_image_channels`</strong> : Échange les canaux de couleur (comme RGB) sur une surface d’image, utile lorsqu’on travaille avec différents formats de couleur ou qu’on effectue des transformations.</p></li>
+<li><p><strong>`scroll_surface_24bit`</strong>, <strong>`scroll24_inplace`</strong>, <strong>`scroll_rgb_array_inplace`</strong>, <strong>`scroll_alpha_inplace`</strong> : Ces fonctions permettent de faire défiler une image ou des canaux d’image dans les directions x et y, ce qui peut être utilisé pour des animations ou des effets visuels. Les versions <cite>c</cite> sont probablement des implémentations optimisées écrites en C pour les performances.</p></li>
+<li><p><strong>`combine_rgba_buffers`</strong> : Combine un tampon d’image BGR et un canal alpha en un seul tampon d’image RGBA. Cela est utile pour travailler avec des images ayant des canaux de couleur et alpha séparés.</p></li>
+<li><p><strong>`normalize_2d_array`</strong> : Normalise un tableau 2D, probablement pour la normalisation des couleurs ou de l’intensité des pixels.</p></li>
+</ul>
+<p><strong>Fonctions utilitaires</strong></p>
+<p>Ces fonctions accomplissent diverses tâches utilitaires, y compris le tri et la génération de nombres aléatoires.</p>
+<ul class="simple">
+<li><p><strong>`rgb_to_int`</strong> et <strong>`int_to_rgb`</strong> : Convertit entre les valeurs RGB et leur représentation entière (souvent utilisée pour l’emballage/déballage des couleurs).</p></li>
+<li><p><strong>`_randf`</strong>, <strong>`_randi`</strong> : Génère des valeurs aléatoires en float et en entier dans une plage spécifiée, probablement pour la génération aléatoire de couleurs ou de pixels.</p></li>
+<li><p><strong>`bubble_sort`</strong>, <strong>`insertion_sort`</strong>, <strong>`quick_sort`</strong>, <strong>`heap_sort`</strong> : Ce sont différents algorithmes de tri implémentés pour trier des tableaux de données de pixels ou d’images. <cite>heap_sort</cite> et <cite>quick_sort</cite> sont particulièrement utiles pour trier de grands ensembles de données ou des valeurs de pixels de manière efficace.</p></li>
+<li><p><strong>`partition_cython`</strong>, <strong>`_quick_sort`</strong>, <strong>`heapify`</strong> : Ce sont des fonctions d’aide pour les algorithmes de tri comme QuickSort et HeapSort, optimisées pour les performances en Cython.</p></li>
+</ul>
+<p><strong>Vérification du format et du type d’image</strong></p>
+<p>Ces fonctions aident à déterminer le type de données ou de tampons d’image.</p>
+<ul class="simple">
+<li><p><strong>`get_image_format`</strong> : Vérifie probablement le format d’une image (si elle est en RGBA, RGB, etc.).</p></li>
+<li><p><strong>`is_type_memoryview`</strong>, <strong>`is_uint8`</strong>, <strong>`is_float64`</strong>, <strong>`is_int32`</strong> : Ces fonctions vérifient le type et le format des données d’un tableau ou tampon d’image donné, utile pour valider l’entrée et garantir le bon format de données.</p></li>
+</ul>
+</section>
+<section id="overall-purpose-of-the-library">
+<h2>2. Objectif global de la bibliothèque<a class="headerlink" href="#overall-purpose-of-the-library" title="Lien vers cette rubrique">¶</a></h2>
+<p>La bibliothèque est conçue pour le <strong>traitement d’images</strong> et les <strong>opérations graphiques</strong>, en mettant l’accent sur la <strong>création de gradients</strong>, la <strong>manipulation des canaux d’image</strong>, les <strong>transformations de couleurs</strong>, les <strong>algorithmes de tri</strong>, et <strong>l’optimisation</strong>. Elle fournit des fonctions pour créer des transitions de couleurs douces (gradients), manipuler les données de pixels, vérifier les formats d’images, et optimiser les opérations coûteuses en calcul en utilisant des algorithmes comme QuickSort et HeapSort. Les fonctions sont fortement optimisées avec <cite>cpdef</cite> et <cite>cdef</cite> pour permettre une intégration fluide entre Python et C pour les tâches critiques en termes de performance.</p>
+</section>
+<section id="use-cases">
+<h2>3. Cas d’utilisation<a class="headerlink" href="#use-cases" title="Lien vers cette rubrique">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Traitement d’image</strong> : Manipulation et transformation des images, gestion des canaux RGBA/BGR, défilement des pixels d’image et application de transformations de couleur.</p></li>
+<li><p><strong>Rendu graphique</strong> : Génération de gradients (linéaires, radiaux, quart de cercle) pour des effets de fond ou des transitions visuelles.</p></li>
+<li><p><strong>Correspondance des couleurs</strong> : Trouver les couleurs les plus proches dans une palette donnée en fonction de différents espaces colorimétriques (HSV, HSL).</p></li>
+<li><p><strong>Optimisation des performances</strong> : Utilisation d’algorithmes de tri et de manipulation des couleurs pour traiter efficacement de grandes images ou ensembles de données, avec des améliorations de performance grâce à Cython (<cite>cpdef</cite>/<cite>cdef</cite>).</p></li>
+</ul>
+</section>
+<section id="conclusion">
+<h2>4. Conclusion<a class="headerlink" href="#conclusion" title="Lien vers cette rubrique">¶</a></h2>
+<p>Cette bibliothèque serait utile dans des applications telles que les <strong>éditeurs d’images</strong>, les <strong>outils de conception graphique</strong>, la <strong>visualisation de données</strong> ou les <strong>applications graphiques en temps réel</strong>.</p>
+</section>
+<section id="cython-list-methods">
+<h2>5. Méthodes de liste Cython<a class="headerlink" href="#cython-list-methods" title="Lien vers cette rubrique">¶</a></h2>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.swap_image_channels">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">swap_image_channels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_surface</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_order</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.swap_image_channels" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Échange ou annule les canaux d’une image en fonction de la chaîne d’ordre des canaux spécifiée. La fonction permet d’échanger les canaux de couleur (RGB) d’une image représentée comme un pygame.Surface. Vous pouvez spécifier le nouvel ordre des canaux à l’aide d’une chaîne où chaque lettre représente un canal de couleur (R, G, B) ou “0” pour annuler un canal (le supprimer).</p>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new_surface</span> <span class="o">=</span> <span class="n">swap_image_channels</span><span class="p">(</span><span class="n">image_surface</span><span class="p">,</span> <span class="s1">&#39;R0B&#39;</span><span class="p">)</span>
+<span class="c1"># Swaps red and blue channels and removes green</span>
+</pre></div>
+</div>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>image_surface</strong> (pygame.Surface) :</dt><dd><p>L’image (pygame Surface) dont les canaux doivent être échangés.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>channel_order</strong> (str) :</dt><dd><p>Une chaîne représentant l’ordre souhaité des canaux. Elle doit contenir exactement 3 caractères, où “R”, “G”, et “B” représentent les canaux de couleur respectifs, et “0” annule un canal. Exemples de valeurs : “RGB”, “RBG”, “GRB”, “BGR”, “BRG”, “R0B”, etc.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Retourne</strong> : Une nouvelle surface pygame 24 bits avec les canaux échangés.</p>
+<p><strong>Lève</strong> : - <strong>ValueError</strong> :</p>
+<blockquote>
+<div><p>Si la chaîne d’ordre des canaux n’est pas valide ou si le format de la surface est incompatible.</p>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.create_line_gradient_rgb">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">create_line_gradient_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pixels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_rgb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_rgb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">255,</span> <span class="pre">0)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.create_line_gradient_rgb" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Génère un gradient horizontal 2D de couleurs RGB allant d’une couleur de départ à une couleur de fin. La fonction crée un tableau de valeurs RGB représentant un gradient horizontal lisse transitionnant de <cite>start_rgb</cite> à <cite>end_rgb</cite>. Le gradient consiste en <cite>num_pixels</cite> pixels, avec la couleur changeant progressivement de la couleur de départ à la couleur de fin à travers le tableau 1D.</p>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gradient</span> <span class="o">=</span> <span class="n">create_line_gradient_rgb</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">start_rgb</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">end_rgb</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+<span class="c1"># Generates a horizontal gradient from red to blue with 256 pixels.</span>
+</pre></div>
+</div>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>num_pixels</strong> (int) :</dt><dd><p>Le nombre de pixels dans le gradient (doit être &gt; 0). Détermine la longueur du gradient dans la direction horizontale.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>start_rgb</strong> (tuple, optionnel) :</dt><dd><p>Un tuple représentant les valeurs RGB de la couleur de départ (par défaut, rouge : (255, 0, 0)).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>end_rgb</strong> (tuple, optionnel) :</dt><dd><p>Un tuple représentant les valeurs RGB de la couleur de fin (par défaut, vert : (0, 255, 0)).</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Retourne</strong> : - <strong>numpy.ndarray</strong> :</p>
+<blockquote>
+<div><p>Un tableau numpy 2D de forme (num_pixels, 3), où chaque ligne représente une couleur RGB. Le tableau contient les valeurs des pixels du gradient, avec la couleur transitionnant de <cite>start_rgb</cite> à <cite>end_rgb</cite>.</p>
+</div></blockquote>
+<p><strong>Lève</strong> : - <strong>ValueError</strong> :</p>
+<blockquote>
+<div><p>Si <cite>num_pixels</cite> est inférieur ou égal à 0. Si <cite>start_rgb</cite> ou <cite>end_rgb</cite> ne sont pas des tuples RGB valides de longueur 3, ou si l’une des valeurs de couleur est en dehors de la plage RGB valide [0, 255]. Si <cite>num_pixels</cite> n’est pas un entier positif.</p>
+</div></blockquote>
+<ul>
+<li><p><strong>TypeError</strong> :</p>
+<blockquote>
+<div><p>Si <cite>start_rgb</cite> ou <cite>end_rgb</cite> ne sont pas des tuples, ou s’ils contiennent des valeurs non entières.</p>
+</div></blockquote>
+</li>
+</ul>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.create_line_gradient_rgba">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">create_line_gradient_rgba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pixels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_rgba</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">255)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_rgba</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">255,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.create_line_gradient_rgba" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Génère un gradient horizontal 2D de couleurs RGB(A) allant d’une couleur de départ à une couleur de fin. La fonction crée un tableau de valeurs RGBA représentant un gradient horizontal lisse transitionnant de <cite>start_rgba</cite> à <cite>end_rgba</cite>. Le gradient consiste en <cite>num_pixels</cite> pixels, avec la couleur changeant progressivement de la couleur de départ à la couleur de fin à travers le tableau 1D.</p>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gradient</span> <span class="o">=</span> <span class="n">create_line_gradient_rgba</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">start_rgba</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">end_rgba</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+<span class="c1"># Generates a horizontal gradient from red to blue with 256 pixels.</span>
+</pre></div>
+</div>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>num_pixels</strong> (int) :</dt><dd><p>Le nombre de pixels dans le gradient (doit être &gt; 0). Détermine la longueur du gradient dans la direction horizontale.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>start_rgba</strong> (tuple, optionnel) :</dt><dd><p>Un tuple représentant les valeurs RGBA de la couleur de départ (par défaut, rouge : (255, 0, 0, 255)).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>end_rgba</strong> (tuple, optionnel) :</dt><dd><p>Un tuple représentant les valeurs RGBA de la couleur de fin (par défaut, vert : (0, 255, 0, 0)).</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Retourne</strong> : - <strong>numpy.ndarray</strong> :</p>
+<blockquote>
+<div><p>Un tableau numpy 2D de forme (num_pixels, 4), où chaque ligne représente une couleur RGBA. Le tableau contient les valeurs des pixels du gradient, avec la couleur transitionnant de <cite>start_rgba</cite> à <cite>end_rgba</cite>.</p>
+</div></blockquote>
+<p><strong>Lève</strong> : - <strong>ValueError</strong> :</p>
+<blockquote>
+<div><p>Si <cite>num_pixels</cite> est inférieur ou égal à 0. Si <cite>start_rgba</cite> ou <cite>end_rgba</cite> ne sont pas des tuples RGBA valides de longueur 4, ou si l’une des valeurs de couleur est en dehors de la plage RGBA valide [0, 255]. Si <cite>num_pixels</cite> n’est pas un entier positif.</p>
+</div></blockquote>
+<ul>
+<li><p><strong>TypeError</strong> :</p>
+<blockquote>
+<div><p>Si <cite>start_rgba</cite> ou <cite>end_rgba</cite> ne sont pas des tuples, ou s’ils contiennent des valeurs non entières.</p>
+</div></blockquote>
+</li>
+</ul>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.horizontal_rgb_gradient">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">horizontal_rgb_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">255,</span> <span class="pre">0)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.horizontal_rgb_gradient" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Génère un gradient horizontal 24 bits entre deux couleurs RGB. La fonction crée une transition douce de <cite>color_start</cite> à <cite>color_end</cite> à travers une surface de dimensions spécifiées.</p>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a gradient from red to green</span>
+<span class="n">gradient</span> <span class="o">=</span> <span class="n">horizontal_rgb_gradient</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>w</strong> (int) :</dt><dd><p>La largeur de la surface du gradient en pixels (doit être &gt; 1).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>h</strong> (int) :</dt><dd><p>La hauteur de la surface du gradient en pixels (doit être &gt; 0).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>color_start</strong> (tuple, optionnel) :</dt><dd><p>La couleur de départ sous forme de tuple (R, G, B), où chaque valeur est dans la plage [0, 255]. La valeur par défaut est (255, 0, 0), représentant le rouge.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>color_end</strong> (tuple, optional):</dt><dd><p>La couleur finale sous forme de tuple (R, G, B), où chaque valeur est dans l’intervalle [0, 255]. La valeur par défaut est (0, 255, 0), ce qui représente le vert.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Retour</strong> : - <strong>pygame.Surface</strong> :</p>
+<blockquote>
+<div><p>Un objet pygame.Surface RGB 24 bits de taille (<cite>w</cite>, <cite>h</cite>) avec le dégradé appliqué.</p>
+</div></blockquote>
+<p><strong>Lève</strong> : - <strong>ValueError</strong> :</p>
+<blockquote>
+<div><p>Si <cite>w</cite> ou <cite>h</cite> n’est pas valide. Si <cite>color_start</cite> ou <cite>color_end</cite> n’est pas un tuple RGB valide.</p>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.horizontal_rgba_gradient">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">horizontal_rgba_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">255)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">255,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.horizontal_rgba_gradient" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Génère un dégradé horizontal 32 bits avec transparence entre deux couleurs RGBA. La fonction crée une transition horizontale fluide de <cite>color_start</cite> à <cite>color_end</cite> à travers la largeur donnée tout en maintenant la hauteur spécifiée.</p>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a gradient from red to green</span>
+<span class="n">gradient</span> <span class="o">=</span> <span class="n">horizontal_rgba_gradient</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>w</strong> (int) :</dt><dd><p>La largeur de la surface du gradient en pixels (doit être &gt; 1).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>h</strong> (int) :</dt><dd><p>La hauteur de la surface du gradient en pixels (doit être &gt; 0).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>color_start</strong> (tuple, optionnel) :</dt><dd><p>La couleur de départ au format RGBA, où chaque composant (R, G, B, A) est dans l’intervalle 0-255. Par défaut : (255, 0, 0, 255) (rouge opaque).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>color_end</strong> (tuple, optional):</dt><dd><p>La couleur de fin au format RGBA, où chaque composant (R, G, B, A) est dans l’intervalle 0-255. Par défaut : (0, 255, 0, 0) (vert transparent).</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Retour</strong> : - <strong>pygame.Surface</strong> :</p>
+<blockquote>
+<div><p>Un <cite>pygame.Surface</cite> 32 bits par pixel avec les dimensions (w, h), contenant le dégradé généré avec un canal alpha.</p>
+</div></blockquote>
+<p><strong>Lève</strong> : - <strong>ValueError</strong> :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Si <cite>w</cite> ou <cite>h</cite> n’est pas un entier positif valide.</p></li>
+<li><p>Si <cite>color_start</cite> ou <cite>color_end</cite> n’est pas un tuple de quatre entiers (0-255).</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.create_radial_gradient">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">create_radial_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precomputed_gradient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">r_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.create_radial_gradient" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Génère un dégradé radial (RGB 24 bits) avec une transition fluide entre deux couleurs, centré dans une surface rectangulaire de largeur et hauteur données. Le dégradé rayonne depuis le centre de la surface, et la transition entre les couleurs est basée sur la distance au centre, permettant divers effets de dégradé (tel que circulaire ou radial). Optionnellement, un dégradé pré-calculé peut être utilisé, ou un dégradé peut être généré dynamiquement.</p>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">precomputed_gradient</span> <span class="o">=</span> <span class="n">create_line_gradient_rgb</span><span class="p">(</span>
+    <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">800</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">800</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="n">start_rgb</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">end_rgb</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+<span class="n">surface</span> <span class="o">=</span> <span class="n">create_radial_gradient</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span>
+    <span class="n">offset_x</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">offset_y</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">color_start</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">color_end</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">precomputed_gradient</span> <span class="o">=</span> <span class="n">precomputed_gradient</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>w</strong> (int) :</dt><dd><p>La largeur de la surface du dégradé de sortie en pixels (doit être &gt; 0).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>h</strong> (int) :</dt><dd><p>La hauteur de la surface du dégradé de sortie en pixels (doit être &gt; 0).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>offset_x</strong> (float, optionnel) :</dt><dd><p>Le décalage horizontal du centre du dégradé, où 0,5 représente le centre de la surface (par défaut 0,5).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>offset_y</strong> (float, optionnel) :</dt><dd><p>Le décalage vertical du centre du dégradé, où 0,5 représente le centre de la surface (par défaut 0,5).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>color_start</strong> (tuple, optionnel) :</dt><dd><p>La couleur de départ du dégradé au format RGB (0-255). Par défaut, (255, 0, 0), ce qui correspond au rouge opaque.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>color_end</strong> (tuple, optional):</dt><dd><p>La couleur de fin du dégradé au format RGB (0-255). Par défaut : (0, 0, 0), ce qui correspond au noir.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>precomputed_gradient</strong> (numpy.array, optionnel) :</dt><dd><p>Un tableau 2D de dégradé pré-calculé (forme : (n, 3), contenant les valeurs RGB). Si non fourni, un nouveau dégradé sera calculé.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>scale_factor</strong> (float, optionnel) :</dt><dd><p>Un facteur de mise à l’échelle qui ajuste le rayon du dégradé. Une valeur supérieure à 1 augmentera la taille du dégradé, et des valeurs inférieures à 1 réduiront son rayon. Par défaut : 1,4. Doit être &gt; 0.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>threads</strong> (int, optionnel) :</dt><dd><p>Le nombre de threads simultanés à utiliser pour le calcul du dégradé. Par défaut 8.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Retour</strong> : - <strong>pygame.Surface</strong> :</p>
+<blockquote>
+<div><p>Un objet <cite>pygame.Surface</cite> avec le dégradé radial généré, centré à (w/2, h/2), au format RGB 24 bits.</p>
+</div></blockquote>
+<p><strong>Lève</strong> : - <strong>ValueError</strong> :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Si <cite>color_start</cite> ou <cite>color_end</cite> n’est pas un tuple de 3 entiers.</p></li>
+<li><p>Si une valeur RGB dans <cite>color_start</cite> ou <cite>color_end</cite> est hors de portée (0-255).</p></li>
+<li><p>Si <cite>scale_factor</cite> est None ou &lt;= 0.</p></li>
+<li><p>Si <cite>w</cite> ou <cite>h</cite> est &lt;= 1.</p></li>
+</ul>
+</div></blockquote>
+<ul>
+<li><p><strong>TypeError</strong> :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Si <cite>precomputed_gradient</cite> n’est pas un tableau contigu.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>ValueError</strong> :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Si <cite>precomputed_gradient</cite> n’est pas un tableau 2D, n’est pas de type uint8, a une longueur &lt;= 1, ou n’est pas au format RGB.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p><strong>Crédits</strong> : Fonction améliorée avec la collaboration de ChatGPT.</p>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.create_radial_gradient_alpha">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">create_radial_gradient_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">255)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precomputed_gradient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">r_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.create_radial_gradient_alpha" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Crée un dégradé radial 32 bits avec transparence, fusionnant en douceur entre deux couleurs RGBA (<cite>color_start</cite> et <cite>color_end</cite>), et prend en charge les tableaux de dégradé pré-calculés pour l’optimisation des performances.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>w</strong> (int) : La largeur de la surface en pixels (doit être &gt; 1).</p></li>
+<li><p><strong>h</strong> (int) : La hauteur de la surface en pixels (doit être &gt; 1).</p></li>
+<li><p><strong>offset_x</strong> (float, optionnel) : La coordonnée X du centre du dégradé en fraction de la largeur (par défaut 0.5).</p></li>
+<li><p><strong>offset_y</strong> (float, optionnel) : La coordonnée Y du centre du dégradé en fraction de la hauteur (par défaut 0.5).</p></li>
+<li><p><strong>color_start</strong> (tuple, optionnel) : La couleur RGBA de départ du dégradé (par défaut (255, 0, 0, 255)).</p></li>
+<li><p><strong>color_end</strong> (tuple, optionnel) : La couleur RGBA de fin du dégradé (par défaut (0, 0, 0, 0)).</p></li>
+<li><p><strong>precomputed_gradient</strong> (numpy.ndarray ou None, optionnel) : Un tableau de dégradé pré-calculé de forme (w, 4) au format uint8 pour l’optimisation (par défaut None).</p></li>
+<li><p><strong>scale_factor</strong> (float, optionnel) : Le facteur de mise à l’échelle pour le dégradé (doit être &gt; 0, la valeur par défaut est <cite>r_max</cite>).</p></li>
+<li><p><strong>threads</strong> (entier court non signé, optionnel) : Le nombre de threads à utiliser pour le calcul parallèle (la valeur par défaut est 8).</p></li>
+</ul>
+<p><strong>Retourne</strong> : - <strong>pygame.Surface</strong> : Une surface contenant le dégradé radial généré avec une transparence par pixel.</p>
+<p><strong>Lève</strong> : - <strong>ValueError</strong> : Si <cite>color_start</cite> ou <cite>color_end</cite> n’est pas un tuple de quatre entiers, si une valeur RGBA est hors de la plage (0-255), ou si <cite>scale_factor</cite> est None ou &lt;= 0. - <strong>ValueError</strong> : Si <cite>w</cite> ou <cite>h</cite> est &lt;= 1. - <strong>TypeError</strong> : Si <cite>precomputed_gradient</cite> n’est pas un tableau contigu. - <strong>ValueError</strong> : Si <cite>precomputed_gradient</cite> n’est pas un tableau 2D, n’est pas de type uint8, a une longueur &lt;= 1, ou n’est pas en format RGBA.</p>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">precomputed_gradient</span> <span class="o">=</span> <span class="n">create_line_gradient_rgba</span><span class="p">(</span>
+    <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">800</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">800</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)),</span>
+    <span class="n">start_rgba</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+    <span class="n">end_rgba</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">surface</span> <span class="o">=</span> <span class="n">create_radial_gradient_alpha</span><span class="p">(</span>
+    <span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span>
+    <span class="n">precomputed_gradient</span><span class="o">=</span><span class="n">precomputed_gradient</span>
+<span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.create_quarter_radial_gradient">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">create_quarter_radial_gradient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_color_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_color_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradient_array_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.create_quarter_radial_gradient" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Génère un dégradé radial d’un quart (24 bits opaque). Cette fonction crée un <strong>dégradé radial</strong> en itérant sur le <strong>quart nord-ouest (NW)</strong> de la surface (<cite>width_/2</cite>, <cite>height_/2</cite>) et en miroir les pixels calculés dans les trois autres quadrants (<strong>nord-est (NE), sud-est (SE) et sud-ouest (SW)</strong>).</p>
+<p>Le dégradé passe de <cite>start_color_</cite> au centre à <cite>end_color_</cite> sur les bords.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>width_</strong> (int) : La largeur de la surface en pixels (doit être &gt; 1).</p></li>
+<li><p><strong>height_</strong> (int) : La hauteur de la surface en pixels (doit être &gt; 1).</p></li>
+<li><p><strong>start_color_</strong> (tuple, optionnel) : La couleur RGB de départ au centre du dégradé. Par défaut, c’est <strong>(255, 0, 0) [Rouge]</strong>.</p></li>
+<li><p><strong>end_color_</strong> (tuple, optionnel) : La couleur RGB de fin sur le bord extérieur du dégradé. Par défaut, c’est <strong>(0, 0, 0) [Noir]</strong>.</p></li>
+<li><p><strong>gradient_array_</strong> (numpy.ndarray ou None, optionnel) : Un tableau NumPy de forme <cite>(width_, 3)</cite>, contenant des valeurs de couleur RGB précalculées (<cite>uint8</cite>). Si <cite>None</cite>, le dégradé est calculé dynamiquement.</p></li>
+<li><p><strong>factor_</strong> (float, optionnel) : Contrôle l’intensité et l’étalement du dégradé. <strong>Doit être &gt; 0</strong>. La valeur par défaut est <strong>1.4</strong>.</p></li>
+<li><p><strong>threads_</strong> (int, optionnel) : Le nombre de threads concurrents à utiliser pour le calcul. La valeur par défaut est <strong>8</strong>.</p></li>
+</ul>
+<p><strong>Retour</strong> : - <strong>pygame.Surface</strong> :</p>
+<blockquote>
+<div><p>Un objet <cite>pygame.Surface</cite> contenant le dégradé radial, <strong>centré sur (width_/2, height_/2)</strong>.</p>
+</div></blockquote>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">surface</span> <span class="o">=</span> <span class="n">create_quarter_radial_gradient</span><span class="p">(</span>
+    <span class="n">width_</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="n">height_</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="n">start_color_</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">end_color_</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">factor_</span><span class="o">=</span><span class="mf">1.4</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.create_quarter_radial_gradient_alpha">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">create_quarter_radial_gradient_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_color_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">255)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_color_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gradient_array_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">factor_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.create_quarter_radial_gradient_alpha" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Génère un dégradé radial d’un quart avec transparence alpha (32 bits). Cette fonction crée un <strong>dégradé radial avec transparence</strong> en itérant sur le <strong>quart nord-ouest (NW)</strong> de la surface (<cite>width_/2</cite>, <cite>height_/2</cite>) et en miroir les pixels calculés dans les trois autres quadrants (<strong>nord-est (NE), sud-est (SE) et sud-ouest (SW)</strong>).</p>
+<p>Le dégradé passe en douceur de <cite>start_color_</cite> au centre à <cite>end_color_</cite> sur les bords, avec un <strong>mélange alpha pour la transparence</strong>.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>width_</strong> (int) : La largeur de la surface en pixels (doit être &gt; 1).</p></li>
+<li><p><strong>height_</strong> (int) : La hauteur de la surface en pixels (doit être &gt; 1).</p></li>
+<li><p><strong>start_color_</strong> (tuple, optionnel) : La couleur au <strong>centre</strong> du dégradé en <strong>format RGBA</strong>. La valeur par défaut est <strong>(255, 0, 0, 255) [Rouge opaque]</strong>.</p></li>
+<li><p><strong>end_color_</strong> (tuple, optionnel) : La couleur au <strong>bord extérieur</strong> du dégradé en <strong>format RGBA</strong>. La valeur par défaut est <strong>(0, 0, 0, 0) [Noir entièrement transparent]</strong>.</p></li>
+<li><p><strong>gradient_array_</strong> (numpy.ndarray ou None, optionnel) : Un tableau NumPy de forme <cite>(width_, 4)</cite>, contenant des valeurs de couleur RGBA précalculées (<cite>uint8</cite>). Si <cite>None</cite>, le dégradé est calculé dynamiquement.</p></li>
+<li><p><strong>factor_</strong> (float, optionnel) : Contrôle l’intensité et l’étalement du dégradé. <strong>Doit être &gt; 0</strong>. La valeur par défaut est <strong>1.4</strong>.</p></li>
+<li><p><strong>threads_</strong> (int, optionnel) : Le nombre de threads concurrents à utiliser pour le calcul. La valeur par défaut est <strong>8</strong>.</p></li>
+</ul>
+<p><strong>Retour</strong> : - <strong>pygame.Surface</strong> :</p>
+<blockquote>
+<div><p>Un objet <cite>pygame.Surface</cite> contenant le dégradé radial, <strong>centré sur (width_/2, height_/2)</strong>, avec <strong>transparence alpha pour un fondu en douceur</strong>.</p>
+</div></blockquote>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">precomputed_gradient</span> <span class="o">=</span> <span class="n">create_line_gradient_rgba</span><span class="p">(</span>
+    <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">800</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">800</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)),</span>
+    <span class="n">start_rgba</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+    <span class="n">end_rgba</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">surface</span> <span class="o">=</span> <span class="n">create_quarter_radial_gradient_alpha</span><span class="p">(</span>
+    <span class="n">width_</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="n">height_</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="n">start_color_</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+    <span class="n">end_color_</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">precomputed_gradient</span><span class="o">=</span><span class="n">precomputed_gradient</span>
+<span class="p">)</span><span class="o">.</span><span class="n">convert_alpha</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.scroll_surface_24bit">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">scroll_surface_24bit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.scroll_surface_24bit" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Fait défiler une surface Pygame <strong>24 bits ou 32 bits</strong> <strong>horizontalement et/ou verticalement</strong>.</p>
+<p>Cette fonction crée et retourne une <strong>nouvelle surface 24 bits</strong> avec les données de pixels décalées selon les valeurs spécifiées de <cite>dx</cite> et <cite>dy</cite>. Les pixels qui dépassent seront <strong>déplacés</strong> de l’autre côté.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>surface</strong> (pygame.Surface) : Un objet <cite>Surface</cite> Pygame en format <strong>24 bits ou 32 bits</strong>.</p></li>
+<li><p><strong>dx</strong> (int) : Le nombre de pixels à faire défiler <strong>horizontalement</strong>. - Un <strong>`dx` positif</strong> déplace la surface vers la <strong>droite</strong>. - Un <strong>`dx` négatif</strong> déplace la surface vers la <strong>gauche</strong>.</p></li>
+<li><p><strong>dy</strong> (int) : Le nombre de pixels à faire défiler <strong>verticalement</strong>. - Un <strong>`dy` positif</strong> déplace la surface <strong>vers le bas</strong>. - Un <strong>`dy` négatif</strong> déplace la surface <strong>vers le haut</strong>.</p></li>
+</ul>
+<p><strong>Retour</strong> : - <strong>pygame.Surface</strong> :</p>
+<blockquote>
+<div><p>Un objet <cite>pygame.Surface</cite> 24 bits <strong>nouveau</strong> avec l’effet de défilement appliqué.</p>
+</div></blockquote>
+<p><strong>Lève</strong> : - <strong>TypeError</strong> :</p>
+<blockquote>
+<div><p>Si <cite>surface</cite> n’est <strong>pas</strong> un objet <cite>pygame.Surface</cite>.</p>
+</div></blockquote>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">new_surface</span> <span class="o">=</span> <span class="n">scroll_surface_24bit</span><span class="p">(</span><span class="n">original_surface</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dy</span><span class="o">=-</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Cela déplace la surface de <strong>10 pixels vers la droite</strong> et de <strong>5 pixels vers le haut</strong>.</p>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.scroll24_inplace">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">scroll24_inplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.scroll24_inplace" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Summary</strong>:
+Scrolls a <strong>24-bit Pygame surface</strong> horizontally and/or vertically <strong>in place</strong>.</p>
+<p>This function <strong>modifies</strong> the given surface <strong>directly</strong> by shifting its pixel data
+based on the specified horizontal (<cite>dx</cite>) and vertical (<cite>dy</cite>) displacement.
+Scrolling <strong>wraps around</strong>, meaning pixels that move off one edge <strong>reappear</strong>
+on the opposite edge.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul>
+<li><p><strong>surface</strong> (pygame.Surface) :</p>
+<p>Un objet <cite>pygame.Surface</cite> en format <strong>24 bits ou 32 bits</strong> (compatible avec l’accès aux pixels).</p>
+</li>
+<li><p><strong>dx</strong> (int) : Quantité de défilement horizontal. - <strong>Les valeurs positives</strong> déplacent les pixels <strong>vers la droite</strong>. - <strong>Les valeurs négatives</strong> déplacent les pixels <strong>vers la gauche</strong>.</p></li>
+<li><p><strong>dy</strong> (int) : Quantité de défilement vertical. - <strong>Les valeurs positives</strong> déplacent les pixels <strong>vers le bas</strong>. - <strong>Les valeurs négatives</strong> déplacent les pixels <strong>vers le haut</strong>.</p></li>
+</ul>
+<p><strong>Retourne</strong> :</p>
+<ul class="simple">
+<li><p><strong>None</strong> (modifie la surface <strong>sur place</strong>).</p></li>
+</ul>
+<p><strong>Lève</strong> : - <strong>TypeError</strong> :</p>
+<blockquote>
+<div><p>Si <cite>surface</cite> n’est <strong>pas</strong> un objet <cite>pygame.Surface</cite>.</p>
+</div></blockquote>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scroll24_inplace</span><span class="p">(</span><span class="n">image_surface</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Cela déplace la surface de <strong>1 pixel vers la droite</strong> sans créer une nouvelle surface.</p>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.scroll_rgb_array_inplace">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">scroll_rgb_array_inplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.scroll_rgb_array_inplace" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Fait défiler un <strong>tableau de pixels RGB 3D</strong> horizontalement et/ou verticalement <strong>sur place</strong>.</p>
+<p>Cette fonction <strong>modifie</strong> directement le <cite>rgb_array</cite> donné en déplaçant les valeurs de pixels en fonction des décalages horizontaux (<cite>dx</cite>) et verticaux (<cite>dy</cite>). Le défilement <strong>fait une boucle</strong>, ce qui signifie que les pixels déplacés au-delà des limites du tableau réapparaissent de l’autre côté.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>rgb_array</strong> (numpy.ndarray) : - Un <strong>tableau NumPy 3D</strong> contenant des <strong>valeurs de pixels RGB</strong>. - Le tableau doit référencer <strong>tous les pixels</strong> pour garantir la modification sur place. - Forme attendue : <strong>(hauteur, largeur, 3)</strong> (format RGB).</p></li>
+<li><p><strong>dx</strong> (int, optionnel, défaut=0) : - <strong>Quantité de décalage horizontal</strong>. - <strong>Les valeurs négatives</strong> déplacent les pixels <strong>à gauche</strong>. - <strong>Les valeurs positives</strong> déplacent les pixels <strong>à droite</strong>.</p></li>
+<li><p><strong>dy</strong> (int, optionnel, défaut=0) : - <strong>Quantité de décalage vertical</strong>. - <strong>Les valeurs négatives</strong> déplacent les pixels <strong>vers le haut</strong>. - <strong>Les valeurs positives</strong> déplacent les pixels <strong>vers le bas</strong>.</p></li>
+</ul>
+<p><strong>Retourne</strong> : - <strong>None</strong> (modifie <cite>rgb_array</cite> <strong>sur place</strong>).</p>
+<p><strong>Lève</strong> :</p>
+<ul class="simple">
+<li><p><strong>TypeError</strong> : Si <cite>rgb_array</cite> n’est <strong>pas</strong> un <cite>numpy.ndarray</cite> ou <cite>memoryviewslice</cite>.</p></li>
+<li><p><strong>ValueError</strong> : - Si <cite>rgb_array</cite> n’est <strong>pas un tableau 3D</strong> avec la forme <cite>(hauteur, largeur, 3)</cite>. - Si <cite>rgb_array.dtype</cite> n’est <strong>pas</strong> <cite>numpy.uint8</cite> (format RGB <strong>8 bits attendu</strong>). - Si <cite>rgb_array</cite> est <strong>vide</strong> (<cite>shape[0] == 0</cite>).</p></li>
+</ul>
+<p><strong>Notes</strong> :</p>
+<ul class="simple">
+<li><p>Si <cite>dx</cite> et <cite>dy</cite> sont tous deux à zéro, la fonction n’effectue <strong>aucune opération</strong>.</p></li>
+<li><p>Cette fonction est optimisée pour la <strong>performance</strong> et fonctionne <strong>sans copier de données</strong>.</p></li>
+<li><p>Le tableau doit être <strong>contigu</strong> et correctement référencé pour éviter des comportements inattendus.</p></li>
+</ul>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scroll_rgb_array_inplace</span><span class="p">(</span><span class="n">rgb_array</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">dy</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Cela déplace le tableau de <strong>5 pixels vers la droite</strong> et de <strong>2 pixels vers le haut</strong>.</p>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.scroll_alpha_inplace">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">scroll_alpha_inplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.scroll_alpha_inplace" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Fait défiler un <strong>tableau de canal alpha</strong> (2D) <strong>horizontalement et/ou verticalement</strong> <strong>sur place</strong>.</p>
+<p>Cette fonction <strong>modifie</strong> directement le <cite>alpha_array</cite> donné en déplaçant les valeurs alpha en fonction des décalages horizontaux (<cite>dx</cite>) et verticaux (<cite>dy</cite>). Le défilement <strong>fait une boucle</strong>, ce qui signifie que les pixels déplacés au-delà des limites du tableau réapparaissent de l’autre côté.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>alpha_array</strong> (numpy.ndarray) : - Un <strong>tableau NumPy 2D</strong> contenant des <strong>valeurs de pixels du canal alpha</strong>. - Le tableau doit référencer <strong>toutes les valeurs alpha des pixels</strong> pour la transformation sur place. - Forme attendue : <strong>(hauteur, largeur)</strong> (format alpha en niveaux de gris).</p></li>
+<li><p><strong>dx</strong> (int, optionnel, défaut=0) : - <strong>Quantité de décalage horizontal</strong>. - <strong>Les valeurs négatives</strong> déplacent les pixels <strong>à gauche</strong>. - <strong>Les valeurs positives</strong> déplacent les pixels <strong>à droite</strong>.</p></li>
+<li><p><strong>dy</strong> (int, optionnel, défaut=0) : - <strong>Quantité de décalage vertical</strong>. - <strong>Les valeurs négatives</strong> déplacent les pixels <strong>vers le haut</strong>. - <strong>Les valeurs positives</strong> déplacent les pixels <strong>vers le bas</strong>.</p></li>
+</ul>
+<p><strong>Retourne</strong> : - <strong>None</strong> (modifie <cite>alpha_array</cite> <strong>sur place</strong>).</p>
+<p><strong>Notes</strong> :</p>
+<ul class="simple">
+<li><p>Si <cite>dx</cite> et <cite>dy</cite> sont tous deux à zéro, la fonction n’effectue <strong>aucune opération</strong>.</p></li>
+<li><p>Cette fonction est optimisée pour la <strong>performance</strong> et fonctionne <strong>sans copier de données</strong>.</p></li>
+<li><p>Le tableau doit être <strong>contigu</strong> et correctement référencé pour éviter des comportements inattendus.</p></li>
+<li><p>Les <strong>valeurs du canal alpha</strong> représentent généralement la transparence des pixels, où : - <cite>0</cite> = <strong>Complètement transparent</strong> - <cite>255</cite> = <strong>Complètement opaque</strong></p></li>
+</ul>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scroll_alpha_inplace</span><span class="p">(</span><span class="n">alpha_array</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">dy</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Cela déplace le canal alpha de <strong>3 pixels vers la droite</strong> et de <strong>1 pixel vers le haut</strong>.</p>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.scroll32_inplace">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">scroll32_inplace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.scroll32_inplace" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Fait défiler une <strong>surface Pygame 32 bits</strong> <strong>horizontalement et/ou verticalement</strong> <strong>sur place</strong>.</p>
+<p>Cette fonction <strong>modifie</strong> directement la <cite>surface</cite> donnée en déplaçant les données des pixels en fonction des décalages horizontaux (<cite>dx</cite>) et verticaux (<cite>dy</cite>). Le défilement <strong>fait une boucle</strong>, ce qui signifie que les pixels déplacés au-delà des limites de la surface réapparaissent de l’autre côté.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>surface</strong> (pygame.Surface) : - Un objet <cite>pygame.Surface</cite> avec un format de pixel <strong>32 bits</strong>. - Les données de pixels de la surface seront <strong>modifiées directement</strong>.</p></li>
+<li><p><strong>dx</strong> (int, optionnel, défaut=0) : - <strong>Quantité de décalage horizontal</strong>. - <strong>Les valeurs négatives</strong> déplacent les pixels <strong>à gauche</strong>. - <strong>Les valeurs positives</strong> déplacent les pixels <strong>à droite</strong>.</p></li>
+<li><p><strong>dy</strong> (int, optionnel, défaut=0) : - <strong>Quantité de décalage vertical</strong>. - <strong>Les valeurs négatives</strong> déplacent les pixels <strong>vers le haut</strong>. - <strong>Les valeurs positives</strong> déplacent les pixels <strong>vers le bas</strong>.</p></li>
+</ul>
+<p><strong>Retourne</strong> : - <strong>None</strong> (modifie <cite>surface</cite> <strong>sur place</strong>).</p>
+<p><strong>Exceptions</strong> : - <strong>TypeError</strong> : Si <cite>surface</cite> n’est pas une <cite>pygame.Surface</cite> valide.</p>
+<p><strong>Notes</strong> :</p>
+<ul class="simple">
+<li><p>Si <cite>dx</cite> et <cite>dy</cite> sont tous deux à zéro, la fonction n’effectue <strong>aucune opération</strong>.</p></li>
+<li><p>Cette fonction garantit une <strong>modification efficace sur place</strong> sans copier de données.</p></li>
+<li><p>Le défilement est <strong>cyclique (bouclage toroïdal)</strong>, ce qui signifie que les pixels qui sortent par un bord <strong>réapparaissent</strong> sur le bord opposé.</p></li>
+</ul>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">surface</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">))</span>
+<span class="n">scroll32_inplace</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">dy</span><span class="o">=-</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># Moves 15 pixels right and 10 pixels up.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.rgb_to_int">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">rgb_to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">red</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">green</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blue</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.rgb_to_int" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Convertit les valeurs de couleur RGB en un seul entier 32 bits, similaire à la fonction <cite>pygame.map_rgb()</cite>.</p>
+<p>Cette fonction <cite>cpdef</cite> Cython permet des appels directs sans nécessiter une fonction d’accroche Python. Elle encode efficacement les valeurs rouges, vertes et bleues en une représentation d’entier compactée.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>rouge</strong> (char non signé) : - Composant de couleur rouge (0-255).</p></li>
+<li><p><strong>vert</strong> (char non signé) : - Composant de couleur verte (0-255).</p></li>
+<li><p><strong>bleu</strong> (char non signé) : - Composant de couleur bleue (0-255).</p></li>
+</ul>
+<p><strong>Retourne</strong> :</p>
+<ul class="simple">
+<li><p><strong>entier non signé</strong> : - Un entier non signé de 32 bits représentant la couleur RGB combinée.</p></li>
+</ul>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.int_to_rgb">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">int_to_rgb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.int_to_rgb" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Convertit un <strong>entier non signé de 32 bits</strong> en une <strong>représentation de couleur RGB</strong>.</p>
+<p>Cette fonction extrait les composants <strong>rouge, vert et bleu</strong> d’un <strong>format d’entier compacté</strong> (similaire à <cite>pygame.Color.unmap_rgb()</cite>) et les renvoie sous la forme d’un <strong>tuple</strong> contenant des <strong>valeurs dans la plage [0, 255]</strong>.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>n</strong> (int) : - Un <strong>entier non signé de 32 bits</strong> représentant une <strong>couleur RGB</strong>.</p></li>
+</ul>
+<p><strong>Retourne</strong> :</p>
+<ul class="simple">
+<li><p><strong>tuple (char non signé, char non signé, char non signé)</strong> : - Un tuple contenant les <strong>valeurs extraites</strong> <cite>(rouge, vert, bleu)</cite>.</p></li>
+</ul>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">int_to_rgb</span><span class="p">(</span><span class="mh">0xFF8000</span><span class="p">)</span>  <span class="c1"># Extracts (255, 128, 0) from integer.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc._randf">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">_randf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc._randf" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> :</p>
+<p>Génère un <strong>nombre à virgule flottante aléatoire</strong> dans la plage <strong>[inférieur, supérieur)</strong>.</p>
+<p>Cette fonction est une <strong>alternative optimisée</strong> à <cite>random.uniform(lower, upper)</cite>, utilisant une <strong>fonction C externe</strong> (<cite>randRangeFloat</cite>) pour améliorer les performances.</p>
+<p><strong>Note</strong> :</p>
+<ul class="simple">
+<li><p>Cette fonction fonctionne <strong>sans le GIL Python (`nogil`)</strong>, ce qui la rend <strong>sûre pour une exécution parallèle en Cython</strong>.</p></li>
+</ul>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>inférieur</strong> (float) :</p>
+<ul>
+<li><p>La <strong>borne inférieure</strong> de la plage (<strong>incluse</strong>).</p></li>
+</ul>
+</li>
+<li><p><strong>supérieur</strong> (float) :</p>
+<ul>
+<li><p>La <strong>borne supérieure</strong> de la plage (<strong>exclusive</strong>).</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Retourne</strong> : - <strong>float</strong> :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Une <strong>valeur flottante aléatoire</strong> dans la plage <strong>[inférieur, supérieur)</strong>.</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">_randf</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># Generates a random float between 0.0 and 1.0.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc._randi">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">_randi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lower</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc._randi" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Génère un <strong>entier aléatoire</strong> dans la plage <strong>[inférieur, supérieur]</strong>.</p>
+<p>Cette fonction est une <strong>alternative optimisée</strong> à <cite>random.randint(lower, upper)</cite>, utilisant une <strong>fonction C externe</strong> (<cite>randRange</cite>) pour améliorer les performances.</p>
+<p><strong>Remarques de performance</strong> :</p>
+<ul class="simple">
+<li><p>Déclarée comme <strong>`inline`</strong> pour <strong>une exécution plus rapide</strong>.</p></li>
+<li><p>Fonctionne <strong>sans le verrou global de l’interpréteur Python (`nogil`)</strong>, ce qui la rend <strong>sûre pour une exécution parallèle en Cython</strong>.</p></li>
+</ul>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>inférieur</strong> (int) : - La <strong>borne inférieure</strong> de la plage (<strong>incluse</strong>).</p></li>
+<li><p><strong>supérieur</strong> (int) : - La <strong>borne supérieure</strong> de la plage (<strong>incluse</strong>).</p></li>
+</ul>
+<p><strong>Retourne</strong> :</p>
+<ul class="simple">
+<li><p><strong>int</strong> : - Un <strong>entier aléatoire</strong> dans la plage <strong>[inférieur, supérieur]</strong>.</p></li>
+</ul>
+<p><strong>Notes importantes</strong> :</p>
+<ul class="simple">
+<li><p>La fonction <strong>ne vérifie pas</strong> si <cite>inférieur &lt;= supérieur</cite>. <strong>Une utilisation incorrecte</strong> peut entraîner un <strong>comportement indéfini</strong>, selon l’implémentation de <cite>randRange</cite>.</p></li>
+</ul>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">_randi</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1"># Generates a random integer between 1 and 10.</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.combine_rgba_buffers">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">combine_rgba_buffers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bgr_buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_rgba_buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.combine_rgba_buffers" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Combine des tampons mémoire séparés <strong>BGR</strong> et <strong>Alpha</strong> en un seul tampon <strong>RGBA</strong>.</p>
+<p>Cette fonction prend des tampons mémoire <strong>séparés BGR</strong> (Bleu-Vert-Rouge) et <strong>Alpha</strong>, les empile dans un seul <strong>tampon RGBA</strong>, et transpose éventuellement le résultat. Elle est optimisée à l’aide de <strong>Cython</strong> et parallélisée avec <strong>OpenMP</strong> pour améliorer les performances.</p>
+<p>Si <cite>transpose_output</cite> est <strong>True</strong>, la vue mémoire de sortie est inversée en échangeant les lignes et les colonnes.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>w</strong> (int) : - La <strong>largeur</strong> de la texture.</p></li>
+<li><p><strong>h</strong> (int) : - La <strong>hauteur</strong> de la texture.</p></li>
+<li><p><strong>bgr_buffer</strong> (memoryview [char non signé [::1]]): - Une <strong>vue mémoire 1D continue</strong> contenant les <strong>valeurs BGR</strong> packagées (uint8). - Taille attendue : <cite>largeur * hauteur * 3</cite>.</p></li>
+<li><p><strong>alpha_channel</strong> (memoryview [char non signé [::1]]): - Une <strong>vue mémoire 1D continue</strong> contenant les <strong>valeurs alpha</strong> (uint8). - Taille attendue : <cite>largeur * hauteur</cite>.</p></li>
+<li><p><strong>output_rgba_buffer</strong> (memoryview [char non signé [::1]]): - Une <strong>vue mémoire 1D préallouée</strong> pour stocker les <strong>valeurs RGBA</strong> résultantes (uint8). - Taille attendue : <cite>largeur * hauteur * 4</cite>.</p></li>
+<li><p><strong>transpose_output</strong> (booléen, optionnel, par défaut=False) : - Si <strong>True</strong>, le <strong>tampon RGBA résultant</strong> est transposé (retourné).</p></li>
+</ul>
+<p><strong>Retourne</strong> : - <strong>memoryview [char non signé [::1]]</strong> :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Une <strong>vue mémoire continue</strong> contenant les <strong>valeurs de pixels RGBA</strong> combinées (uint8).</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Lève</strong> :</p>
+<ul class="simple">
+<li><p><strong>ValueError</strong> :</p>
+<ul>
+<li><p>Si <cite>w</cite> ou <cite>h</cite> est <strong>non positif</strong>.</p></li>
+<li><p>Si la taille de <cite>bgr_buffer</cite> ne correspond pas à <cite>largeur * hauteur * 3</cite>.</p></li>
+<li><p>Si la taille de <cite>alpha_channel</cite> ne correspond pas à <cite>largeur * hauteur</cite>.</p></li>
+<li><p>Si <cite>output_rgba_buffer</cite> n’est pas suffisamment grand pour stocker <cite>largeur * hauteur * 4</cite>.</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Notes</strong> :</p>
+<ul class="simple">
+<li><p>Utilise <strong>`memcpy`</strong> pour <strong>un copier de mémoire efficace</strong>.</p></li>
+<li><p>Prend en charge la <strong>transposition</strong> optionnelle du tampon.</p></li>
+<li><p>Conçu pour des <strong>applications nécessitant des performances critiques</strong>.</p></li>
+</ul>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rgba_buffer</span> <span class="o">=</span> <span class="n">combine_rgba_buffers</span><span class="p">(</span>
+    <span class="n">w</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="n">bgr_buffer</span><span class="o">=</span><span class="n">bgr_data</span><span class="p">,</span>
+    <span class="n">alpha_channel</span><span class="o">=</span><span class="n">alpha_data</span><span class="p">,</span>
+    <span class="n">output_rgba_buffer</span><span class="o">=</span><span class="n">output_data</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.normalize_2d_array">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">normalize_2d_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array2d</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.normalize_2d_array" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Normalise un <strong>tableau 2D</strong> d’entiers non signés de 8 bits (<strong>uint8</strong>) en valeurs flottantes dans la plage <strong>[0, 1]</strong>.</p>
+<p>Cette fonction prend un <strong>tableau 2D</strong> de forme <cite>(largeur, hauteur)</cite> contenant des <strong>valeurs uint8</strong> (0-255) et le convertit en un <strong>MemoryViewSlice (tableau 2D)</strong> de nombres à virgule flottante, où chaque valeur est mise à l’échelle dans la plage <strong>[0, 1]</strong>.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>array2d</strong> (memoryview [unsigned char[:, :]]): - Un <strong>tableau 2D</strong> de forme <cite>(largeur, hauteur)</cite> contenant des <strong>valeurs uint8</strong> représentant l’intensité des pixels.</p></li>
+</ul>
+<p><strong>Retourne</strong> : - <strong>memoryview [float[:, :]]</strong> :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Un <strong>tableau 2D</strong> de forme <cite>(largeur, hauteur)</cite> avec des <strong>valeurs flottantes</strong> normalisées dans la plage [0, 1].</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Lève</strong> :</p>
+<ul class="simple">
+<li><p><strong>ValueError</strong> : - Si le tableau d’entrée n’a pas <strong>exactement deux dimensions</strong>.</p></li>
+</ul>
+<p><strong>Notes</strong> : - Utilise <strong>`prange`</strong> avec <strong>OpenMP</strong> pour des <strong>opérations parallélisées</strong> afin d’améliorer les performances. - Effectue une normalisation élément par élément en utilisant la constante <cite>ONE_255 = 1/255.0</cite>. - Conçu pour un <strong>traitement d’image rapide</strong> et des <strong>applications d’apprentissage automatique</strong>.</p>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">normalized_array</span> <span class="o">=</span> <span class="n">normalize_2d_array</span><span class="p">(</span><span class="n">array2d</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.generate_spectrum_surface">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">generate_spectrum_surface</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.generate_spectrum_surface" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Crée une <strong>surface pygame</strong> affichant le <strong>spectre lumineux</strong> allant de <strong>380 à 750 nm</strong>.</p>
+<p>La fonction visualise le spectre lumineux en affichant les couleurs correspondant à des longueurs d’onde spécifiques. Le spectre comprend les zones de couleur suivantes :</p>
+<ul class="simple">
+<li><p><strong>Rouge</strong> : 620-750 nm, 484-400 THz</p></li>
+<li><p><strong>Orange</strong> : 590-620 nm, 508-484 THz</p></li>
+<li><p><strong>Jaune</strong> : 570-590 nm, 526-508 THz</p></li>
+<li><p><strong>Vert</strong> : 495-570 nm, 606-526 THz</p></li>
+<li><p><strong>Bleu</strong> : 450-495 nm, 668-606 THz</p></li>
+<li><p><strong>Violet</strong> : 380-450 nm, 789-668 THz</p></li>
+</ul>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>largeur</strong> (int) : - La largeur de la surface (image) en pixels.</p></li>
+<li><p><strong>hauteur</strong> (int) : - La hauteur de la surface (image) en pixels.</p></li>
+<li><p><strong>gamma</strong> (float, optionnel, par défaut=1.0) : - La valeur gamma pour ajuster la couleur.</p></li>
+</ul>
+<p><strong>Retour</strong> : - <strong>pygame.Surface</strong> :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Une <strong>surface pygame de 24 bits</strong> de forme <cite>(largeur, hauteur)</cite> contenant le spectre lumineux. Elle est optimisée pour des opérations <strong>blit</strong> rapides.</p></li>
+</ul>
+</div></blockquote>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spectrum_surface</span> <span class="o">=</span> <span class="n">generate_spectrum_surface</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.bubble_sort">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">bubble_sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.bubble_sort" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> :</p>
+<p>Trie un tableau de <strong>caractères non signés</strong> (par exemple, octets ou valeurs de pixels) en utilisant l”<strong>algorithme de tri à bulles</strong>.</p>
+<p>Le tri à bulles compare itérativement les éléments adjacents dans le tableau et les échange si nécessaire. Le processus continue jusqu’à ce que le tableau soit entièrement trié. L’algorithme s’arrête lorsqu’aucun échange n’est effectué pendant un passage complet.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>nums</strong> (unsigned char [::1]) : - Une vue mémoire ou un tableau unidimensionnel de valeurs de caractères non signés à trier. Typiquement, ce tableau représente des valeurs d’octets ou des données de pixels (par exemple, valeurs RVB).</p></li>
+<li><p><strong>taille</strong> (int) : - Le nombre d’éléments dans le tableau <cite>nums</cite> à trier.</p></li>
+</ul>
+<p><strong>Retourne</strong> :</p>
+<ul class="simple">
+<li><p><strong>None</strong> : - Cette fonction trie le tableau <strong>sur place</strong>. Aucune valeur n’est retournée ; le tableau d’entrée est modifié directement.</p></li>
+</ul>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nums</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<span class="n">bubble_sort</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span>
+<span class="c1"># Output: bytearray(b&#39;\x01\x02\x03\x04\x05&#39;)</span>
+</pre></div>
+</div>
+<p><strong>Notes</strong> : - Il s’agit d’un <strong>algorithme de tri sur place</strong>, ce qui signifie qu’il modifie le tableau d’origine. - Le tri à bulles n’est pas l’algorithme de tri le plus efficace, mais il est simple à implémenter. - L’algorithme fonctionne en <strong>O(n^2)</strong> dans les pires et moyennes situations, ce qui le rend moins efficace pour de grands ensembles de données.</p>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.insertion_sort">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">insertion_sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.insertion_sort" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Trie un tableau d’éléments de <strong>caractères non signés</strong> en utilisant l”<strong>algorithme de tri par insertion</strong>.</p>
+<p>Le tri par insertion parcourt le tableau, prend chaque élément un par un, et l’insère dans la portion triée du tableau en déplaçant les autres éléments en conséquence. Cette implémentation utilise le <strong>traitement parallèle</strong> pour améliorer les performances.</p>
+<p><strong>Exemple d’utilisation</strong> :</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nums</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
+<span class="n">insertion_sort</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nums</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>nums</strong> (unsigned char [::1]) : - Un tableau numpy 1D ou une vue mémoire de caractères non signés (uint8), représentant le tableau à trier.</p></li>
+<li><p><strong>taille</strong> (int) : - La taille du tableau <cite>nums</cite>. Elle spécifie le nombre d’éléments dans le tableau.</p></li>
+</ul>
+<p><strong>Retourne</strong> :</p>
+<ul class="simple">
+<li><p><strong>None</strong> : - Cette fonction trie le tableau <strong>sur place</strong>. Aucune valeur n’est retournée ; le tableau d’entrée est modifié directement.</p></li>
+</ul>
+<p><strong>Notes</strong> : - L’algorithme fonctionne avec une complexité temporelle de <strong>O(n^2)</strong> dans les pires et moyennes situations, ce qui le rend moins efficace pour de grands ensembles de données. - Le tri par insertion est particulièrement efficace pour les petits ensembles de données ou les tableaux déjà presque triés. - Le traitement parallèle est utilisé dans cette implémentation pour améliorer les performances.</p>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.partition_cython">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">partition_cython</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.partition_cython" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Fonction de partition pour l”<strong>algorithme de tri rapide</strong>.</p>
+<p>Cette fonction sélectionne un élément pivot et partitionne le tableau d’entrée <cite>nums</cite> de sorte que tous les éléments inférieurs au pivot sont déplacés vers la gauche, et tous les éléments supérieurs au pivot sont déplacés vers la droite. Elle retourne l’indice du point de partition.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>nums</strong> (unsigned char [::1]) : - Une vue mémoire 1D de valeurs de caractères non signés, représentant le tableau d’entrée à partitionner.</p></li>
+<li><p><strong>low</strong> (int) : - L’indice de début du sous-tableau à partitionner.</p></li>
+<li><p><strong>high</strong> (int) : - L’indice de fin du sous-tableau à partitionner.</p></li>
+</ul>
+<p><strong>Retourne</strong> :</p>
+<ul class="simple">
+<li><p><strong>int</strong> : - L’indice du point de partition dans le tableau.</p></li>
+</ul>
+<p><strong>Notes</strong> : - Cette fonction est utilisée dans le cadre de l’algorithme de tri rapide. - Elle garantit que les éléments inférieurs au pivot sont à gauche, et les éléments supérieurs au pivot sont à droite.</p>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc._quick_sort">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">_quick_sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc._quick_sort" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Implémentation du tri rapide <strong>sur place</strong> pour un tableau de valeurs de caractères non signés.</p>
+<p>Cette fonction trie récursivement le tableau <cite>items</cite> en sélectionnant un pivot et partitionnant le tableau de sorte que les éléments plus petits que le pivot se déplacent vers la gauche et les éléments plus grands se déplacent vers la droite. Elle est optimisée pour réduire la profondeur de récursion en triant d’abord la plus petite partition.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>items</strong> (unsigned char [::1]) : - Une vue mémoire 1D de valeurs de caractères non signés, représentant le tableau d’entrée à trier.</p></li>
+<li><p><strong>low</strong> (unsigned int) : - L’indice de début du sous-tableau à trier.</p></li>
+<li><p><strong>high</strong> (unsigned int) : - L’indice de fin du sous-tableau à trier.</p></li>
+</ul>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.heapify">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">heapify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heap_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">root_index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.heapify" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Fonction <cite>heapify</cite> itérative ultra-optimisée pour maintenir la propriété de tas maximal.</p>
+<p>Cette fonction « filtre vers le bas » la valeur à l’indice de racine donné afin que le sous-arbre ancré à cet indice devienne un tas maximal valide. On suppose que les sous-arbres en dessous sont déjà des tas valides. Pour un tri par tas complet, assurez-vous de construire le tas en appelant cette fonction sur tous les nœuds non-feuilles dans l’ordre inverse.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>nums</strong> (unsigned char [::1]) : - Une vue mémoire 1D de valeurs de caractères non signés, représentant le tas.</p></li>
+<li><p><strong>heap_size</strong> (unsigned int) : - Le nombre d’éléments dans le tas.</p></li>
+<li><p><strong>root_index</strong> (unsigned int) : - L’indice du nœud racine du sous-arbre à <cite>heapifier</cite>.</p></li>
+</ul>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="Misc.heap_sort">
+<span class="sig-prename descclassname"><span class="pre">Misc.</span></span><span class="sig-name descname"><span class="pre">heap_sort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nums</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#Misc.heap_sort" title="Lien vers cette définition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Résumé</strong> : Effectue un tri par tas sur place sur un tableau de valeurs de caractères non signés.</p>
+<p>Cette fonction construit d’abord un tas maximal à partir du tableau d’entrée, garantissant que l’élément le plus grand se trouve à la racine. Ensuite, elle extrait de manière répétée l’élément maximum (en l’échangeant avec le dernier élément) et re-heapifie le tas réduit pour maintenir les propriétés du tas jusqu’à ce que le tableau entier soit trié.</p>
+<p><strong>Complexité temporelle</strong> : - Construction du tas : O(n) - Extraction et re-heapification : O(n log n) - Globalement : O(n log n)</p>
+<p><strong>Complexité spatiale</strong> : O(1) (tri sur place)</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><strong>nums</strong> (unsigned char [::1]) : - Une vue mémoire 1D de valeurs de caractères non signés à trier.</p></li>
+<li><p><strong>n</strong> (unsigned int) : - Le nombre d’éléments dans le tableau.</p></li>
+</ul>
+</dd></dl>
+
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table des matières</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Misc</a><ul>
+<li><a class="reference internal" href="#python-library-summary">1. Résumé de la bibliothèque Python</a></li>
+<li><a class="reference internal" href="#overall-purpose-of-the-library">2. Objectif global de la bibliothèque</a></li>
+<li><a class="reference internal" href="#use-cases">3. Cas d’utilisation</a></li>
+<li><a class="reference internal" href="#conclusion">4. Conclusion</a></li>
+<li><a class="reference internal" href="#cython-list-methods">5. Méthodes de liste Cython</a><ul>
+<li><a class="reference internal" href="#Misc.swap_image_channels"><code class="docutils literal notranslate"><span class="pre">swap_image_channels()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.create_line_gradient_rgb"><code class="docutils literal notranslate"><span class="pre">create_line_gradient_rgb()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.create_line_gradient_rgba"><code class="docutils literal notranslate"><span class="pre">create_line_gradient_rgba()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.horizontal_rgb_gradient"><code class="docutils literal notranslate"><span class="pre">horizontal_rgb_gradient()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.horizontal_rgba_gradient"><code class="docutils literal notranslate"><span class="pre">horizontal_rgba_gradient()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.create_radial_gradient"><code class="docutils literal notranslate"><span class="pre">create_radial_gradient()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.create_radial_gradient_alpha"><code class="docutils literal notranslate"><span class="pre">create_radial_gradient_alpha()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.create_quarter_radial_gradient"><code class="docutils literal notranslate"><span class="pre">create_quarter_radial_gradient()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.create_quarter_radial_gradient_alpha"><code class="docutils literal notranslate"><span class="pre">create_quarter_radial_gradient_alpha()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.scroll_surface_24bit"><code class="docutils literal notranslate"><span class="pre">scroll_surface_24bit()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.scroll24_inplace"><code class="docutils literal notranslate"><span class="pre">scroll24_inplace()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.scroll_rgb_array_inplace"><code class="docutils literal notranslate"><span class="pre">scroll_rgb_array_inplace()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.scroll_alpha_inplace"><code class="docutils literal notranslate"><span class="pre">scroll_alpha_inplace()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.scroll32_inplace"><code class="docutils literal notranslate"><span class="pre">scroll32_inplace()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.rgb_to_int"><code class="docutils literal notranslate"><span class="pre">rgb_to_int()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.int_to_rgb"><code class="docutils literal notranslate"><span class="pre">int_to_rgb()</span></code></a></li>
+<li><a class="reference internal" href="#Misc._randf"><code class="docutils literal notranslate"><span class="pre">_randf()</span></code></a></li>
+<li><a class="reference internal" href="#Misc._randi"><code class="docutils literal notranslate"><span class="pre">_randi()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.combine_rgba_buffers"><code class="docutils literal notranslate"><span class="pre">combine_rgba_buffers()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.normalize_2d_array"><code class="docutils literal notranslate"><span class="pre">normalize_2d_array()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.generate_spectrum_surface"><code class="docutils literal notranslate"><span class="pre">generate_spectrum_surface()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.bubble_sort"><code class="docutils literal notranslate"><span class="pre">bubble_sort()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.insertion_sort"><code class="docutils literal notranslate"><span class="pre">insertion_sort()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.partition_cython"><code class="docutils literal notranslate"><span class="pre">partition_cython()</span></code></a></li>
+<li><a class="reference internal" href="#Misc._quick_sort"><code class="docutils literal notranslate"><span class="pre">_quick_sort()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.heapify"><code class="docutils literal notranslate"><span class="pre">heapify()</span></code></a></li>
+<li><a class="reference internal" href="#Misc.heap_sort"><code class="docutils literal notranslate"><span class="pre">heap_sort()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Sujet précédent</h4>
+    <p class="topless"><a href="Palette.html"
+                          title="Chapitre précédent">Palette</a></p>
+  </div>
+  <div>
+    <h4>Sujet suivant</h4>
+    <p class="topless"><a href="GaussianBlur5x5.html"
+                          title="Chapitre suivant">GaussianBlur5x5</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>Cette page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Misc.rst.txt"
+            rel="nofollow">Montrer le code source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Recherche rapide</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="Index général"
+             >index</a></li>
+        <li class="right" >
+          <a href="GaussianBlur5x5.html" title="GaussianBlur5x5"
+             >suivant</a> |</li>
+        <li class="right" >
+          <a href="Palette.html" title="Palette"
+             >précédent</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Documentation PygameShader 1.0.11</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Misc</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Créé en utilisant <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>

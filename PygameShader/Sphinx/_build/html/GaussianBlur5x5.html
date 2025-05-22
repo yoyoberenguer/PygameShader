@@ -1,0 +1,747 @@
+
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GaussianBlur5x5 &#8212; PygameShader 1.0.11 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d75fae25" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=5283bb3d" />
+    
+    <script src="_static/documentation_options.js?v=9306f2a9"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="BurstSurface" href="BurstSurface.html" />
+    <link rel="prev" title="Misc" href="Misc.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="BurstSurface.html" title="BurstSurface"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Misc.html" title="Misc"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">GaussianBlur5x5</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="gaussianblur5x5">
+<h1>GaussianBlur5x5<a class="headerlink" href="#gaussianblur5x5" title="Link to this heading">¶</a></h1>
+<p><code class="xref py py-mod docutils literal notranslate"><span class="pre">GaussianBlur5x5.pyx</span></code></p>
+<hr class="docutils" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="summary-of-the-library">
+<h2>1. Summary of the Library<a class="headerlink" href="#summary-of-the-library" title="Link to this heading">¶</a></h2>
+<p>This Python library provides fast and efficient <strong>image processing</strong> functions,
+focusing on <strong>blurring</strong>, <strong>Gaussian filtering</strong>, and <strong>edge detection</strong>.
+It is implemented in <strong>Cython</strong> for high performance, making it ideal for applications
+in <strong>computer vision</strong>, <strong>graphics</strong>, and <strong>image preprocessing</strong>.</p>
+</section>
+<section id="purpose">
+<h2>2. Purpose<a class="headerlink" href="#purpose" title="Link to this heading">¶</a></h2>
+<p>The library is designed to perform fast blurring and edge detection, which are essential for:</p>
+<ul class="simple">
+<li><p><strong>Noise reduction</strong> (smoothing images).</p></li>
+<li><p><strong>Edge detection</strong> (for object recognition and feature extraction).</p></li>
+<li><p><strong>Graphics effects</strong> (motion blur, bloom effects).</p></li>
+<li><p><strong>Preprocessing for computer vision tasks</strong> (image segmentation, filtering).</p></li>
+</ul>
+</section>
+<section id="main-features">
+<h2>3. Main Features<a class="headerlink" href="#main-features" title="Link to this heading">¶</a></h2>
+<p><strong>Blurring Functions</strong></p>
+<p>These functions apply various types of blurring to smooth images:</p>
+<ul class="simple">
+<li><p><strong>`blur(surface_, npass)`</strong>:</p></li>
+</ul>
+<p>Blurs an image surface, where <cite>npass</cite> controls intensity.</p>
+<ul class="simple">
+<li><p><strong>`blur3d(rgb_array, npass)`</strong>:</p></li>
+</ul>
+<p>Blurs a 3D (RGB) image array.</p>
+<ul class="simple">
+<li><p><strong>`blur1d(bgr_array, width, height, npass, format_32)`</strong>:</p></li>
+</ul>
+<p>Optimized 1D blurring for efficiency.</p>
+<ul class="simple">
+<li><p><strong>`blur1d_cp(bgr_array, width, height, npass, format_32)`</strong>:</p></li>
+</ul>
+<p>Returns a new blurred array instead of modifying in-place.</p>
+<ul class="simple">
+<li><p><strong>`blur4bloom_c(surface_, npass, tmp_array)`</strong>:</p></li>
+</ul>
+<p>Likely used for bloom effects, enhancing bright areas.</p>
+<p>Several internal <strong>Cython-optimized</strong> versions (<cite>blur3d_c</cite>, <cite>blur1d_c</cite>, etc.) run without the <strong>Global Interpreter Lock (GIL)</strong> for multi-threading support.</p>
+<p><strong>Gaussian Filtering</strong></p>
+<ul class="simple">
+<li><p><strong>`gauss_filter24(surface_)`</strong>:</p></li>
+</ul>
+<p>Applies Gaussian blur to a 24-bit image.</p>
+<ul class="simple">
+<li><p><strong>`gauss_filter32(surface_)`</strong>:</p></li>
+</ul>
+<p>Applies Gaussian blur to a 32-bit image.</p>
+<p>📌 <strong>Why Gaussian Blur?</strong></p>
+<p>It helps smooth images before edge detection, reducing false edges caused by noise.</p>
+<p><strong>Edge Detection (Canny Algorithm)</strong></p>
+<p>The <strong>Canny algorithm</strong> is widely used in computer vision to detect object boundaries.</p>
+<ul class="simple">
+<li><p><strong>`canny3d(rgb_array, threshold, low, high)`</strong>:</p></li>
+</ul>
+<p>Detects edges in an RGB image.</p>
+<ul class="simple">
+<li><p><strong>`canny1d(bgr_array, width, height, format_32, threshold)`</strong>:</p></li>
+</ul>
+<p>Detects edges in a linear 1D image representation for efficiency.</p>
+<p>There are also <strong>Cython-optimized</strong> versions (<cite>canny3d_c</cite>, <cite>canny1d_c</cite>) that improve performance using multi-threading.</p>
+<p><strong>Optimization Features</strong></p>
+<ul class="simple">
+<li><p><strong>Cython-based</strong> (<cite>cdef</cite>, <cite>cpdef</cite>, <cite>nogil</cite>) → Direct C-level performance.</p></li>
+<li><p><strong>In-place operations</strong> (<cite>blur1d</cite>, <cite>blur3d</cite>) → Saves memory.</p></li>
+<li><p><strong>Multi-threading</strong> (<cite>nogil</cite>) → Faster execution on multi-core processors.</p></li>
+<li><p><strong>Optimized memory handling</strong> (<cite>[::1]</cite> memory views) → Reduces Python overhead.</p></li>
+</ul>
+</section>
+<section id="use-cases">
+<h2>4. Use Cases<a class="headerlink" href="#use-cases" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Computer Vision</strong> → Object recognition, feature extraction.</p></li>
+<li><p><strong>Graphics &amp; Gaming</strong> → Motion blur, bloom effects.</p></li>
+<li><p><strong>Image Processing Pipelines</strong> → Preprocessing before machine learning models.</p></li>
+<li><p><strong>Medical Imaging</strong> → Enhancing and detecting features in scans.</p></li>
+</ul>
+</section>
+<section id="conclusion">
+<h2>5. Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
+<p>This library is highly optimized for fast blurring, Gaussian filtering, and edge detection,
+making it a great choice for <strong>computer vision</strong>, <strong>graphics</strong>, and <strong>machine learning
+applications</strong> where speed is critical.</p>
+</section>
+<section id="cython-list-methods">
+<h2>6. Cython list methods<a class="headerlink" href="#cython-list-methods" title="Link to this heading">¶</a></h2>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Parameters</strong>:
+- <cite>surface_</cite> (<em>pygame.Surface</em>): A Pygame surface object (24-bit or 32-bit).
+- <cite>npass</cite> (<em>int</em>, optional): The number of blur passes to apply (default is 1). Must be a positive integer.</p>
+<p><strong>Returns</strong>: None</p>
+<p><strong>Description</strong>:
+Apply an in-place Gaussian blur effect to a Pygame surface.</p>
+<p>This function performs a <strong>two-pass convolution</strong> using a <strong>5x5 Gaussian kernel</strong>
+to blur the input surface. The first pass applies the blur horizontally, and the
+second pass applies the blur vertically. For pixels outside the image boundaries,
+the function assigns the nearest edge value to reduce visual artifacts.</p>
+<div class="math notranslate nohighlight">
+\[\text{Horizontal pass: }
+\begin{bmatrix}
+\frac{1}{16} &amp; \frac{4}{16} &amp; \frac{6}{16} &amp; \frac{4}{16} &amp; \frac{1}{16}
+\end{bmatrix}\]</div>
+<div class="math notranslate nohighlight">
+\[\begin{split}\text{Vertical pass: }
+\begin{bmatrix}
+\frac{1}{16} \\ \frac{4}{16} \\ \frac{6}{16} \\ \frac{4}{16} \\ \frac{1}{16}
+\end{bmatrix}\end{split}\]</div>
+<p><strong>Features</strong></p>
+<ul class="simple">
+<li><p>Supports <strong>24-bit (RGB)</strong> and <strong>32-bit (RGBA)</strong> Pygame surfaces.</p></li>
+<li><p>Uses a <strong>5x5 Gaussian kernel</strong> for smoothing the image.</p></li>
+<li><p>Allows <strong>multiple passes</strong> (<cite>npass &gt; 1</cite>) for enhanced blur intensity.</p></li>
+<li><p>Ignores the <strong>alpha channel</strong> during processing to avoid altering transparency.</p></li>
+</ul>
+<p><strong>Parameters</strong></p>
+<ul class="simple">
+<li><p><strong>surface_</strong> (<em>pygame.Surface</em>):
+A Pygame surface object to which the blur effect will be applied. It must be either
+<strong>24-bit RGB</strong> or <strong>32-bit RGBA</strong>. The function modifies the surface in-place.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, optional):
+The number of blur passes to apply. Default is <strong>1</strong>.
+Must be a <strong>positive integer</strong> (<cite>npass &gt; 0</cite>).
+Multiple passes result in a stronger blur effect but may increase processing time.</p></li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul class="simple">
+<li><p><strong>None</strong> – The function modifies <cite>surface_</cite> in place, with no return value.</p></li>
+</ul>
+<p><strong>Raises</strong></p>
+<ul class="simple">
+<li><p><strong>TypeError</strong>:
+If <cite>surface_</cite> is not a valid <cite>pygame.Surface</cite> object.</p></li>
+<li><p><strong>ValueError</strong>:
+If the surface format is incompatible (e.g., non-24-bit or non-32-bit format) or cannot be processed.</p></li>
+<li><p><strong>ValueError</strong>:
+If <cite>npass</cite> is not a positive integer (<cite>npass &lt;= 0</cite>).</p></li>
+</ul>
+<p><strong>Implementation Details</strong></p>
+<ul class="simple">
+<li><p>The function accesses the pixel buffer of the surface directly using <cite>get_view(‘3’)</cite>,
+which allows it to process <strong>only the RGB channels</strong>, ignoring the alpha channel.</p></li>
+<li><p>It calls an optimized Cython function, <cite>blur3d_c()</cite>, to perform the in-place blurring with minimal overhead.</p></li>
+<li><p>If <cite>npass &gt; 1</cite>, multiple blur passes are applied for a stronger effect, but this increases the processing time.</p></li>
+</ul>
+<p><strong>Memory Efficiency</strong></p>
+<ul class="simple">
+<li><p>This function is <strong>memory-efficient</strong>, as it operates directly on the surface buffer without creating additional copies of the image data.</p></li>
+<li><p>If the surface has an <strong>alpha channel</strong>, it is <strong>ignored</strong> during processing, meaning any transparency information will remain unchanged.</p></li>
+</ul>
+<p><strong>Performance Considerations</strong></p>
+<ul class="simple">
+<li><p>The function is optimized using Cython to minimize overhead and improve performance.</p></li>
+<li><p>It supports <strong>multi-threading</strong> when using Cython’s <cite>nogil</cite> feature for enhanced execution speed on multi-core systems.</p></li>
+</ul>
+<p><strong>Example Usage</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pygame</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">your_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">blur</span>
+
+<span class="c1"># Create a 24-bit Pygame surface</span>
+<span class="n">surface</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">Surface</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+<span class="c1"># Apply a single blur pass (default)</span>
+<span class="n">blur</span><span class="p">(</span><span class="n">surface</span><span class="p">)</span>
+
+<span class="c1"># Apply three blur passes for a stronger blur effect</span>
+<span class="n">blur</span><span class="p">(</span><span class="n">surface</span><span class="p">,</span> <span class="n">npass</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>See Also</strong></p>
+<ul class="simple">
+<li><p><cite>blur3d_c</cite>: Optimized Cython function for 3D image blurring.</p></li>
+<li><p><cite>gaussian_filter</cite>: Applies a Gaussian blur with more control over the kernel size.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur3d">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur3d" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Parameters</strong>:
+- <cite>rgb_array</cite> (<em>numpy.ndarray</em> or <em>memoryview slice</em>): A 3D array of shape <cite>(w, h, n)</cite>, representing an image in RGB(A) format.
+- <cite>npass</cite> (<em>int</em>, optional): The number of blur passes to apply (<strong>default is `1`</strong>). More passes result in a stronger blur.</p>
+<p><strong>Returns</strong>: None</p>
+<p><strong>Description</strong></p>
+<p>Apply an in-place Gaussian blur to a <strong>3D image array or memoryview slice</strong>.</p>
+<p>This function performs a <strong>Gaussian blur</strong> on an image represented as a 3D array with shape <cite>(w, h, n)</cite>,
+where <cite>w</cite> and <cite>h</cite> are the width and height, and <cite>n</cite> is the number of color channels (typically <strong>3 for RGB</strong> or <strong>4 for RGBA</strong>).
+It uses a <strong>5x5 Gaussian kernel</strong> for smoothing, applied through <strong>two-pass convolution</strong> (horizontal + vertical).
+The function modifies the input array in-place, avoiding unnecessary memory allocation.</p>
+<p><strong>Features</strong></p>
+<ul class="simple">
+<li><p>Supports <strong>RGB(A) image data</strong> with any number of channels (<cite>n = 3</cite> for RGB, <cite>n = 4</cite> for RGBA).</p></li>
+<li><p>Performs <strong>Gaussian blur</strong> using a <strong>5x5 convolution kernel</strong>.</p></li>
+<li><p>Uses <strong>two-pass convolution</strong> (horizontal and vertical) for an efficient blur.</p></li>
+<li><p>Handles <strong>edge pixels</strong> by setting them to the nearest edge values.</p></li>
+<li><p>Allows <strong>multiple blur passes</strong> (<cite>npass &gt; 1</cite>) for increased smoothing.</p></li>
+</ul>
+<p><strong>Parameters</strong></p>
+<ul class="simple">
+<li><p><strong>rgb_array</strong> (<em>numpy.ndarray</em> or <em>memoryview slice</em>):
+A <strong>3D array</strong> of shape <cite>(w, h, n)</cite>, containing <strong>uint8</strong> values representing the image in <strong>RGB(A) format</strong>.
+The function modifies this array in-place.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, optional):
+The number of blur passes to apply. <strong>Default is `1`</strong>.
+Higher values will <strong>increase blur strength</strong> but require more processing time.</p></li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul class="simple">
+<li><p><strong>None</strong> – The function modifies <cite>rgb_array</cite> in place and does not return anything.</p></li>
+</ul>
+<p><strong>Implementation Details</strong></p>
+<ul class="simple">
+<li><p>The function applies a <strong>5x5 Gaussian blur</strong> using the kernel:</p></li>
+</ul>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\frac{1}{256}
+\begin{bmatrix}
+1  &amp;  4  &amp;  6  &amp;  4  &amp;  1  \\
+4  &amp; 16  &amp; 24  &amp; 16  &amp;  4  \\
+6  &amp; 24  &amp; 36  &amp; 24  &amp;  6  \\
+4  &amp; 16  &amp; 24  &amp; 16  &amp;  4  \\
+1  &amp;  4  &amp;  6  &amp;  4  &amp;  1
+\end{bmatrix}\end{split}\]</div>
+</div></blockquote>
+<ul class="simple">
+<li><p>Uses <strong>two-pass convolution</strong> (horizontal and vertical) to apply the blur efficiently.</p></li>
+<li><p>Handles <strong>edge pixels</strong> by assigning the <strong>nearest edge values</strong> to prevent artifacts.</p></li>
+<li><p>Optimized for <strong>image processing</strong>, <strong>real-time rendering</strong>, and <strong>graphics effects</strong>.</p></li>
+</ul>
+<p><strong>Memory Efficiency</strong></p>
+<ul class="simple">
+<li><p>Operates <strong>directly on the image buffer</strong>, avoiding extra memory allocations.</p></li>
+<li><p>Can be used on large images without significant memory overhead.</p></li>
+<li><p>Optimized using <strong>Cython</strong> for high performance.</p></li>
+</ul>
+<p><strong>Example Usage</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">your_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">blur3d</span>
+
+<span class="c1"># Create a sample 3D RGB image array (100x100 with 3 channels)</span>
+<span class="n">rgb_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+<span class="c1"># Apply a single blur pass</span>
+<span class="n">blur3d</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">)</span>
+
+<span class="c1"># Apply multiple blur passes for stronger blur effect</span>
+<span class="n">blur3d</span><span class="p">(</span><span class="n">rgb_image</span><span class="p">,</span> <span class="n">npass</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Use Cases</strong></p>
+<ul class="simple">
+<li><p><strong>Computer Vision</strong> → Preprocessing for image segmentation and object detection.</p></li>
+<li><p><strong>Graphics &amp; Gaming</strong> → Motion blur, bloom effects, and real-time rendering.</p></li>
+<li><p><strong>Image Processing Pipelines</strong> → Reducing noise and enhancing visual quality.</p></li>
+<li><p><strong>Medical Imaging</strong> → Smoothing image data before feature extraction.</p></li>
+</ul>
+<p><strong>See Also</strong></p>
+<ul class="simple">
+<li><p><cite>blur</cite> → Blurs a Pygame surface directly.</p></li>
+<li><p><cite>gauss_filter24</cite> → Applies Gaussian filtering to a 24-bit image.</p></li>
+<li><p><cite>canny3d</cite> → Performs edge detection on an RGB image.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p><strong>Apply an in-place Gaussian blur to a 1D array or memoryview slice representing pixel data.</strong></p>
+<p>This function applies a <strong>Gaussian blur</strong> on a 1D array (or memoryview slice) with shape <cite>(w,)</cite>,
+where <cite>w</cite> is the number of pixels. The array can represent either <strong>BGR</strong> (24-bit) or <strong>BGRA</strong> (32-bit)
+pixel formats or any other format compatible with the <cite>uint8</cite> data type. The blur operation is
+performed <strong>in-place</strong> on the provided array.</p>
+<p>The function performs <strong>npass</strong> passes of convolution using a <strong>5x5 Gaussian kernel</strong>. This can be
+useful for image processing tasks where you need to apply a blur effect, especially on pixel data
+represented as a 1D array (such as when the image data is flattened).</p>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><strong>bgr_array</strong> (<em>1D numpy.ndarray</em> or <em>memoryview slice</em>):
+A 1D array or memoryview slice with shape <cite>(w,)</cite> containing pixel data (e.g., in <strong>BGR(A)</strong> or any other
+pixel format). The array should be of type <strong>uint8</strong>.</p></li>
+<li><p><strong>width</strong> (<em>int</em>):
+The width (<cite>w</cite>) of the original image. Used for proper handling during the blur operation.</p></li>
+<li><p><strong>height</strong> (<em>int</em>):
+The height (<cite>h</cite>) of the original image. Required for correct image processing.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, optional):
+The number of blur passes to apply. <strong>Default is 1 pass</strong>. More passes result in a stronger blur.</p></li>
+<li><p><strong>format_32</strong> (<em>bool</em>):
+A flag indicating whether the pixel format is <strong>BGR (24-bit)</strong> or <strong>BGRA (32-bit)</strong>.
+<cite>False</cite> for <strong>BGR (24-bit)</strong> (3 channels) and <cite>True</cite> for <strong>BGRA (32-bit)</strong> (4 channels).</p></li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul class="simple">
+<li><p><strong>None</strong>:
+The function performs the blur in-place on <cite>bgr_array</cite> and does not return a value.</p></li>
+</ul>
+<p><strong>Notes:</strong></p>
+<ul class="simple">
+<li><p>The function uses <strong>Gaussian convolution</strong> with a 5x5 kernel used in two passes.</p></li>
+</ul>
+<div class="math notranslate nohighlight">
+\[\begin{split}\frac{1}{256} \begin{bmatrix}
+1 &amp; 4 &amp; 6 &amp; 4 &amp; 1 \\
+4 &amp; 16 &amp; 24 &amp; 16 &amp; 4 \\
+6 &amp; 24 &amp; 36 &amp; 24 &amp; 6 \\
+4 &amp; 16 &amp; 24 &amp; 16 &amp; 4 \\
+1 &amp; 4 &amp; 6 &amp; 4 &amp; 1
+\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>The image is processed in two passes (horizontal and vertical) for efficiency.</p></li>
+<li><p><strong>Edge handling</strong>: Pixels outside the image boundaries are replaced by adjacent edge values.</p></li>
+<li><p>The function operates <strong>in-place</strong>, meaning the original <cite>bgr_array</cite> is modified directly.</p></li>
+<li><p>This function is compatible with <strong>BGR</strong> and <strong>BGRA</strong> pixel formats (or other formats with the same shape and data type).</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur1d_cp">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur1d_cp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_32</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur1d_cp" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Apply a blur effect to a 1D buffer (memoryview slice) and return a copy.</p>
+<p>This function takes a <strong>1D buffer or memoryview slice</strong> containing pixel data in <strong>BGR(A)</strong> format
+(or any other compatible pixel format) and applies a <strong>Gaussian blur</strong>. The blurred result is
+returned as a new array, leaving the original buffer unmodified.</p>
+<p>The function supports both <strong>24-bit (BGR)</strong> and <strong>32-bit (BGRA)</strong> pixel formats. The <cite>format_32</cite>
+flag must be set accordingly:</p>
+<ul class="simple">
+<li><p><strong>`format_32=False`</strong> → for <strong>BGR (24-bit)</strong> format.</p></li>
+<li><p><strong>`format_32=True`</strong> → for <strong>BGRA (32-bit)</strong> format (includes an alpha channel).</p></li>
+</ul>
+<p><strong>Example Usage:</strong></p>
+<p><strong>For a 24-bit image (BGR format):</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">blur1d_cp</span><span class="p">(</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">get_buffer</span><span class="p">(),</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="n">npass</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">format_32</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="s1">&#39;BGR&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>For a 32-bit image (BGRA format):</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">blur1d_cp</span><span class="p">(</span>
+    <span class="n">source</span><span class="o">.</span><span class="n">get_buffer</span><span class="p">(),</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="n">npass</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">format_32</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">pygame</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="s1">&#39;BGRA&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><strong>bgr_array</strong> (<em>C-buffer, numpy.ndarray, or memoryview slice</em>):
+A <strong>1D array</strong> with shape <cite>(w,)</cite> containing <strong>BGR(A)</strong> pixel data (or any compatible format).</p></li>
+<li><p><strong>width</strong> (<em>int</em>):
+The width of the original image in pixels.</p></li>
+<li><p><strong>height</strong> (<em>int</em>):
+The height of the original image in pixels.</p></li>
+<li><p><strong>npass</strong> (<em>int</em>, optional):
+The number of blur passes to apply (<strong>default is 1</strong>). Increasing this value intensifies the blur effect.</p></li>
+<li><p><strong>format_32</strong> (<em>bool</em>):
+- <cite>True</cite> → <strong>BGRA (32-bit)</strong> format (includes an alpha channel).
+- <cite>False</cite> → <strong>BGR (24-bit)</strong> format.</p></li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul class="simple">
+<li><p><strong>numpy.ndarray</strong> or <strong>memoryview slice</strong> (<cite>shape (w,)</cite>, <cite>dtype=uint8</cite>):
+A <strong>blurred copy</strong> of the input array, maintaining the original pixel format.</p></li>
+</ul>
+<p><strong>Notes:</strong></p>
+<ul class="simple">
+<li><p>This function does <strong>not modify the input buffer</strong>; it returns a <strong>new</strong> blurred array.</p></li>
+<li><p>The blur operation uses <strong>Gaussian convolution</strong> in multiple passes.</p></li>
+<li><p>The <strong>pixel format of the output array is identical</strong> to the input buffer.</p></li>
+<li><p>Providing an appropriate <cite>format_32</cite> flag ensures correct handling of alpha transparency.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.gauss_filter24">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">gauss_filter24</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.gauss_filter24" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Apply a 5x5 Gaussian filter to smooth an image or surface.
+This function performs Gaussian blurring using a 5x5 convolution kernel, which helps reduce noise
+and detail in an image. It is particularly useful for preprocessing images before edge detection
+or other computer vision tasks.</p>
+<p><strong>5x5 Gaussian Kernel:</strong></p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+5 &amp; 12 &amp; 15 &amp; 12 &amp; 5 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2
+\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>The kernel values are normalized internally to ensure proper smoothing.</p></li>
+<li><p>The filtering process preserves edges better than a simple average blur.</p></li>
+</ul>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><strong>surface_ (pygame.Surface, 24-bit or 32-bit image):</strong></p></li>
+<li><p>The input image or surface to be blurred.</p></li>
+<li><p>If a 32-bit surface (with an alpha channel) is provided, the alpha layer is ignored in the output,
+resulting in a 24-bit image.</p></li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul class="simple">
+<li><p><strong>pygame.Surface (24-bit filtered image):</strong>
+- A new blurred surface with reduced noise and smoothed pixel transitions.
+- The output image is always 24-bit, even if the input was 32-bit.</p></li>
+</ul>
+<p><strong>Notes:</strong></p>
+<ul class="simple">
+<li><p>Gaussian blur is widely used in computer vision and graphics for reducing high-frequency noise.</p></li>
+<li><p>This method is optimized for performance and maintains image integrity.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.gauss_filter32">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">gauss_filter32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">surface_</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.gauss_filter32" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Apply a 5x5 Gaussian blur filter to an image or pygame surface.
+This function smooths an image by convolving it with a 5x5 Gaussian kernel,
+reducing noise and fine details while preserving essential structures.
+5x5 Gaussian Kernel:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{bmatrix}
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+5 &amp; 12 &amp; 15 &amp; 12 &amp; 5 \\
+4 &amp; 9 &amp; 12 &amp; 9 &amp; 4 \\
+2 &amp; 4 &amp; 5 &amp; 4 &amp; 2
+\end{bmatrix}\end{split}\]</div>
+<ul class="simple">
+<li><p>The kernel values are normalized internally to ensure proper smoothing.</p></li>
+<li><p>This method helps remove high-frequency noise while retaining important image structures.</p></li>
+</ul>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><strong>surface_ (pygame.Surface, 32-bit or 24-bit image):</strong></p></li>
+<li><p>The input image or surface to be blurred.</p></li>
+<li><p>Both 24-bit (RGB) and 32-bit (RGBA) surfaces are supported.</p></li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul class="simple">
+<li><p>pygame.Surface (32-bit filtered image):</p></li>
+<li><p>A new blurred surface where pixel transitions are smoothed.</p></li>
+<li><p>If the original surface includes per-pixel transparency (alpha channel), it is preserved in the output.</p></li>
+</ul>
+<p><strong>Notes:</strong></p>
+<ul class="simple">
+<li><p>Gaussian blur is commonly used in image preprocessing, noise reduction, and artistic effects.</p></li>
+<li><p>The filtering process is optimized for performance while maintaining high image fidelity.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.canny3d">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">canny3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.canny3d" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Apply Canny edge detection to a 3D array or memoryview slice.
+The Canny edge detection algorithm is a multi-stage process that identifies edges
+in an image by detecting areas with significant intensity changes. It was developed
+by John F. Canny (1986) and remains widely used in computer vision.</p>
+<p><strong>Steps of the Canny Algorithm:</strong></p>
+<ol class="arabic simple">
+<li><p>Gradient Computation – Detects intensity changes.</p></li>
+<li><p>Non-Maximum Suppression – Removes non-edge pixels.</p></li>
+<li><p>Double Thresholding – Filters weak edges.</p></li>
+<li><p>Edge Tracking by Hysteresis – Retains strong edges.</p></li>
+</ol>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><strong>rgb_array</strong> (numpy.ndarray or memoryviewslice, shape (w, h, n), dtype uint8):
+Input image as a 3D array with RGB(A), BGRA, or other pixel formats.</p></li>
+<li><p><strong>threshold</strong> (unsigned char, default = 50):
+Lower-bound threshold to suppress weak edges in gradient magnitude.</p></li>
+<li><p><strong>low</strong> (unsigned char, default = 0):
+Lower hysteresis threshold for edge tracking.
+Weak edges below this value are discarded.</p></li>
+<li><p><strong>high</strong> (unsigned char, default = 20):
+Upper hysteresis threshold for edge tracking.
+Strong edges above this value are retained.</p></li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul class="simple">
+<li><p>pygame.Surface – A new surface/image with detected edges.</p></li>
+</ul>
+<p><strong>Notes:</strong></p>
+<ul class="simple">
+<li><p>Higher <cite>threshold</cite> values produce fewer edges (less noise).</p></li>
+<li><p>Hysteresis (<cite>low</cite>, <cite>high</cite>) ensures only meaningful edges are kept.</p></li>
+<li><p>This function supports multiple pixel formats and operates on 3D arrays directly.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.canny1d">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">canny1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bgr_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_32</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.canny1d" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Apply Canny edge detection to a 1D buffer, NumPy array, or memoryview slice.
+This function processes a flat (1D) image buffer representing a grayscale or color image
+and applies the Canny edge detection algorithm to highlight edges.</p>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><strong>bgr_array</strong> (numpy.ndarray or memoryviewslice, shape (w,), dtype uint8):
+1D buffer containing pixel data in BGR(A), BGR, or other formats.</p></li>
+<li><p><strong>width</strong> (int):
+Width of the original image in pixels.</p></li>
+<li><p><strong>height</strong> (int):
+Height of the original image in pixels.</p></li>
+<li><p><strong>format_32</strong> (bool):
+True for 32-bit buffers (BGRA, BGRA).
+False for 24-bit buffers (BGR, BGR).</p></li>
+<li><p><strong>threshold</strong> (int, default = 70):
+Gradient magnitude threshold for edge detection.
+Higher values suppress weaker edges and reduce noise.</p></li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul class="simple">
+<li><p>pygame.Surface – A new image with Canny edge detection applied.</p></li>
+</ul>
+<p><strong>Notes:</strong></p>
+<ul class="simple">
+<li><p>This function supports various pixel formats (e.g., RGB, BGR, RGBA, BGRA).</p></li>
+<li><p>Thresholding affects edge strength—adjust for optimal results.</p></li>
+<li><p>Operates directly on a 1D buffer, making it memory-efficient.</p></li>
+</ul>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="GaussianBlur5x5.blur3d_cp">
+<span class="sig-prename descclassname"><span class="pre">GaussianBlur5x5.</span></span><span class="sig-name descname"><span class="pre">blur3d_cp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rgb_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#GaussianBlur5x5.blur3d_cp" title="Link to this definition">¶</a></dt>
+<dd><div class="line-block">
+<div class="line"><br /></div>
+</div>
+<p>Apply a blur effect to a 3D numpy array or memoryviewslice (returns a copy).
+This function performs a blur operation on a 3D array, such as an image, and returns a blurred copy.
+It supports RGB(A) or other pixel formats, maintaining the original format in the returned array.</p>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><p><strong>rgb_array</strong> (numpy.ndarray or memoryviewslice, shape (w, h, n), dtype uint8):
+3D array containing pixel data in RGB(A) or any compatible pixel format (e.g., BGRA).
+The shape should be (width, height, channels) where channels typically represent color
+components (3 for RGB, 4 for RGBA, etc.).</p></li>
+</ul>
+<p><strong>Returns:</strong></p>
+<ul class="simple">
+<li><p>numpy.ndarray: A new array (blurred copy) with the same shape and pixel format as <cite>rgb_array</cite>.
+The returned array will have the same width, height, and pixel format as the input,
+but with the blur effect applied.</p></li>
+</ul>
+<p><strong>Notes:</strong></p>
+<ul class="simple">
+<li><p>The function does not modify the input array in-place; it returns a new blurred array.</p></li>
+<li><p>The output will preserve the same color channels (e.g., RGB or RGBA).</p></li>
+</ul>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">GaussianBlur5x5</a><ul>
+<li><a class="reference internal" href="#summary-of-the-library">1. Summary of the Library</a></li>
+<li><a class="reference internal" href="#purpose">2. Purpose</a></li>
+<li><a class="reference internal" href="#main-features">3. Main Features</a></li>
+<li><a class="reference internal" href="#use-cases">4. Use Cases</a></li>
+<li><a class="reference internal" href="#conclusion">5. Conclusion</a></li>
+<li><a class="reference internal" href="#cython-list-methods">6. Cython list methods</a><ul>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur"><code class="docutils literal notranslate"><span class="pre">blur()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur3d"><code class="docutils literal notranslate"><span class="pre">blur3d()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur1d_cp"><code class="docutils literal notranslate"><span class="pre">blur1d_cp()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.gauss_filter24"><code class="docutils literal notranslate"><span class="pre">gauss_filter24()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.gauss_filter32"><code class="docutils literal notranslate"><span class="pre">gauss_filter32()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.canny3d"><code class="docutils literal notranslate"><span class="pre">canny3d()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.canny1d"><code class="docutils literal notranslate"><span class="pre">canny1d()</span></code></a></li>
+<li><a class="reference internal" href="#GaussianBlur5x5.blur3d_cp"><code class="docutils literal notranslate"><span class="pre">blur3d_cp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="Misc.html"
+                          title="previous chapter">Misc</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="BurstSurface.html"
+                          title="next chapter">BurstSurface</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/GaussianBlur5x5.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="BurstSurface.html" title="BurstSurface"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Misc.html" title="Misc"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">PygameShader 1.0.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">GaussianBlur5x5</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Yoann Berenguer.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    </div>
+  </body>
+</html>
